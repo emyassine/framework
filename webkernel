@@ -79,11 +79,6 @@ final class Server
 
     public function start(): void
     {
-        if ($this->profile_lifecycle) {
-            putenv('WEBKERNEL_PROFILE_LIFECYCLE=1');
-            $_ENV['WEBKERNEL_PROFILE_LIFECYCLE'] = '1';
-        }
-
         $this->register_signals();
 
         for ($try = 0; $try < self::MAX_PORT_TRIES; $try++) {

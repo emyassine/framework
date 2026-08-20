@@ -1,8 +1,6 @@
 <?php declare(strict_types=1);
 require __DIR__ . '/../third_party/autoload.php';
-if (getenv('WEBKERNEL_PROFILE_LIFECYCLE') === '1') {
-    define('WEBKERNEL_T_AUTOLOAD', hrtime(true));
-}
+define('WEBKERNEL_T_AUTOLOAD', hrtime(true));
 ?>
 
 <!DOCTYPE html>
