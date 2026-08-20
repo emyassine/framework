@@ -73,4 +73,3 @@ php -r "echo opcache_get_status()['opcache_enabled'] ? 'OPcache Active' : 'OPcac
 ## Development Modules (`x-webkernel-dev`)
 
 All internal development components, experimental software, and modular packages reside under `x-webkernel-dev/`. Path repositories inside `composer.json` symlink these directories directly to maintain local synchronization without remote repository pulls.
-# framework
