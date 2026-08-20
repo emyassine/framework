@@ -9,7 +9,7 @@ Route::get('/', function () {
 
 Route::get('/invoices/{id}', InvoicePage::class)
     ->name('invoices.show')
-    ->whereNumber('id')
+    ->where_number('id')
     ->panel('accounting')
     ->cluster('sales')
     ->resource('invoice')

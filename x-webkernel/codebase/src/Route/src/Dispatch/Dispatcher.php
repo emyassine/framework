@@ -1,6 +1,8 @@
 <?php declare(strict_types=1);
 
-namespace Webkernel\Route;
+namespace Webkernel\Route\Dispatch;
+
+use Webkernel\Route\Compile\Generator;
 
 /**
  * MarkBased dispatcher (FastRoute). One strategy only.

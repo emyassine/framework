@@ -2,16 +2,18 @@
 
 namespace Webkernel\View;
 
+use Webkernel\WebAppApi\ComposableContract;
+
 /**
  * Views. Compiler is BladeOne owned in this package — not a Composer dependency.
  *
  * Templates: {name}.view.php
  * Compiled:  storage/framework/views/{name}_{hash}.view.php.compiled
  *
- * Template directories come from vendor/composer/webkernel_views.php
- * (host resources/views first, then each package views/ declared at dump-autoload).
+ * Namespaced: @include('webkernel::layouts.page'), <webkernel::page />.
+ * Un-namespaced @extends('layouts.page') stays (host resources/views first).
  */
-final class View implements \Stringable
+final class View implements ComposableContract, \Stringable
 {
     /** @var array<class-string, callable(object): string> */
     private static array $stringable = [];
@@ -24,9 +26,19 @@ final class View implements \Stringable
      * @param array<string, mixed> $data
      */
     public function __construct(
-        private readonly string $name,
+        private readonly string $name = '',
         private array $data = [],
     ) {
+    }
+
+    public static function api_name(): string
+    {
+        return 'view';
+    }
+
+    public static function container_lifetime(): string
+    {
+        return 'singleton';
     }
 
     /**
@@ -51,7 +63,7 @@ final class View implements \Stringable
         return self::compiler()->getTemplateFile($view) !== '';
     }
 
-    public static function addLocation(string $path): void
+    public static function add_location(string $path): void
     {
         self::compiler()->add_template_path($path);
     }
@@ -90,7 +102,7 @@ final class View implements \Stringable
         self::$stringable[$class] = $handler;
     }
 
-    public static function withoutDoubleEncoding(): void
+    public static function without_double_encoding(): void
     {
         self::$double_encode = false;
     }
@@ -113,6 +125,7 @@ final class View implements \Stringable
         $engine->set_echo_format('\\'.self::class.'::echo(%s)');
         $engine->addAliasClasses('Js', Js::class);
         $engine->addAliasClasses('View', self::class);
+        self::apply_namespaces($engine);
 
         return self::$compiler = $engine;
     }
@@ -122,13 +135,9 @@ final class View implements \Stringable
      */
     public static function template_paths(): array
     {
-        $file = vendor_dir('composer/webkernel_views.php');
-        if (is_file($file)) {
-            $paths = require $file;
-            if (is_array($paths) && $paths !== []) {
-                /** @var list<string> $paths */
-                return array_values(array_filter($paths, is_string(...)));
-            }
+        $dirs = webapp()->view_dirs();
+        if ($dirs !== []) {
+            return $dirs;
         }
 
         return [webapp_path('resources/views')];
@@ -140,6 +149,7 @@ final class View implements \Stringable
         self::$compiler = null;
         self::$stringable = [];
         self::$double_encode = true;
+        webapp()->container()->forget(self::class);
     }
 
     public static function echo(mixed $value): string
@@ -181,4 +191,23 @@ final class View implements \Stringable
     {
         return $this->render();
     }
+
+    private static function apply_namespaces(Compiler $engine): void
+    {
+        foreach (webapp()->view_namespaces() as $namespace => $dirs) {
+            if ($namespace === '') {
+                continue;
+            }
+            foreach ($dirs as $dir) {
+                $engine->add_view_namespace($namespace, $dir);
+            }
+        }
+        foreach (webapp()->component_namespaces() as $namespace => $dirs) {
+            foreach ($dirs as $dir) {
+                $engine->add_component_namespace($namespace, $dir);
+            }
+        }
+    }
 }
+
+require_once dirname(__DIR__).'/functions/view.php';

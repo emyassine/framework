@@ -10,9 +10,11 @@
             "load.codebase.package-function.php"
         ],
         "classmap": [
-            "src/WebApp.php"
+            "src/WebApp.php",
+            "src/PlatformProvider.php"
         ],
         "psr-4": {
+            "Webkernel\\WebAppApi\\": "src/WebAppApi/src/",
             "Webkernel\\Paths\\": "src/Paths/src/",
             "Webkernel\\Instance\\": "src/Instance/src/",
             "Webkernel\\Route\\": "src/Route/src/",

@@ -36,7 +36,7 @@ http_response_code(200);
 
 Route::prefix('v1')->name('admin.')->group(function (): void {
     Route::get('/dashboard/{tenant_id?}', [DashboardController::class, 'show'])
-        ->whereNumber('tenant_id')
+        ->where_number('tenant_id')
         ->name('dashboard');
 
     Route::view('/overview', 'dashboard', [
@@ -51,20 +51,20 @@ expect(Route::url('admin.dashboard', ['tenant_id' => '42']) === '/v1/dashboard/4
 $mismatch = false;
 try {
     Route::url('admin.dashboard', ['tenant_id' => 'ab']);
-} catch (\Webkernel\Route\UriException $e) {
+} catch (\Webkernel\Route\Uri\UriException $e) {
     $mismatch = true;
 }
-expect($mismatch, 'whereNumber rejects url');
+expect($mismatch, 'where_number rejects url');
 
 $_SERVER['REQUEST_METHOD'] = 'GET';
 $_SERVER['REQUEST_URI'] = '/v1/dashboard/9';
 http_response_code(200);
-expect(Route::dispatch() === 'tenant=9', 'whereNumber match');
+expect(Route::dispatch() === 'tenant=9', 'where_number match');
 
 $_SERVER['REQUEST_URI'] = '/v1/dashboard/ab';
 http_response_code(200);
-expect(Route::dispatch() === '', 'whereNumber 404');
-expect(http_response_code() === 404, 'whereNumber status');
+expect(Route::dispatch() === '', 'where_number 404');
+expect(http_response_code() === 404, 'where_number status');
 
 $_SERVER['REQUEST_URI'] = '/v1/dashboard';
 http_response_code(200);

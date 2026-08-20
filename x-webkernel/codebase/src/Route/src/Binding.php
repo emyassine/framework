@@ -2,6 +2,11 @@
 
 namespace Webkernel\Route;
 
+use Webkernel\Route\Compile\Generator;
+use Webkernel\Route\Compile\Pattern;
+use Webkernel\Route\Exception\BadRoute;
+use Webkernel\Route\Group\PendingGroup;
+
 /**
  * One registered route. Returned by Route::get / view / … so attributes chain.
  *
@@ -57,7 +62,7 @@ final class Binding
         return $this;
     }
 
-    public function whereNumber(string $parameter): self
+    public function where_number(string $parameter): self
     {
         return $this->where($parameter, '[0-9]+');
     }
@@ -131,6 +136,16 @@ final class Binding
         return $this->methods;
     }
 
+    public function action(): mixed
+    {
+        return $this->action;
+    }
+
+    public function is_closure(): bool
+    {
+        return $this->action instanceof \Closure;
+    }
+
     public function resolved_name(): string
     {
         if ($this->name === '') {
@@ -150,6 +165,9 @@ final class Binding
         }
         if (is_string($this->action) && $this->action !== '') {
             return $this->action;
+        }
+        if (is_object($this->action)) {
+            return $this->action::class;
         }
 
         return 'Closure';

@@ -1,6 +1,9 @@
 <?php declare(strict_types=1);
 
-namespace Webkernel\Route;
+namespace Webkernel\Route\Uri;
+
+use Webkernel\Route\Compile\Pattern;
+use Webkernel\Route\Route;
 
 /**
  * Named-route URI builder (FastRoute GenerateUri, string only — no PSR-7).

@@ -39,11 +39,11 @@ Same idea as Filament: pick a chrome, only that chrome's CSS is compiled in.
 ```json
 "extra": {
   "webkernel": {
-    "views": "views",
-    "routes": "routes/web.php",
-    "eager": false
+    "prefix": "views",
+    "provider": "Webkernel\\View\\ViewProvider",
+    "views": "views"
   }
 }
 ```
 
-Missing `views` / `routes` keys still pick up `views/`, `resources/views/`, `routes/web.php`, and `routes.php` when those paths exist. `eager: true` is only for tiny boot helpers (paths, instance). Route and View classes stay lazy.
+Providers declare view/component dirs at boot (`declare_view('webkernel', $dir)`). Dump `webkernel_views.php` is fallback. Namespaced: `@include('webkernel::layouts.page')`, `<webkernel::page />`. Un-namespaced `@extends('layouts.page')` stays. Route and View classes stay lazy until `webapp()->view()` / `webapp()->route()`.

@@ -11,12 +11,17 @@ Follow https://getcomposer.org/doc/articles/custom-installers.md :
 
 snake_case on Webkernel methods (`on_post_autoload_dump`, `parent_module`). Keep Composer interface names (`activate`, `getSubscribedEvents`, `getInstallPath`, `supports`).
 
-No Laravel, no Vite, no request-path module scanner. Dump-autoload writes `{vendor}/composer/webkernel.php`, classmap, eager files, `webkernel_views.php`, and `webkernel_routes.php`.
+No Laravel, no Vite, no request-path module scanner. Dump-autoload writes `{vendor}/composer/webkernel.php`, classmap, path/instance function files, `webkernel_views.php`, `webkernel_routes.php`, `webkernel_composables.php`, and `webkernel_providers.php`.
 
 Packages declare themselves in `extra.webkernel`:
 
-- `eager: true` — function files are required at boot (paths, instance). Default false.
-- `views` — dir or list. Default: `views/`, `resources/views/` when they exist.
-- `routes` — file or list. Default: `routes/web.php`, `routes.php` when they exist.
+- `prefix` — package alias for `webkernel_package_root()`.
+- `provider` — one FQCN per package, dumped into `webkernel_providers.php`.
+- `views` — dir or list. Default: `views/`, `resources/views/` when they exist. Runtime source of truth is `declare_view` from providers; dump is fallback.
+- `routes` — file or list. Default: `routes/web.php`, `routes.php` when those files exist. Runtime source of truth is `declare('routes', …)`; dump is fallback.
+
+ComposableContract implementors already in the classmap are mapped `api_name => class` into `webkernel_composables.php`. No glob on the request path.
+
+Path/instance function files stay dumped. Packages with `provider` do not dump `functions/*.php` (those load with the composable).
 
 Scan Composer install paths (including `modules/` via the installer). Do not walk `modules/` at request time.

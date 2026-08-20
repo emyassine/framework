@@ -1,6 +1,9 @@
 <?php declare(strict_types=1);
 
-namespace Webkernel\Route;
+namespace Webkernel\Route\Group;
+
+use Webkernel\Route\Binding;
+use Webkernel\Route\Route;
 
 /**
  * Accumulates group attributes until group() or a verb registers a route.
@@ -163,9 +166,9 @@ final class PendingGroup
         return $this->tap(static fn (): Binding => Route::redirect($uri, $destination, $status));
     }
 
-    public function permanentRedirect(string $uri, string $destination): Binding
+    public function permanent_redirect(string $uri, string $destination): Binding
     {
-        return $this->tap(static fn (): Binding => Route::permanentRedirect($uri, $destination));
+        return $this->tap(static fn (): Binding => Route::permanent_redirect($uri, $destination));
     }
 
     public function fallback(mixed $action): Binding

@@ -158,7 +158,7 @@
             "dist": {
                 "type": "path",
                 "url": "x-webkernel/codebase",
-                "reference": "f3375a4ba821757686b52f0b6aae364a50b36d51"
+                "reference": "1b64da908f873f124043c81c9034d30551215311"
             },
             "require": {
                 "php": ">=8.4",
@@ -177,9 +177,11 @@
                     "load.codebase.package-function.php"
                 ],
                 "classmap": [
-                    "src/WebApp.php"
+                    "src/WebApp.php",
+                    "src/PlatformProvider.php"
                 ],
                 "psr-4": {
+                    "Webkernel\\WebAppApi\\": "src/WebAppApi/src/",
                     "Webkernel\\Paths\\": "src/Paths/src/",
                     "Webkernel\\Instance\\": "src/Instance/src/",
                     "Webkernel\\Route\\": "src/Route/src/",

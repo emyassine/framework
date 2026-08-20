@@ -159,6 +159,10 @@ class Compiler
     protected int $renderCount = 0;
     /** @var string[] Get the template path for the compiled views. */
     protected array $templatePath = [];
+    /** @var array<string, list<string>> namespaced view dirs */
+    protected array $viewNamespaces = [];
+    /** @var array<string, list<string>> namespaced component dirs */
+    protected array $componentNamespaces = [];
     /** @var string|null Get the compiled path for the compiled views. If null then it uses the default path */
     protected ?string $compiledPath = null;
     /** @var string the extension of the compiled file. */
@@ -709,6 +713,16 @@ class Compiler
     public function add_template_path(string $path): void
     {
         $this->templatePath[] = rtrim($path, '/\\');
+    }
+
+    public function add_view_namespace(string $namespace, string $path): void
+    {
+        $this->viewNamespaces[$namespace][] = rtrim($path, '/\\');
+    }
+
+    public function add_component_namespace(string $namespace, string $path): void
+    {
+        $this->componentNamespaces[$namespace][] = rtrim($path, '/\\');
     }
 
     /**
@@ -1508,31 +1522,39 @@ class Compiler
     public function getTemplateFile($templateName = ''): string
     {
         $templateName = (empty($templateName)) ? $this->fileName : $templateName;
-        if (\strpos($templateName, '/') !== false) {
-            return $this->locateTemplate($templateName); // it's a literal
+        $namespace = '';
+        $name = $templateName;
+        $sep = \strpos($templateName, '::');
+        if ($sep !== false) {
+            $namespace = \substr($templateName, 0, $sep);
+            $name = \substr($templateName, $sep + 2);
         }
-        $arr = \explode('.', $templateName);
+        if (\strpos($name, '/') !== false) {
+            return $this->locateTemplate($name, $namespace); // it's a literal
+        }
+        $arr = \explode('.', $name);
         $c = \count($arr);
         if ($c == 1) {
             // it's in the root of the template folder.
-            return $this->locateTemplate($templateName . $this->fileExtension);
+            return $this->locateTemplate($name . $this->fileExtension, $namespace);
         }
         $file = $arr[$c - 1];
         \array_splice($arr, $c - 1, $c - 1); // delete the last element
         $path = \implode('/', $arr);
-        return $this->locateTemplate($path . '/' . $file . $this->fileExtension);
+        return $this->locateTemplate($path . '/' . $file . $this->fileExtension, $namespace);
     }
 
     /**
      * Find template file with the given name in all template paths in the order the paths were written
      *
      * @param string $name Filename of the template (without path)
+     * @param string $namespace View/component namespace (`webkernel`), empty for default
      * @return string template file
      */
-    protected function locateTemplate($name): string
+    protected function locateTemplate($name, $namespace = ''): string
     {
         $this->notFoundPath = '';
-        foreach ($this->templatePath as $dir) {
+        foreach ($this->template_dirs((string) $namespace) as $dir) {
             $path = $dir . '/' . $name;
             if (\is_file($path)) {
                 return $path;
@@ -1540,6 +1562,23 @@ class Compiler
             $this->notFoundPath .= $path . ",";
         }
         return '';
+    }
+
+    /**
+     * @return list<string>
+     */
+    private function template_dirs(string $namespace): array
+    {
+        if ($namespace === '') {
+            return $this->templatePath;
+        }
+        $dirs = $this->viewNamespaces[$namespace] ?? [];
+        foreach ($this->componentNamespaces[$namespace] ?? [] as $dir) {
+            if (! \in_array($dir, $dirs, true)) {
+                $dirs[] = $dir;
+            }
+        }
+        return $dirs;
     }
 
     /**
@@ -3030,16 +3069,19 @@ class Compiler
      */
     protected function compileComponents($value)
     {
-        /**
-         * @param array $match
-         *                    [0]=full expression with @ and parenthesis
-         *                    [1]=Component name
-         *                    [2]=parameters
-         *                    [3]=...
-         *                    [4]=content
-         *
-         * @return string
-         */
+        $namespaced = function ($match) {
+            if (isset($match[5])) {
+                $match[5] = $this->compileComponents($match[5]);
+            }
+            $paramsCompiled = $this->parseParams($match[3] ?? '');
+            $str = "('" . $match[1] . '::' . $match[2] . "'," . $paramsCompiled . ")";
+            return self::compileComponent($str) . ($match[5] ?? '') . self::compileEndComponent();
+        };
+        $value = preg_replace_callback(
+            '/<(?:x-)?([a-z0-9.-]+)::([a-z0-9.-]+)(\s[^>]*)?(>((?:(?!<\/(?:x-)?\1::\2>).)*)<\/(?:x-)?\1::\2>|\/>)/ms',
+            $namespaced,
+            $value
+        );
         $callback = function($match) {
             if (isset($match[4]) && static::contains($match[0], 'x-')) {
                 $match[4] = $this->compileComponents($match[4]);

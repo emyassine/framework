@@ -19,7 +19,7 @@
     "extra": {
         "webkernel": {
             "prefix": "route",
-            "eager": true
+            "provider": "Webkernel\\Route\\RouteProvider"
         }
     }
 }

@@ -2,6 +2,18 @@
 
 namespace Webkernel\Route;
 
+use Webkernel\Route\Action\RedirectAction;
+use Webkernel\Route\Action\ViewAction;
+use Webkernel\Route\Compile\Cache;
+use Webkernel\Route\Compile\Generator;
+use Webkernel\Route\Compile\Pattern;
+use Webkernel\Route\Dispatch\Dispatcher;
+use Webkernel\Route\Dispatch\MethodNotAllowed;
+use Webkernel\Route\Dispatch\NotMatched;
+use Webkernel\Route\Group\PendingGroup;
+use Webkernel\Route\Uri\Uri;
+use Webkernel\WebAppApi\ComposableContract;
+
 /**
  * Application router. FastRoute MarkBased engine, owned in this package.
  *
@@ -13,9 +25,8 @@ namespace Webkernel\Route;
  * @phpstan-import-type RouteData from Generator
  * @phpstan-import-type ParsedRoutes from Pattern
  * @phpstan-type NamedRoutes array<string, ParsedRoutes>
- * @phpstan-type Processed array{0: RouteData[0], 1: RouteData[1], 2: NamedRoutes}
  */
-final class Route
+final class Route implements ComposableContract
 {
     public const NAME = '_name';
 
@@ -39,8 +50,6 @@ final class Route
 
     private static bool $declared_loaded = false;
 
-    private static ?self $app = null;
-
     private string $group_prefix = '';
 
     private string $group_name = '';
@@ -61,26 +70,29 @@ final class Route
 
     private ?Uri $uris = null;
 
-    private function __construct()
+    public static function api_name(): string
     {
+        return 'route';
+    }
+
+    public static function container_lifetime(): string
+    {
+        return 'singleton';
     }
 
     public static function app(): self
     {
-        $created = self::$app === null;
-        self::$app ??= new self();
-        if ($created) {
-            self::load_declared();
-        }
+        $route = webapp()->route();
+        $route->ensure_declared();
 
-        return self::$app;
+        return $route;
     }
 
     /** Reset process singleton (tests). */
     public static function flush(): void
     {
-        self::$app = null;
         self::$declared_loaded = false;
+        webapp()->container()->forget(self::class);
     }
 
     public static function get(string $uri, mixed $action): Binding
@@ -131,26 +143,15 @@ final class Route
      */
     public static function view(string $uri, string $view, array $data = [], int $status = 200): Binding
     {
-        return self::get($uri, static function () use ($view, $data, $status): \Webkernel\View\View {
-            if ($status !== 200) {
-                http_response_code($status);
-            }
-
-            return \Webkernel\View\View::make($view, $data);
-        })->as_view($view);
+        return self::get($uri, new ViewAction($view, $data, $status))->as_view($view);
     }
 
     public static function redirect(string $uri, string $destination, int $status = 302): Binding
     {
-        return self::get($uri, static function () use ($destination, $status): string {
-            http_response_code($status);
-            header('Location: '.$destination, true, $status);
-
-            return '';
-        });
+        return self::get($uri, new RedirectAction($destination, $status));
     }
 
-    public static function permanentRedirect(string $uri, string $destination): Binding
+    public static function permanent_redirect(string $uri, string $destination): Binding
     {
         return self::redirect($uri, $destination, 301);
     }
@@ -308,10 +309,33 @@ final class Route
 
     private function dispatcher(string $host): Dispatcher
     {
-        return $this->dispatchers[$host] ??= $this->build_dispatcher($host);
+        return $this->dispatchers[$host] ??= new Dispatcher($this->compiled_data($host));
     }
 
-    private function build_dispatcher(string $host): Dispatcher
+    /**
+     * @return RouteData
+     */
+    private function compiled_data(string $host): array
+    {
+        if ($this->has_closure_handler()) {
+            return $this->build_data($host);
+        }
+        $hash = $this->compile_hash($host);
+        $path = Cache::path($hash);
+        $cached = Cache::read($path);
+        if ($cached !== null) {
+            return $cached;
+        }
+        $data = $this->build_data($host);
+        Cache::write($path, $data);
+
+        return $data;
+    }
+
+    /**
+     * @return RouteData
+     */
+    private function build_data(string $host): array
     {
         $specific = [];
         $general = [];
@@ -338,7 +362,32 @@ final class Route
             $binding->compile($generator);
         }
 
-        return new Dispatcher($generator->get_data());
+        return $generator->get_data();
+    }
+
+    private function compile_hash(string $host): string
+    {
+        $parts = [$host];
+        foreach (webapp()->route_files() as $file) {
+            $parts[] = $file;
+            $parts[] = (string) (@filemtime($file) ?: 0);
+        }
+        foreach ($this->bindings as $binding) {
+            $parts[] = implode(',', $binding->methods()).' '.$binding->uri().' '.$binding->action_label();
+        }
+
+        return sha1(implode("\n", $parts));
+    }
+
+    private function has_closure_handler(): bool
+    {
+        foreach ($this->bindings as $binding) {
+            if ($binding->is_closure()) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private function uri_generator(): Uri
@@ -442,27 +491,21 @@ final class Route
     }
 
     /**
-     * Require route files collected at dump-autoload. Not called until Route is used.
+     * Require route files declared by providers / host, dump-autoload list as fallback.
      */
-    private static function load_declared(): void
+    private function ensure_declared(): void
     {
         if (self::$declared_loaded) {
             return;
         }
         self::$declared_loaded = true;
 
-        $file = vendor_dir('composer/webkernel_routes.php');
-        if (! is_file($file)) {
-            return;
-        }
-        $routes = require $file;
-        if (! is_array($routes)) {
-            return;
-        }
-        foreach ($routes as $path) {
-            if (is_string($path) && $path !== '' && is_file($path)) {
+        foreach (webapp()->route_files() as $path) {
+            if (is_file($path)) {
                 require $path;
             }
         }
     }
 }
+
+require_once dirname(__DIR__).'/functions/route.php';

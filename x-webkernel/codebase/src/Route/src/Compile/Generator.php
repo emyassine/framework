@@ -1,6 +1,8 @@
 <?php declare(strict_types=1);
 
-namespace Webkernel\Route;
+namespace Webkernel\Route\Compile;
+
+use Webkernel\Route\Exception\BadRoute;
 
 /**
  * MarkBased data generator (FastRoute). One strategy only.

@@ -1,11 +1,13 @@
 <?php declare(strict_types=1);
 
 /**
- * Webkernel autoloader. Classmap + eager files from lifecycle dump
+ * Webkernel autoloader. Classmap + dumped function files from lifecycle
  * (vendor/composer/webkernel_classmap.php, webkernel_files.php).
  *
  * Short names (Route, View, Js) alias on first use — class_alias at boot
  * would load the target class on every request.
+ *
+ * Path helpers stay dumped. Route/view composables load on webapp()->{name}().
  */
 const WEBKERNEL_NS = 'Webkernel\\';
 const WEBKERNEL_NS_LEN = 10;
@@ -122,5 +124,12 @@ if ($webkernel_composer_dir !== null) {
     $webkernel_files = $webkernel_composer_dir.'/webkernel_files.php';
     if (is_file($webkernel_files)) {
         require $webkernel_files;
+    }
+}
+
+if (! function_exists('webapp')) {
+    function webapp(): \Webkernel\WebApp
+    {
+        return \Webkernel\WebApp::get();
     }
 }

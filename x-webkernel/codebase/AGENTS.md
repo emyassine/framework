@@ -12,12 +12,12 @@ Engines we own in-tree (fork, specialize — do not wrap as a vendor): FastRoute
 
 | Kind | Rule | Example |
 | --- | --- | --- |
-| Webkernel methods / functions | `snake_case` | `webapp_path()`, `add_path()` |
+| Webkernel methods / functions | `snake_case` | `webapp_path()`, `add_path()`, `where_number()` |
 | Parameters / locals | `snake_case` | `$webapp_root`, `$cache_dir` |
 | Classes / namespaces | `PascalCase` | `Engine`, `InstanceId` |
 | Constants | `UPPER_SNAKE` | `WEBKERNEL_NS` |
 
-Exceptions: Composer / PSR interface methods you do not own (`activate`, `getSubscribedEvents`, `getInstallPath`, `supports`); HTTP verbs, fluent route modifiers, and view helpers that match Laravel usage (`Route::get`, `whereNumber`, `view()`, `View::make`).
+Exceptions: Composer / PSR interface methods you do not own (`activate`, `getSubscribedEvents`, `getInstallPath`, `supports`).
 
 Do not introduce `camelCase` on Webkernel surfaces. Do not keep dual APIs.
 
@@ -26,7 +26,7 @@ Do not introduce `camelCase` on Webkernel surfaces. Do not keep dual APIs.
 - Runtime: PHP 8.4+ only. No nikic/fast-route, no eftec/bladeone (copied and specialized under `src/Route`, `src/View`). Templates are `*.view.php`, never `*.blade.php`.
 - PSR allowed only when a type we expose needs it. This slice does not.
 - `composer-plugin-api` is Composer-time, in `webkernel/lifecycle` only.
-- Do not add Laravel, Filament, Symfony HTTP, or a container.
+- Do not add Laravel, Filament, or Symfony HTTP.
 
 ## Paths
 
@@ -39,17 +39,44 @@ Do not introduce `camelCase` on Webkernel surfaces. Do not keep dual APIs.
 
 `Webkernel\Instance\InstanceId` — fingerprint of host path + machine. Lifecycle writes it. Do not recompute MAC / product uuid per request.
 
+## Host API
+
+`webapp()` is the eager helper. `WebApp` is the facade. `__call` resolves dump-autoload map `{vendor}/composer/webkernel_composables.php` (`api_name => class`) then `container()->make()`. Unknown segment throws. No request-time class glob.
+
+Providers (`PlatformProvider`) declare view paths, component dirs, route files, extra bindings at boot. Composables are lazy fluent segments (`webapp()->view()`, `webapp()->route()`, later `webapp()->auth()`). Path helpers stay dumped; route/view function files load with the composable class.
+
+Container: `singleton` / `bind` / `scoped`. No PSR-11. No reflection auto-wiring.
+
+```php
+webapp()->declare('providers', [
+    Webkernel\View\ViewProvider::class,
+    Webkernel\Route\RouteProvider::class,
+]);
+webapp()->boot();
+webapp()->route()->view('/', 'dashboard')->name('dashboard');
+```
+
+Dump-autoload also writes `webkernel_providers.php` from `extra.webkernel.provider`. Merged with host `declare('providers', …)`.
+
 ## Route
 
-`Webkernel\Route\Route` — `Route::get` / `post` / `view` return a `Binding` for fluent `name()`, `where()`, `middleware()`, `panel()`, … Groups chain `prefix()` / `name()` / `domain()` / `middleware()` then `group()`. Extra keys still stored on the compiled route. Permission and middleware are recorded, not enforced, until auth exists.
+`Webkernel\Route\Route` — `Route::get` / `post` / `view` return a `Binding` for fluent `name()`, `where()`, `where_number()`, `middleware()`, `panel()`, … Groups chain `prefix()` / `name()` / `domain()` / `middleware()` then `group()`. Extra keys still stored on the compiled route. Permission and middleware are recorded, not enforced, until auth exists.
 
 One dispatcher: MarkBased. No CharCount / GroupCount / GroupPos. No PSR-7 URI objects.
 
+`Route::view()` / `redirect()` use serialisable invokables. Closures skip the compile file and stay in-memory. Compile file: `storage/framework/cache/routes_{hash}.php`, hash/mtime over declared route files. No `artisan` cache:clear.
+
+Layout under `src/Route/src/`: `Group/`, `Dispatch/`, `Compile/`, `Uri/`, `Exception/`, `Action/`. Facade and `Binding` stay at the package root of that tree.
+
 ## View
 
-`view()` + `Webkernel\View\View`. Compiler is BladeOne in `Webkernel\View\Compiler`. Templates: `{name}.view.php`. Compiled: `storage/framework/views/{name}_{hash}.view.php.compiled`.
+`view()` + `Webkernel\View\View`. Compiler is BladeOne in `Webkernel\View\Compiler`. Templates: `{name}.view.php`. Compiled: `storage/framework/views/{name}_{hash}.view.php.compiled`. `MODE_AUTO` recompiles when template mtime is newer. Hash is of the full template path. No `view:clear`.
 
-Template directories are listed at dump-autoload in `{vendor}/composer/webkernel_views.php` (host `resources/views` first, then each package `views/`). Do not glob view dirs on the request path.
+`declare_view('webkernel', $dir)` → `@include('webkernel::layouts.page')`.
+`declare_component('webkernel', $dir)` → `<webkernel::page />` / `<x-webkernel::page />`.
+Un-namespaced `@extends('layouts.page')` stays (host `resources/views` first). `<x-foo />` is `components.foo`.
+
+Dump `webkernel_views.php` / `webkernel_routes.php` are fallback until providers declare paths.
 
 Layouts (Filament-shaped, CSS split by chrome):
 
@@ -59,7 +86,7 @@ Layouts (Filament-shaped, CSS split by chrome):
 | `layouts.simple` | tokens + centered card (no sidebar) |
 | `layouts.page` | tokens + shell (sidebar / topnav / horizontal) + components |
 
-Do not boot Route or View classes on requests that do not call them. `class_alias` of `Route` / `View` / `Js` is lazy (autoload). `extra.webkernel.eager` is dump-time, for tiny function files only.
+Do not boot Route or View classes on requests that do not call them. `class_alias` of `Route` / `View` / `Js` is lazy (autoload).
 
 Platform tree (later, not this package): App owner → Platform (system panel) → Module → Panel → Cluster → Resource → Page → components. Do not invent a second templating stack.
 
@@ -80,6 +107,8 @@ views/components/
 Composer lock records the loader path only. Do not list functions/*.php in autoload.files.
 ```
 
+`extra.webkernel.prefix` is the package alias for `webkernel_package_root()`. `extra.webkernel.provider` is one FQCN dumped into `webkernel_providers.php`.
+
 ## Performance
 
 - No directory walking on the request path that Composer already computed.
@@ -88,8 +117,4 @@ Composer lock records the loader path only. Do not list functions/*.php in autol
 
 ## DevEnv / IDE
 
-`Webkernel\DevEnv\IdeHelper` generates `src/DevEnv/_ide_helper.php` from Composer classmap so analyzers see `Composer\InstalledVersions` and the rest of vendor. No hardcoded class list, no directory walk. Lifecycle calls it on dump-autoload.
-
-## Host API
-
-Do not add a service container, composable discovery, or `webapp()` facade until something actually needs it.
+`Webkernel\DevEnv\IdeHelper` generates `src/DevEnv/_ide_helper.php` from Composer classmap so analyzers see `Composer\InstalledVersions` and the rest of vendor. Dump-autoload also writes `_ide_helper_webapp.php` so Intellephense sees `webapp(): WebApp` and `WebApp::view()` / `route()`. No hardcoded class list, no directory walk. Lifecycle calls it on dump-autoload.

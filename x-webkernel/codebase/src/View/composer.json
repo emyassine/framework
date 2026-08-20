@@ -19,7 +19,7 @@
     "extra": {
         "webkernel": {
             "prefix": "views",
-            "eager": true,
+            "provider": "Webkernel\\View\\ViewProvider",
             "views": "views"
         }
     }

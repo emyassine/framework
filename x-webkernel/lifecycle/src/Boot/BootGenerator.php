@@ -10,6 +10,7 @@ use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 use Webkernel\DevEnv\IdeHelper;
 use Webkernel\Instance\InstanceId;
+use Webkernel\WebAppApi\ComposableContract;
 
 /**
  * Writes {vendor}/composer/webkernel.php and related dump files.
@@ -26,6 +27,10 @@ final class BootGenerator
     public const VIEWS_BASENAME = 'webkernel_views.php';
 
     public const ROUTES_BASENAME = 'webkernel_routes.php';
+
+    public const COMPOSABLES_BASENAME = 'webkernel_composables.php';
+
+    public const PROVIDERS_BASENAME = 'webkernel_providers.php';
 
     public static function write(Composer $composer, ?IOInterface $io = null): void
     {
@@ -53,10 +58,13 @@ final class BootGenerator
             'generated_at' => gmdate('c'),
         ];
 
+        $classmap = self::classmap($composer);
+        $composables = self::composables_list($classmap);
+
         self::write_php($composer_dir.DIRECTORY_SEPARATOR.self::BOOT_BASENAME, $boot);
         self::write_classmap(
             $composer_dir.DIRECTORY_SEPARATOR.self::CLASSMAP_BASENAME,
-            self::classmap($composer),
+            $classmap,
             $vendor_dir,
             $root,
         );
@@ -78,6 +86,14 @@ final class BootGenerator
             $vendor_dir,
             $root,
         );
+        self::write_composables(
+            $composer_dir.DIRECTORY_SEPARATOR.self::COMPOSABLES_BASENAME,
+            $composables,
+        );
+        self::write_class_list(
+            $composer_dir.DIRECTORY_SEPARATOR.self::PROVIDERS_BASENAME,
+            self::providers_list($composer),
+        );
         self::info($io, 'wrote composer/'.self::BOOT_BASENAME.' (instance '.$instance_id.')');
 
         try {
@@ -88,6 +104,13 @@ final class BootGenerator
                 $ide['classes'],
                 $ide['bytes'],
                 $ide['skipped'] ? ', unchanged' : '',
+            ));
+            $webapp_ide = IdeHelper::generate_webapp($composables);
+            self::info($io, sprintf(
+                'webapp ide helper %s (%d bytes%s)',
+                $webapp_ide['path'],
+                $webapp_ide['bytes'],
+                $webapp_ide['skipped'] ? ', unchanged' : '',
             ));
         } catch (\Throwable $e) {
             self::warn($io, 'ide helper: '.$e->getMessage());
@@ -181,8 +204,8 @@ final class BootGenerator
     }
 
     /**
-     * Eager function files, glob'd at dump-autoload. extra.webkernel.eager = true.
-     * Nested loaders are not listed — their functions/*.php paths are.
+     * Path/instance function files. Composable packages (extra.webkernel.provider)
+     * keep helpers next to the class and are not dumped into webkernel_files.php.
      *
      * @return list<string>
      */
@@ -201,7 +224,7 @@ final class BootGenerator
             }
             $install_path = rtrim(str_replace('\\', '/', $install_path), '/');
 
-            if ((self::extra($package)['eager'] ?? false) === true) {
+            if (! isset(self::extra($package)['provider'])) {
                 self::collect_function_files($paths, $install_path);
             }
 
@@ -214,7 +237,7 @@ final class BootGenerator
                 if (! is_array($data)) {
                     continue;
                 }
-                if ((self::extra($data)['eager'] ?? false) !== true) {
+                if (isset(self::extra($data)['provider'])) {
                     continue;
                 }
                 self::collect_function_files($paths, str_replace('\\', '/', dirname($json_file)));
@@ -225,6 +248,61 @@ final class BootGenerator
         sort($list, SORT_STRING);
 
         return $list;
+    }
+
+    /**
+     * Dump-autoload map of ComposableContract implementors already in the classmap.
+     * No glob on the request path.
+     *
+     * @param array<string, string> $classmap
+     * @return array<string, class-string<ComposableContract>>
+     */
+    private static function composables_list(array $classmap): array
+    {
+        $contract_file = $classmap[ComposableContract::class] ?? null;
+        if (is_string($contract_file) && is_file($contract_file)) {
+            require_once $contract_file;
+        }
+        if (! interface_exists(ComposableContract::class, false)) {
+            return [];
+        }
+
+        $map = [];
+        foreach ($classmap as $class => $file) {
+            if (! is_string($file) || ! is_file($file)) {
+                continue;
+            }
+            $src = file_get_contents($file);
+            if ($src === false || ! str_contains($src, 'ComposableContract')) {
+                continue;
+            }
+            require_once $file;
+            if (! class_exists($class, false) || ! is_a($class, ComposableContract::class, true)) {
+                continue;
+            }
+            $map[$class::api_name()] = $class;
+        }
+        ksort($map);
+
+        return $map;
+    }
+
+    /**
+     * extra.webkernel.provider: one FQCN per package.
+     *
+     * @return list<class-string>
+     */
+    private static function providers_list(Composer $composer): array
+    {
+        $providers = [];
+        foreach (self::package_paths($composer) as $extra) {
+            $provider = $extra['provider'] ?? null;
+            if (is_string($provider) && $provider !== '' && ! in_array($provider, $providers, true)) {
+                $providers[] = $provider;
+            }
+        }
+
+        return $providers;
     }
 
     /**
@@ -550,6 +628,56 @@ PHP;
 
 \$v = dirname(__DIR__); // vendor_dir
 \$b = dirname(\$v); // base_dir
+
+return [{$list}];
+
+PHP;
+        file_put_contents($path, $body, LOCK_EX);
+    }
+
+    /**
+     * @param array<string, class-string> $map
+     */
+    private static function write_composables(string $path, array $map): void
+    {
+        $header = IdeHelper::generated_header();
+        $lines = [];
+        foreach ($map as $name => $class) {
+            $lines[] = '    '.var_export($name, true).' => \\'.$class.'::class,';
+        }
+        $list = $lines === [] ? '' : "\n".implode("\n", $lines)."\n";
+
+        $body = <<<PHP
+<?php declare(strict_types=1);
+
+{$header}
+//>
+//> Generated. Do not edit.
+
+return [{$list}];
+
+PHP;
+        file_put_contents($path, $body, LOCK_EX);
+    }
+
+    /**
+     * @param list<class-string> $classes
+     */
+    private static function write_class_list(string $path, array $classes): void
+    {
+        $header = IdeHelper::generated_header();
+        $lines = [];
+        foreach ($classes as $class) {
+            $lines[] = '    \\'.$class.'::class,';
+        }
+        $list = $lines === [] ? '' : "\n".implode("\n", $lines)."\n";
+
+        $body = <<<PHP
+<?php declare(strict_types=1);
+
+{$header}
+//>
+//> Generated. Do not edit.
 
 return [{$list}];
 
