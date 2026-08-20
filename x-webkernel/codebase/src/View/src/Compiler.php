@@ -1317,13 +1317,13 @@ class Compiler
             }
             $result = $this->compile($view, $forced);
             if (!$this->is_compiled) {
-                return $this->post_run($this->evaluate_text($result, $this->variables));
+                return (string) $this->post_run($this->evaluate_text($result, $this->variables));
             }
         } elseif ($view) {
             $this->file_name = $view;
         }
         $this->is_run_fast = $run_fast;
-        return $this->post_run($this->evaluate_path($this->get_compiled_file(), $this->variables));
+        return (string) $this->post_run($this->evaluate_path($this->get_compiled_file(), $this->variables));
     }
 
     protected function eval_composer($view): void

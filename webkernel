@@ -261,11 +261,22 @@ final class IncludeClock
         return fflush($handle);
     }
 
+    public function stream_truncate($new_size): bool
+    {
+        $handle = $this->handle;
+        if ($handle === null) return false;
+        return ftruncate($handle, $new_size);
+    }
+
     public function stream_lock($operation): bool
     {
         $handle = $this->handle;
         if ($handle === null) return false;
-        return flock($handle, $operation);
+        $operation = (int) $operation;
+        if ($operation === 0) return true;
+        $lock = $operation & (LOCK_SH | LOCK_EX | LOCK_UN | LOCK_NB);
+        if (($lock & (LOCK_SH | LOCK_EX | LOCK_UN)) === 0) return false;
+        return flock($handle, $lock);
     }
 
     public function stream_stat(): array|false
@@ -275,7 +286,13 @@ final class IncludeClock
         return fstat($handle);
     }
 
-    public function stream_set_option($option, $arg1, $arg2): bool { return false; }
+    public function stream_set_option($option, $arg1, $arg2): bool
+    {
+        if ($option === STREAM_OPTION_LOCKING) {
+            return $this->stream_lock($arg1);
+        }
+        return false;
+    }
 
     public function stream_close(): void
     {

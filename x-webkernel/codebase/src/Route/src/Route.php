@@ -206,7 +206,7 @@ final class Route implements ComposableContract
         $uri = rawurldecode($uri);
         $host = self::normalize_host($host ?? (string) ($_SERVER['HTTP_HOST'] ?? ''));
 
-        $result = self::app()->dispatcher($host)->dispatch($method, $uri);
+        $result = webapp()->route()->dispatcher($host)->dispatch($method, $uri);
 
         if ($result instanceof NotMatched) {
             http_response_code(404);
@@ -305,17 +305,22 @@ final class Route implements ComposableContract
      */
     private function compiled_data(string $host): array
     {
+        if ($this->bindings !== []) {
+            return $this->build_data($host);
+        }
+        $path = Cache::path($this->files_hash($host));
+        $cached = Cache::read($path);
+        if (is_array($cached) && (($cached[0] ?? []) !== [] || ($cached[1] ?? []) !== [])) {
+            return $cached;
+        }
+        $this->ensure_declared();
         if ($this->has_closure_handler()) {
             return $this->build_data($host);
         }
-        $hash = $this->compile_hash($host);
-        $path = Cache::path($hash);
-        $cached = Cache::read($path);
-        if ($cached !== null) {
-            return $cached;
-        }
         $data = $this->build_data($host);
-        Cache::write($path, $data);
+        if (($data[0] ?? []) !== [] || ($data[1] ?? []) !== []) {
+            Cache::write($path, $data);
+        }
 
         return $data;
     }
@@ -353,15 +358,12 @@ final class Route implements ComposableContract
         return $generator->get_data();
     }
 
-    private function compile_hash(string $host): string
+    private function files_hash(string $host): string
     {
         $parts = [$host];
         foreach (webapp()->route_files() as $file) {
             $parts[] = $file;
             $parts[] = (string) (@filemtime($file) ?: 0);
-        }
-        foreach ($this->bindings as $binding) {
-            $parts[] = implode(',', $binding->methods()).' '.$binding->uri().' '.$binding->action_label();
         }
 
         return sha1(implode("\n", $parts));

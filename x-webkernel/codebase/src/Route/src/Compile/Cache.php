@@ -18,12 +18,7 @@ final class Cache
 
     public static function path(string $hash): string
     {
-        $dir = webapp_path('storage/framework/cache');
-        if (! is_dir($dir) && ! mkdir($dir, 0775, true) && ! is_dir($dir)) {
-            throw new \RuntimeException('Unable to create '.$dir);
-        }
-
-        return $dir.'/routes_'.$hash.'.php';
+        return webapp_path('storage/framework/cache').'/routes_'.$hash.'.php';
     }
 
     /**
@@ -52,9 +47,9 @@ final class Cache
             return;
         }
 
-        $tmp = $path.'.tmp';
+        $tmp = $path.'.'.getmypid().'.tmp';
         $body = "<?php declare(strict_types=1);\n\nreturn ".var_export($data, true).";\n";
-        if (file_put_contents($tmp, $body, LOCK_EX) === false) {
+        if (file_put_contents($tmp, $body) === false) {
             return;
         }
         chmod($tmp, self::FILE_PERMISSIONS);

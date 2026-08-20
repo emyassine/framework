@@ -18,8 +18,7 @@
     },
     "extra": {
         "webkernel": {
-            "prefix": "route",
-            "provider": "Webkernel\\Route\\RouteProvider"
+            "prefix": "route"
         }
     }
 }

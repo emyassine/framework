@@ -5,7 +5,7 @@
 require __DIR__.'/fast-boot.php';
 
 use Webkernel\Http\Request;
-use Webkernel\Platform\{Exceptions, Middleware};
+use Webkernel\Platform\Exceptions;
 use Webkernel\WebApp;
 
 // ---- Global WebApp Configuration ----------------------------------------------------------
@@ -17,9 +17,8 @@ use Webkernel\WebApp;
 // Including the autoloader takes
 
 return WebApp::configure()
-    ->with_middleware(function (Middleware $middleware): void {
-    })
-    ->with_exceptions(function (Exceptions $exceptions): void {
+	    //->with_middleware(function (Middleware $middleware): void {})
+		->with_exceptions(function (Exceptions $exceptions): void {
         $exceptions->should_render_json_when(
             fn (Request $request) => $request->is('api/*'),
         );

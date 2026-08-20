@@ -20,7 +20,7 @@ final class View implements ComposableContract, \Stringable
 
     private static bool $double_encode = true;
 
-    private static ?Compiler $compiler = null;
+    private static ?Engine $engine = null;
 
     /**
      * @param array<string, mixed> $data
@@ -55,17 +55,17 @@ final class View implements ComposableContract, \Stringable
      */
     public static function share(string|array $key, mixed $value = null): void
     {
-        self::compiler()->share($key, $value);
+        self::engine()->share($key, $value);
     }
 
     public static function exists(string $view): bool
     {
-        return self::compiler()->get_template_file($view) !== '';
+        return self::engine()->template_file($view) !== '';
     }
 
     public static function add_location(string $path): void
     {
-        self::compiler()->add_template_path($path);
+        self::engine()->add_template_path($path);
     }
 
     public static function directive(string $name, callable $handler): void
@@ -107,27 +107,23 @@ final class View implements ComposableContract, \Stringable
         self::$double_encode = false;
     }
 
-    public static function compiler(): Compiler
+    public static function engine(): Engine
     {
-        if (self::$compiler instanceof Compiler) {
-            return self::$compiler;
+        if (self::$engine instanceof Engine) {
+            return self::$engine;
         }
-
-        $paths = self::template_paths();
-        $compiled = webapp_path('storage/framework/views');
-        if (! is_dir($compiled) && ! mkdir($compiled, 0775, true) && ! is_dir($compiled)) {
-            throw new \RuntimeException('Unable to create '.$compiled);
-        }
-
-        $mode = Compiler::MODE_AUTO;
-        $engine = new Compiler($paths, $compiled, $mode);
-        $engine->throw_on_error = true;
+        $engine = new Engine(self::template_paths(), webapp_path('storage/framework/views'), Engine::MODE_AUTO);
         $engine->set_echo_format('\\'.self::class.'::echo(%s)');
         $engine->add_alias_classes('Js', Js::class);
         $engine->add_alias_classes('View', self::class);
         self::apply_namespaces($engine);
 
-        return self::$compiler = $engine;
+        return self::$engine = $engine;
+    }
+
+    public static function compiler(): Compiler
+    {
+        return self::engine()->compiler();
     }
 
     /**
@@ -146,7 +142,7 @@ final class View implements ComposableContract, \Stringable
     /** Reset process singleton (tests). */
     public static function flush(): void
     {
-        self::$compiler = null;
+        self::$engine = null;
         self::$stringable = [];
         self::$double_encode = true;
         webapp()->container()->forget(self::class);
@@ -184,7 +180,7 @@ final class View implements ComposableContract, \Stringable
 
     public function render(): string
     {
-        return self::compiler()->run($this->name, $this->data);
+        return self::engine()->run($this->name, $this->data);
     }
 
     public function __toString(): string
@@ -192,7 +188,7 @@ final class View implements ComposableContract, \Stringable
         return $this->render();
     }
 
-    private static function apply_namespaces(Compiler $engine): void
+    private static function apply_namespaces(Engine $engine): void
     {
         foreach (webapp()->view_namespaces() as $namespace => $dirs) {
             if ($namespace === '') {

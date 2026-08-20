@@ -202,6 +202,9 @@ final class WebApp
     {
         $this->boot();
         $dirs = $this->view_namespaces[''] ?? [];
+        if ($dirs !== []) {
+            return $dirs;
+        }
         foreach ($this->dumped_paths('webkernel_views.php') as $dir) {
             if (is_dir($dir) && ! in_array($dir, $dirs, true)) {
                 $dirs[] = $dir;

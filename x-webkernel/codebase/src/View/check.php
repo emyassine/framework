@@ -11,7 +11,15 @@ function expect(mixed $ok, string $msg): void
     exit(1);
 }
 
+if (! defined('START_REQUEST')) {
+    define('START_REQUEST', hrtime(true));
+}
+
 webapp()->boot();
+\Webkernel\View\View::flush();
+$dashboard = (string) \Webkernel\View\View::make('dashboard', ['title' => 'Dash']);
+expect(str_contains($dashboard, 'Dashboard Overview'), 'dashboard html');
+expect(! class_exists(\Webkernel\View\Compiler::class, false), 'compiler not loaded for warm dashboard');
 
 expect(\Webkernel\View\View::exists('layouts.page'), 'un-namespaced layouts.page');
 expect(\Webkernel\View\View::exists('webkernel::layouts.page'), 'namespaced layouts.page');
