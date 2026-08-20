@@ -13,8 +13,12 @@ if (PHP_SAPI === 'cli-server') {
 
     $root = str_replace('\\', '/', dirname($docroot));
     $profile = ($_SERVER['WEBKERNEL_PROFILE_LIFECYCLE'] ?? getenv('WEBKERNEL_PROFILE_LIFECYCLE')) === '1';
+
+    $is_api = str_starts_with($uri, '/api/') || (isset($_SERVER['HTTP_ACCEPT']) && str_contains((string) $_SERVER['HTTP_ACCEPT'], 'application/json'));
+
     $files_before = $profile ? get_included_files() : [];
     $classes_before = $profile ? get_declared_classes() : [];
+
     if ($profile) {
         IncludeClock::start();
     }
@@ -43,14 +47,17 @@ if (PHP_SAPI === 'cli-server') {
     ));
 
     if ($profile) {
+        file_put_contents('php://stderr', 'webkernel-type '.($is_api ? 'API' : 'WEB')."\n");
+
         $prefix = $root.'/';
         $to_rel = static function (string $abs) use ($prefix): string {
             $abs = str_replace('\\', '/', $abs);
-
             return str_starts_with($abs, $prefix) ? substr($abs, strlen($prefix)) : $abs;
         };
+
         $timed = IncludeClock::stop();
         $seen = [];
+
         foreach (get_included_files() as $included) {
             if (in_array($included, $files_before, true)) {
                 continue;
@@ -58,10 +65,12 @@ if (PHP_SAPI === 'cli-server') {
             $rel = $to_rel($included);
             $seen[$rel] = true;
             $row = $timed[$included] ?? null;
+
             if ($row === null) {
                 file_put_contents('php://stderr', 'webkernel-include ? ? ? '.$rel."\n");
                 continue;
             }
+
             file_put_contents('php://stderr', sprintf(
                 "webkernel-include %.3f %.3f %.3f %s\n",
                 $row['ms'],
@@ -70,6 +79,7 @@ if (PHP_SAPI === 'cli-server') {
                 $rel,
             ));
         }
+
         foreach ($timed as $abs => $row) {
             $rel = $to_rel($abs);
             if (isset($seen[$rel])) {
@@ -83,41 +93,74 @@ if (PHP_SAPI === 'cli-server') {
                 $rel,
             ));
         }
+
         foreach (get_declared_classes() as $class) {
             if (in_array($class, $classes_before, true)) {
                 continue;
             }
             file_put_contents('php://stderr', 'webkernel-class '.$class."\n");
         }
+
         file_put_contents('php://stderr', 'webkernel-mem '.memory_get_usage(true)."\n");
     }
+
     return;
 }
 
-/**
- * Dev-server include clock. Times file I/O (read) and the gap until the next
- * include / request end (run = compile + execute). Profile mode only.
- */
+final class UI
+{
+    public const RESET = "\033[0m";
+    public const BOLD = "\033[1m";
+    public const GRAY = "\033[90m";
+    public const YELLOW = "\033[33m";
+    public const GREEN = "\033[32m";
+    public const RED = "\033[31m";
+    public const CYAN = "\033[36m";
+
+    public static function muted(string $text): string
+    {
+        return self::GRAY . $text . self::RESET;
+    }
+
+    public static function statusColor(int $code): string
+    {
+        return match (true) {
+            $code >= 200 && $code < 300 => self::GREEN,
+            $code >= 300 && $code < 400 => self::YELLOW,
+            $code >= 400 && $code < 500 => "\033[33;1m",
+            $code >= 500 => "\033[31;1m",
+            default => "\033[37m",
+        };
+    }
+
+    public static function info(string $msg): void
+    {
+        echo "  \033[44;97;1m INFO \033[0m " . self::BOLD . $msg . self::RESET . "\n";
+    }
+
+    public static function warn(string $msg): void
+    {
+        echo "  \033[43;30;1m WARN \033[0m " . self::YELLOW . $msg . self::RESET . "\n";
+    }
+
+    public static function badge(string $text, string $bg, string $fg): string
+    {
+        return "\033[{$bg};{$fg};1m {$text} \033[0m";
+    }
+}
+
 final class IncludeClock
 {
     /** @var array<string, array{read_ns: int, run_ns: int, bytes: int}> */
     private static array $stats = [];
-
     private static bool $active = false;
-
     private static int $nest = 0;
-
     private static ?string $pending = null;
-
     private static float $pending_t = 0.0;
-
-    public $context;
 
     /** @var resource|null */
     private $handle = null;
-
     private string $path = '';
-
     private float $t_open = 0.0;
 
     public static function start(): void
@@ -155,7 +198,6 @@ final class IncludeClock
             ];
         }
         uasort($out, static fn (array $a, array $b): int => $b['ms'] <=> $a['ms']);
-
         return $out;
     }
 
@@ -166,100 +208,73 @@ final class IncludeClock
         $this->t_open = hrtime(true);
         $use_path = (bool) ((int) $options & STREAM_USE_PATH);
         $handle = self::with_real(static fn () => fopen($path, $mode, $use_path));
-        if (! is_resource($handle)) {
-            return false;
-        }
+        if (! is_resource($handle)) return false;
         $this->handle = $handle;
         $opened_path = $path;
         if (! isset(self::$stats[$path])) {
             self::$stats[$path] = ['read_ns' => 0, 'run_ns' => 0, 'bytes' => 0];
         }
-
         return true;
     }
 
     public function stream_read($count): string|false
     {
         $handle = $this->handle;
-        if (! is_resource($handle)) {
-            return false;
-        }
-
-        return fread($handle, $count);
+        return is_resource($handle) ? fread($handle, $count) : false;
     }
 
     public function stream_write($data): int|false
     {
         $handle = $this->handle;
-        if (! is_resource($handle)) {
-            return false;
-        }
-
-        return fwrite($handle, $data);
+        return is_resource($handle) ? fwrite($handle, $data) : false;
     }
 
     public function stream_eof(): bool
     {
         $handle = $this->handle;
-
         return is_resource($handle) && feof($handle);
     }
 
     public function stream_seek($offset, $whence = SEEK_SET): bool
     {
         $handle = $this->handle;
-
         return is_resource($handle) && fseek($handle, $offset, $whence) === 0;
     }
 
     public function stream_tell(): int
     {
         $handle = $this->handle;
-        if (! is_resource($handle)) {
-            return 0;
-        }
+        if (! is_resource($handle)) return 0;
         $pos = ftell($handle);
-
         return is_int($pos) ? $pos : 0;
     }
 
     public function stream_flush(): bool
     {
         $handle = $this->handle;
-
         return is_resource($handle) && fflush($handle);
     }
 
     public function stream_lock($operation): bool
     {
         $handle = $this->handle;
-
         return is_resource($handle) && flock($handle, $operation);
     }
 
     public function stream_stat(): array|false
     {
         $handle = $this->handle;
-        if (! is_resource($handle)) {
-            return false;
-        }
-
-        return fstat($handle);
+        return is_resource($handle) ? fstat($handle) : false;
     }
 
-    public function stream_set_option($option, $arg1, $arg2): bool
-    {
-        return false;
-    }
+    public function stream_set_option($option, $arg1, $arg2): bool { return false; }
 
     public function stream_close(): void
     {
         $bytes = 0;
         if (is_resource($this->handle)) {
             $stat = fstat($this->handle);
-            if (is_array($stat)) {
-                $bytes = (int) ($stat['size'] ?? 0);
-            }
+            if (is_array($stat)) $bytes = (int) ($stat['size'] ?? 0);
             fclose($this->handle);
         }
         $this->handle = null;
@@ -272,99 +287,57 @@ final class IncludeClock
         self::$pending_t = hrtime(true);
     }
 
-    public function url_stat($path, $flags)
-    {
+    public function url_stat($path, $flags) {
         return self::with_real(static function () use ($path, $flags) {
-            if ($flags & STREAM_URL_STAT_QUIET) {
-                return @stat($path);
-            }
-
-            return stat($path);
+            return ($flags & STREAM_URL_STAT_QUIET) ? @stat($path) : stat($path);
         });
     }
 
-    public function mkdir($path, $mode, $options): bool
-    {
+    public function mkdir($path, $mode, $options): bool {
         return (bool) self::with_real(static fn () => mkdir($path, $mode, (bool) ($options & STREAM_MKDIR_RECURSIVE)));
     }
 
-    public function rmdir($path, $options): bool
-    {
-        return (bool) self::with_real(static fn () => rmdir($path));
-    }
+    public function rmdir($path, $options): bool { return (bool) self::with_real(static fn () => rmdir($path)); }
+    public function rename($from, $to): bool { return (bool) self::with_real(static fn () => rename($from, $to)); }
+    public function unlink($path): bool { return (bool) self::with_real(static fn () => unlink($path)); }
 
-    public function rename($from, $to): bool
-    {
-        return (bool) self::with_real(static fn () => rename($from, $to));
-    }
-
-    public function unlink($path): bool
-    {
-        return (bool) self::with_real(static fn () => unlink($path));
-    }
-
-    public function dir_opendir($path, $options): bool
-    {
+    public function dir_opendir($path, $options): bool {
         $handle = self::with_real(static fn () => opendir($path));
-        if (! is_resource($handle)) {
-            return false;
-        }
+        if (! is_resource($handle)) return false;
         $this->handle = $handle;
-
         return true;
     }
 
-    public function dir_readdir(): string|false
-    {
+    public function dir_readdir(): string|false {
         $handle = $this->handle;
-        if (! is_resource($handle)) {
-            return false;
-        }
-
-        return readdir($handle);
+        return is_resource($handle) ? readdir($handle) : false;
     }
 
-    public function dir_rewinddir(): bool
-    {
+    public function dir_rewinddir(): bool {
         $handle = $this->handle;
-        if (! is_resource($handle)) {
-            return false;
-        }
+        if (! is_resource($handle)) return false;
         rewinddir($handle);
-
         return true;
     }
 
-    public function dir_closedir(): void
-    {
-        if (is_resource($this->handle)) {
-            closedir($this->handle);
-        }
+    public function dir_closedir(): void {
+        if (is_resource($this->handle)) closedir($this->handle);
         $this->handle = null;
     }
 
-    private static function flush_pending(): void
-    {
-        if (self::$pending === null) {
-            return;
-        }
+    private static function flush_pending(): void {
+        if (self::$pending === null) return;
         self::add_run(self::$pending, (int) (hrtime(true) - self::$pending_t));
         self::$pending = null;
     }
 
-    private static function add_run(string $path, int $ns): void
-    {
-        if (! isset(self::$stats[$path])) {
-            self::$stats[$path] = ['read_ns' => 0, 'run_ns' => 0, 'bytes' => 0];
-        }
+    private static function add_run(string $path, int $ns): void {
+        if (! isset(self::$stats[$path])) self::$stats[$path] = ['read_ns' => 0, 'run_ns' => 0, 'bytes' => 0];
         self::$stats[$path]['run_ns'] += max(0, $ns);
     }
 
-    private static function with_real(callable $fn): mixed
-    {
-        if (self::$nest === 0) {
-            stream_wrapper_restore('file');
-        }
+    private static function with_real(callable $fn): mixed {
+        if (self::$nest === 0) stream_wrapper_restore('file');
         self::$nest++;
         try {
             return $fn();
@@ -378,32 +351,27 @@ final class IncludeClock
     }
 }
 
-// use Webkernel\Console\Input\ArgvInput;
-# /** @var \Webkernel\WebApp $webapp */
-// $webapp = require_once __DIR__.'/bootstrap/app.php';
-// exit($webapp->handleCommand(new ArgvInput));
-
 final class Server
 {
     private const int MAX_PORT_TRIES = 10;
-
     private string $host;
     private int $port;
     private string $public_dir;
     private bool $profile_lifecycle;
-
     /** @var resource|null */
     private $process = null;
-
     /** @var array<int, resource> */
     private array $pipes = [];
-
     private string $output_buffer = '';
     private bool $banner_shown = false;
     private bool $address_in_use = false;
+    private bool $is_first_request = true;
 
-    /** @var array<int, array{started: int|float, request: string, status: int, render_ms: float|null, times: list<array{ms: float, run_ms: float, read_ms: float, bytes: int, path: string}>, mem: int|null}> */
+    /** @var array<int, array{started: int|float, request: string, status: int, render_ms: float|null, type: string, times: list<array{ms: float|null, run_ms: float|null, read_ms: float|null, path: string, inferred?: bool}>, classes: list<string>, mem: int|null}> */
     private array $requests_pool = [];
+
+    /** @var array<string, array{render_ms: float|null, request_ms: float, times: array<string, array{ms: float, run_ms: float, read_ms: float}>}> */
+    private array $baselines = [];
 
     public function __construct(string $host = '127.0.0.1', int $port = 8000, bool $profile_lifecycle = false)
     {
@@ -416,91 +384,53 @@ final class Server
     public function start(): void
     {
         $this->register_signals();
-
         for ($try = 0; $try < self::MAX_PORT_TRIES; $try++) {
             $exit_code = $this->run_process();
-
             if ($this->address_in_use) {
                 $this->address_in_use = false;
                 $this->banner_shown   = false;
                 $this->port++;
                 continue;
             }
-
             exit(is_int($exit_code) ? $exit_code : 0);
         }
-
         fwrite(STDERR, "Unable to listen on {$this->host} after ".self::MAX_PORT_TRIES." port attempts.\n");
         exit(1);
     }
 
     private function run_process(): ?int
     {
-        $command = [
-            PHP_BINARY,
-            '-S',
-            "{$this->host}:{$this->port}",
-            '-t',
-            $this->public_dir,
-            __FILE__,
-        ];
-
+        $command = [PHP_BINARY, '-S', "{$this->host}:{$this->port}", '-t', $this->public_dir, __FILE__];
         $env = null;
         if ($this->profile_lifecycle) {
             $env = getenv();
-            if (! is_array($env)) {
-                $env = [];
-            }
+            if (! is_array($env)) $env = [];
             $env['WEBKERNEL_PROFILE_LIFECYCLE'] = '1';
         }
-
         $pipes = [];
         $process = proc_open($command, [
             0 => ['file', '/dev/null', 'r'],
             1 => ['pipe', 'w'],
             2 => ['redirect', 1],
         ], $pipes, __DIR__, $env);
-
-        if (!is_resource($process)) {
-            fwrite(STDERR, "Failed to start PHP development server.\n");
-            exit(1);
-        }
-
+        if (!is_resource($process)) { fwrite(STDERR, "Failed to start PHP development server.\n"); exit(1); }
         $this->process = $process;
-
         $stdout = $pipes[1] ?? null;
-        if (!is_resource($stdout)) {
-            $this->close_process();
-            fwrite(STDERR, "Failed to capture server output.\n");
-            exit(1);
-        }
-
+        if (!is_resource($stdout)) { $this->close_process(); fwrite(STDERR, "Failed to capture server output.\n"); exit(1); }
         $kept = [];
-        foreach ($pipes as $fd => $pipe) {
-            if (is_resource($pipe)) {
-                $kept[(int) $fd] = $pipe;
-            }
-        }
+        foreach ($pipes as $fd => $pipe) if (is_resource($pipe)) $kept[(int) $fd] = $pipe;
         $this->pipes = $kept;
-
         stream_set_blocking($stdout, false);
-
         while (true) {
             $chunk = fread($stdout, 8192);
-            if (is_string($chunk) && $chunk !== '') {
-                $this->ingest($chunk);
-            }
-
+            if (is_string($chunk) && $chunk !== '') $this->ingest($chunk);
             $status = proc_get_status($process);
             if (!$status['running']) {
                 $leftover = stream_get_contents($stdout);
-                if (is_string($leftover) && $leftover !== '') {
-                    $this->ingest($leftover);
-                }
+                if (is_string($leftover) && $leftover !== '') $this->ingest($leftover);
                 $this->close_process();
                 return $status['exitcode'];
             }
-
             usleep(50_000);
         }
     }
@@ -510,46 +440,24 @@ final class Server
         $this->output_buffer .= $chunk;
         $lines = explode("\n", $this->output_buffer);
         $this->output_buffer = (string) array_pop($lines);
-
-        foreach ($lines as $line) {
-            $this->handle_line(trim($line));
-        }
+        foreach ($lines as $line) $this->handle_line(trim($line));
     }
 
     private function handle_line(string $line): void
     {
-        if ($line === '') {
-            return;
-        }
-
-        if (str_contains($line, 'Failed to listen') || str_contains($line, 'Address already in use')) {
-            $this->address_in_use = true;
-            return;
-        }
-
+        if ($line === '') return;
+        if (str_contains($line, 'Failed to listen') || str_contains($line, 'Address already in use')) { $this->address_in_use = true; return; }
         if (str_contains($line, 'Development Server (http')) {
-            if (!$this->banner_shown) {
-                $this->banner_shown = true;
-                $this->render_banner();
-            }
+            if (!$this->banner_shown) { $this->banner_shown = true; $this->render_banner(); }
             return;
         }
-
-        if (str_contains($line, 'Closed without sending a request') || str_contains($line, 'Failed to poll event')) {
-            return;
-        }
+        if (str_contains($line, 'Closed without sending a request') || str_contains($line, 'Failed to poll event')) return;
 
         $port = $this->request_port($line);
-
         if (str_ends_with($line, ' Accepted') && $port !== null) {
             $this->requests_pool[$port] = [
-                'started' => hrtime(true),
-                'request' => '',
-                'status' => 200,
-                'render_ms' => null,
-                'times' => [],
-                'classes' => [],
-                'mem' => null,
+                'started' => hrtime(true), 'request' => '', 'status' => 200, 'render_ms' => null, 'type' => 'WEB',
+                'times' => [], 'classes' => [], 'mem' => null,
             ];
             return;
         }
@@ -563,32 +471,21 @@ final class Server
             ]);
             return;
         }
-        if (str_starts_with($line, 'webkernel-class ')) {
-            $this->trace_push('classes', substr($line, 16));
-            return;
-        }
-        if (str_starts_with($line, 'webkernel-mem ')) {
-            $this->trace_push('mem', substr($line, 14));
-            return;
-        }
+        if (str_starts_with($line, 'webkernel-class ')) { $this->trace_push('classes', substr($line, 16)); return; }
+        if (str_starts_with($line, 'webkernel-mem ')) { $this->trace_push('mem', substr($line, 14)); return; }
+        if (str_starts_with($line, 'webkernel-type ')) { $this->trace_push('type', substr($line, 15)); return; }
 
         if (preg_match('/\[(\d+)\]:\s+(\S+)\s+(\S+)/', $line, $m) === 1) {
             $status = (int) $m[1];
             $request = $m[2].' '.$m[3];
             $render_ms = null;
-            if (preg_match('/render=([0-9.]+)/', $line, $r) === 1) {
-                $render_ms = (float) $r[1];
-            }
-
+            if (preg_match('/render=([0-9.]+)/', $line, $r) === 1) $render_ms = (float) $r[1];
             if ($port !== null && isset($this->requests_pool[$port])) {
                 $this->requests_pool[$port]['request'] = $request;
                 $this->requests_pool[$port]['status'] = $status;
-                if ($render_ms !== null) {
-                    $this->requests_pool[$port]['render_ms'] = $render_ms;
-                }
+                if ($render_ms !== null) $this->requests_pool[$port]['render_ms'] = $render_ms;
                 return;
             }
-
             $this->log_request($request, $status, hrtime(true), ['render_ms' => $render_ms]);
             return;
         }
@@ -596,164 +493,224 @@ final class Server
         if (str_ends_with($line, ' Closing') && $port !== null) {
             $entry = $this->requests_pool[$port] ?? null;
             unset($this->requests_pool[$port]);
-
-            if ($entry === null || $entry['request'] === '') {
-                return;
-            }
-
+            if ($entry === null || $entry['request'] === '') return;
             $this->log_request($entry['request'], $entry['status'], $entry['started'], [
-                'render_ms' => $entry['render_ms'],
-                'times' => $entry['times'],
-                'classes' => $entry['classes'],
-                'mem' => $entry['mem'],
+                'render_ms' => $entry['render_ms'], 'times' => $entry['times'],
+                'classes' => $entry['classes'], 'mem' => $entry['mem'], 'type' => $entry['type']
             ]);
             return;
         }
 
-        if (str_starts_with($line, '[')) {
-            $line = trim((string) strstr($line, '] '));
-        }
-
-        if ($line !== '') {
-            $gray  = "\033[90m";
-            $reset = "\033[0m";
-            echo "  {$gray}{$line}{$reset}\n";
-        }
+        if (str_starts_with($line, '[')) $line = trim((string) strstr($line, '] '));
+        if ($line !== '') echo "  " . UI::muted($line) . "\n";
     }
 
     private function request_port(string $line): ?int
     {
-        if (preg_match('/:(\d+)\s+(?:Accepted|Closing|\[\d+\])/', $line, $m) === 1) {
-            return (int) $m[1];
-        }
-
+        if (preg_match('/:(\d+)\s+(?:Accepted|Closing|\[\d+\])/', $line, $m) === 1) return (int) $m[1];
         return null;
     }
 
     private function render_banner(): void
     {
-        $reset      = "\033[0m";
-        $bold       = "\033[1m";
-        $info_badge = "\033[44;97;1m INFO \033[0m";
-        $warn_badge = "\033[43;30;1m WARN \033[0m";
-        $gray       = "\033[90m";
-        $yellow     = "\033[33m";
-        $green      = "\033[32m";
+     	$banner_start_message = [
+	     	'This feature is part of Webkernel.',
+	     	"(c) 2025 - " . (date('Y') + 1) . " Numerimondes, El Moumen Yassine",
+	     	'Yassine El Moumen <yassine@numerimondes.com> | <platform@webkernelphp.com>',
+	     	'For the full copyright and license information, please view the LICENSE',
+	     	'file that was distributed with the source code.',
+			'Made in Morocco.'
+	    ];
+		echo "\n";
+     	foreach ($banner_start_message as $line) {
+     		echo UI::muted("  //> " . $line) . "\n";
+     	}
 
         $url = "http://{$this->host}:{$this->port}";
-
         $opcache_active = extension_loaded('Zend OPcache') && (ini_get('opcache.enable') || ini_get('opcache.enable_cli'));
-        $opcache_status = $opcache_active ? "{$green}enabled{$reset}" : "{$gray}disabled{$reset}";
-
+        $opcache_status = $opcache_active ? UI::GREEN . "enabled" . UI::RESET : UI::GRAY . "disabled" . UI::RESET;
         echo "\n";
-        echo "  ".$info_badge." Server running on ".$bold."[".$url."]".$reset.".\n\n";
-        echo "  ".$gray."PHP Version: ".PHP_VERSION." | OPcache: ".$opcache_status.$reset."\n\n";
-        echo "  ".$warn_badge." ".$yellow."This server is for local development only. Behavior differs from production (Nginx/Apache/FPM).".$reset."\n\n";
+        UI::info("Server running on " . UI::BOLD . "[" . $url . "]" . UI::RESET);
+        echo "\n";
+        echo "  " . UI::muted("PHP Version: " . PHP_VERSION . " | OPcache: " . $opcache_status) . "\n\n";
+        UI::warn("This server is for local development only. Behavior differs from production (Nginx/Apache/FPM).");
+        echo "\n";
         if ($this->profile_lifecycle) {
-            echo "  ".$info_badge." ".$gray."--profile-lifecycle".$reset."  include cost (run/read); ?? when OPcache hid the file stream.\n\n";
+            UI::info(UI::muted("--profile-lifecycle") . " include cost (run/read); ?? when OPcache hid the file stream.");
+            echo "\n";
         }
-        echo "  ".$gray."Press Ctrl+C to stop the server".$reset."\n\n";
+        echo "  " . UI::muted("Press Ctrl+C to stop the server") . "\n\n";
     }
 
     /**
-     * @param array{render_ms?: float|null, times?: list<array{ms: float|null, run_ms: float|null, read_ms: float|null, path: string}>, classes?: list<string>, mem?: int|string|null} $timings
+     * @param array{render_ms?: float|null, times?: list<array{ms: float|null, run_ms: float|null, read_ms: float|null, path: string}>, classes?: list<string>, mem?: int|string|null, type?: string} $timings
      */
     private function log_request(string $request, int $status_code, float|int $start_time, array $timings = []): void
     {
-        $reset = "\033[0m";
-        $cyan = "\033[36m";
-        $gray = "\033[90m";
+        if (!$this->is_first_request) echo "\n";
+        $this->is_first_request = false;
 
-        $status_color = match (true) {
-            $status_code >= 200 && $status_code < 300 => "\033[32m",
-            $status_code >= 300 && $status_code < 400 => "\033[33m",
-            $status_code >= 400 && $status_code < 500 => "\033[33;1m",
-            $status_code >= 500 => "\033[31;1m",
-            default => "\033[37m",
-        };
-
-        $reason = $this->get_status_reason($status_code);
         $request_ms = (hrtime(true) - $start_time) / 1e6;
         $timestamp = date('H:i:s');
         $width = $this->line_width();
 
-        $left = "  {$gray}{$timestamp}{$reset} {$status_color}{$status_code} {$reason}{$reset} {$cyan}{$request}{$reset}";
+        $is_api = $timings['type'] ?? 'WEB';
+        $type_badge = $is_api === 'API' ? UI::badge('API', '45', '97') . " " : UI::badge('WEB', '42', '97') . " ";
+        $reason = $this->get_status_reason($status_code);
+
+        $left = sprintf("  %s %s%s %s %s%s%s %s", UI::muted($timestamp), UI::statusColor($status_code), $status_code, $reason, UI::CYAN, $request, UI::RESET, $type_badge);
         $right_plain = $this->metrics_plain($timings['render_ms'] ?? null, $request_ms);
-        $right = $gray.$right_plain.$reset;
+        $right = UI::muted($right_plain);
 
         $left_len = $this->visible_len($left);
         $right_len = strlen($right_plain);
         $dots = $width - $left_len - $right_len - 2;
+
         if ($dots < 2) {
             $overflow = 2 - $dots;
             $max_req = max(8, strlen($request) - $overflow);
-            $request = $this->shorten($request, $max_req);
-            $left = "  {$gray}{$timestamp}{$reset} {$status_color}{$status_code} {$reason}{$reset} {$cyan}{$request}{$reset}";
+            $request_short = $this->shorten($request, $max_req);
+            $left = sprintf("  %s %s%s %s %s%s%s %s", UI::muted($timestamp), UI::statusColor($status_code), $status_code, $reason, UI::CYAN, $request_short, UI::RESET, $type_badge);
             $dots = max(2, $width - $this->visible_len($left) - $right_len - 2);
         }
 
-        echo $left.' '.$gray.str_repeat('.', $dots).$reset.' '.$right."\n";
-
-        if (! $this->profile_lifecycle) {
-            return;
-        }
+        echo $left . ' ' . UI::muted(str_repeat('.', $dots)) . ' ' . $right . "\n";
+        if (! $this->profile_lifecycle) return;
 
         $times = $timings['times'] ?? [];
         $classes = $timings['classes'] ?? [];
-        if ($times === [] && $classes === []) {
-            return;
-        }
         $mem = $timings['mem'] ?? null;
-        $mem_label = is_numeric($mem)
-            ? number_format(((int) $mem) / 1048576, 1).'MB'
-            : null;
-        $known = 0;
-        foreach ($times as $row) {
-            if ($row['ms'] !== null) {
-                $known++;
+        $mem_label = is_numeric($mem) ? number_format(((int) $mem) / 1048576, 1).'MB' : '?';
+
+        $has_real = false;
+        foreach ($times as $row) if ($row['ms'] !== null) { $has_real = true; break; }
+
+        $inferred_count = 0;
+        if (!$has_real && isset($this->baselines[$request])) {
+            $baseline = $this->baselines[$request];
+            $base_metric = $baseline['render_ms'] ?? $baseline['request_ms'];
+            $curr_metric = $timings['render_ms'] ?? $request_ms;
+            $ratio = ($base_metric > 0.0) ? ($curr_metric / $base_metric) : 1.0;
+
+            foreach ($times as &$row) {
+                if ($row['ms'] === null && isset($baseline['times'][$row['path']])) {
+                    $base_row = $baseline['times'][$row['path']];
+                    $row['ms'] = $base_row['ms'] * $ratio;
+                    $row['run_ms'] = $base_row['run_ms'] * $ratio;
+                    $row['read_ms'] = $base_row['read_ms'] * $ratio;
+                    $row['inferred'] = true;
+                    $inferred_count++;
+                }
+            }
+            unset($row);
+        } elseif ($has_real) {
+            $this->baselines[$request] = ['render_ms' => $timings['render_ms'] ?? null, 'request_ms' => $request_ms, 'times' => []];
+            foreach ($times as $row) {
+                if ($row['ms'] !== null) {
+                    $this->baselines[$request]['times'][$row['path']] = [
+                        'ms' => (float) $row['ms'], 'run_ms' => (float) $row['run_ms'], 'read_ms' => (float) $row['read_ms'],
+                    ];
+                }
             }
         }
-        $summary = [
-            $request.'  →  '.$status_code.' '.$reason,
-            count($times).' files',
-            $known.' timed',
-            (count($times) - $known).' ??',
-            count($classes).' classes',
-        ];
-        if ($mem_label !== null) {
-            $summary[] = $mem_label;
+
+        $valid_times = [];
+        foreach ($times as $row) if ($row['ms'] !== null) $valid_times[] = $row['ms'];
+        sort($valid_times);
+        $count_valid = count($valid_times);
+        $median = 0.0;
+        if ($count_valid > 0) {
+            $mid = (int) floor(($count_valid - 1) / 2);
+            $median = ($count_valid % 2 === 0) ? ($valid_times[$mid] + $valid_times[$mid + 1]) / 2.0 : $valid_times[$mid];
         }
-        echo "  {$gray}  ".implode(' · ', $summary).$reset."\n";
-        echo "  {$gray}      total     run    read  file{$reset}\n";
+
+        $grades = ['e' => 0, 'g' => 0, 'f' => 0, 's' => 0];
+        foreach ($valid_times as $t) {
+            if ($t < 0.1) $grades['e']++;
+            elseif ($t < 0.5) $grades['g']++;
+            elseif ($t < 1.0) $grades['f']++;
+            else $grades['s']++;
+        }
+        echo "\n";
+
+        $summary1 = sprintf("%s -> %d %s | files=%d timed=%d inferred=%d classes=%d mem=%s", $request, $status_code, $reason, count($times), $count_valid, $inferred_count, count($classes), $mem_label);
+        $summary2 = sprintf("grades excellent=%d good=%d fair=%d slow=%d (%de %dg %df %ds) median=%.3fms", $grades['e'], $grades['g'], $grades['f'], $grades['s'], $grades['e'], $grades['g'], $grades['f'], $grades['s'], $median);
+
+        echo "  " . UI::muted($summary1) . "\n";
+        echo "  " . UI::muted($summary2) . "\n";
+
+        if ($times === [] && $classes === []) return;
+
+        echo "\n";
+        echo "  " . UI::RESET . '  TOTAL     RUN     READ     FILE' . UI::RESET . "\n\n";
+        echo "  " . UI::RESET . ' ---------------------------------' . UI::RESET . "\n\n";
         foreach ($times as $row) {
-            echo sprintf(
-                "  {$gray}    %7s  %7s  %7s  %s{$reset}\n",
-                $this->format_ms($row['ms']),
-                $this->format_ms($row['run_ms']),
-                $this->format_ms($row['read_ms']),
-                $row['path'],
-            );
+            $ms = $row['ms']; $run = $row['run_ms']; $read = $row['read_ms']; $path = $row['path']; $inferred = $row['inferred'] ?? false;
+            $flag = '';
+            if ($ms !== null) {
+                if ($median > 0.0) {
+                    if ($ms > 2.0 * $median) $flag = ' ' . UI::RED . '[SLOW] ' . UI::RESET;
+                    elseif ($ms < 0.5 * $median) $flag = ' ' . UI::GREEN . '[FAST] ' . UI::RESET;
+                    else $flag = ' ' . UI::GRAY . ' [OK]  ' . UI::RESET;
+                } else {
+                    $flag = ' ' . UI::GRAY . ' [OK]  ' . UI::RESET;
+                }
+            }
+            $ms_str = $ms === null ? '      ??' : sprintf('%c%7.3f', $inferred ? '~' : ' ', $ms);
+            $run_str = $run === null ? '      ??' : sprintf('%c%7.3f', $inferred ? '~' : ' ', $run);
+            $read_str = $read === null ? '      ??' : sprintf('%c%7.3f', $inferred ? '~' : ' ', $read);
+
+            echo sprintf("  %s  %s  %s  %s%s\n", UI::muted($ms_str), UI::muted($run_str), UI::muted($read_str), $flag, UI::muted(' ->  ') . $path);
         }
-        foreach ($classes as $class) {
-            echo "  {$gray}      class {$class}{$reset}\n";
-        }
+        echo "\n";
+        foreach ($classes as $class) echo "  " . UI::muted("class " . $class) . "\n";
     }
 
-    private function format_ms(?float $ms): string
+    private function metrics_plain(?float $render_ms, float $request_ms): string
     {
-        return $ms === null ? '     ??' : sprintf('%7.3f', $ms);
+        $request = 'request '.number_format($request_ms, 2).'ms';
+        return $render_ms === null ? $request : 'render '.number_format($render_ms, 2).'ms  '.$request;
     }
 
-    /**
-     * @param array{ms: float|null, run_ms: float|null, read_ms: float|null, path: string} $row
-     */
+    private function line_width(): int
+    {
+        static $width = null;
+        if ($width !== null) return $width;
+        $cols = (int) (getenv('COLUMNS') ?: 0);
+        if ($cols < 40) {
+            $stty = @shell_exec('stty size 2>/dev/null');
+            if (is_string($stty) && preg_match('/\d+\s+(\d+)/', $stty, $m) === 1) $cols = (int) $m[1];
+        }
+        if ($cols < 40) $cols = 80;
+        return $width = max(60, (int) floor($cols * 0.95));
+    }
+
+    private function visible_len(string $text): int
+    {
+        $plain = preg_replace('/\033\[[0-9;]*m/', '', $text);
+        return strlen(is_string($plain) ? $plain : $text);
+    }
+
+    private function shorten(string $text, int $max): string
+    {
+        if ($max < 2 || strlen($text) <= $max) return $text;
+        return substr($text, 0, $max - 1).'...';
+    }
+
+    private function get_status_reason(int $code): string
+    {
+        return match ($code) {
+            200 => 'OK', 201 => 'Created', 204 => 'No Content', 301 => 'Moved Permanently', 302 => 'Found', 304 => 'Not Modified',
+            400 => 'Bad Request', 401 => 'Unauthorized', 403 => 'Forbidden', 404 => 'Not Found', 405 => 'Method Not Allowed',
+            500 => 'Internal Server Error', 502 => 'Bad Gateway', 503 => 'Service Unavailable', default => 'Response',
+        };
+    }
+
     private function trace_time(array $row): void
     {
         end($this->requests_pool);
         $port = key($this->requests_pool);
-        if (! is_int($port)) {
-            return;
-        }
+        if (! is_int($port)) return;
         $this->requests_pool[$port]['times'][] = $row;
     }
 
@@ -761,135 +718,34 @@ final class Server
     {
         end($this->requests_pool);
         $port = key($this->requests_pool);
-        if (! is_int($port)) {
-            return;
-        }
-        if ($kind === 'mem') {
-            $this->requests_pool[$port]['mem'] = (int) $value;
-
-            return;
-        }
+        if (! is_int($port)) return;
+        if ($kind === 'mem') { $this->requests_pool[$port]['mem'] = (int) $value; return; }
+        if ($kind === 'type') { $this->requests_pool[$port]['type'] = $value; return; }
         $this->requests_pool[$port][$kind][] = $value;
-    }
-
-    private function metrics_plain(?float $render_ms, float $request_ms): string
-    {
-        $request = 'request '.number_format($request_ms, 2).'ms';
-        if ($render_ms === null) {
-            return $request;
-        }
-
-        return 'render '.number_format($render_ms, 2).'ms  '.$request;
-    }
-
-    private function line_width(): int
-    {
-        static $width = null;
-        if ($width !== null) {
-            return $width;
-        }
-        $cols = (int) (getenv('COLUMNS') ?: 0);
-        if ($cols < 40) {
-            $stty = @shell_exec('stty size 2>/dev/null');
-            if (is_string($stty) && preg_match('/\d+\s+(\d+)/', $stty, $m) === 1) {
-                $cols = (int) $m[1];
-            }
-        }
-        if ($cols < 40) {
-            $cols = 80;
-        }
-
-        return $width = max(60, (int) floor($cols * 0.95));
-    }
-
-    private function visible_len(string $text): int
-    {
-        $plain = preg_replace('/\033\[[0-9;]*m/', '', $text);
-
-        return strlen(is_string($plain) ? $plain : $text);
-    }
-
-    private function shorten(string $text, int $max): string
-    {
-        if ($max < 2 || strlen($text) <= $max) {
-            return $text;
-        }
-
-        return substr($text, 0, $max - 1).'…';
-    }
-
-    private function get_status_reason(int $code): string
-    {
-        return match ($code) {
-            200 => 'OK',
-            201 => 'Created',
-            204 => 'No Content',
-            301 => 'Moved Permanently',
-            302 => 'Found',
-            304 => 'Not Modified',
-            400 => 'Bad Request',
-            401 => 'Unauthorized',
-            403 => 'Forbidden',
-            404 => 'Not Found',
-            405 => 'Method Not Allowed',
-            500 => 'Internal Server Error',
-            502 => 'Bad Gateway',
-            503 => 'Service Unavailable',
-            default => 'Response',
-        };
     }
 
     private function register_signals(): void
     {
-        if (!function_exists('pcntl_async_signals') || !function_exists('pcntl_signal')) {
-            return;
-        }
-
+        if (!function_exists('pcntl_async_signals') || !function_exists('pcntl_signal')) return;
         pcntl_async_signals(true);
-
-        $stop = function (): void {
-            $this->close_process();
-            exit(0);
-        };
-
-        pcntl_signal(SIGINT, $stop);
-        pcntl_signal(SIGTERM, $stop);
-        pcntl_signal(SIGHUP, $stop);
-        pcntl_signal(SIGQUIT, $stop);
-
-        register_shutdown_function(function (): void {
-            $this->close_process();
-        });
+        $stop = function (): void { $this->close_process(); exit(0); };
+        pcntl_signal(SIGINT, $stop); pcntl_signal(SIGTERM, $stop); pcntl_signal(SIGHUP, $stop); pcntl_signal(SIGQUIT, $stop);
+        register_shutdown_function(function (): void { $this->close_process(); });
     }
 
     private function close_process(): void
     {
         $process = $this->process;
-        if (!is_resource($process)) {
-            $this->process = null;
-            $this->pipes = [];
-            return;
-        }
-
+        if (!is_resource($process)) { $this->process = null; $this->pipes = []; return; }
         $status = proc_get_status($process);
         if ($status['running']) {
             proc_terminate($process, SIGTERM);
             $deadline = microtime(true) + 2;
-            while (proc_get_status($process)['running'] && microtime(true) < $deadline) {
-                usleep(50_000);
-            }
-            if (proc_get_status($process)['running']) {
-                proc_terminate($process, SIGKILL);
-            }
+            while (proc_get_status($process)['running'] && microtime(true) < $deadline) usleep(50_000);
+            if (proc_get_status($process)['running']) proc_terminate($process, SIGKILL);
         }
-
-        foreach ($this->pipes as $pipe) {
-            if (is_resource($pipe)) {
-                fclose($pipe);
-            }
-        }
+        foreach ($this->pipes as $pipe) if (is_resource($pipe)) fclose($pipe);
         $this->pipes = [];
-
         proc_close($process);
         $this->process = null;
     }
@@ -899,16 +755,10 @@ if (($argv[1] ?? null) === 'server') {
     $host = '127.0.0.1';
     $port = 8000;
     $profile_lifecycle = false;
-
     foreach (array_slice($argv, 2) as $arg) {
-        if (str_starts_with($arg, '--host=')) {
-            $host = substr($arg, 7);
-        } elseif (str_starts_with($arg, '--port=')) {
-            $port = (int) substr($arg, 7);
-        } elseif ($arg === '--profile-lifecycle') {
-            $profile_lifecycle = true;
-        }
+        if (str_starts_with($arg, '--host=')) $host = substr($arg, 7);
+        elseif (str_starts_with($arg, '--port=')) $port = (int) substr($arg, 7);
+        elseif ($arg === '--profile-lifecycle') $profile_lifecycle = true;
     }
-
     (new Server($host, $port, $profile_lifecycle))->start();
 }
