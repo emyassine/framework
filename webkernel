@@ -208,7 +208,8 @@ final class IncludeClock
         $this->t_open = hrtime(true);
         $use_path = (bool) ((int) $options & STREAM_USE_PATH);
         $handle = self::with_real(static fn () => fopen($path, $mode, $use_path));
-        if (! is_resource($handle)) return false;
+        if ($handle === false || $handle === null) return false;
+        /** @var resource $handle */
         $this->handle = $handle;
         $opened_path = $path;
         if (! isset(self::$stats[$path])) {
@@ -220,31 +221,35 @@ final class IncludeClock
     public function stream_read($count): string|false
     {
         $handle = $this->handle;
-        return is_resource($handle) ? fread($handle, $count) : false;
+        if ($handle === null) return false;
+        return fread($handle, $count);
     }
 
     public function stream_write($data): int|false
     {
         $handle = $this->handle;
-        return is_resource($handle) ? fwrite($handle, $data) : false;
+        if ($handle === null) return false;
+        return fwrite($handle, $data);
     }
 
     public function stream_eof(): bool
     {
         $handle = $this->handle;
-        return is_resource($handle) && feof($handle);
+        if ($handle === null) return false;
+        return feof($handle);
     }
 
     public function stream_seek($offset, $whence = SEEK_SET): bool
     {
         $handle = $this->handle;
-        return is_resource($handle) && fseek($handle, $offset, $whence) === 0;
+        if ($handle === null) return false;
+        return fseek($handle, $offset, $whence) === 0;
     }
 
     public function stream_tell(): int
     {
         $handle = $this->handle;
-        if (! is_resource($handle)) return 0;
+        if ($handle === null) return 0;
         $pos = ftell($handle);
         return is_int($pos) ? $pos : 0;
     }
@@ -252,19 +257,22 @@ final class IncludeClock
     public function stream_flush(): bool
     {
         $handle = $this->handle;
-        return is_resource($handle) && fflush($handle);
+        if ($handle === null) return false;
+        return fflush($handle);
     }
 
     public function stream_lock($operation): bool
     {
         $handle = $this->handle;
-        return is_resource($handle) && flock($handle, $operation);
+        if ($handle === null) return false;
+        return flock($handle, $operation);
     }
 
     public function stream_stat(): array|false
     {
         $handle = $this->handle;
-        return is_resource($handle) ? fstat($handle) : false;
+        if ($handle === null) return false;
+        return fstat($handle);
     }
 
     public function stream_set_option($option, $arg1, $arg2): bool { return false; }
@@ -272,12 +280,13 @@ final class IncludeClock
     public function stream_close(): void
     {
         $bytes = 0;
-        if (is_resource($this->handle)) {
-            $stat = fstat($this->handle);
-            if (is_array($stat)) $bytes = (int) ($stat['size'] ?? 0);
-            fclose($this->handle);
-        }
+        $handle = $this->handle;
         $this->handle = null;
+        if ($handle !== null) {
+            $stat = fstat($handle);
+            if (is_array($stat)) $bytes = (int) ($stat['size'] ?? 0);
+            fclose($handle);
+        }
         if (! isset(self::$stats[$this->path])) {
             self::$stats[$this->path] = ['read_ns' => 0, 'run_ns' => 0, 'bytes' => 0];
         }
@@ -303,26 +312,29 @@ final class IncludeClock
 
     public function dir_opendir($path, $options): bool {
         $handle = self::with_real(static fn () => opendir($path));
-        if (! is_resource($handle)) return false;
+        if ($handle === false || $handle === null) return false;
+        /** @var resource $handle */
         $this->handle = $handle;
         return true;
     }
 
     public function dir_readdir(): string|false {
         $handle = $this->handle;
-        return is_resource($handle) ? readdir($handle) : false;
+        if ($handle === null) return false;
+        return readdir($handle);
     }
 
     public function dir_rewinddir(): bool {
         $handle = $this->handle;
-        if (! is_resource($handle)) return false;
+        if ($handle === null) return false;
         rewinddir($handle);
         return true;
     }
 
     public function dir_closedir(): void {
-        if (is_resource($this->handle)) closedir($this->handle);
+        $handle = $this->handle;
         $this->handle = null;
+        if ($handle !== null) closedir($handle);
     }
 
     private static function flush_pending(): void {
@@ -413,12 +425,17 @@ final class Server
             1 => ['pipe', 'w'],
             2 => ['redirect', 1],
         ], $pipes, __DIR__, $env);
-        if (!is_resource($process)) { fwrite(STDERR, "Failed to start PHP development server.\n"); exit(1); }
+        if ($process === false) { fwrite(STDERR, "Failed to start PHP development server.\n"); exit(1); }
         $this->process = $process;
         $stdout = $pipes[1] ?? null;
-        if (!is_resource($stdout)) { $this->close_process(); fwrite(STDERR, "Failed to capture server output.\n"); exit(1); }
+        if ($stdout === null) { $this->close_process(); fwrite(STDERR, "Failed to capture server output.\n"); exit(1); }
+        /** @var resource $stdout */
         $kept = [];
-        foreach ($pipes as $fd => $pipe) if (is_resource($pipe)) $kept[(int) $fd] = $pipe;
+        foreach ($pipes as $fd => $pipe) {
+            if ($pipe === null) continue;
+            /** @var resource $pipe */
+            $kept[(int) $fd] = $pipe;
+        }
         $this->pipes = $kept;
         stream_set_blocking($stdout, false);
         while (true) {
@@ -788,7 +805,7 @@ final class Server
     private function close_process(): void
     {
         $process = $this->process;
-        if (!is_resource($process)) { $this->process = null; $this->pipes = []; return; }
+        if ($process === null) { $this->pipes = []; return; }
         $status = proc_get_status($process);
         if ($status['running']) {
             proc_terminate($process, SIGTERM);
@@ -796,7 +813,7 @@ final class Server
             while (proc_get_status($process)['running'] && microtime(true) < $deadline) usleep(50_000);
             if (proc_get_status($process)['running']) proc_terminate($process, SIGKILL);
         }
-        foreach ($this->pipes as $pipe) if (is_resource($pipe)) fclose($pipe);
+        foreach ($this->pipes as $pipe) fclose($pipe);
         $this->pipes = [];
         proc_close($process);
         $this->process = null;
