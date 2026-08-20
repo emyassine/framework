@@ -158,7 +158,7 @@
             "dist": {
                 "type": "path",
                 "url": "x-webkernel/codebase",
-                "reference": "73d39a8bc523c67d5a7d20a5c062bb1a8bf867c3"
+                "reference": "5fb164fb6f9bf22b295f64c9b69e0f035df3d521"
             },
             "require": {
                 "php": ">=8.4",
@@ -189,7 +189,7 @@
             "license": [
                 "proprietary"
             ],
-            "description": "Webkernel runtime: paths, instance, views. Zero runtime package dependencies.",
+            "description": "Webkernel runtime: paths, instance. Zero runtime package dependencies.",
             "transport-options": {
                 "symlink": true,
                 "relative": true

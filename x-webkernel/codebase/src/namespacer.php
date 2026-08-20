@@ -1,12 +1,8 @@
 <?php declare(strict_types=1);
 
 /**
- * Webkernel autoloader for codebase subpackages.
- *
- *   Webkernel\WebApp            → src/WebApp.php
- *   Webkernel\{Pkg}\{Rest}      → src/{Pkg}/src/{Rest}.php
- *
- * Hits are cached. Lifecycle may also write vendor/composer/webkernel_classmap.php.
+ * Webkernel autoloader. Classmap + files from lifecycle dump
+ * (vendor/composer/webkernel_classmap.php, webkernel_files.php).
  */
 const WEBKERNEL_NS = 'Webkernel\\';
 const WEBKERNEL_NS_LEN = 10;
@@ -33,9 +29,9 @@ function webkernel_autoload(string $class): bool
         if (class_exists(\Composer\InstalledVersions::class)) {
             $installed = (new \ReflectionClass(\Composer\InstalledVersions::class))->getFileName();
             if (is_string($installed) && $installed !== '') {
-                $cache = dirname($installed).'/webkernel_classmap.php';
-                if (is_file($cache)) {
-                    $loaded = require $cache;
+                $file = dirname($installed).'/webkernel_classmap.php';
+                if (is_file($file)) {
+                    $loaded = require $file;
                     if (is_array($loaded)) {
                         $map = $loaded;
                     }
@@ -81,3 +77,13 @@ function webkernel_autoload(string $class): bool
 }
 
 spl_autoload_register('webkernel_autoload');
+
+if (class_exists(\Composer\InstalledVersions::class)) {
+    $installed = (new \ReflectionClass(\Composer\InstalledVersions::class))->getFileName();
+    if (is_string($installed) && $installed !== '' && ! str_starts_with($installed, 'phar://')) {
+        $files = dirname($installed).'/webkernel_files.php';
+        if (is_file($files)) {
+            require $files;
+        }
+    }
+}

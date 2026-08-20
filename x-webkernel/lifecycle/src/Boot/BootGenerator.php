@@ -20,6 +20,8 @@ final class BootGenerator
 
     public const CLASSMAP_BASENAME = 'webkernel_classmap.php';
 
+    public const FILES_BASENAME = 'webkernel_files.php';
+
     public static function write(Composer $composer, ?IOInterface $io = null): void
     {
         $vendor_dir = rtrim(
@@ -50,6 +52,12 @@ final class BootGenerator
         self::write_classmap(
             $composer_dir.DIRECTORY_SEPARATOR.self::CLASSMAP_BASENAME,
             self::classmap($composer),
+            $vendor_dir,
+            $root,
+        );
+        self::write_files(
+            $composer_dir.DIRECTORY_SEPARATOR.self::FILES_BASENAME,
+            self::files_list($composer),
             $vendor_dir,
             $root,
         );
@@ -129,6 +137,59 @@ final class BootGenerator
     }
 
     /**
+     * autoload.files from nested subpackage composer.json (not the root loaders Composer already runs).
+     *
+     * @return list<string>
+     */
+    private static function files_list(Composer $composer): array
+    {
+        $paths = [];
+        $skip = [];
+        $installers = $composer->getInstallationManager();
+
+        foreach ($composer->getRepositoryManager()->getLocalRepository()->getCanonicalPackages() as $package) {
+            if (! str_starts_with($package->getName(), 'webkernel/')) {
+                continue;
+            }
+            $install_path = $installers->getInstallPath($package);
+            if (! is_string($install_path) || $install_path === '' || ! is_dir($install_path)) {
+                continue;
+            }
+            $install_path = rtrim(str_replace('\\', '/', $install_path), '/');
+
+            foreach ($package->getAutoload()['files'] ?? [] as $rel) {
+                $skip[$install_path.'/'.ltrim(str_replace('\\', '/', (string) $rel), '/')] = true;
+            }
+
+            foreach (glob($install_path.'/src/*/composer.json') ?: [] as $json_file) {
+                $raw = file_get_contents($json_file);
+                if ($raw === false) {
+                    continue;
+                }
+                $data = json_decode($raw, true);
+                if (! is_array($data)) {
+                    continue;
+                }
+                $dir = str_replace('\\', '/', dirname($json_file));
+                foreach ($data['autoload']['files'] ?? [] as $rel) {
+                    if (! is_string($rel) || $rel === '') {
+                        continue;
+                    }
+                    $abs = $dir.'/'.ltrim(str_replace('\\', '/', $rel), '/');
+                    if (is_file($abs) && ! isset($skip[$abs])) {
+                        $paths[$abs] = true;
+                    }
+                }
+            }
+        }
+
+        $list = array_keys($paths);
+        sort($list, SORT_STRING);
+
+        return $list;
+    }
+
+    /**
      * @param array<string, string> $map
      */
     private static function scan_psr4(array &$map, string $namespace, string $base): void
@@ -198,6 +259,34 @@ PHP;
         }
 
         return var_export($file, true);
+    }
+
+    /**
+     * @param list<string> $files
+     */
+    private static function write_files(string $path, array $files, string $vendor_dir, string $root): void
+    {
+        $vendor_dir = rtrim(str_replace('\\', '/', $vendor_dir), '/');
+        $root = rtrim(str_replace('\\', '/', $root), '/');
+        $header = IdeHelper::generated_header();
+        $requires = [];
+        foreach ($files as $file) {
+            $requires[] = 'require '.self::path_code(str_replace('\\', '/', $file), $vendor_dir, $root).';';
+        }
+
+        $body = <<<PHP
+<?php declare(strict_types=1);
+
+{$header}
+//>
+//> Generated. Do not edit.
+
+\$v = dirname(__DIR__); // vendor_dir
+\$b = dirname(\$v); // base_dir
+
+PHP;
+        $body .= ($requires === [] ? '' : implode("\n", $requires)."\n");
+        file_put_contents($path, $body, LOCK_EX);
     }
 
     private static function write_php(string $path, mixed $data): void
