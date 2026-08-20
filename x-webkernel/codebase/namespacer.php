@@ -68,7 +68,7 @@ function webkernel_autoload(string $class): bool
 
     if (! $booted) {
         $booted = true;
-        $base = __DIR__.'/';
+        $base = __DIR__.'/src/';
         $composer_dir = webkernel_composer_dir();
         if ($composer_dir !== null) {
             $file = $composer_dir.'/webkernel_classmap.php';

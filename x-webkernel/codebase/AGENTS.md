@@ -17,14 +17,14 @@ Engines we own in-tree (fork, specialize — do not wrap as a vendor): FastRoute
 | Classes / namespaces | `PascalCase` | `Engine`, `InstanceId` |
 | Constants | `UPPER_SNAKE` | `WEBKERNEL_NS` |
 
-Exceptions: Composer / PSR interface methods you do not own (`activate`, `getSubscribedEvents`, `getInstallPath`, `supports`).
+Exceptions: Composer / PSR interface methods you do not own (`activate`, `getSubscribedEvents`, `getInstallPath`, `supports`, `get`, `has`).
 
 Do not introduce `camelCase` on Webkernel surfaces. Do not keep dual APIs.
 
 ## Dependencies
 
-- Runtime: PHP 8.4+ only. No nikic/fast-route, no eftec/bladeone (copied and specialized under `src/Route`, `src/View`). Templates are `*.view.php`, never `*.blade.php`.
-- PSR allowed only when a type we expose needs it. This slice does not.
+- Runtime: PHP 8.4+ only, plus `psr/container` (PSR-11). No nikic/fast-route, no eftec/bladeone (copied and specialized under `src/Route`, `src/View`). Templates are `*.view.php`, never `*.blade.php`.
+- PSR-11 is required: `Webkernel\Container\Container` implements `Psr\Container\ContainerInterface`.
 - `composer-plugin-api` is Composer-time, in `webkernel/lifecycle` only.
 - Do not add Laravel, Filament, or Symfony HTTP.
 
@@ -45,16 +45,23 @@ Do not introduce `camelCase` on Webkernel surfaces. Do not keep dual APIs.
 
 Providers (`PlatformProvider`) declare view paths, component dirs, route files, extra bindings at boot. Composables are lazy fluent segments (`webapp()->view()`, `webapp()->route()`, later `webapp()->auth()`). Path helpers stay dumped; route/view function files load with the composable class.
 
-Container: `singleton` / `bind` / `scoped`. No PSR-11. No reflection auto-wiring.
+Container: `Webkernel\Container\Container` — PSR-11 `get` / `has`, plus `singleton` / `bind` / `scoped` / `instance`. Unbound `get`/`make` throws `NotFound`. No reflection auto-wiring.
+
+Host bootstrap (Laravel-shaped, platform-wide):
 
 ```php
-webapp()->declare('providers', [
-    Webkernel\View\ViewProvider::class,
-    Webkernel\Route\RouteProvider::class,
-]);
-webapp()->boot();
-webapp()->route()->view('/', 'dashboard')->name('dashboard');
+return WebApp::configure()
+    ->with_middleware(function (Middleware $middleware): void {})
+    ->with_exceptions(function (Exceptions $exceptions): void {
+        $exceptions->should_render_json_when(
+            fn (Request $request) => $request->is('api/*'),
+        );
+    })
+    ->with_routes()
+    ->create();
 ```
+
+`with_routes()` declares host `routes/web.php`. `create()` boots providers from dump + host `declare`.
 
 Dump-autoload also writes `webkernel_providers.php` from `extra.webkernel.provider`. Merged with host `declare('providers', …)`.
 

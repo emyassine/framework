@@ -2,8 +2,11 @@
 
 namespace Webkernel;
 
-use Webkernel\WebAppApi\ComposableContract;
-use Webkernel\WebAppApi\Container;
+use Psr\Container\ContainerInterface;
+use Webkernel\Container\Container;
+use Webkernel\Platform\Exceptions;
+use Webkernel\Platform\Middleware;
+use Webkernel\WebAppApi\Composables\ComposableContract;
 
 /**
  * Host application facade. Composables are lazy API segments
@@ -33,16 +36,27 @@ final class WebApp
     /** @var list<string> */
     private array $route_files = [];
 
+    private ?Middleware $middleware = null;
+
+    private ?Exceptions $exceptions = null;
+
     private bool $booted = false;
 
     private function __construct()
     {
         $this->container = new Container();
+        $this->container->instance(Container::class, $this->container);
+        $this->container->instance(ContainerInterface::class, $this->container);
     }
 
     public static function get(): self
     {
         return self::$instance ??= new self();
+    }
+
+    public static function configure(): self
+    {
+        return self::get();
     }
 
     /** Reset process singleton (tests). */
@@ -54,6 +68,53 @@ final class WebApp
     public function container(): Container
     {
         return $this->container;
+    }
+
+    /**
+     * @param callable(Middleware): void $callback
+     */
+    public function with_middleware(callable $callback): self
+    {
+        $this->middleware ??= new Middleware();
+        $callback($this->middleware);
+
+        return $this;
+    }
+
+    /**
+     * @param callable(Exceptions): void $callback
+     */
+    public function with_exceptions(callable $callback): self
+    {
+        $this->exceptions ??= new Exceptions();
+        $callback($this->exceptions);
+
+        return $this;
+    }
+
+    public function with_routes(?string $web = null): self
+    {
+        $web ??= webapp_path('routes/web.php');
+        if (is_file($web)) {
+            $this->declare('routes', [$web]);
+        }
+
+        return $this;
+    }
+
+    public function create(): self
+    {
+        return $this->boot();
+    }
+
+    public function middleware(): ?Middleware
+    {
+        return $this->middleware;
+    }
+
+    public function exceptions(): ?Exceptions
+    {
+        return $this->exceptions;
     }
 
     /**

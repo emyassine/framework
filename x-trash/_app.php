@@ -2,11 +2,11 @@
 //> This file is part of Webkernel.
 //> (c) 2025 - 2027 Numerimondes, El Moumen Yassine
 
-//require __DIR__ . '/fast-boot.php';
-
-//use Webkernel\Configuration\{Exceptions, Middleware};
-//use Webkernel\Http\Request;
-//use Webkernel\WebApp;
+// require __DIR__ . '/fast-boot.php'; // does instllation of thirdparty and some preparation
+//
+// use Webkernel\Configuration\{Exceptions, Middleware};
+// use Webkernel\Http\Request;
+// use Webkernel\WebApp;
 
 // ---- Global WebApp Configuration ----------------------------------------------------------
 // THOSE MEASURES ARE IN MILLISECONDS WITH SERVER RUNNING ON LOCALHOST
@@ -17,15 +17,11 @@
 // Including the autoloader takes
 
 
-//return WebApp::configure()
-//    ->withMiddleware(function (Middleware $middleware): void {})
-//    ->withExceptions(function (Exceptions $exceptions): void {
-//        $exceptions->shouldRenderJsonWhen(
-//            fn (Request $request) => $request->is('api/*'),
-//        );
-//    })
-//    ->create();
-?>
-
-
-<div>HEU</div>
+// return WebApp::configure()
+//     ->with_middleware(function (Middleware $middleware): void {})
+//     ->with_exceptions(function (Exceptions $exceptions): void {
+//         $exceptions->should_render_json_when(
+//             fn (Request $request) => $request->is('api/*'),
+//         );
+//     })
+//     ->create();

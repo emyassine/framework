@@ -12,7 +12,7 @@ use Webkernel\Route\Dispatch\MethodNotAllowed;
 use Webkernel\Route\Dispatch\NotMatched;
 use Webkernel\Route\Group\PendingGroup;
 use Webkernel\Route\Uri\Uri;
-use Webkernel\WebAppApi\ComposableContract;
+use Webkernel\WebAppApi\Composables\ComposableContract;
 
 /**
  * Application router. FastRoute MarkBased engine, owned in this package.
@@ -29,31 +29,19 @@ use Webkernel\WebAppApi\ComposableContract;
 final class Route implements ComposableContract
 {
     public const NAME = '_name';
-
     public const PANEL = '_panel';
-
     public const CLUSTER = '_cluster';
-
     public const RESOURCE = '_resource';
-
     public const PAGE = '_page';
-
     public const PERMISSION = '_permission';
-
     public const REGEX = '_route';
-
     public const VIEW = '_view';
-
     public const DOMAIN = '_domain';
-
     public const MIDDLEWARE = '_middleware';
 
     private static bool $declared_loaded = false;
-
     private string $group_prefix = '';
-
     private string $group_name = '';
-
     private string $group_domain = '';
 
     /** @var list<string> */
@@ -88,10 +76,10 @@ final class Route implements ComposableContract
         return $route;
     }
 
-    /** Reset process singleton (tests). */
+    /** Reset process singleton (tests). Does not reload host route files. */
     public static function flush(): void
     {
-        self::$declared_loaded = false;
+        self::$declared_loaded = true;
         webapp()->container()->forget(self::class);
     }
 

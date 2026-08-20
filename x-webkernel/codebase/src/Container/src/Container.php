@@ -1,55 +1,69 @@
 <?php declare(strict_types=1);
 
-namespace Webkernel\WebAppApi;
+namespace Webkernel\Container;
+
+use Psr\Container\ContainerInterface;
 
 /**
- * Three lifetimes. No PSR-11. No reflection auto-wiring.
- * Explicit bind, or `new $abstract()`.
+ * PSR-11 container. Lifetimes: singleton, bind, scoped.
+ * Explicit bind, or a constructor we own. No reflection auto-wiring.
  */
-final class Container
+final class Container implements ContainerInterface
 {
     /**
-     * @var array<class-string, array{lifetime: 'singleton'|'bind'|'scoped', factory: callable|null}>
+     * @var array<string, array{lifetime: 'singleton'|'bind'|'scoped', factory: callable|null}>
      */
     private array $bindings = [];
 
-    /** @var array<class-string, object> */
+    /** @var array<string, object> */
     private array $instances = [];
 
-    /** @var array<class-string, object> */
+    /** @var array<string, object> */
     private array $scoped_instances = [];
 
-    /**
-     * @param class-string $abstract
-     */
     public function singleton(string $abstract, ?callable $factory = null): void
     {
         $this->bindings[$abstract] = ['lifetime' => 'singleton', 'factory' => $factory];
     }
 
-    /**
-     * @param class-string $abstract
-     */
     public function bind(string $abstract, ?callable $factory = null): void
     {
         $this->bindings[$abstract] = ['lifetime' => 'bind', 'factory' => $factory];
         unset($this->instances[$abstract], $this->scoped_instances[$abstract]);
     }
 
-    /**
-     * @param class-string $abstract
-     */
     public function scoped(string $abstract, ?callable $factory = null): void
     {
         $this->bindings[$abstract] = ['lifetime' => 'scoped', 'factory' => $factory];
     }
 
-    /**
-     * @param class-string $abstract
-     */
+    public function instance(string $abstract, object $object): void
+    {
+        $this->bindings[$abstract] = ['lifetime' => 'singleton', 'factory' => static fn (): object => $object];
+        $this->instances[$abstract] = $object;
+    }
+
+    public function has(string $id): bool
+    {
+        return isset($this->bindings[$id]) || isset($this->instances[$id]) || isset($this->scoped_instances[$id]);
+    }
+
+    public function get(string $id): mixed
+    {
+        if (! $this->has($id)) {
+            throw NotFound::of($id);
+        }
+
+        return $this->make($id);
+    }
+
     public function make(string $abstract): mixed
     {
-        $binding = $this->bindings[$abstract] ?? ['lifetime' => 'bind', 'factory' => null];
+        if (! $this->has($abstract)) {
+            throw NotFound::of($abstract);
+        }
+
+        $binding = $this->bindings[$abstract] ?? ['lifetime' => 'singleton', 'factory' => null];
         $lifetime = $binding['lifetime'];
 
         if ($lifetime === 'singleton' && isset($this->instances[$abstract])) {
@@ -59,9 +73,19 @@ final class Container
             return $this->scoped_instances[$abstract];
         }
 
-        $object = $binding['factory'] !== null
-            ? ($binding['factory'])()
-            : new $abstract();
+        try {
+            $object = $binding['factory'] !== null
+                ? ($binding['factory'])()
+                : new $abstract();
+        } catch (NotFound $e) {
+            throw $e;
+        } catch (\Throwable $e) {
+            throw new ContainerException('Unable to resolve ['.$abstract.']: '.$e->getMessage(), 0, $e);
+        }
+
+        if (! is_object($object)) {
+            throw new ContainerException('Factory for ['.$abstract.'] did not return an object.');
+        }
 
         if ($lifetime === 'singleton') {
             $this->instances[$abstract] = $object;
@@ -72,9 +96,6 @@ final class Container
         return $object;
     }
 
-    /**
-     * @param class-string $abstract
-     */
     public function forget(string $abstract): void
     {
         unset($this->instances[$abstract], $this->scoped_instances[$abstract]);

@@ -38,44 +38,103 @@ final class IdeHelper
     {
         $vendor_dir = rtrim($vendor_dir, '/\\');
         $output ??= self::output_path();
-        $names = self::class_names($vendor_dir);
-        sort($names, SORT_STRING);
+        $catalog = self::catalog($vendor_dir);
 
         $ctx = hash_init('xxh3');
-        foreach ($names as $name) {
-            hash_update($ctx, $name."\n");
+        foreach ($catalog as $name => $kind) {
+            hash_update($ctx, $kind.' '.$name."\n");
         }
         $hash = hash_final($ctx);
 
         if (is_file($output) && self::stored_hash($output) === $hash) {
-            return ['path' => $output, 'classes' => count($names), 'bytes' => (int) filesize($output), 'skipped' => true];
+            return ['path' => $output, 'classes' => count($catalog), 'bytes' => (int) filesize($output), 'skipped' => true];
         }
 
-        $bytes = self::write($output, $names, $hash);
+        $bytes = self::write($output, $catalog, $hash);
 
-        return ['path' => $output, 'classes' => count($names), 'bytes' => $bytes, 'skipped' => false];
+        return ['path' => $output, 'classes' => count($catalog), 'bytes' => $bytes, 'skipped' => false];
     }
 
     /**
-     * @return list<string>
+     * FQCN => class|interface|trait|enum, from Composer classmap + file tokens.
+     *
+     * @return array<string, 'class'|'interface'|'trait'|'enum'>
      */
-    private static function class_names(string $vendor_dir): array
+    private static function catalog(string $vendor_dir): array
     {
         $classmap = $vendor_dir.DIRECTORY_SEPARATOR.'composer'.DIRECTORY_SEPARATOR.'autoload_classmap.php';
-        $names = [];
+        $catalog = [];
 
         if (is_file($classmap)) {
             $map = require $classmap;
             if (is_array($map)) {
                 foreach ($map as $class => $file) {
-                    if (is_string($class) && $class !== 'Webkernel\\WebApp' && self::is_class_name($class)) {
-                        $names[$class] = true;
+                    if (! is_string($class) || $class === 'Webkernel\\WebApp' || ! self::is_class_name($class)) {
+                        continue;
                     }
+                    $slash = strrpos($class, '\\');
+                    $short = $slash === false ? $class : substr($class, $slash + 1);
+                    $catalog[$class] = is_string($file) && is_file($file)
+                        ? self::kind($file, $short)
+                        : 'class';
                 }
             }
         }
+        ksort($catalog, SORT_STRING);
 
-        return array_keys($names);
+        return $catalog;
+    }
+
+    /**
+     * @return 'class'|'interface'|'trait'|'enum'
+     */
+    private static function kind(string $file, string $short): string
+    {
+        $src = file_get_contents($file);
+        if (! is_string($src) || $src === '') {
+            return 'class';
+        }
+        if (! str_contains($src, 'interface') && ! str_contains($src, 'trait') && ! str_contains($src, 'enum')) {
+            return 'class';
+        }
+
+        $tokens = token_get_all($src);
+        $prev = 0;
+        $count = count($tokens);
+        for ($i = 0; $i < $count; $i++) {
+            $token = $tokens[$i];
+            if (! is_array($token)) {
+                $prev = 0;
+                continue;
+            }
+            $id = $token[0];
+            if ($id === T_WHITESPACE || $id === T_COMMENT || $id === T_DOC_COMMENT) {
+                continue;
+            }
+            $kind = match ($id) {
+                T_INTERFACE => 'interface',
+                T_TRAIT => 'trait',
+                T_ENUM => 'enum',
+                T_CLASS => $prev === T_DOUBLE_COLON ? null : 'class',
+                default => null,
+            };
+            $prev = $id;
+            if ($kind === null) {
+                continue;
+            }
+            for ($j = $i + 1; $j < $count; $j++) {
+                $next = $tokens[$j];
+                if (is_array($next) && ($next[0] === T_WHITESPACE || $next[0] === T_COMMENT || $next[0] === T_DOC_COMMENT)) {
+                    continue;
+                }
+                if (is_array($next) && $next[0] === T_STRING && $next[1] === $short) {
+                    return $kind;
+                }
+                break;
+            }
+        }
+
+        return 'class';
     }
 
     private static function is_class_name(string $name): bool
@@ -94,9 +153,9 @@ final class IdeHelper
     }
 
     /**
-     * @param list<string> $names
+     * @param array<string, 'class'|'interface'|'trait'|'enum'> $catalog
      */
-    private static function write(string $output, array $names, string $hash): int
+    private static function write(string $output, array $catalog, string $hash): int
     {
         $dir = dirname($output);
         if (! is_dir($dir) && ! mkdir($dir, 0775, true) && ! is_dir($dir)) {
@@ -117,7 +176,7 @@ final class IdeHelper
         $current_ns = null;
         $open = false;
 
-        foreach ($names as $fqcn) {
+        foreach ($catalog as $fqcn => $kind) {
             $pos = strrpos($fqcn, '\\');
             if ($pos === false) {
                 $ns = '';
@@ -136,7 +195,7 @@ final class IdeHelper
                 $current_ns = $ns;
             }
 
-            fwrite($fh, '        class '.$short." {}\n");
+            fwrite($fh, '        '.$kind.' '.$short." {}\n");
         }
 
         if ($open) {
@@ -160,6 +219,7 @@ final class IdeHelper
         $output ??= dirname(__DIR__).'/_ide_helper_webapp.php';
         ksort($composables);
         $ctx = hash_init('xxh3');
+        hash_update($ctx, 'container=Webkernel\\Container\\Container'."\n");
         foreach ($composables as $name => $class) {
             hash_update($ctx, $name.'='.$class."\n");
         }
@@ -172,7 +232,7 @@ final class IdeHelper
         foreach ($composables as $name => $class) {
             $methods[] = '            public function '.$name.'(): \\'.$class.' {}';
         }
-        $methods[] = '            public function container(): \\Webkernel\\WebAppApi\\Container {}';
+        $methods[] = '            public function container(): \\Webkernel\\Container\\Container {}';
         $methods[] = '            public function boot(): self {}';
         $method_block = implode("\n", $methods);
         $header = self::generated_header();
