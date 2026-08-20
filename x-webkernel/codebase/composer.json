@@ -1,20 +1,30 @@
 {
     "$schema": "https://getcomposer.org/schema.json",
     "name": "webkernel/codebase",
-    "description": "Central package for booting and managing a Webkernel platform (Laravel + Filament integration).",
+    "description": "Webkernel runtime: paths, instance, views. Zero runtime package dependencies.",
     "type": "library",
     "license": "EPL-2.0",
     "version": "0.12.0",
     "autoload": {
         "files": [
-            "src/namespacer.php"
+            "src/namespacer.php",
+            "src/Paths/src/functions.php",
+            "src/Instance/src/functions.php",
+            "src/Views/src/functions.php"
         ],
-        "classmap": [],
+        "classmap": [
+            "src/WebApp.php"
+        ],
         "psr-4": {
+            "Webkernel\\Paths\\": "src/Paths/src/",
+            "Webkernel\\Instance\\": "src/Instance/src/",
+            "Webkernel\\Views\\": "src/Views/src/",
+            "Webkernel\\DevEnv\\": "src/DevEnv/src/"
         }
     },
     "require": {
-        "php": ">=8.4"
+        "php": ">=8.4",
+        "webkernel/lifecycle": "^0.12.0"
     },
     "extra": {
         "webkernel": {
@@ -24,16 +34,8 @@
         }
     },
     "config": {
-        "sort-packages": true,
-        "allow-plugins": {
-            "phpstan/extension-installer": true
-        }
+        "sort-packages": true
     },
     "minimum-stability": "stable",
-    "prefer-stable": true,
-    "require-dev": {
-        "phpstan/extension-installer": "^1.3|^2.0",
-        "phpstan/phpstan-deprecation-rules": "^1.1|^2.0",
-        "phpstan/phpstan-phpunit": "^1.3|^2.0"
-    }
+    "prefer-stable": true
 }
