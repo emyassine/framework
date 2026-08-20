@@ -2,6 +2,7 @@
 
 namespace Webkernel\Route;
 
+use Webkernel\Composables\ComposableContract;
 use Webkernel\Route\Action\RedirectAction;
 use Webkernel\Route\Action\ViewAction;
 use Webkernel\Route\Compile\Cache;
@@ -12,7 +13,6 @@ use Webkernel\Route\Dispatch\MethodNotAllowed;
 use Webkernel\Route\Dispatch\NotMatched;
 use Webkernel\Route\Group\PendingGroup;
 use Webkernel\Route\Uri\Uri;
-use Webkernel\WebAppApi\Composables\ComposableContract;
 
 /**
  * Application router. FastRoute MarkBased engine, owned in this package.

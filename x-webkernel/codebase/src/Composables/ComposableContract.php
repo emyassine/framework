@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace Webkernel\WebAppApi\Composables;
+namespace Webkernel\Composables;
 
 /**
  * Public API segment: webapp()->{api_name()}(). Class file is not loaded until
