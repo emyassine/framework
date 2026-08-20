@@ -21,8 +21,24 @@ if (PHP_SAPI === 'cli-server') {
     $client = ($_SERVER['REMOTE_ADDR'] ?? '127.0.0.1').':'.($_SERVER['REMOTE_PORT'] ?? '0');
     $method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
     $path   = $_SERVER['REQUEST_URI'] ?? $uri;
+    $now = hrtime(true);
+    $bits = [];
+    if (defined('START_REQUEST')) {
+        $bits[] = sprintf('render=%.2f', ($now - START_REQUEST) / 1e6);
+        if (defined('WEBKERNEL_T_AUTOLOAD')) {
+            $bits[] = sprintf('autoload=%.2f', (WEBKERNEL_T_AUTOLOAD - START_REQUEST) / 1e6);
+            $bits[] = sprintf('app=%.2f', ($now - WEBKERNEL_T_AUTOLOAD) / 1e6);
+        }
+    }
 
-    file_put_contents('php://stderr', sprintf("%s [%d]: %s %s\n", $client, $status, $method, $path));
+    file_put_contents('php://stderr', sprintf(
+        "%s [%d]: %s %s%s\n",
+        $client,
+        $status,
+        $method,
+        $path,
+        $bits === [] ? '' : ' '.implode(' ', $bits),
+    ));
     return;
 }
 
@@ -38,6 +54,7 @@ final class Server
     private string $host;
     private int $port;
     private string $public_dir;
+    private bool $profile_lifecycle;
 
     /** @var resource|null */
     private $process = null;
@@ -49,18 +66,24 @@ final class Server
     private bool $banner_shown = false;
     private bool $address_in_use = false;
 
-    /** @var array<int, array{started: int|float, request: string, status: int}> */
+    /** @var array<int, array{started: int|float, request: string, status: int, render_ms: float|null, autoload_ms: float|null, app_ms: float|null}> */
     private array $requests_pool = [];
 
-    public function __construct(string $host = '127.0.0.1', int $port = 8000)
+    public function __construct(string $host = '127.0.0.1', int $port = 8000, bool $profile_lifecycle = false)
     {
-        $this->host       = $host;
-        $this->port       = $port;
+        $this->host = $host;
+        $this->port = $port;
         $this->public_dir = __DIR__.'/public';
+        $this->profile_lifecycle = $profile_lifecycle;
     }
 
     public function start(): void
     {
+        if ($this->profile_lifecycle) {
+            putenv('WEBKERNEL_PROFILE_LIFECYCLE=1');
+            $_ENV['WEBKERNEL_PROFILE_LIFECYCLE'] = '1';
+        }
+
         $this->register_signals();
 
         for ($try = 0; $try < self::MAX_PORT_TRIES; $try++) {
@@ -182,22 +205,31 @@ final class Server
             $this->requests_pool[$port] = [
                 'started' => hrtime(true),
                 'request' => '',
-                'status'  => 200,
+                'status' => 200,
+                'render_ms' => null,
+                'autoload_ms' => null,
+                'app_ms' => null,
             ];
             return;
         }
 
         if (preg_match('/\[(\d+)\]:\s+(\S+)\s+(\S+)/', $line, $m) === 1) {
-            $status  = (int) $m[1];
+            $status = (int) $m[1];
             $request = $m[2].' '.$m[3];
+            $timings = $this->parse_timings($line);
 
             if ($port !== null && isset($this->requests_pool[$port])) {
                 $this->requests_pool[$port]['request'] = $request;
-                $this->requests_pool[$port]['status']  = $status;
+                $this->requests_pool[$port]['status'] = $status;
+                foreach (['render_ms', 'autoload_ms', 'app_ms'] as $key) {
+                    if ($timings[$key] !== null) {
+                        $this->requests_pool[$port][$key] = $timings[$key];
+                    }
+                }
                 return;
             }
 
-            $this->log_request($request, $status, hrtime(true));
+            $this->log_request($request, $status, hrtime(true), $timings);
             return;
         }
 
@@ -209,7 +241,11 @@ final class Server
                 return;
             }
 
-            $this->log_request($entry['request'], $entry['status'], $entry['started']);
+            $this->log_request($entry['request'], $entry['status'], $entry['started'], [
+                'render_ms' => $entry['render_ms'],
+                'autoload_ms' => $entry['autoload_ms'],
+                'app_ms' => $entry['app_ms'],
+            ]);
             return;
         }
 
@@ -252,14 +288,20 @@ final class Server
         echo "  ".$info_badge." Server running on ".$bold."[".$url."]".$reset.".\n\n";
         echo "  ".$gray."PHP Version: ".PHP_VERSION." | OPcache: ".$opcache_status.$reset."\n\n";
         echo "  ".$warn_badge." ".$yellow."This server is for local development only. Behavior differs from production (Nginx/Apache/FPM).".$reset."\n\n";
+        if ($this->profile_lifecycle) {
+            echo "  ".$info_badge." ".$gray."--profile-lifecycle".$reset."  autoload / app / php timings on each request.\n\n";
+        }
         echo "  ".$gray."Press Ctrl+C to stop the server".$reset."\n\n";
     }
 
-    private function log_request(string $request, int $status_code, float|int $start_time): void
+    /**
+     * @param array{render_ms: float|null, autoload_ms?: float|null, app_ms?: float|null} $timings
+     */
+    private function log_request(string $request, int $status_code, float|int $start_time, array $timings = []): void
     {
         $reset = "\033[0m";
-        $cyan  = "\033[36m";
-        $gray  = "\033[90m";
+        $cyan = "\033[36m";
+        $gray = "\033[90m";
 
         $status_color = match (true) {
             $status_code >= 200 && $status_code < 300 => "\033[32m",
@@ -269,11 +311,96 @@ final class Server
             default => "\033[37m",
         };
 
-        $reason      = $this->get_status_reason($status_code);
-        $duration_ms = number_format((hrtime(true) - $start_time) / 1e6, 2);
-        $timestamp   = date('H:i:s');
+        $reason = $this->get_status_reason($status_code);
+        $request_ms = (hrtime(true) - $start_time) / 1e6;
+        $timestamp = date('H:i:s');
+        $width = $this->line_width();
 
-        echo "  {$gray}{$timestamp}{$reset} {$status_color}{$status_code} {$reason}{$reset} {$cyan}{$request}{$reset} {$gray}({$duration_ms}ms){$reset}\n";
+        $left = "  {$gray}{$timestamp}{$reset} {$status_color}{$status_code} {$reason}{$reset} {$cyan}{$request}{$reset}";
+        $right_plain = $this->metrics_plain($timings['render_ms'] ?? null, $request_ms);
+        $right = $gray.$right_plain.$reset;
+
+        $left_len = $this->visible_len($left);
+        $right_len = strlen($right_plain);
+        $dots = $width - $left_len - $right_len - 2;
+        if ($dots < 2) {
+            $overflow = 2 - $dots;
+            $max_req = max(8, strlen($request) - $overflow);
+            $request = $this->shorten($request, $max_req);
+            $left = "  {$gray}{$timestamp}{$reset} {$status_color}{$status_code} {$reason}{$reset} {$cyan}{$request}{$reset}";
+            $dots = max(2, $width - $this->visible_len($left) - $right_len - 2);
+        }
+
+        echo $left.' '.$gray.str_repeat('.', $dots).$reset.' '.$right."\n";
+
+        if ($this->profile_lifecycle && ($timings['autoload_ms'] ?? null) !== null) {
+            $autoload = number_format((float) $timings['autoload_ms'], 2);
+            $app = number_format((float) ($timings['app_ms'] ?? 0), 2);
+            $php = number_format((float) ($timings['render_ms'] ?? 0), 2);
+            echo "  {$gray}  {$request}  →  {$status_code} {$reason}    autoload {$autoload}ms · app {$app}ms · php {$php}ms{$reset}\n";
+        }
+    }
+
+    /**
+     * @return array{render_ms: float|null, autoload_ms: float|null, app_ms: float|null}
+     */
+    private function parse_timings(string $line): array
+    {
+        $out = ['render_ms' => null, 'autoload_ms' => null, 'app_ms' => null];
+        if (preg_match_all('/(render|autoload|app)=([0-9.]+)/', $line, $m, PREG_SET_ORDER) === false) {
+            return $out;
+        }
+        foreach ($m as $row) {
+            $out[$row[1].'_ms'] = (float) $row[2];
+        }
+
+        return $out;
+    }
+
+    private function metrics_plain(?float $render_ms, float $request_ms): string
+    {
+        $request = 'request '.number_format($request_ms, 2).'ms';
+        if ($render_ms === null) {
+            return $request;
+        }
+
+        return 'render '.number_format($render_ms, 2).'ms  '.$request;
+    }
+
+    private function line_width(): int
+    {
+        static $width = null;
+        if ($width !== null) {
+            return $width;
+        }
+        $cols = (int) (getenv('COLUMNS') ?: 0);
+        if ($cols < 40) {
+            $stty = @shell_exec('stty size 2>/dev/null');
+            if (is_string($stty) && preg_match('/\d+\s+(\d+)/', $stty, $m) === 1) {
+                $cols = (int) $m[1];
+            }
+        }
+        if ($cols < 40) {
+            $cols = 80;
+        }
+
+        return $width = max(60, (int) floor($cols * 0.95));
+    }
+
+    private function visible_len(string $text): int
+    {
+        $plain = preg_replace('/\033\[[0-9;]*m/', '', $text);
+
+        return strlen(is_string($plain) ? $plain : $text);
+    }
+
+    private function shorten(string $text, int $max): string
+    {
+        if ($max < 2 || strlen($text) <= $max) {
+            return $text;
+        }
+
+        return substr($text, 0, $max - 1).'…';
     }
 
     private function get_status_reason(int $code): string
@@ -356,14 +483,17 @@ final class Server
 if (($argv[1] ?? null) === 'server') {
     $host = '127.0.0.1';
     $port = 8000;
+    $profile_lifecycle = false;
 
     foreach (array_slice($argv, 2) as $arg) {
         if (str_starts_with($arg, '--host=')) {
             $host = substr($arg, 7);
         } elseif (str_starts_with($arg, '--port=')) {
             $port = (int) substr($arg, 7);
+        } elseif ($arg === '--profile-lifecycle') {
+            $profile_lifecycle = true;
         }
     }
 
-    (new Server($host, $port))->start();
+    (new Server($host, $port, $profile_lifecycle))->start();
 }
