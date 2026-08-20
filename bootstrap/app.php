@@ -1,7 +1,5 @@
 <?php declare(strict_types=1);
-require __DIR__ . '/../third_party/autoload.php';
-define('WEBKERNEL_T_AUTOLOAD', hrtime(true));
-?>
+require __DIR__ . '/../third_party/autoload.php';?>
 
 <!DOCTYPE html>
 <html lang="en" data-wds-theme="light" data-wds-layout="sidebar" data-wds-sidebar="expanded">

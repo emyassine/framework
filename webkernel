@@ -11,6 +11,10 @@ if (PHP_SAPI === 'cli-server') {
         return false;
     }
 
+    $root = str_replace('\\', '/', dirname($docroot));
+    $files_before = get_included_files();
+    $classes_before = get_declared_classes();
+
     require $docroot.'/index.php';
 
     $status = http_response_code();
@@ -20,16 +24,10 @@ if (PHP_SAPI === 'cli-server') {
 
     $client = ($_SERVER['REMOTE_ADDR'] ?? '127.0.0.1').':'.($_SERVER['REMOTE_PORT'] ?? '0');
     $method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
-    $path   = $_SERVER['REQUEST_URI'] ?? $uri;
-    $now = hrtime(true);
-    $bits = [];
-    if (defined('START_REQUEST')) {
-        $bits[] = sprintf('render=%.2f', ($now - START_REQUEST) / 1e6);
-        if (defined('WEBKERNEL_T_AUTOLOAD')) {
-            $bits[] = sprintf('autoload=%.2f', (WEBKERNEL_T_AUTOLOAD - START_REQUEST) / 1e6);
-            $bits[] = sprintf('app=%.2f', ($now - WEBKERNEL_T_AUTOLOAD) / 1e6);
-        }
-    }
+    $path = $_SERVER['REQUEST_URI'] ?? $uri;
+    $render = defined('START_REQUEST')
+        ? sprintf(' render=%.2f', (hrtime(true) - START_REQUEST) / 1e6)
+        : '';
 
     file_put_contents('php://stderr', sprintf(
         "%s [%d]: %s %s%s\n",
@@ -37,8 +35,29 @@ if (PHP_SAPI === 'cli-server') {
         $status,
         $method,
         $path,
-        $bits === [] ? '' : ' '.implode(' ', $bits),
+        $render,
     ));
+
+    $prefix = $root.'/';
+    $to_rel = static function (string $abs) use ($prefix): string {
+        $abs = str_replace('\\', '/', $abs);
+
+        return str_starts_with($abs, $prefix) ? substr($abs, strlen($prefix)) : $abs;
+    };
+
+    foreach (get_included_files() as $included) {
+        if (in_array($included, $files_before, true)) {
+            continue;
+        }
+        file_put_contents('php://stderr', 'webkernel-file '.$to_rel($included)."\n");
+    }
+    foreach (get_declared_classes() as $class) {
+        if (in_array($class, $classes_before, true)) {
+            continue;
+        }
+        file_put_contents('php://stderr', 'wk-class '.$class."\n");
+    }
+    file_put_contents('php://stderr', 'wk-mem '.memory_get_usage(true)."\n");
     return;
 }
 
@@ -66,7 +85,7 @@ final class Server
     private bool $banner_shown = false;
     private bool $address_in_use = false;
 
-    /** @var array<int, array{started: int|float, request: string, status: int, render_ms: float|null, autoload_ms: float|null, app_ms: float|null}> */
+    /** @var array<int, array{started: int|float, request: string, status: int, render_ms: float|null, files: list<string>, classes: list<string>, mem: int|null}> */
     private array $requests_pool = [];
 
     public function __construct(string $host = '127.0.0.1', int $port = 8000, bool $profile_lifecycle = false)
@@ -202,29 +221,44 @@ final class Server
                 'request' => '',
                 'status' => 200,
                 'render_ms' => null,
-                'autoload_ms' => null,
-                'app_ms' => null,
+                'files' => [],
+                'classes' => [],
+                'mem' => null,
             ];
+            return;
+        }
+
+        if (str_starts_with($line, 'webkernel-file ')) {
+            $this->trace_push('files', substr($line, 14));
+            return;
+        }
+        if (str_starts_with($line, 'webkernel-class ')) {
+            $this->trace_push('classes', substr($line, 15));
+            return;
+        }
+        if (str_starts_with($line, 'webkernel-mem ')) {
+            $this->trace_push('mem', substr($line, 12));
             return;
         }
 
         if (preg_match('/\[(\d+)\]:\s+(\S+)\s+(\S+)/', $line, $m) === 1) {
             $status = (int) $m[1];
             $request = $m[2].' '.$m[3];
-            $timings = $this->parse_timings($line);
+            $render_ms = null;
+            if (preg_match('/render=([0-9.]+)/', $line, $r) === 1) {
+                $render_ms = (float) $r[1];
+            }
 
             if ($port !== null && isset($this->requests_pool[$port])) {
                 $this->requests_pool[$port]['request'] = $request;
                 $this->requests_pool[$port]['status'] = $status;
-                foreach (['render_ms', 'autoload_ms', 'app_ms'] as $key) {
-                    if ($timings[$key] !== null) {
-                        $this->requests_pool[$port][$key] = $timings[$key];
-                    }
+                if ($render_ms !== null) {
+                    $this->requests_pool[$port]['render_ms'] = $render_ms;
                 }
                 return;
             }
 
-            $this->log_request($request, $status, hrtime(true), $timings);
+            $this->log_request($request, $status, hrtime(true), ['render_ms' => $render_ms]);
             return;
         }
 
@@ -238,8 +272,9 @@ final class Server
 
             $this->log_request($entry['request'], $entry['status'], $entry['started'], [
                 'render_ms' => $entry['render_ms'],
-                'autoload_ms' => $entry['autoload_ms'],
-                'app_ms' => $entry['app_ms'],
+                'files' => $entry['files'],
+                'classes' => $entry['classes'],
+                'mem' => $entry['mem'],
             ]);
             return;
         }
@@ -284,13 +319,13 @@ final class Server
         echo "  ".$gray."PHP Version: ".PHP_VERSION." | OPcache: ".$opcache_status.$reset."\n\n";
         echo "  ".$warn_badge." ".$yellow."This server is for local development only. Behavior differs from production (Nginx/Apache/FPM).".$reset."\n\n";
         if ($this->profile_lifecycle) {
-            echo "  ".$info_badge." ".$gray."--profile-lifecycle".$reset."  autoload / app / php timings on each request.\n\n";
+            echo "  ".$info_badge." ".$gray."--profile-lifecycle".$reset."  PHP include traceroute (files + classes this request loaded).\n\n";
         }
         echo "  ".$gray."Press Ctrl+C to stop the server".$reset."\n\n";
     }
 
     /**
-     * @param array{render_ms: float|null, autoload_ms?: float|null, app_ms?: float|null} $timings
+     * @param array{render_ms?: float|null, files?: list<string>, classes?: list<string>, mem?: int|string|null} $timings
      */
     private function log_request(string $request, int $status_code, float|int $start_time, array $timings = []): void
     {
@@ -328,28 +363,47 @@ final class Server
 
         echo $left.' '.$gray.str_repeat('.', $dots).$reset.' '.$right."\n";
 
-        if ($this->profile_lifecycle && ($timings['autoload_ms'] ?? null) !== null) {
-            $autoload = number_format((float) $timings['autoload_ms'], 2);
-            $app = number_format((float) ($timings['app_ms'] ?? 0), 2);
-            $php = number_format((float) ($timings['render_ms'] ?? 0), 2);
-            echo "  {$gray}  {$request}  →  {$status_code} {$reason}    autoload {$autoload}ms · app {$app}ms · php {$php}ms{$reset}\n";
+        if (! $this->profile_lifecycle) {
+            return;
+        }
+
+        $files = $timings['files'] ?? [];
+        $classes = $timings['classes'] ?? [];
+        $mem = $timings['mem'] ?? null;
+        $mem_label = is_numeric($mem)
+            ? number_format(((int) $mem) / 1048576, 1).'MB'
+            : null;
+
+        $summary = [
+            $request.'  →  '.$status_code.' '.$reason,
+            count($files).' files',
+            count($classes).' classes',
+        ];
+        if ($mem_label !== null) {
+            $summary[] = $mem_label;
+        }
+        echo "  {$gray}  ".implode(' · ', $summary).$reset."\n";
+        foreach ($files as $i => $included) {
+            echo "  {$gray}    ".str_pad((string) ($i + 1), 2, ' ', STR_PAD_LEFT)."  {$included}{$reset}\n";
+        }
+        foreach ($classes as $class) {
+            echo "  {$gray}      class {$class}{$reset}\n";
         }
     }
 
-    /**
-     * @return array{render_ms: float|null, autoload_ms: float|null, app_ms: float|null}
-     */
-    private function parse_timings(string $line): array
+    private function trace_push(string $kind, string $value): void
     {
-        $out = ['render_ms' => null, 'autoload_ms' => null, 'app_ms' => null];
-        if (preg_match_all('/(render|autoload|app)=([0-9.]+)/', $line, $m, PREG_SET_ORDER) === false) {
-            return $out;
+        end($this->requests_pool);
+        $port = key($this->requests_pool);
+        if (! is_int($port)) {
+            return;
         }
-        foreach ($m as $row) {
-            $out[$row[1].'_ms'] = (float) $row[2];
-        }
+        if ($kind === 'mem') {
+            $this->requests_pool[$port]['mem'] = (int) $value;
 
-        return $out;
+            return;
+        }
+        $this->requests_pool[$port][$kind][] = $value;
     }
 
     private function metrics_plain(?float $render_ms, float $request_ms): string
