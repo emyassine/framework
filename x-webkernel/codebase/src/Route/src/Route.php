@@ -9,6 +9,7 @@ use Webkernel\Route\Compile\Cache;
 use Webkernel\Route\Compile\Generator;
 use Webkernel\Route\Compile\Pattern;
 use Webkernel\Route\Dispatch\Dispatcher;
+use Webkernel\Route\Dispatch\Matched;
 use Webkernel\Route\Dispatch\MethodNotAllowed;
 use Webkernel\Route\Dispatch\NotMatched;
 use Webkernel\Route\Group\PendingGroup;
@@ -52,9 +53,6 @@ final class Route implements ComposableContract
 
     /** @var list<Binding> */
     private array $bindings = [];
-
-    /** @var array<string, Dispatcher> */
-    private array $dispatchers = [];
 
     private ?Uri $uris = null;
 
@@ -206,7 +204,9 @@ final class Route implements ComposableContract
         $uri = rawurldecode($uri);
         $host = self::normalize_host($host ?? (string) ($_SERVER['HTTP_HOST'] ?? ''));
 
-        $result = webapp()->route()->dispatcher($host)->dispatch($method, $uri);
+        $data = webapp()->route()->compiled_data($host);
+        $result = self::match_static($data, $method, $uri)
+            ?? (new Dispatcher($data))->dispatch($method, $uri);
 
         if ($result instanceof NotMatched) {
             http_response_code(404);
@@ -220,7 +220,11 @@ final class Route implements ComposableContract
             return '';
         }
 
-        $vars = Binding::domain_variables($result->extra, $host) + $result->variables;
+        $vars = $result->variables;
+        $domain = $result->extra[self::DOMAIN] ?? null;
+        if (is_string($domain) && $domain !== '' && str_contains($domain, '{')) {
+            $vars = Binding::domain_variables($result->extra, $host) + $vars;
+        }
         $out = self::invoke($result->handler, $vars);
         if ($out instanceof \Stringable) {
             return (string) $out;
@@ -246,7 +250,6 @@ final class Route implements ComposableContract
 
     public function invalidate(): void
     {
-        $this->dispatchers = [];
         $this->uris = null;
     }
 
@@ -295,9 +298,26 @@ final class Route implements ComposableContract
         return $binding;
     }
 
-    private function dispatcher(string $host): Dispatcher
+    /**
+     * @param RouteData $data
+     */
+    private static function match_static(array $data, string $method, string $uri): ?Matched
     {
-        return $this->dispatchers[$host] ??= new Dispatcher($this->compiled_data($host));
+        $static = $data[0] ?? [];
+        foreach ([$method, $method === 'HEAD' ? 'GET' : null, '*'] as $try) {
+            if (! is_string($try)) {
+                continue;
+            }
+            $row = $static[$try][$uri] ?? null;
+            if (! is_array($row) || ! array_key_exists(0, $row)) {
+                continue;
+            }
+            $extra = $row[1] ?? [];
+
+            return new Matched($row[0], [], is_array($extra) ? $extra : []);
+        }
+
+        return null;
     }
 
     /**

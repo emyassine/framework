@@ -3,4 +3,4 @@ use Webkernel\Route\Route;
 
 Route::view('/', 'dashboard', [
     'title' => 'Webkernel — Dashboard',
-])->name('dashboard');
+    ])->name('dashboard');
