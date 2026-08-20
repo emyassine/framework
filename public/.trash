@@ -1,0 +1,7 @@
+Pour activer le JIT et voir la vraie différence
+✅ php.ini — activer JIT tracing
+Dans ton php.ini (ou docker-php-ext-enable), ajoute :
+opcache.jit=tracing
+opcache.jit_buffer_size=128M
+opcache.enable=1
+opcache.enable_cli=1  CLI obligatoire pour les scripts

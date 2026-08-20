@@ -1,0 +1,62 @@
+{
+    "$schema": "https://getcomposer.org/schema.json",
+    "name": "webkernel/lifecycle",
+    "description": "Composer plugin for Webkernel package install paths and application lifecycle (including Vite webapp snapshots).",
+    "version": "0.12.0",
+    "homepage": "https://www.webkernelphp.com",
+    "type": "composer-plugin",
+    "license": "EPL-2.0",
+    "authors": [
+        {
+            "name": "El Moumen Yassine",
+            "email": "yassine@numerimondes.com",
+            "homepage": "https://webkernelphp.com/about"
+        }
+    ],
+    "support": {
+        "issues": "https://github.com/webkernelphp/lifecycle/issues"
+    },
+    "require": {
+        "php": "^8.4",
+        "composer-plugin-api": "^2.0",
+        "composer/composer": "^2.0",
+        "composer/installers": "^2.0"
+    },
+    "require-dev": {},
+    "autoload": {
+        "psr-4": {
+            "Webkernel\\Lifecycle\\": "src/lifecycle/",
+            "Webkernel\\Paths\\": "src/paths/"
+        },
+        "files": [
+            "load.paths.functions.php"
+        ]
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Webkernel\\Lifecycle\\Tests\\": "tests/"
+        }
+    },
+    "suggest": {
+        "laravel/framework": "Provides Illuminate\\Foundation\\ComposerScripts and PackageManifest (host app)."
+    },
+    "scripts": {
+        "fix": "vendor/bin/phpcbf",
+        "lint": "vendor/bin/phpcs",
+        "test": "vendor/bin/phpunit",
+        "test:paths": "@php tests/Paths/paths_check.php"
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "extra": {
+        "class": "Webkernel\\Lifecycle\\LCInstaller",
+        "webkernel": {
+            "package_repo": "git@github.com:webkernelphp/lifecycle.git",
+            "production": true,
+            "prefix": "lifecycle"
+        }
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}

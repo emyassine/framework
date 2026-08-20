@@ -1,0 +1,369 @@
+#!/usr/bin/env php
+<?php declare(strict_types=1);
+
+if (PHP_SAPI === 'cli-server') {
+    $parsed = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH);
+    $uri = urldecode(is_string($parsed) && $parsed !== '' ? $parsed : '/');
+    $docroot = $_SERVER['DOCUMENT_ROOT'] ?? __DIR__.'/public';
+    $file = $docroot.$uri;
+
+    if ($uri !== '/' && is_file($file)) {
+        return false;
+    }
+
+    require $docroot.'/index.php';
+
+    $status = http_response_code();
+    if (!is_int($status) || $status < 100) {
+        $status = 200;
+    }
+
+    $client = ($_SERVER['REMOTE_ADDR'] ?? '127.0.0.1').':'.($_SERVER['REMOTE_PORT'] ?? '0');
+    $method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
+    $path   = $_SERVER['REQUEST_URI'] ?? $uri;
+
+    file_put_contents('php://stderr', sprintf("%s [%d]: %s %s\n", $client, $status, $method, $path));
+    return;
+}
+
+// use Webkernel\Console\Input\ArgvInput;
+# /** @var \Webkernel\WebApp $webapp */
+// $webapp = require_once __DIR__.'/bootstrap/app.php';
+// exit($webapp->handleCommand(new ArgvInput));
+
+final class Server
+{
+    private const int MAX_PORT_TRIES = 10;
+
+    private string $host;
+    private int $port;
+    private string $public_dir;
+
+    /** @var resource|null */
+    private $process = null;
+
+    /** @var array<int, resource> */
+    private array $pipes = [];
+
+    private string $output_buffer = '';
+    private bool $banner_shown = false;
+    private bool $address_in_use = false;
+
+    /** @var array<int, array{started: int|float, request: string, status: int}> */
+    private array $requests_pool = [];
+
+    public function __construct(string $host = '127.0.0.1', int $port = 8000)
+    {
+        $this->host       = $host;
+        $this->port       = $port;
+        $this->public_dir = __DIR__.'/public';
+    }
+
+    public function start(): void
+    {
+        $this->register_signals();
+
+        for ($try = 0; $try < self::MAX_PORT_TRIES; $try++) {
+            $exit_code = $this->run_process();
+
+            if ($this->address_in_use) {
+                $this->address_in_use = false;
+                $this->banner_shown   = false;
+                $this->port++;
+                continue;
+            }
+
+            exit(is_int($exit_code) ? $exit_code : 0);
+        }
+
+        fwrite(STDERR, "Unable to listen on {$this->host} after ".self::MAX_PORT_TRIES." port attempts.\n");
+        exit(1);
+    }
+
+    private function run_process(): ?int
+    {
+        $command = [
+            PHP_BINARY,
+            '-S',
+            "{$this->host}:{$this->port}",
+            '-t',
+            $this->public_dir,
+            __FILE__,
+        ];
+
+        $pipes = [];
+        $process = proc_open($command, [
+            0 => ['file', '/dev/null', 'r'],
+            1 => ['pipe', 'w'],
+            2 => ['redirect', 1],
+        ], $pipes, __DIR__);
+
+        if (!is_resource($process)) {
+            fwrite(STDERR, "Failed to start PHP development server.\n");
+            exit(1);
+        }
+
+        $this->process = $process;
+
+        $stdout = $pipes[1] ?? null;
+        if (!is_resource($stdout)) {
+            $this->close_process();
+            fwrite(STDERR, "Failed to capture server output.\n");
+            exit(1);
+        }
+
+        $kept = [];
+        foreach ($pipes as $fd => $pipe) {
+            if (is_resource($pipe)) {
+                $kept[(int) $fd] = $pipe;
+            }
+        }
+        $this->pipes = $kept;
+
+        stream_set_blocking($stdout, false);
+
+        while (true) {
+            $chunk = fread($stdout, 8192);
+            if (is_string($chunk) && $chunk !== '') {
+                $this->ingest($chunk);
+            }
+
+            $status = proc_get_status($process);
+            if (!$status['running']) {
+                $leftover = stream_get_contents($stdout);
+                if (is_string($leftover) && $leftover !== '') {
+                    $this->ingest($leftover);
+                }
+                $this->close_process();
+                return $status['exitcode'];
+            }
+
+            usleep(50_000);
+        }
+    }
+
+    private function ingest(string $chunk): void
+    {
+        $this->output_buffer .= $chunk;
+        $lines = explode("\n", $this->output_buffer);
+        $this->output_buffer = (string) array_pop($lines);
+
+        foreach ($lines as $line) {
+            $this->handle_line(trim($line));
+        }
+    }
+
+    private function handle_line(string $line): void
+    {
+        if ($line === '') {
+            return;
+        }
+
+        if (str_contains($line, 'Failed to listen') || str_contains($line, 'Address already in use')) {
+            $this->address_in_use = true;
+            return;
+        }
+
+        if (str_contains($line, 'Development Server (http')) {
+            if (!$this->banner_shown) {
+                $this->banner_shown = true;
+                $this->render_banner();
+            }
+            return;
+        }
+
+        if (str_contains($line, 'Closed without sending a request') || str_contains($line, 'Failed to poll event')) {
+            return;
+        }
+
+        $port = $this->request_port($line);
+
+        if (str_ends_with($line, ' Accepted') && $port !== null) {
+            $this->requests_pool[$port] = [
+                'started' => hrtime(true),
+                'request' => '',
+                'status'  => 200,
+            ];
+            return;
+        }
+
+        if (preg_match('/\[(\d+)\]:\s+(\S+)\s+(\S+)/', $line, $m) === 1) {
+            $status  = (int) $m[1];
+            $request = $m[2].' '.$m[3];
+
+            if ($port !== null && isset($this->requests_pool[$port])) {
+                $this->requests_pool[$port]['request'] = $request;
+                $this->requests_pool[$port]['status']  = $status;
+                return;
+            }
+
+            $this->log_request($request, $status, hrtime(true));
+            return;
+        }
+
+        if (str_ends_with($line, ' Closing') && $port !== null) {
+            $entry = $this->requests_pool[$port] ?? null;
+            unset($this->requests_pool[$port]);
+
+            if ($entry === null || $entry['request'] === '') {
+                return;
+            }
+
+            $this->log_request($entry['request'], $entry['status'], $entry['started']);
+            return;
+        }
+
+        if (str_starts_with($line, '[')) {
+            $line = trim((string) strstr($line, '] '));
+        }
+
+        if ($line !== '') {
+            $gray  = "\033[90m";
+            $reset = "\033[0m";
+            echo "  {$gray}{$line}{$reset}\n";
+        }
+    }
+
+    private function request_port(string $line): ?int
+    {
+        if (preg_match('/:(\d+)\s+(?:Accepted|Closing|\[\d+\])/', $line, $m) === 1) {
+            return (int) $m[1];
+        }
+
+        return null;
+    }
+
+    private function render_banner(): void
+    {
+        $reset      = "\033[0m";
+        $bold       = "\033[1m";
+        $info_badge = "\033[44;97;1m INFO \033[0m";
+        $warn_badge = "\033[43;30;1m WARN \033[0m";
+        $gray       = "\033[90m";
+        $yellow     = "\033[33m";
+        $green      = "\033[32m";
+
+        $url = "http://{$this->host}:{$this->port}";
+
+        $opcache_active = extension_loaded('Zend OPcache') && (ini_get('opcache.enable') || ini_get('opcache.enable_cli'));
+        $opcache_status = $opcache_active ? "{$green}enabled{$reset}" : "{$gray}disabled{$reset}";
+
+        echo "\n";
+        echo "  ".$info_badge." Server running on ".$bold."[".$url."]".$reset.".\n\n";
+        echo "  ".$gray."PHP Version: ".PHP_VERSION." | OPcache: ".$opcache_status.$reset."\n\n";
+        echo "  ".$warn_badge." ".$yellow."This server is for local development only. Behavior differs from production (Nginx/Apache/FPM).".$reset."\n\n";
+        echo "  ".$gray."Press Ctrl+C to stop the server".$reset."\n\n";
+    }
+
+    private function log_request(string $request, int $status_code, float|int $start_time): void
+    {
+        $reset = "\033[0m";
+        $cyan  = "\033[36m";
+        $gray  = "\033[90m";
+
+        $status_color = match (true) {
+            $status_code >= 200 && $status_code < 300 => "\033[32m",
+            $status_code >= 300 && $status_code < 400 => "\033[33m",
+            $status_code >= 400 && $status_code < 500 => "\033[33;1m",
+            $status_code >= 500 => "\033[31;1m",
+            default => "\033[37m",
+        };
+
+        $reason      = $this->get_status_reason($status_code);
+        $duration_ms = number_format((hrtime(true) - $start_time) / 1e6, 2);
+        $timestamp   = date('H:i:s');
+
+        echo "  {$gray}{$timestamp}{$reset} {$status_color}{$status_code} {$reason}{$reset} {$cyan}{$request}{$reset} {$gray}({$duration_ms}ms){$reset}\n";
+    }
+
+    private function get_status_reason(int $code): string
+    {
+        return match ($code) {
+            200 => 'OK',
+            201 => 'Created',
+            204 => 'No Content',
+            301 => 'Moved Permanently',
+            302 => 'Found',
+            304 => 'Not Modified',
+            400 => 'Bad Request',
+            401 => 'Unauthorized',
+            403 => 'Forbidden',
+            404 => 'Not Found',
+            405 => 'Method Not Allowed',
+            500 => 'Internal Server Error',
+            502 => 'Bad Gateway',
+            503 => 'Service Unavailable',
+            default => 'Response',
+        };
+    }
+
+    private function register_signals(): void
+    {
+        if (!function_exists('pcntl_async_signals') || !function_exists('pcntl_signal')) {
+            return;
+        }
+
+        pcntl_async_signals(true);
+
+        $stop = function (): void {
+            $this->close_process();
+            exit(0);
+        };
+
+        pcntl_signal(SIGINT, $stop);
+        pcntl_signal(SIGTERM, $stop);
+        pcntl_signal(SIGHUP, $stop);
+        pcntl_signal(SIGQUIT, $stop);
+
+        register_shutdown_function(function (): void {
+            $this->close_process();
+        });
+    }
+
+    private function close_process(): void
+    {
+        $process = $this->process;
+        if (!is_resource($process)) {
+            $this->process = null;
+            $this->pipes = [];
+            return;
+        }
+
+        $status = proc_get_status($process);
+        if ($status['running']) {
+            proc_terminate($process, SIGTERM);
+            $deadline = microtime(true) + 2;
+            while (proc_get_status($process)['running'] && microtime(true) < $deadline) {
+                usleep(50_000);
+            }
+            if (proc_get_status($process)['running']) {
+                proc_terminate($process, SIGKILL);
+            }
+        }
+
+        foreach ($this->pipes as $pipe) {
+            if (is_resource($pipe)) {
+                fclose($pipe);
+            }
+        }
+        $this->pipes = [];
+
+        proc_close($process);
+        $this->process = null;
+    }
+}
+
+if (($argv[1] ?? null) === 'server') {
+    $host = '127.0.0.1';
+    $port = 8000;
+
+    foreach (array_slice($argv, 2) as $arg) {
+        if (str_starts_with($arg, '--host=')) {
+            $host = substr($arg, 7);
+        } elseif (str_starts_with($arg, '--port=')) {
+            $port = (int) substr($arg, 7);
+        }
+    }
+
+    (new Server($host, $port))->start();
+}
