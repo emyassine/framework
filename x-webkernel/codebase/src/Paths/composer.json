@@ -3,7 +3,7 @@
     "name": "webkernel/paths",
     "description": "Zero-dependency host path helpers (webapp_path, vendor_dir).",
     "type": "library",
-    "license": "EPL-2.0",
+    "license": "proprietary",
     "version": "0.12.0",
     "require": {
         "php": ">=8.4"
@@ -13,7 +13,7 @@
             "Webkernel\\Paths\\": "src/"
         },
         "files": [
-            "src/functions.php"
+            "load.paths.package-function.php"
         ]
     },
     "extra": {

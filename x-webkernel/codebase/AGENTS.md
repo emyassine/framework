@@ -58,11 +58,15 @@ Each subpackage:
 
 ```
 composer.json
+load.{prefix}.package-function.php   next to composer.json — the only files-autoload path (stable; never rename)
+functions/*.php                      glob'd by the loader (this directory only, no subfolders)
+src/                                 PHP classes (namespace Webkernel\{Pkg}\)
 README.md
 SECURITY.md
-src/                 PHP (namespace Webkernel\{Pkg}\)
 resources/{js,css,img,icons}/
 views/components/
+
+Composer lock records the loader path only. Do not list functions/*.php in autoload.files.
 ```
 
 ## Performance
@@ -70,6 +74,10 @@ views/components/
 - No directory walking on the request path that Composer already computed.
 - Static process caches. Opcache-friendly generated PHP.
 - Do not add work that is not required to boot or render.
+
+## DevEnv / IDE
+
+`Webkernel\DevEnv\IdeHelper` generates `src/DevEnv/_ide_helper.php` from Composer classmap so analyzers see `Composer\InstalledVersions` and the rest of vendor. No hardcoded class list, no directory walk. Lifecycle calls it on dump-autoload.
 
 ## Host API
 

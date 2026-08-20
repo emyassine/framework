@@ -18,5 +18,3 @@ Looks in `webapp_path('views')` then this package `views/`.
 ```
 
 Do not put `@if` inside an HTML tag. Compute locals, then always emit the attribute.
-
-License: EPL-2.0.

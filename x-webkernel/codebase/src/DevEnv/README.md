@@ -1,5 +1,5 @@
 # webkernel/devenv
 
-Development environment utilities (IDE support, stubs). Empty until needed.
+IDE stubs. `IdeHelper` reads Composer `autoload_classmap.php` (no vendor tree walk, no hardcoded class names) and writes `_ide_helper.php` (`if (false) { class … {} }`).
 
-License: EPL-2.0.
+Lifecycle runs it on `composer dump-autoload`. Deterministic: sorted names + xxh3 hash, skip rewrite when unchanged.

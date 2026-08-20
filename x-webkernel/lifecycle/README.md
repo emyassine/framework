@@ -17,5 +17,3 @@ On `composer dump-autoload` writes:
 - `storage/instance/data/instance_id`
 
 If the app is moved to another host, run `composer dump-autoload`.
-
-License: EPL-2.0.

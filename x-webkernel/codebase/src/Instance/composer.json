@@ -3,7 +3,7 @@
     "name": "webkernel/instance",
     "description": "Host instance fingerprint. Written by webkernel/lifecycle.",
     "type": "library",
-    "license": "EPL-2.0",
+    "license": "proprietary",
     "version": "0.12.0",
     "require": {
         "php": ">=8.4"
@@ -13,7 +13,7 @@
             "Webkernel\\Instance\\": "src/"
         },
         "files": [
-            "src/functions.php"
+            "load.instance.package-function.php"
         ]
     },
     "extra": {
