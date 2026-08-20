@@ -1,37 +1,99 @@
 # Webkernel Platform
 
-A high-performance, zero-overhead PHP web kernel built from scratch. Webkernel eliminates full-framework bootstrapping latency by executing minimal, explicit PHP pipelines without third-party service provider discovery overhead.
+A high-performance, zero-dependency PHP web kernel and enterprise application builder. Webkernel replaces heavy framework stacks with direct, unabstracted PHP primitives tailored specifically for custom business operations.
 
-## Architectural Principles
+## Vision & Product Philosophy
 
-* **Zero Magic:** No magic methods, magic resolution, or dynamic package auto-discovery.
-* **Direct Composition:** Standalone components imported explicitly without deep inheritance chains.
-* **Pre-Render Native Caching:** Native ETag validation (`304 Not Modified`) before booting template compilers or parsing Markdown assets.
-* **Controlled Scope:** Pure PHP HTTP lifecycle targeting sub-10ms server-side responses under OPcache.
+The objective of Webkernel is to provide a complete **application builder without third-party framework dependencies**.
 
-## Project Structure
+Instead of adding abstract wrappers on top of generic libraries, Webkernel directly integrates and re-adapts core framework utilities to match enterprise realities. By eliminating unnecessary generalization, it delivers maximum execution speed, full architectural control, and absolute independence from external ecosystems.
 
+---
+
+## Domain & UI Hierarchy
+
+Applications built on Webkernel follow a multi-panel, modular structure secured by a fine-grained role and permission system.
+
+```mermaid
+graph TD
+    subgraph Platform ["Platform Level"]
+        AO["App Owner(s)"]
+        SAP["System Admin Panel (Global Control)"]
+        MOD["Modules (1..N)"]
+    end
+
+    subgraph Module ["Module Domain"]
+        AP["Admin Panels (1..N)"]
+    end
+
+    subgraph Panel ["Panel Domain"]
+        CL["Clusters"]
+    end
+
+    subgraph Cluster ["Cluster Domain"]
+        RES["Resources"]
+    end
+
+    subgraph Resource ["Resource Domain"]
+        PG["Pages"]
+    end
+
+    subgraph Page ["Page Domain"]
+        CMP["Components (Tables, Forms, Widgets, Custom Views)"]
+    end
+
+    AO --> Platform
+    SAP --> MOD
+    MOD --> AP
+    AP --> CL
+    CL --> RES
+    RES --> PG
+    PG --> CMP
+
+    AUTH["Granular Permissions & Authorization"] -.- AP
+    AUTH -.- RES
+    AUTH -.- PG
+    AUTH -.- CMP
 
 ```
 
+### Hierarchy Overview
+
+* **Platform:** Core system level managed by one or more **App Owners**. Houses overall platform state and at least one **System Admin Panel** for global administration.
+* **Modules:** Independent domains residing in the platform. A single module can expose one or multiple **Admin Panels**.
+* **Admin Panels:** Operational workspaces containing organized **Clusters**.
+* **Clusters:** Logical groupings used to aggregate related resources within a panel.
+* **Resources:** Primary business entities managed within a cluster.
+* **Pages:** Individual screens constituting a resource (Lists, Forms, Details).
+* **Components:** UI primitives used inside pages (Data Tables, Metric Cards, Forms, Developer Custom Views).
+* **Granular Permissions:** Fine-grained authorization controls assigned across panels, resources, pages, and components.
+
+---
+
+## Architectural Principles
+
+* **Zero External Dependencies:** Native PHP execution tailored to business logic without vendor bloat.
+* **Zero Magic:** Explicit wiring without implicit service providers, dynamic auto-discovery, or magic resolution.
+* **Domain-Centric Abstractions:** Components designed specifically for enterprise business rules, avoiding bloated generic wrappers.
+* **Sub-10ms Execution:** Lightweight HTTP lifecycle optimized for OPcache execution.
+
+---
+
+## Project Structure
+
+```text
 webkernel/
 ├── public/
-│   └── index.php             # Single entry point
+│   └── index.php             # Single HTTP entry point
 ├── src/
 │   ├── Http/
 │   │   ├── Request.php       # HTTP Request capture
-│   │   ├── Response.php      # Response emission
+│   │   ├── Response.php      # HTTP Response emission
 │   │   └── Router.php        # Pattern matching router
-│   ├── Md/
-│   │   ├── Parser.php        # YAML Frontmatter & Markdown parser
-│   │   └── Cache.php         # Disk & ETag cache layer
 │   ├── View/
-│   │   └── Renderer.php      # Blade rendering wrapper
-│   └── Kernel.php            # Request processing orchestrator
-├── content/                  # Raw Markdown content files
-├── cache/                    # Static compiled HTML cache
-├── third_party/              # Vendor directory
-├── x-webkernel-dev/          # Development packages & modules source code
+│   │   └── Renderer.php      # Core UI rendering engine
+│   └── Kernel.php            # HTTP lifecycle orchestrator
+├── x-webkernel-dev/          # Internal dev packages & modules source code
 │   ├── software/
 │   ├── software-dev/
 │   ├── software-experimental/
@@ -41,11 +103,11 @@ webkernel/
 
 ```
 
-## Local Development & Setup
+---
+
+## Local Setup
 
 ### 1. Installation
-
-Ensure PHP 8.2+ is installed on your host system.
 
 ```bash
 composer install
@@ -54,8 +116,6 @@ composer install
 
 ### 2. Local HTTP Server
 
-Run via native PHP server for testing:
-
 ```bash
 php -S localhost:8000 -t public/
 
@@ -63,13 +123,8 @@ php -S localhost:8000 -t public/
 
 ### 3. Server OPcache Verification
 
-Verify OPcache configuration in production environment to achieve targeted performance benchmarks:
+Verify OPcache configuration in production environment:
 
 ```bash
 php -r "echo opcache_get_status()['opcache_enabled'] ? 'OPcache Active' : 'OPcache Disabled';"
-
 ```
-
-## Development Modules (`x-webkernel-dev`)
-
-All internal development components, experimental software, and modular packages reside under `x-webkernel-dev/`. Path repositories inside `composer.json` symlink these directories directly to maintain local synchronization without remote repository pulls.
