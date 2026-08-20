@@ -63,6 +63,13 @@ return WebApp::configure()
 
 `with_routes()` declares host `routes/web.php`. `create()` boots providers from dump + host `declare`.
 
+Front controller:
+
+```php
+(require __DIR__.'/../bootstrap/app.php')
+    ->handle_request(Request::capture());
+```
+
 Dump-autoload also writes `webkernel_providers.php` from `extra.webkernel.provider`. Merged with host `declare('providers', …)`.
 
 ## Route

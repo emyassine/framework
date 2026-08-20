@@ -211,7 +211,7 @@
             "dist": {
                 "type": "path",
                 "url": "x-webkernel/codebase",
-                "reference": "e982866a78f9b1b708ea02beb6a5046c00f58fcc"
+                "reference": "15c26dae080aa2fa70f7f889b09ffa9971a40875"
             },
             "require": {
                 "php": ">=8.4",
@@ -235,7 +235,7 @@
                     "src/PlatformProvider.php"
                 ],
                 "psr-4": {
-                    "Webkernel\\WebAppApi\\": "src/WebAppApi/src/",
+                    "Webkernel\\Composables\\": "src/Composables/",
                     "Webkernel\\Container\\": "src/Container/src/",
                     "Webkernel\\Http\\": "src/Http/src/",
                     "Webkernel\\Platform\\": "src/Platform/src/",

@@ -14,7 +14,7 @@
             "src/PlatformProvider.php"
         ],
         "psr-4": {
-            "Webkernel\\WebAppApi\\": "src/WebAppApi/src/",
+            "Webkernel\\Composables\\": "src/Composables/",
             "Webkernel\\Container\\": "src/Container/src/",
             "Webkernel\\Http\\": "src/Http/src/",
             "Webkernel\\Platform\\": "src/Platform/src/",

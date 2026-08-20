@@ -1,9 +1,13 @@
 <?php declare(strict_types=1);
 define('START_REQUEST', hrtime(true));
+
 use Webkernel\Http\Request;
-if (file_exists($maint = __DIR__.'/../storage/maintenance.php')) { require $maint; }
+
+if (file_exists($maint = __DIR__.'/../storage/maintenance.php')) {
+    require $maint;
+}
 
 // ---- Start WebApp -------------------------------------------------------------------------
 // Webkernel Web Application is ... and does ...
-$app = require __DIR__.'/../bootstrap/app.php';
-Route::run();
+(require __DIR__.'/../bootstrap/app.php')
+    ->handle_request(Request::capture());

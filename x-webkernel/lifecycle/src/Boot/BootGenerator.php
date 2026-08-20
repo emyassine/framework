@@ -10,7 +10,7 @@ use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 use Webkernel\DevEnv\IdeHelper;
 use Webkernel\Instance\InstanceId;
-use Webkernel\WebAppApi\Composables\ComposableContract;
+use Webkernel\Composables\ComposableContract;
 
 /**
  * Writes {vendor}/composer/webkernel.php and related dump files.

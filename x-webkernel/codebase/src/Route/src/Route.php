@@ -196,7 +196,7 @@ final class Route implements ComposableContract
         return self::app()->uri_generator()->for_name($name, $parameters);
     }
 
-    public static function dispatch(?string $method = null, ?string $uri = null): mixed
+    public static function dispatch(?string $method = null, ?string $uri = null, ?string $host = null): mixed
     {
         $method ??= $_SERVER['REQUEST_METHOD'] ?? 'GET';
         $uri ??= $_SERVER['REQUEST_URI'] ?? '/';
@@ -204,7 +204,7 @@ final class Route implements ComposableContract
             $uri = substr($uri, 0, $q);
         }
         $uri = rawurldecode($uri);
-        $host = self::normalize_host((string) ($_SERVER['HTTP_HOST'] ?? ''));
+        $host = self::normalize_host($host ?? (string) ($_SERVER['HTTP_HOST'] ?? ''));
 
         $result = self::app()->dispatcher($host)->dispatch($method, $uri);
 

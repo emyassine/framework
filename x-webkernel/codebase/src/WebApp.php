@@ -4,9 +4,10 @@ namespace Webkernel;
 
 use Psr\Container\ContainerInterface;
 use Webkernel\Container\Container;
+use Webkernel\Http\Request;
 use Webkernel\Platform\Exceptions;
 use Webkernel\Platform\Middleware;
-use Webkernel\WebAppApi\Composables\ComposableContract;
+use Webkernel\Composables\ComposableContract;
 
 /**
  * Host application facade. Composables are lazy API segments
@@ -105,6 +106,12 @@ final class WebApp
     public function create(): self
     {
         return $this->boot();
+    }
+
+    public function handle_request(Request $request): void
+    {
+        $this->container->instance(Request::class, $request);
+        echo $this->route()::dispatch($request->method(), $request->uri(), $request->host());
     }
 
     public function middleware(): ?Middleware

@@ -10,6 +10,7 @@ final class Request
     public function __construct(
         private readonly string $path,
         private readonly string $method = 'GET',
+        private readonly string $host = '',
     ) {
     }
 
@@ -22,7 +23,11 @@ final class Request
         $path = rawurldecode($uri);
         $path = trim($path, '/');
 
-        return new self($path === '' ? '/' : $path, strtoupper((string) ($_SERVER['REQUEST_METHOD'] ?? 'GET')));
+        return new self(
+            $path === '' ? '/' : $path,
+            strtoupper((string) ($_SERVER['REQUEST_METHOD'] ?? 'GET')),
+            (string) ($_SERVER['HTTP_HOST'] ?? ''),
+        );
     }
 
     public function path(): string
@@ -30,9 +35,20 @@ final class Request
         return $this->path;
     }
 
+    /** Path with leading slash, for the router. */
+    public function uri(): string
+    {
+        return $this->path === '/' ? '/' : '/'.$this->path;
+    }
+
     public function method(): string
     {
         return $this->method;
+    }
+
+    public function host(): string
+    {
+        return $this->host;
     }
 
     public function is(string ...$patterns): bool

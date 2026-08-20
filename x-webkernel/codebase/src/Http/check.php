@@ -15,6 +15,8 @@ function expect(mixed $ok, string $msg): void
 }
 
 $api = new Request('api/users', 'GET');
+expect($api->uri() === '/api/users', 'uri slash');
+expect((new Request('/'))->uri() === '/', 'root uri');
 expect($api->is('api/*') === true, 'api/* match');
 expect($api->is('admin/*') === false, 'admin/* miss');
 expect((new Request('api'))->is('api/*') === false, 'api not api/*');

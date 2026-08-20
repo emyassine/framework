@@ -5,8 +5,9 @@
 require __DIR__.'/fast-boot.php'; // does installation of third_party and some preparation actions
 
 use Webkernel\Http\Request;
-use Webkernel\Platform\Exceptions;
-use Webkernel\Platform\Middleware;
+use Webkernel\Platform\{
+	Exceptions, Middleware
+};
 use Webkernel\WebApp;
 
 // ---- Global WebApp Configuration ----------------------------------------------------------

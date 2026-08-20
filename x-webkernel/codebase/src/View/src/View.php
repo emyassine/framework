@@ -2,7 +2,7 @@
 
 namespace Webkernel\View;
 
-use Webkernel\WebAppApi\Composables\ComposableContract;
+use Webkernel\Composables\ComposableContract;
 
 /**
  * Views. Compiler is BladeOne owned in this package — not a Composer dependency.
