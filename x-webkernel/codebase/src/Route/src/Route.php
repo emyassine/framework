@@ -2,8 +2,6 @@
 
 namespace Webkernel\Route;
 
-use Webkernel\View\View;
-
 /**
  * Application router. FastRoute MarkBased engine, owned in this package.
  *
@@ -32,6 +30,8 @@ final class Route
 
     public const REGEX = '_route';
 
+    private static bool $declared_loaded = false;
+
     private static ?self $app = null;
 
     private string $group_prefix = '';
@@ -53,13 +53,20 @@ final class Route
 
     public static function app(): self
     {
-        return self::$app ??= new self();
+        $created = self::$app === null;
+        self::$app ??= new self();
+        if ($created) {
+            self::load_declared();
+        }
+
+        return self::$app;
     }
 
     /** Reset process singleton (tests). */
     public static function flush(): void
     {
         self::$app = null;
+        self::$declared_loaded = false;
     }
 
     /**
@@ -132,7 +139,7 @@ final class Route
      */
     public static function view(string $uri, string $view, array $data = [], array $extra = []): void
     {
-        self::get($uri, static fn (): View => View::make($view, $data), $extra);
+        self::get($uri, static fn (): \Webkernel\View\View => \Webkernel\View\View::make($view, $data), $extra);
     }
 
     public static function redirect(string $uri, string $destination, int $status = 302): void
@@ -305,5 +312,30 @@ final class Route
         }
 
         throw new \RuntimeException('Invalid route action.');
+    }
+
+    /**
+     * Require route files collected at dump-autoload. Not called until Route is used.
+     */
+    private static function load_declared(): void
+    {
+        if (self::$declared_loaded) {
+            return;
+        }
+        self::$declared_loaded = true;
+
+        $file = vendor_dir('composer/webkernel_routes.php');
+        if (! is_file($file)) {
+            return;
+        }
+        $routes = require $file;
+        if (! is_array($routes)) {
+            return;
+        }
+        foreach ($routes as $path) {
+            if (is_string($path) && $path !== '' && is_file($path)) {
+                require $path;
+            }
+        }
     }
 }

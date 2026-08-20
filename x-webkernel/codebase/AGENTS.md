@@ -17,13 +17,13 @@ Engines we own in-tree (fork, specialize — do not wrap as a vendor): FastRoute
 | Classes / namespaces | `PascalCase` | `Engine`, `InstanceId` |
 | Constants | `UPPER_SNAKE` | `WEBKERNEL_NS` |
 
-Exceptions: Composer / PSR interface methods you do not own (`activate`, `getSubscribedEvents`, `getInstallPath`, `supports`); HTTP verbs and Blade helpers that match Laravel usage (`Route::get`, `view()`, `View::make`).
+Exceptions: Composer / PSR interface methods you do not own (`activate`, `getSubscribedEvents`, `getInstallPath`, `supports`); HTTP verbs and view helpers that match Laravel usage (`Route::get`, `view()`, `View::make`).
 
 Do not introduce `camelCase` on Webkernel surfaces. Do not keep dual APIs.
 
 ## Dependencies
 
-- Runtime: PHP 8.4+ only. No nikic/fast-route, no eftec/bladeone (copied and specialized under `src/Route`, `src/View`).
+- Runtime: PHP 8.4+ only. No nikic/fast-route, no eftec/bladeone (copied and specialized under `src/Route`, `src/View`). Templates are `*.view.php`, never `*.blade.php`.
 - PSR allowed only when a type we expose needs it. This slice does not.
 - `composer-plugin-api` is Composer-time, in `webkernel/lifecycle` only.
 - Do not add Laravel, Filament, Symfony HTTP, or a container.
@@ -47,7 +47,19 @@ One dispatcher: MarkBased. No CharCount / GroupCount / GroupPos. No PSR-7 URI ob
 
 ## View
 
-`view()` + `Webkernel\View\View`. Compiler is BladeOne in `Webkernel\View\Compiler`. Templates: `resources/views/*.blade.php`. Compiled: `storage/framework/views`.
+`view()` + `Webkernel\View\View`. Compiler is BladeOne in `Webkernel\View\Compiler`. Templates: `{name}.view.php`. Compiled: `storage/framework/views/{name}_{hash}.view.php.compiled`.
+
+Template directories are listed at dump-autoload in `{vendor}/composer/webkernel_views.php` (host `resources/views` first, then each package `views/`). Do not glob view dirs on the request path.
+
+Layouts (Filament-shaped, CSS split by chrome):
+
+| Layout | Loads |
+| --- | --- |
+| `layouts.base` | tokens only |
+| `layouts.simple` | tokens + centered card (no sidebar) |
+| `layouts.page` | tokens + shell (sidebar / topnav / horizontal) + components |
+
+Do not boot Route or View classes on requests that do not call them. `class_alias` of `Route` / `View` / `Js` is lazy (autoload). `extra.webkernel.eager` is dump-time, for tiny function files only.
 
 Platform tree (later, not this package): App owner → Platform (system panel) → Module → Panel → Cluster → Resource → Page → components. Do not invent a second templating stack.
 

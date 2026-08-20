@@ -1,3 +1,0 @@
-<?php echo ($at)->format('Y-m-d'); ?>
-<?php  if ($this->check('disk', 'local')): ?>local@elsedisk('s3')s3@elseother@enddisk
-<?php echo \Webkernel\View\View::echo(Webkernel\View\Js::from(['a' => 1])); ?>

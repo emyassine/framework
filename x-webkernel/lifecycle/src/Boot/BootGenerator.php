@@ -4,6 +4,7 @@ namespace Webkernel\Lifecycle\Boot;
 
 use Composer\Composer;
 use Composer\IO\IOInterface;
+use Composer\Package\PackageInterface;
 use FilesystemIterator;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
@@ -11,8 +12,8 @@ use Webkernel\DevEnv\IdeHelper;
 use Webkernel\Instance\InstanceId;
 
 /**
- * Writes {vendor}/composer/webkernel.php and webkernel_classmap.php.
- * Composer-time only.
+ * Writes {vendor}/composer/webkernel.php and related dump files.
+ * Composer-time only. Do not walk disks on the request path.
  */
 final class BootGenerator
 {
@@ -21,6 +22,10 @@ final class BootGenerator
     public const CLASSMAP_BASENAME = 'webkernel_classmap.php';
 
     public const FILES_BASENAME = 'webkernel_files.php';
+
+    public const VIEWS_BASENAME = 'webkernel_views.php';
+
+    public const ROUTES_BASENAME = 'webkernel_routes.php';
 
     public static function write(Composer $composer, ?IOInterface $io = null): void
     {
@@ -58,6 +63,18 @@ final class BootGenerator
         self::write_files(
             $composer_dir.DIRECTORY_SEPARATOR.self::FILES_BASENAME,
             self::files_list($composer),
+            $vendor_dir,
+            $root,
+        );
+        self::write_path_list(
+            $composer_dir.DIRECTORY_SEPARATOR.self::VIEWS_BASENAME,
+            self::views_list($composer, $root),
+            $vendor_dir,
+            $root,
+        );
+        self::write_path_list(
+            $composer_dir.DIRECTORY_SEPARATOR.self::ROUTES_BASENAME,
+            self::routes_list($composer, $root),
             $vendor_dir,
             $root,
         );
@@ -100,8 +117,35 @@ final class BootGenerator
         return null;
     }
 
+    private static function is_webkernel_package(PackageInterface $package): bool
+    {
+        $type = $package->getType();
+        if (is_string($type) && str_starts_with($type, 'webkernel-')) {
+            return true;
+        }
+        if (isset($package->getExtra()['webkernel'])) {
+            return true;
+        }
+
+        return str_starts_with($package->getName(), 'webkernel/');
+    }
+
     /**
-     * Scan PSR-4 dirs of installed webkernel/* packages (Composer install paths).
+     * @return array<string, mixed>
+     */
+    private static function extra(PackageInterface|array $package): array
+    {
+        if ($package instanceof PackageInterface) {
+            $extra = $package->getExtra()['webkernel'] ?? null;
+        } else {
+            $extra = $package['extra']['webkernel'] ?? null;
+        }
+
+        return is_array($extra) ? $extra : [];
+    }
+
+    /**
+     * Scan PSR-4 dirs of installed webkernel packages (Composer install paths).
      *
      * @return array<string, string>
      */
@@ -111,7 +155,7 @@ final class BootGenerator
         $installers = $composer->getInstallationManager();
 
         foreach ($composer->getRepositoryManager()->getLocalRepository()->getCanonicalPackages() as $package) {
-            if (! str_starts_with($package->getName(), 'webkernel/')) {
+            if (! self::is_webkernel_package($package)) {
                 continue;
             }
             $install_path = $installers->getInstallPath($package);
@@ -137,18 +181,18 @@ final class BootGenerator
     }
 
     /**
-     * autoload.files from nested subpackage composer.json (not the root loaders Composer already runs).
+     * Eager function files, glob'd at dump-autoload. extra.webkernel.eager = true.
+     * Nested loaders are not listed — their functions/*.php paths are.
      *
      * @return list<string>
      */
     private static function files_list(Composer $composer): array
     {
         $paths = [];
-        $skip = [];
         $installers = $composer->getInstallationManager();
 
         foreach ($composer->getRepositoryManager()->getLocalRepository()->getCanonicalPackages() as $package) {
-            if (! str_starts_with($package->getName(), 'webkernel/')) {
+            if (! self::is_webkernel_package($package)) {
                 continue;
             }
             $install_path = $installers->getInstallPath($package);
@@ -157,8 +201,8 @@ final class BootGenerator
             }
             $install_path = rtrim(str_replace('\\', '/', $install_path), '/');
 
-            foreach ($package->getAutoload()['files'] ?? [] as $rel) {
-                $skip[$install_path.'/'.ltrim(str_replace('\\', '/', (string) $rel), '/')] = true;
+            if ((self::extra($package)['eager'] ?? false) === true) {
+                self::collect_function_files($paths, $install_path);
             }
 
             foreach (glob($install_path.'/src/*/composer.json') ?: [] as $json_file) {
@@ -170,16 +214,10 @@ final class BootGenerator
                 if (! is_array($data)) {
                     continue;
                 }
-                $dir = str_replace('\\', '/', dirname($json_file));
-                foreach ($data['autoload']['files'] ?? [] as $rel) {
-                    if (! is_string($rel) || $rel === '') {
-                        continue;
-                    }
-                    $abs = $dir.'/'.ltrim(str_replace('\\', '/', $rel), '/');
-                    if (is_file($abs) && ! isset($skip[$abs])) {
-                        $paths[$abs] = true;
-                    }
+                if ((self::extra($data)['eager'] ?? false) !== true) {
+                    continue;
                 }
+                self::collect_function_files($paths, str_replace('\\', '/', dirname($json_file)));
             }
         }
 
@@ -187,6 +225,197 @@ final class BootGenerator
         sort($list, SORT_STRING);
 
         return $list;
+    }
+
+    /**
+     * @param array<string, true> $paths
+     */
+    private static function collect_function_files(array &$paths, string $dir): void
+    {
+        foreach (glob($dir.'/functions/*.php') ?: [] as $file) {
+            if (is_file($file)) {
+                $paths[str_replace('\\', '/', $file)] = true;
+            }
+        }
+    }
+
+    /**
+     * Host resources/views first, then each package views dir.
+     *
+     * extra.webkernel.views: false | true | "views" | list<string>
+     * Missing: include views/ and resources/views/ when those directories exist.
+     *
+     * @return list<string>
+     */
+    private static function views_list(Composer $composer, string $root): array
+    {
+        $dirs = [];
+        $host = rtrim(str_replace('\\', '/', $root), '/').'/resources/views';
+        $dirs[$host] = true;
+
+        foreach (self::package_paths($composer) as $install_path => $extra) {
+            foreach (self::declared_dirs($install_path, $extra['views'] ?? null, ['views', 'resources/views']) as $dir) {
+                if (self::has_view_templates($dir)) {
+                    $dirs[$dir] = true;
+                }
+            }
+            foreach (glob($install_path.'/src/*/views') ?: [] as $nested) {
+                $nested = str_replace('\\', '/', $nested);
+                if (is_dir($nested) && self::has_view_templates($nested)) {
+                    $dirs[$nested] = true;
+                }
+            }
+        }
+
+        return array_keys($dirs);
+    }
+
+    /**
+     * extra.webkernel.routes: false | true | "routes/web.php" | list<string>
+     * Missing: include routes.php and routes/web.php when those files exist.
+     *
+     * @return list<string>
+     */
+    private static function routes_list(Composer $composer, string $root): array
+    {
+        $files = [];
+        $root = rtrim(str_replace('\\', '/', $root), '/');
+        foreach ([$root.'/routes/web.php', $root.'/routes.php'] as $host) {
+            if (is_file($host)) {
+                $files[$host] = true;
+            }
+        }
+
+        foreach (self::package_paths($composer) as $install_path => $extra) {
+            foreach (self::declared_files($install_path, $extra['routes'] ?? null, ['routes/web.php', 'routes.php']) as $file) {
+                $files[$file] = true;
+            }
+        }
+
+        return array_keys($files);
+    }
+
+    /**
+     * @return array<string, array<string, mixed>>
+     */
+    private static function package_paths(Composer $composer): array
+    {
+        $out = [];
+        $installers = $composer->getInstallationManager();
+
+        foreach ($composer->getRepositoryManager()->getLocalRepository()->getCanonicalPackages() as $package) {
+            if (! self::is_webkernel_package($package)) {
+                continue;
+            }
+            $install_path = $installers->getInstallPath($package);
+            if (! is_string($install_path) || $install_path === '' || ! is_dir($install_path)) {
+                continue;
+            }
+            $install_path = rtrim(str_replace('\\', '/', $install_path), '/');
+            $out[$install_path] = self::extra($package);
+
+            foreach (glob($install_path.'/src/*/composer.json') ?: [] as $json_file) {
+                $raw = file_get_contents($json_file);
+                if ($raw === false) {
+                    continue;
+                }
+                $data = json_decode($raw, true);
+                if (! is_array($data)) {
+                    continue;
+                }
+                $dir = str_replace('\\', '/', dirname($json_file));
+                $out[$dir] = self::extra($data);
+            }
+        }
+
+        return $out;
+    }
+
+    private static function has_view_templates(string $dir): bool
+    {
+        if (! is_dir($dir)) {
+            return false;
+        }
+        $it = new RecursiveIteratorIterator(
+            new RecursiveDirectoryIterator($dir, FilesystemIterator::SKIP_DOTS),
+        );
+        foreach ($it as $file) {
+            if ($file->isFile() && str_ends_with($file->getFilename(), '.view.php')) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * @param mixed $declared
+     * @param list<string> $defaults
+     * @return list<string>
+     */
+    private static function declared_dirs(string $install_path, mixed $declared, array $defaults): array
+    {
+        if ($declared === false) {
+            return [];
+        }
+        $rels = self::declared_rels($declared, $defaults);
+        $dirs = [];
+        foreach ($rels as $rel) {
+            $dir = $install_path.'/'.$rel;
+            if (is_dir($dir)) {
+                $dirs[] = $dir;
+            }
+        }
+
+        return $dirs;
+    }
+
+    /**
+     * @param mixed $declared
+     * @param list<string> $defaults
+     * @return list<string>
+     */
+    private static function declared_files(string $install_path, mixed $declared, array $defaults): array
+    {
+        if ($declared === false) {
+            return [];
+        }
+        $rels = self::declared_rels($declared, $defaults);
+        $files = [];
+        foreach ($rels as $rel) {
+            $file = $install_path.'/'.$rel;
+            if (is_file($file)) {
+                $files[] = $file;
+            }
+        }
+
+        return $files;
+    }
+
+    /**
+     * @param mixed $declared
+     * @param list<string> $defaults
+     * @return list<string>
+     */
+    private static function declared_rels(mixed $declared, array $defaults): array
+    {
+        if ($declared === null || $declared === true) {
+            return $defaults;
+        }
+        if (is_string($declared) && $declared !== '') {
+            return [ltrim(str_replace('\\', '/', $declared), '/')];
+        }
+        if (! is_array($declared)) {
+            return [];
+        }
+        $rels = [];
+        foreach ($declared as $rel) {
+            if (is_string($rel) && $rel !== '') {
+                $rels[] = ltrim(str_replace('\\', '/', $rel), '/');
+            }
+        }
+
+        return $rels;
     }
 
     /**
@@ -249,17 +478,17 @@ PHP;
     /**
      * Same rule as Composer AutoloadGenerator::getPathCode().
      */
-     private static function path_code(string $file, string $vendor_dir, string $root): string
-     {
-         if (str_starts_with($file, $vendor_dir.'/')) {
-             return '$v . ' . (string) var_export(substr($file, strlen($vendor_dir)), true);
-         }
-         if (str_starts_with($file, $root.'/')) {
-             return '$b . ' . (string) var_export(substr($file, strlen($root)), true);
-         }
+    private static function path_code(string $file, string $vendor_dir, string $root): string
+    {
+        if (str_starts_with($file, $vendor_dir.'/')) {
+            return '$v . '.(string) var_export(substr($file, strlen($vendor_dir)), true);
+        }
+        if (str_starts_with($file, $root.'/')) {
+            return '$b . '.(string) var_export(substr($file, strlen($root)), true);
+        }
 
-         return (string) var_export($file, true);
-     }
+        return (string) var_export($file, true);
+    }
 
     /**
      * @param list<string> $files
@@ -293,6 +522,36 @@ foreach (\$files as \$file) {
         throw new \\RuntimeException('Unable to load required file: '.\$file);
     }
 }
+
+PHP;
+        file_put_contents($path, $body, LOCK_EX);
+    }
+
+    /**
+     * @param list<string> $paths
+     */
+    private static function write_path_list(string $path, array $paths, string $vendor_dir, string $root): void
+    {
+        $vendor_dir = rtrim(str_replace('\\', '/', $vendor_dir), '/');
+        $root = rtrim(str_replace('\\', '/', $root), '/');
+        $header = IdeHelper::generated_header();
+        $items = [];
+        foreach ($paths as $item) {
+            $items[] = '    '.self::path_code(str_replace('\\', '/', $item), $vendor_dir, $root).',';
+        }
+        $list = $items === [] ? '' : "\n".implode("\n", $items)."\n";
+
+        $body = <<<PHP
+<?php declare(strict_types=1);
+
+{$header}
+//>
+//> Generated. Do not edit.
+
+\$v = dirname(__DIR__); // vendor_dir
+\$b = dirname(\$v); // base_dir
+
+return [{$list}];
 
 PHP;
         file_put_contents($path, $body, LOCK_EX);

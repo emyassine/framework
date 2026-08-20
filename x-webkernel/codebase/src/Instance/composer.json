@@ -18,7 +18,8 @@
     },
     "extra": {
         "webkernel": {
-            "prefix": "instance"
+            "prefix": "instance",
+            "eager": true
         }
     }
 }

@@ -18,7 +18,8 @@
     },
     "extra": {
         "webkernel": {
-            "prefix": "paths"
+            "prefix": "paths",
+            "eager": true
         }
     }
 }

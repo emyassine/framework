@@ -1,4 +1,0 @@
-<?php $__currentLoopData = $users; $this->addLoop($__currentLoopData);$this->getFirstLoop();
- foreach($__currentLoopData as $user): $loop = $this->incrementLoopIndices();  ?>
-<?php echo \Webkernel\View\View::echo($user); ?><?php if(!$loop->last): ?>, <?php endif; ?>
-<?php endforeach; $this->popLoop(); $loop = $this->getFirstLoop(); ?>

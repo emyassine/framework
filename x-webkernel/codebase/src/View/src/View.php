@@ -3,10 +3,13 @@
 namespace Webkernel\View;
 
 /**
- * Blade views. Compiler is BladeOne owned in this package — not a Composer dependency.
+ * Views. Compiler is BladeOne owned in this package — not a Composer dependency.
  *
- * Templates: resources/views/{name}.blade.php
- * Compiled:  storage/framework/views
+ * Templates: {name}.view.php
+ * Compiled:  storage/framework/views/{name}_{hash}.view.php.compiled
+ *
+ * Template directories come from vendor/composer/webkernel_views.php
+ * (host resources/views first, then each package views/ declared at dump-autoload).
  */
 final class View implements \Stringable
 {
@@ -60,17 +63,17 @@ final class View implements \Stringable
 
     public static function if(string $name, callable $callback): void
     {
-        $blade = self::compiler();
-        $blade->if($name, $callback);
-        $blade->directive('unless'.$name, static function (?string $expression) use ($name, $blade): string {
-            $tmp = $blade->stripParentheses($expression);
+        $compiler = self::compiler();
+        $compiler->if($name, $callback);
+        $compiler->directive('unless'.$name, static function (?string $expression) use ($name, $compiler): string {
+            $tmp = $compiler->stripParentheses($expression);
 
             return ($expression !== null && $expression !== '')
-                ? $blade->phpTag." if (! \$this->check('$name', $tmp)): ?>"
-                : $blade->phpTag." if (! \$this->check('$name')): ?>";
+                ? $compiler->phpTag." if (! \$this->check('$name', $tmp)): ?>"
+                : $compiler->phpTag." if (! \$this->check('$name')): ?>";
         });
-        $blade->directive('endunless'.$name, static function () use ($blade): string {
-            return $blade->phpTag.' endif; ?>';
+        $compiler->directive('endunless'.$name, static function () use ($compiler): string {
+            return $compiler->phpTag.' endif; ?>';
         });
     }
 
@@ -98,20 +101,37 @@ final class View implements \Stringable
             return self::$compiler;
         }
 
-        $views = webapp_path('resources/views');
+        $paths = self::template_paths();
         $compiled = webapp_path('storage/framework/views');
         if (! is_dir($compiled) && ! mkdir($compiled, 0775, true) && ! is_dir($compiled)) {
             throw new \RuntimeException('Unable to create '.$compiled);
         }
 
         $mode = Compiler::MODE_AUTO;
-        $engine = new Compiler($views, $compiled, $mode);
+        $engine = new Compiler($paths, $compiled, $mode);
         $engine->throwOnError = true;
         $engine->set_echo_format('\\'.self::class.'::echo(%s)');
         $engine->addAliasClasses('Js', Js::class);
         $engine->addAliasClasses('View', self::class);
 
         return self::$compiler = $engine;
+    }
+
+    /**
+     * @return list<string>
+     */
+    public static function template_paths(): array
+    {
+        $file = vendor_dir('composer/webkernel_views.php');
+        if (is_file($file)) {
+            $paths = require $file;
+            if (is_array($paths) && $paths !== []) {
+                /** @var list<string> $paths */
+                return array_values(array_filter($paths, is_string(...)));
+            }
+        }
+
+        return [webapp_path('resources/views')];
     }
 
     /** Reset process singleton (tests). */

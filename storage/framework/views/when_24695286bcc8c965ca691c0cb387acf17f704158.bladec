@@ -1,9 +1,0 @@
-<?php echo ($at)->format('Y-m-d'); ?>
-<?php  if ($this->check('disk', 'local')): ?>
-local
-<?php  elseif ($this->check('disk', 's3')): ?>
-s3
-<?php else: ?>
-other
-<?php  endif; ?>
-<?php echo \Webkernel\View\View::echo(Webkernel\View\Js::from(['a' => 1])); ?>

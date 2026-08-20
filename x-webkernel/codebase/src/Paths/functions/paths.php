@@ -47,10 +47,10 @@ if (! function_exists('webkernel_vendor_dir')) {
             return $dir;
         }
 
-        if (class_exists(\Composer\InstalledVersions::class)) {
-            $file = (new \ReflectionClass(\Composer\InstalledVersions::class))->getFileName();
-            if (is_string($file) && $file !== '') {
-                $vendor = dirname($file, 2);
+        if (function_exists('webkernel_composer_dir')) {
+            $composer_dir = webkernel_composer_dir();
+            if (is_string($composer_dir) && $composer_dir !== '') {
+                $vendor = dirname($composer_dir);
                 $real = realpath($vendor);
 
                 return $dir = $real !== false ? $real : $vendor;

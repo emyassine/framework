@@ -30,6 +30,7 @@ use InvalidArgumentException;
 
 /**
  * Compiler — BladeOne (EFTEC) owned by Webkernel. Do not require eftec/bladeone.
+ * Templates: .view.php. Compiled: .view.php.compiled.
  *
  * @package   Compiler
  * @author    Jorge Patricio Castro Castillo <jcastro arroba eftec dot cl>
@@ -129,7 +130,7 @@ class Compiler
     protected string $currentView = "";
     protected string $notFoundPath = "";
     /** @var string File extension for the template files. */
-    protected string $fileExtension = '.blade.php';
+    protected string $fileExtension = '.view.php';
     /** @var array The stack of in-progress sections. */
     protected array $sectionStack = [];
     /** @var array The stack of in-progress loops. */
@@ -161,7 +162,7 @@ class Compiler
     /** @var string|null Get the compiled path for the compiled views. If null then it uses the default path */
     protected ?string $compiledPath = null;
     /** @var string the extension of the compiled file. */
-    protected string $compileExtension = '.bladec';
+    protected string $compileExtension = '.view.php.compiled';
     /**
      * @var string=['auto','sha1','md5'][$i] It determines how the compiled filename will be called.<br>
      *            **auto** (default mode) the mode is "sha1"<br>
@@ -2035,7 +2036,7 @@ class Compiler
 
     /**
      * Set the file extension for the template files.
-     * It must include the leading dot e.g. ".blade.php"
+     * It must include the leading dot e.g. ".view.php"
      *
      * @param string $fileExtension Example: .prefix.ext
      */
@@ -2056,7 +2057,7 @@ class Compiler
 
     /**
      * Set the file extension for the compiled files.
-     * Including the leading dot for the extension is required, e.g. ".bladec"
+     * Including the leading dot for the extension is required, e.g. ".view.php.compiled"
      *
      * @param $fileExtension
      */
@@ -2185,7 +2186,7 @@ class Compiler
     /**
      * Run the blade engine. It returns the result of the code.
      *
-     * @param string|null $view      The name of the cache. Ex: "folder.folder.view" ("/folder/folder/view.blade")
+     * @param string|null $view      The name of the cache. Ex: "folder.folder.view" ("/folder/folder/view.view.php")
      * @param array       $variables An associative arrays with the values to display.
      * @return string
      * @throws Exception

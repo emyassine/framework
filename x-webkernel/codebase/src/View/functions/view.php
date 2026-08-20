@@ -1,19 +1,17 @@
 <?php declare(strict_types=1);
 
-use Webkernel\View\View;
-
 if (! function_exists('view')) {
     /**
      * @param  array<string, mixed>  $data
      * @param  array<string, mixed>  $merge_data
      */
-    function view(?string $view = null, array $data = [], array $merge_data = []): View|\Webkernel\View\Compiler
+    function view(?string $view = null, array $data = [], array $merge_data = []): \Webkernel\View\View|\Webkernel\View\Compiler
     {
         if ($view === null) {
-            return View::compiler();
+            return \Webkernel\View\View::compiler();
         }
 
-        return View::make($view, $data, $merge_data);
+        return \Webkernel\View\View::make($view, $data, $merge_data);
     }
 }
 
@@ -34,12 +32,4 @@ if (! function_exists('e')) {
 
         return htmlspecialchars($value, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8', $double_encode);
     }
-}
-
-if (! class_exists('View', false)) {
-    class_alias(View::class, 'View');
-}
-
-if (! class_exists('Js', false)) {
-    class_alias(\Webkernel\View\Js::class, 'Js');
 }

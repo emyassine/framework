@@ -1,11 +1,38 @@
 <?php declare(strict_types=1);
 
 /**
- * Webkernel autoloader. Classmap + files from lifecycle dump
+ * Webkernel autoloader. Classmap + eager files from lifecycle dump
  * (vendor/composer/webkernel_classmap.php, webkernel_files.php).
+ *
+ * Short names (Route, View, Js) alias on first use — class_alias at boot
+ * would load the target class on every request.
  */
 const WEBKERNEL_NS = 'Webkernel\\';
 const WEBKERNEL_NS_LEN = 10;
+
+/** @var array<string, class-string> */
+const WEBKERNEL_CLASS_ALIAS = [
+    'Route' => 'Webkernel\\Route\\Route',
+    'View' => 'Webkernel\\View\\View',
+    'Js' => 'Webkernel\\View\\Js',
+];
+
+function webkernel_composer_dir(): ?string
+{
+    static $dir = false;
+    if ($dir !== false) {
+        return $dir;
+    }
+    if (! class_exists(\Composer\Autoload\ClassLoader::class, false)) {
+        return $dir = null;
+    }
+    $file = (new \ReflectionClass(\Composer\Autoload\ClassLoader::class))->getFileName();
+    if (! is_string($file) || $file === '') {
+        return $dir = null;
+    }
+
+    return $dir = dirname($file);
+}
 
 function webkernel_autoload(string $class): bool
 {
@@ -23,18 +50,30 @@ function webkernel_autoload(string $class): bool
         return true;
     }
 
+    foreach (WEBKERNEL_CLASS_ALIAS as $short => $fqcn) {
+        if (strcasecmp($class, $short) !== 0) {
+            continue;
+        }
+        if (! class_exists($fqcn, true)) {
+            $hit[$class] = '';
+
+            return false;
+        }
+        class_alias($fqcn, $class);
+
+        return true;
+    }
+
     if (! $booted) {
         $booted = true;
         $base = __DIR__.'/';
-        if (class_exists(\Composer\InstalledVersions::class)) {
-            $installed = (new \ReflectionClass(\Composer\InstalledVersions::class))->getFileName();
-            if (is_string($installed) && $installed !== '') {
-                $file = dirname($installed).'/webkernel_classmap.php';
-                if (is_file($file)) {
-                    $loaded = require $file;
-                    if (is_array($loaded)) {
-                        $map = $loaded;
-                    }
+        $composer_dir = webkernel_composer_dir();
+        if ($composer_dir !== null) {
+            $file = $composer_dir.'/webkernel_classmap.php';
+            if (is_file($file)) {
+                $loaded = require $file;
+                if (is_array($loaded)) {
+                    $map = $loaded;
                 }
             }
         }
@@ -78,12 +117,10 @@ function webkernel_autoload(string $class): bool
 
 spl_autoload_register('webkernel_autoload');
 
-if (class_exists(\Composer\InstalledVersions::class)) {
-    $installed = (new \ReflectionClass(\Composer\InstalledVersions::class))->getFileName();
-    if (is_string($installed) && $installed !== '' && ! str_starts_with($installed, 'phar://')) {
-        $files = dirname($installed).'/webkernel_files.php';
-        if (is_file($files)) {
-            require $files;
-        }
+$webkernel_composer_dir = webkernel_composer_dir();
+if ($webkernel_composer_dir !== null) {
+    $webkernel_files = $webkernel_composer_dir.'/webkernel_files.php';
+    if (is_file($webkernel_files)) {
+        require $webkernel_files;
     }
 }

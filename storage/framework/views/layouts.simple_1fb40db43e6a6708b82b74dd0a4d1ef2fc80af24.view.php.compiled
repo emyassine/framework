@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html
+ lang="<?php echo \Webkernel\View\View::echo($lang ?? 'en'); ?>"
+ data-wds-theme="<?php echo \Webkernel\View\View::echo($theme ?? 'light'); ?>"
+ data-wds-layout="simple"
+>
+<head>
+ <meta charset="UTF-8" />
+ <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+ <title><?php echo \Webkernel\View\View::echo($title ?? 'Webkernel'); ?></title>
+ <?php echo $this->runChild('layouts.partials.tokens'); ?>
+ <?php echo $this->runChild('layouts.partials.simple'); ?>
+ <?php echo  $this->CompileStackFinal('styles'); ?>
+</head>
+<body>
+ <main class="wks-simple">
+ <div class="wks-simple__card">
+ <?php echo $this->yieldContent('content'); ?>
+ </div>
+ </main>
+ <?php echo  $this->CompileStackFinal('scripts'); ?>
+</body>
+</html>
