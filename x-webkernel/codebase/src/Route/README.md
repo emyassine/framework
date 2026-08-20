@@ -7,16 +7,22 @@ Route::get('/', function () {
     return view('greeting', ['name' => 'Finn']);
 });
 
-Route::get('/invoices/{id}', InvoicePage::class, [
-    Route::NAME => 'invoices.show',
-    Route::PANEL => 'accounting',
-    Route::CLUSTER => 'sales',
-    Route::RESOURCE => 'invoice',
-    Route::PAGE => 'show',
-    Route::PERMISSION => 'invoice.view',
-]);
+Route::get('/invoices/{id}', InvoicePage::class)
+    ->name('invoices.show')
+    ->whereNumber('id')
+    ->panel('accounting')
+    ->cluster('sales')
+    ->resource('invoice')
+    ->page('show')
+    ->permission('invoice.view');
+
+Route::prefix('v1')->name('admin.')->group(function () {
+    Route::view('/overview', 'dashboard', [
+        'title' => 'Webkernel — Dashboard Overview',
+    ])->name('overview');
+});
 
 echo Route::dispatch();
 ```
 
-One dispatcher strategy (MarkBased). Extra keys name the panel / cluster / resource / page / permission the URI belongs to. Permission is recorded, not enforced, until the platform auth layer exists.
+One dispatcher strategy (MarkBased). Fluent modifiers name the panel / cluster / resource / page / permission the URI belongs to. Permission and middleware are recorded, not enforced, until the platform auth layer exists.

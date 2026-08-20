@@ -4,6 +4,4 @@ require __DIR__.'/../third_party/autoload.php';
 
 Route::view('/', 'dashboard', [
     'title' => 'Webkernel — Dashboard',
-], [
-    Route::NAME => 'dashboard',
-]);
+])->name('dashboard');

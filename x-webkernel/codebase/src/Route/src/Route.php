@@ -5,8 +5,9 @@ namespace Webkernel\Route;
 /**
  * Application router. FastRoute MarkBased engine, owned in this package.
  *
- * Extra keys bind a URI to the platform tree (panel / cluster / resource / page)
- * and the permission that page requires. Auth is not enforced here.
+ * Registration is fluent: Route::view(...)->name('dashboard'). Extra keys still
+ * bind a URI to the platform tree. Permission and middleware are recorded, not
+ * enforced, until auth exists.
  *
  * @phpstan-import-type Extra from Generator
  * @phpstan-import-type RouteData from Generator
@@ -32,6 +33,10 @@ final class Route
 
     public const VIEW = '_view';
 
+    public const DOMAIN = '_domain';
+
+    public const MIDDLEWARE = '_middleware';
+
     private static bool $declared_loaded = false;
 
     private static ?self $app = null;
@@ -40,17 +45,24 @@ final class Route
 
     private string $group_name = '';
 
-    /** @var NamedRoutes */
-    private array $named = [];
+    private string $group_domain = '';
 
-    private ?Dispatcher $dispatcher = null;
+    /** @var list<string> */
+    private array $group_middleware = [];
+
+    /** @var array<string, string> */
+    private array $group_wheres = [];
+
+    /** @var list<Binding> */
+    private array $bindings = [];
+
+    /** @var array<string, Dispatcher> */
+    private array $dispatchers = [];
 
     private ?Uri $uris = null;
 
-    private function __construct(
-        private readonly Pattern $parser = new Pattern(),
-        private readonly Generator $generator = new Generator(),
-    ) {
+    private function __construct()
+    {
     }
 
     public static function app(): self
@@ -71,82 +83,66 @@ final class Route
         self::$declared_loaded = false;
     }
 
-    /**
-     * @param Extra $extra
-     */
-    public static function get(string $uri, mixed $action, array $extra = []): void
+    public static function get(string $uri, mixed $action): Binding
     {
-        self::app()->add(['GET', 'HEAD'], $uri, $action, $extra);
+        return self::app()->add(['GET', 'HEAD'], $uri, $action);
     }
 
-    /**
-     * @param Extra $extra
-     */
-    public static function post(string $uri, mixed $action, array $extra = []): void
+    public static function post(string $uri, mixed $action): Binding
     {
-        self::app()->add('POST', $uri, $action, $extra);
+        return self::app()->add('POST', $uri, $action);
     }
 
-    /**
-     * @param Extra $extra
-     */
-    public static function put(string $uri, mixed $action, array $extra = []): void
+    public static function put(string $uri, mixed $action): Binding
     {
-        self::app()->add('PUT', $uri, $action, $extra);
+        return self::app()->add('PUT', $uri, $action);
     }
 
-    /**
-     * @param Extra $extra
-     */
-    public static function patch(string $uri, mixed $action, array $extra = []): void
+    public static function patch(string $uri, mixed $action): Binding
     {
-        self::app()->add('PATCH', $uri, $action, $extra);
+        return self::app()->add('PATCH', $uri, $action);
     }
 
-    /**
-     * @param Extra $extra
-     */
-    public static function delete(string $uri, mixed $action, array $extra = []): void
+    public static function delete(string $uri, mixed $action): Binding
     {
-        self::app()->add('DELETE', $uri, $action, $extra);
+        return self::app()->add('DELETE', $uri, $action);
     }
 
-    /**
-     * @param Extra $extra
-     */
-    public static function options(string $uri, mixed $action, array $extra = []): void
+    public static function options(string $uri, mixed $action): Binding
     {
-        self::app()->add('OPTIONS', $uri, $action, $extra);
+        return self::app()->add('OPTIONS', $uri, $action);
     }
 
-    /**
-     * @param Extra $extra
-     */
-    public static function any(string $uri, mixed $action, array $extra = []): void
+    public static function any(string $uri, mixed $action): Binding
     {
-        self::app()->add('*', $uri, $action, $extra);
+        return self::app()->add('*', $uri, $action);
     }
 
     /**
      * @param list<string> $methods
-     * @param Extra        $extra
      */
-    public static function match(array $methods, string $uri, mixed $action, array $extra = []): void
+    public static function match(array $methods, string $uri, mixed $action): Binding
     {
-        self::app()->add(array_map(strtoupper(...), $methods), $uri, $action, $extra);
+        return self::app()->add(array_map(strtoupper(...), $methods), $uri, $action);
     }
 
     /**
-     * @param Extra $extra
+     * @param array<string, mixed> $data
      */
-    public static function view(string $uri, string $view, array $data = [], array $extra = []): void
+    public static function view(string $uri, string $view, array $data = [], int $status = 200): Binding
     {
-        self::get($uri, static fn (): \Webkernel\View\View => \Webkernel\View\View::make($view, $data), [self::VIEW => $view] + $extra);
+        return self::get($uri, static function () use ($view, $data, $status): \Webkernel\View\View {
+            if ($status !== 200) {
+                http_response_code($status);
+            }
+
+            return \Webkernel\View\View::make($view, $data);
+        })->as_view($view);
     }
 
-    public static function redirect(string $uri, string $destination, int $status = 302): void
+    public static function redirect(string $uri, string $destination, int $status = 302): Binding
     {
-        self::get($uri, static function () use ($destination, $status): string {
+        return self::get($uri, static function () use ($destination, $status): string {
             http_response_code($status);
             header('Location: '.$destination, true, $status);
 
@@ -154,30 +150,53 @@ final class Route
         });
     }
 
-    public static function permanentRedirect(string $uri, string $destination): void
+    public static function permanentRedirect(string $uri, string $destination): Binding
     {
-        self::redirect($uri, $destination, 301);
+        return self::redirect($uri, $destination, 301);
+    }
+
+    public static function fallback(mixed $action): Binding
+    {
+        return self::any('/{path:.*}', $action);
+    }
+
+    public static function prefix(string $prefix): PendingGroup
+    {
+        return (new PendingGroup(self::app()))->prefix($prefix);
+    }
+
+    public static function name(string $name): PendingGroup
+    {
+        return (new PendingGroup(self::app()))->name($name);
     }
 
     /**
-     * @param Extra $extra
+     * @param  string|list<string>  $middleware
      */
-    public static function fallback(mixed $action, array $extra = []): void
+    public static function middleware(string|array $middleware): PendingGroup
     {
-        self::any('/{path:.*}', $action, $extra);
+        return (new PendingGroup(self::app()))->middleware($middleware);
+    }
+
+    public static function domain(string $domain): PendingGroup
+    {
+        return (new PendingGroup(self::app()))->domain($domain);
     }
 
     /**
-     * @param string|array{prefix?: string, as?: string, name?: string} $prefix
+     * @param array{prefix?: string, as?: string, name?: string, domain?: string, middleware?: string|list<string>, where?: array<string, string>}|callable $attributes
      */
-    public static function group(string|array $prefix, callable $routes): void
+    public static function group(array|callable $attributes, ?callable $routes = null): void
     {
-        self::app()->push_group($prefix, $routes);
-    }
+        if (is_callable($attributes)) {
+            $attributes();
 
-    public static function prefix(string $prefix, callable $routes): void
-    {
-        self::group(['prefix' => $prefix], $routes);
+            return;
+        }
+        if ($routes === null) {
+            throw new \InvalidArgumentException('Route group requires a callback.');
+        }
+        PendingGroup::from_attributes(self::app(), $attributes)->group($routes);
     }
 
     /**
@@ -196,8 +215,9 @@ final class Route
             $uri = substr($uri, 0, $q);
         }
         $uri = rawurldecode($uri);
+        $host = self::normalize_host((string) ($_SERVER['HTTP_HOST'] ?? ''));
 
-        $result = self::app()->dispatcher()->dispatch($method, $uri);
+        $result = self::app()->dispatcher($host)->dispatch($method, $uri);
 
         if ($result instanceof NotMatched) {
             http_response_code(404);
@@ -211,7 +231,8 @@ final class Route
             return '';
         }
 
-        $out = self::invoke($result->handler, $result->variables);
+        $vars = Binding::domain_variables($result->extra, $host) + $result->variables;
+        $out = self::invoke($result->handler, $vars);
         if ($out instanceof \Stringable) {
             return (string) $out;
         }
@@ -234,78 +255,103 @@ final class Route
         return self::app()->listed();
     }
 
-    /**
-     * @param string|list<string> $http_method
-     * @param Extra               $extra
-     */
-    private function add(string|array $http_method, string $route, mixed $handler, array $extra): void
+    public function invalidate(): void
     {
-        $route = $this->group_prefix.$route;
-        $parsed = $this->parser->parse($route);
-        $extra = [self::REGEX => $route] + $extra;
-
-        if ($this->group_name !== '' && isset($extra[self::NAME]) && is_string($extra[self::NAME])) {
-            $extra[self::NAME] = $this->group_name.$extra[self::NAME];
-        }
-
-        foreach ((array) $http_method as $method) {
-            foreach ($parsed as $parsed_route) {
-                $this->generator->add_route($method, $parsed_route, $handler, $extra);
-            }
-        }
-
-        if (array_key_exists(self::NAME, $extra)) {
-            $this->register_name($extra[self::NAME], $parsed);
-        }
-
-        $this->dispatcher = null;
+        $this->dispatchers = [];
         $this->uris = null;
     }
 
-    /**
-     * @param string|array{prefix?: string, as?: string, name?: string} $attributes
-     */
-    private function push_group(string|array $attributes, callable $routes): void
+    public function push_group(PendingGroup $group, callable $routes): void
     {
-        $prefix = is_string($attributes)
-            ? $attributes
-            : (string) ($attributes['prefix'] ?? '');
-        $as = is_string($attributes)
-            ? ''
-            : (string) ($attributes['as'] ?? $attributes['name'] ?? '');
-
         $previous_prefix = $this->group_prefix;
         $previous_name = $this->group_name;
-        $this->group_prefix = $previous_prefix.$prefix;
-        $this->group_name = $previous_name.$as;
+        $previous_domain = $this->group_domain;
+        $previous_middleware = $this->group_middleware;
+        $previous_wheres = $this->group_wheres;
+
+        $this->group_prefix = $group->prefix_value() === ''
+            ? $previous_prefix
+            : $this->join_uri($previous_prefix, $group->prefix_value());
+        $this->group_name = $previous_name.$group->name_value();
+        $this->group_domain = $group->domain_value() !== '' ? $group->domain_value() : $previous_domain;
+        $this->group_middleware = array_values(array_unique(array_merge($previous_middleware, $group->middleware_value())));
+        $this->group_wheres = $group->wheres_value() + $previous_wheres;
         $routes();
         $this->group_prefix = $previous_prefix;
         $this->group_name = $previous_name;
+        $this->group_domain = $previous_domain;
+        $this->group_middleware = $previous_middleware;
+        $this->group_wheres = $previous_wheres;
     }
 
     /**
-     * @param ParsedRoutes $parsed
+     * @param string|list<string> $http_method
      */
-    private function register_name(mixed $name, array $parsed): void
+    private function add(string|array $http_method, string $route, mixed $handler): Binding
     {
-        if (! is_string($name) || $name === '') {
-            throw BadRoute::invalid_route_name($name);
-        }
-        if (array_key_exists($name, $this->named)) {
-            throw BadRoute::named_route_already_defined($name);
-        }
+        $methods = array_values(array_map(strtoupper(...), (array) $http_method));
+        $binding = new Binding(
+            $this,
+            $methods,
+            $this->join_uri($this->group_prefix, $route),
+            $handler,
+            $this->group_name,
+            $this->group_domain,
+            $this->group_middleware,
+            $this->group_wheres,
+        );
+        $this->bindings[] = $binding;
+        $this->invalidate();
 
-        $this->named[$name] = array_reverse($parsed);
+        return $binding;
     }
 
-    private function dispatcher(): Dispatcher
+    private function dispatcher(string $host): Dispatcher
     {
-        return $this->dispatcher ??= new Dispatcher($this->generator->get_data());
+        return $this->dispatchers[$host] ??= $this->build_dispatcher($host);
+    }
+
+    private function build_dispatcher(string $host): Dispatcher
+    {
+        $specific = [];
+        $general = [];
+        foreach ($this->bindings as $binding) {
+            if ($binding->domain_pattern() !== '') {
+                if ($binding->matches_host($host)) {
+                    $specific[] = $binding;
+                }
+                continue;
+            }
+            $general[] = $binding;
+        }
+
+        $generator = new Generator();
+        $occupied = [];
+        foreach ($specific as $binding) {
+            $occupied[$binding->uri()] = true;
+            $binding->compile($generator);
+        }
+        foreach ($general as $binding) {
+            if (isset($occupied[$binding->uri()])) {
+                continue;
+            }
+            $binding->compile($generator);
+        }
+
+        return new Dispatcher($generator->get_data());
     }
 
     private function uri_generator(): Uri
     {
-        return $this->uris ??= new Uri($this->named);
+        if ($this->uris !== null) {
+            return $this->uris;
+        }
+        $named = [];
+        foreach ($this->bindings as $binding) {
+            $binding->register_named($named);
+        }
+
+        return $this->uris = new Uri($named);
     }
 
     /**
@@ -315,6 +361,15 @@ final class Route
     {
         if (is_callable($handler)) {
             return $handler(...$vars);
+        }
+        if (is_array($handler) && isset($handler[0], $handler[1]) && is_string($handler[0]) && is_string($handler[1]) && class_exists($handler[0])) {
+            $controller = new $handler[0]();
+            $method = $handler[1];
+            if (! is_callable([$controller, $method])) {
+                throw new \RuntimeException('Invalid route action.');
+            }
+
+            return $controller->{$method}(...$vars);
         }
         if (is_string($handler) && class_exists($handler)) {
             $page = new $handler();
@@ -331,70 +386,59 @@ final class Route
      */
     private function listed(): array
     {
-        [$static, $dynamic] = $this->generator->get_data();
         $rows = [];
-
-        foreach ($static as $method => $uris) {
-            foreach ($uris as $uri => [$handler, $extra]) {
-                $this->collect_listed($rows, $method, $uri, $handler, $extra);
-            }
+        foreach ($this->bindings as $binding) {
+            $methods = $binding->methods();
+            $order = ['GET' => 0, 'HEAD' => 1, 'POST' => 2, 'PUT' => 3, 'PATCH' => 4, 'DELETE' => 5, 'OPTIONS' => 6];
+            usort($methods, static fn (string $a, string $b): int => ($order[$a] ?? 99) <=> ($order[$b] ?? 99));
+            $rows[] = [
+                'methods' => $methods,
+                'uri' => $binding->uri(),
+                'name' => $binding->resolved_name(),
+                'action' => $binding->action_label(),
+            ];
         }
-
-        foreach ($dynamic as $method => $chunks) {
-            foreach ($chunks as $chunk) {
-                foreach ($chunk['routeMap'] as [$handler, $variables, $extra]) {
-                    unset($variables);
-                    $uri = is_string($extra[self::REGEX] ?? null) ? (string) $extra[self::REGEX] : '';
-                    $this->collect_listed($rows, $method, $uri, $handler, $extra);
-                }
-            }
-        }
-
-        $list = array_values($rows);
-        usort($list, static function (array $a, array $b): int {
+        usort($rows, static function (array $a, array $b): int {
             return [$a['uri'], $a['name']] <=> [$b['uri'], $b['name']];
         });
 
-        return $list;
+        return $rows;
     }
 
-    /**
-     * @param array<string, array{methods: list<string>, uri: string, name: string, action: string}> $rows
-     * @param array<string, string|int|bool|float> $extra
-     */
-    private function collect_listed(array &$rows, string $method, string $uri, mixed $handler, array $extra): void
+    private function join_uri(string $left, string $right): string
     {
-        $name = isset($extra[self::NAME]) && is_string($extra[self::NAME]) ? $extra[self::NAME] : '';
-        $action = self::action_label($handler, $extra);
-        $key = $uri."\0".$name."\0".$action;
-        if (! isset($rows[$key])) {
-            $rows[$key] = [
-                'methods' => [],
-                'uri' => $uri,
-                'name' => $name,
-                'action' => $action,
-            ];
+        $left = trim($left, '/');
+        $right = trim($right, '/');
+        if ($left === '' && $right === '') {
+            return '/';
         }
-        if (! in_array($method, $rows[$key]['methods'], true)) {
-            $rows[$key]['methods'][] = $method;
+        if ($left === '') {
+            return '/'.$right;
         }
-        $order = ['GET' => 0, 'HEAD' => 1, 'POST' => 2, 'PUT' => 3, 'PATCH' => 4, 'DELETE' => 5, 'OPTIONS' => 6];
-        usort($rows[$key]['methods'], static fn (string $a, string $b): int => ($order[$a] ?? 99) <=> ($order[$b] ?? 99));
+        if ($right === '') {
+            return '/'.$left;
+        }
+
+        return '/'.$left.'/'.$right;
     }
 
-    /**
-     * @param array<string, string|int|bool|float> $extra
-     */
-    private static function action_label(mixed $handler, array $extra): string
+    private static function normalize_host(string $host): string
     {
-        if (isset($extra[self::VIEW]) && is_string($extra[self::VIEW]) && $extra[self::VIEW] !== '') {
-            return 'view:'.$extra[self::VIEW];
+        $host = strtolower($host);
+        if ($host === '') {
+            return '';
         }
-        if (is_string($handler) && $handler !== '') {
-            return $handler;
+        if (str_starts_with($host, '[')) {
+            $end = strpos($host, ']');
+
+            return $end === false ? $host : substr($host, 0, $end + 1);
+        }
+        $colon = strrpos($host, ':');
+        if ($colon === false) {
+            return $host;
         }
 
-        return 'Closure';
+        return substr($host, 0, $colon);
     }
 
     /**

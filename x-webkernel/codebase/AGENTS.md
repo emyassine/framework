@@ -17,7 +17,7 @@ Engines we own in-tree (fork, specialize — do not wrap as a vendor): FastRoute
 | Classes / namespaces | `PascalCase` | `Engine`, `InstanceId` |
 | Constants | `UPPER_SNAKE` | `WEBKERNEL_NS` |
 
-Exceptions: Composer / PSR interface methods you do not own (`activate`, `getSubscribedEvents`, `getInstallPath`, `supports`); HTTP verbs and view helpers that match Laravel usage (`Route::get`, `view()`, `View::make`).
+Exceptions: Composer / PSR interface methods you do not own (`activate`, `getSubscribedEvents`, `getInstallPath`, `supports`); HTTP verbs, fluent route modifiers, and view helpers that match Laravel usage (`Route::get`, `whereNumber`, `view()`, `View::make`).
 
 Do not introduce `camelCase` on Webkernel surfaces. Do not keep dual APIs.
 
@@ -41,7 +41,7 @@ Do not introduce `camelCase` on Webkernel surfaces. Do not keep dual APIs.
 
 ## Route
 
-`Webkernel\Route\Route` — `Route::get` / `post` / `dispatch`. Extra keys `NAME`, `PANEL`, `CLUSTER`, `RESOURCE`, `PAGE`, `PERMISSION` bind a URI to the platform tree. Permission is recorded, not enforced, until auth exists.
+`Webkernel\Route\Route` — `Route::get` / `post` / `view` return a `Binding` for fluent `name()`, `where()`, `middleware()`, `panel()`, … Groups chain `prefix()` / `name()` / `domain()` / `middleware()` then `group()`. Extra keys still stored on the compiled route. Permission and middleware are recorded, not enforced, until auth exists.
 
 One dispatcher: MarkBased. No CharCount / GroupCount / GroupPos. No PSR-7 URI objects.
 
