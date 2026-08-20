@@ -1,7 +1,7 @@
 {
     "$schema": "https://getcomposer.org/schema.json",
     "name": "webkernel/codebase",
-    "description": "Webkernel runtime: paths, instance, views. Zero runtime package dependencies.",
+    "description": "Webkernel runtime: paths, instance. Zero runtime package dependencies.",
     "type": "library",
     "license": "proprietary",
     "version": "0.12.0",

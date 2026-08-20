@@ -38,19 +38,7 @@ Do not introduce `camelCase` on Webkernel surfaces. Do not keep dual APIs.
 
 ## Views
 
-`view('name', $data)` — compile once, `require` the cache.
-
-Do **not** wrap HTML attributes in `@if` / `@endif` inside a tag. Compute locals, then always emit the attribute.
-
-```php
-$show = $open ? 'true' : 'false';
-```
-
-```
-<span x-show="{{ $show }}" class="…">
-```
-
-`{{ }}` escapes. `{!! !!}` is raw.
+`webkernel/views` is an empty package. Do not add templating until asked.
 
 ## Package layout
 
