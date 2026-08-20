@@ -370,6 +370,8 @@ final class Server
     private int $port;
     private string $public_dir;
     private bool $profile_lifecycle;
+    /** true force on, false force off, null inherit php.ini / preference */
+    private ?bool $jit;
     /** @var resource|null */
     private $process = null;
     /** @var array<int, resource> */
@@ -385,12 +387,13 @@ final class Server
     /** @var array<string, array{render_ms: float|null, request_ms: float, times: array<string, array{ms: float, run_ms: float, read_ms: float}>}> */
     private array $baselines = [];
 
-    public function __construct(string $host = '127.0.0.1', int $port = 8000, bool $profile_lifecycle = false)
+    public function __construct(string $host = '127.0.0.1', int $port = 8000, bool $profile_lifecycle = false, ?bool $jit = null)
     {
         $this->host = $host;
         $this->port = $port;
         $this->public_dir = __DIR__.'/public';
         $this->profile_lifecycle = $profile_lifecycle;
+        $this->jit = $jit;
     }
 
     public function start(): void
@@ -412,7 +415,21 @@ final class Server
 
     private function run_process(): ?int
     {
-        $command = [PHP_BINARY, '-S', "{$this->host}:{$this->port}", '-t', $this->public_dir, __FILE__];
+        $command = [PHP_BINARY];
+        if ($this->jit === true) {
+            foreach (\Webkernel\Performance\Performance::jit_engine_args() as $part) {
+                $command[] = $part;
+            }
+        } elseif ($this->jit === false) {
+            foreach (\Webkernel\Performance\Performance::jit_disable_args() as $part) {
+                $command[] = $part;
+            }
+        }
+        $command[] = '-S';
+        $command[] = "{$this->host}:{$this->port}";
+        $command[] = '-t';
+        $command[] = $this->public_dir;
+        $command[] = __FILE__;
         $env = null;
         if ($this->profile_lifecycle) {
             $env = getenv();
@@ -544,12 +561,20 @@ final class Server
      	}
 
         $url = "http://{$this->host}:{$this->port}";
-        $opcache_active = extension_loaded('Zend OPcache') && (ini_get('opcache.enable') || ini_get('opcache.enable_cli'));
+        $child = \Webkernel\Performance\Status::inspect('cli-server');
+        $ext = extension_loaded('Zend OPcache');
+        $opcache_active = $this->jit === true ? $ext : $child->opcache;
+        $jit_active = $this->jit === true ? $ext : ($this->jit === false ? false : $child->jit);
         $opcache_status = $opcache_active ? UI::GREEN . "enabled" . UI::RESET : UI::GRAY . "disabled" . UI::RESET;
+        $jit_status = $jit_active ? UI::GREEN . "enabled" . UI::RESET : UI::GRAY . "disabled" . UI::RESET;
         echo "\n";
         UI::info("Server running on " . UI::BOLD . "[" . $url . "]" . UI::RESET);
         echo "\n";
-        echo "  " . UI::muted("PHP Version: " . PHP_VERSION . " | OPcache: " . $opcache_status) . "\n\n";
+        echo "  " . UI::muted("PHP Version: " . PHP_VERSION . " | OPcache: " . $opcache_status . " | JIT: " . $jit_status) . "\n\n";
+        if ($this->jit === true && ! extension_loaded('Zend OPcache')) {
+            UI::warn("Zend OPcache is not loaded; --with-jit has no effect.");
+            echo "\n";
+        }
         UI::warn("This server is for local development only. Behavior differs from production (Nginx/Apache/FPM).");
         echo "\n";
         if ($this->profile_lifecycle) {
@@ -823,15 +848,19 @@ final class Server
 $command = $argv[1] ?? null;
 
 if ($command === 'server') {
+    require __DIR__.'/third_party/autoload.php';
     $host = '127.0.0.1';
     $port = 8000;
     $profile_lifecycle = false;
+    $jit = \Webkernel\Performance\Performance::wants_jit() ? true : null;
     foreach (array_slice($argv, 2) as $arg) {
         if (str_starts_with($arg, '--host=')) $host = substr($arg, 7);
         elseif (str_starts_with($arg, '--port=')) $port = (int) substr($arg, 7);
         elseif ($arg === '--profile-lifecycle') $profile_lifecycle = true;
+        elseif ($arg === '--with-jit') $jit = true;
+        elseif ($arg === '--no-jit') $jit = false;
     }
-    (new Server($host, $port, $profile_lifecycle))->start();
+    (new Server($host, $port, $profile_lifecycle, $jit))->start();
 }
 
 if ($command === 'routes:list') {
@@ -883,7 +912,7 @@ if ($command === 'routes:list') {
 
 if ($command === null || $command === 'help' || $command === '--help' || $command === '-h') {
     echo "\n  ".UI::BOLD."webkernel".UI::RESET." ".UI::muted('<command>')."\n\n";
-    echo "  ".UI::CYAN."server".UI::RESET."        ".UI::muted('Local HTTP server')."\n";
+    echo "  ".UI::CYAN."server".UI::RESET."        ".UI::muted('Local HTTP server (--host= --port= --profile-lifecycle --with-jit)')."\n";
     echo "  ".UI::CYAN."routes:list".UI::RESET."   ".UI::muted('List registered HTTP routes')."\n\n";
     exit($command === null ? 1 : 0);
 }

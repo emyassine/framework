@@ -15,6 +15,7 @@ use Webkernel\Composables\ComposableContract;
  *
  * @method \Webkernel\View\View view()
  * @method \Webkernel\Route\Route route()
+ * @method \Webkernel\Performance\Performance performance()
  */
 final class WebApp
 {
@@ -241,13 +242,6 @@ final class WebApp
             }
             (new $class())->register($this);
         }
-        foreach ($this->composables as $class) {
-            $lifetime = $class::container_lifetime();
-            if ($lifetime !== 'singleton' && $lifetime !== 'bind' && $lifetime !== 'scoped') {
-                throw new \RuntimeException($class.'::container_lifetime() must be singleton|bind|scoped.');
-            }
-            $this->container->{$lifetime}($class);
-        }
 
         return $this;
     }
@@ -261,6 +255,13 @@ final class WebApp
         }
         if ($arguments !== []) {
             throw new \BadMethodCallException('webapp()->'.$name.'() does not take arguments.');
+        }
+        if (! $this->container->has($class)) {
+            $lifetime = $class::container_lifetime();
+            if ($lifetime !== 'singleton' && $lifetime !== 'bind' && $lifetime !== 'scoped') {
+                throw new \RuntimeException($class.'::container_lifetime() must be singleton|bind|scoped.');
+            }
+            $this->container->{$lifetime}($class);
         }
 
         return $this->container->make($class);

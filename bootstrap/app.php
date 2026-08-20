@@ -10,7 +10,7 @@ use Webkernel\WebApp;
 
 // ---- Global WebApp Configuration ----------------------------------------------------------
 // THOSE MEASURES ARE IN MILLISECONDS WITH SERVER RUNNING ON LOCALHOST
-// PHP Version: 8.4.23 | OPcache: enabled | May differs from production (Nginx/Apache/FPM)
+// PHP Version: 8.4.23 | OPcache: enabled | JIT: disabled | May differ from production (Nginx/Apache/FPM)
 // -------------------------------------------------------------------------------------------
 // Without the following, a "Hello world" request takes 0.020883 ms
 // Render a dashboard with only request_lifetime() function takes 0.33 ms

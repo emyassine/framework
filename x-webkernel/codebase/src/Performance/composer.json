@@ -1,0 +1,24 @@
+{
+    "$schema": "https://getcomposer.org/schema.json",
+    "name": "webkernel/performance",
+    "description": "OPcache and JIT status. JIT is a process-start flag.",
+    "type": "library",
+    "license": "proprietary",
+    "version": "0.12.0",
+    "require": {
+        "php": ">=8.4"
+    },
+    "autoload": {
+        "psr-4": {
+            "Webkernel\\Performance\\": "src/"
+        },
+        "files": [
+            "load.performance.package-function.php"
+        ]
+    },
+    "extra": {
+        "webkernel": {
+            "prefix": "performance"
+        }
+    }
+}
