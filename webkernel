@@ -12,8 +12,12 @@ if (PHP_SAPI === 'cli-server') {
     }
 
     $root = str_replace('\\', '/', dirname($docroot));
-    $files_before = get_included_files();
-    $classes_before = get_declared_classes();
+    $profile = ($_SERVER['WEBKERNEL_PROFILE_LIFECYCLE'] ?? getenv('WEBKERNEL_PROFILE_LIFECYCLE')) === '1';
+    $files_before = $profile ? get_included_files() : [];
+    $classes_before = $profile ? get_declared_classes() : [];
+    if ($profile) {
+        IncludeClock::start();
+    }
 
     require $docroot.'/index.php';
 
@@ -38,27 +42,340 @@ if (PHP_SAPI === 'cli-server') {
         $render,
     ));
 
-    $prefix = $root.'/';
-    $to_rel = static function (string $abs) use ($prefix): string {
-        $abs = str_replace('\\', '/', $abs);
+    if ($profile) {
+        $prefix = $root.'/';
+        $to_rel = static function (string $abs) use ($prefix): string {
+            $abs = str_replace('\\', '/', $abs);
 
-        return str_starts_with($abs, $prefix) ? substr($abs, strlen($prefix)) : $abs;
-    };
-
-    foreach (get_included_files() as $included) {
-        if (in_array($included, $files_before, true)) {
-            continue;
+            return str_starts_with($abs, $prefix) ? substr($abs, strlen($prefix)) : $abs;
+        };
+        $timed = IncludeClock::stop();
+        $seen = [];
+        foreach (get_included_files() as $included) {
+            if (in_array($included, $files_before, true)) {
+                continue;
+            }
+            $rel = $to_rel($included);
+            $seen[$rel] = true;
+            $row = $timed[$included] ?? null;
+            if ($row === null) {
+                file_put_contents('php://stderr', 'webkernel-include ? ? ? '.$rel."\n");
+                continue;
+            }
+            file_put_contents('php://stderr', sprintf(
+                "webkernel-include %.3f %.3f %.3f %s\n",
+                $row['ms'],
+                $row['run_ms'],
+                $row['read_ms'],
+                $rel,
+            ));
         }
-        file_put_contents('php://stderr', 'webkernel-file '.$to_rel($included)."\n");
-    }
-    foreach (get_declared_classes() as $class) {
-        if (in_array($class, $classes_before, true)) {
-            continue;
+        foreach ($timed as $abs => $row) {
+            $rel = $to_rel($abs);
+            if (isset($seen[$rel])) {
+                continue;
+            }
+            file_put_contents('php://stderr', sprintf(
+                "webkernel-include %.3f %.3f %.3f %s\n",
+                $row['ms'],
+                $row['run_ms'],
+                $row['read_ms'],
+                $rel,
+            ));
         }
-        file_put_contents('php://stderr', 'wk-class '.$class."\n");
+        foreach (get_declared_classes() as $class) {
+            if (in_array($class, $classes_before, true)) {
+                continue;
+            }
+            file_put_contents('php://stderr', 'webkernel-class '.$class."\n");
+        }
+        file_put_contents('php://stderr', 'webkernel-mem '.memory_get_usage(true)."\n");
     }
-    file_put_contents('php://stderr', 'wk-mem '.memory_get_usage(true)."\n");
     return;
+}
+
+/**
+ * Dev-server include clock. Times file I/O (read) and the gap until the next
+ * include / request end (run = compile + execute). Profile mode only.
+ */
+final class IncludeClock
+{
+    /** @var array<string, array{read_ns: int, run_ns: int, bytes: int}> */
+    private static array $stats = [];
+
+    private static bool $active = false;
+
+    private static int $nest = 0;
+
+    private static ?string $pending = null;
+
+    private static float $pending_t = 0.0;
+
+    public $context;
+
+    /** @var resource|null */
+    private $handle = null;
+
+    private string $path = '';
+
+    private float $t_open = 0.0;
+
+    public static function start(): void
+    {
+        self::$stats = [];
+        self::$pending = null;
+        self::$pending_t = 0;
+        self::$nest = 0;
+        self::$active = true;
+        stream_wrapper_unregister('file');
+        stream_wrapper_register('file', self::class);
+    }
+
+    /**
+     * @return array<string, array{ms: float, read_ms: float, run_ms: float, bytes: int}>
+     */
+    public static function stop(): array
+    {
+        $now = hrtime(true);
+        if (self::$pending !== null) {
+            self::add_run(self::$pending, (int) ($now - self::$pending_t));
+            self::$pending = null;
+        }
+        if (self::$active) {
+            stream_wrapper_restore('file');
+            self::$active = false;
+        }
+        $out = [];
+        foreach (self::$stats as $path => $row) {
+            $out[$path] = [
+                'ms' => ($row['read_ns'] + $row['run_ns']) / 1e6,
+                'read_ms' => $row['read_ns'] / 1e6,
+                'run_ms' => $row['run_ns'] / 1e6,
+                'bytes' => $row['bytes'],
+            ];
+        }
+        uasort($out, static fn (array $a, array $b): int => $b['ms'] <=> $a['ms']);
+
+        return $out;
+    }
+
+    public function stream_open($path, $mode, $options, &$opened_path): bool
+    {
+        self::flush_pending();
+        $this->path = $path;
+        $this->t_open = hrtime(true);
+        $use_path = (bool) ((int) $options & STREAM_USE_PATH);
+        $handle = self::with_real(static fn () => fopen($path, $mode, $use_path));
+        if (! is_resource($handle)) {
+            return false;
+        }
+        $this->handle = $handle;
+        $opened_path = $path;
+        if (! isset(self::$stats[$path])) {
+            self::$stats[$path] = ['read_ns' => 0, 'run_ns' => 0, 'bytes' => 0];
+        }
+
+        return true;
+    }
+
+    public function stream_read($count): string|false
+    {
+        $handle = $this->handle;
+        if (! is_resource($handle)) {
+            return false;
+        }
+
+        return fread($handle, $count);
+    }
+
+    public function stream_write($data): int|false
+    {
+        $handle = $this->handle;
+        if (! is_resource($handle)) {
+            return false;
+        }
+
+        return fwrite($handle, $data);
+    }
+
+    public function stream_eof(): bool
+    {
+        $handle = $this->handle;
+
+        return is_resource($handle) && feof($handle);
+    }
+
+    public function stream_seek($offset, $whence = SEEK_SET): bool
+    {
+        $handle = $this->handle;
+
+        return is_resource($handle) && fseek($handle, $offset, $whence) === 0;
+    }
+
+    public function stream_tell(): int
+    {
+        $handle = $this->handle;
+        if (! is_resource($handle)) {
+            return 0;
+        }
+        $pos = ftell($handle);
+
+        return is_int($pos) ? $pos : 0;
+    }
+
+    public function stream_flush(): bool
+    {
+        $handle = $this->handle;
+
+        return is_resource($handle) && fflush($handle);
+    }
+
+    public function stream_lock($operation): bool
+    {
+        $handle = $this->handle;
+
+        return is_resource($handle) && flock($handle, $operation);
+    }
+
+    public function stream_stat(): array|false
+    {
+        $handle = $this->handle;
+        if (! is_resource($handle)) {
+            return false;
+        }
+
+        return fstat($handle);
+    }
+
+    public function stream_set_option($option, $arg1, $arg2): bool
+    {
+        return false;
+    }
+
+    public function stream_close(): void
+    {
+        $bytes = 0;
+        if (is_resource($this->handle)) {
+            $stat = fstat($this->handle);
+            if (is_array($stat)) {
+                $bytes = (int) ($stat['size'] ?? 0);
+            }
+            fclose($this->handle);
+        }
+        $this->handle = null;
+        if (! isset(self::$stats[$this->path])) {
+            self::$stats[$this->path] = ['read_ns' => 0, 'run_ns' => 0, 'bytes' => 0];
+        }
+        self::$stats[$this->path]['read_ns'] += (int) (hrtime(true) - $this->t_open);
+        self::$stats[$this->path]['bytes'] = max(self::$stats[$this->path]['bytes'], $bytes);
+        self::$pending = $this->path;
+        self::$pending_t = hrtime(true);
+    }
+
+    public function url_stat($path, $flags)
+    {
+        return self::with_real(static function () use ($path, $flags) {
+            if ($flags & STREAM_URL_STAT_QUIET) {
+                return @stat($path);
+            }
+
+            return stat($path);
+        });
+    }
+
+    public function mkdir($path, $mode, $options): bool
+    {
+        return (bool) self::with_real(static fn () => mkdir($path, $mode, (bool) ($options & STREAM_MKDIR_RECURSIVE)));
+    }
+
+    public function rmdir($path, $options): bool
+    {
+        return (bool) self::with_real(static fn () => rmdir($path));
+    }
+
+    public function rename($from, $to): bool
+    {
+        return (bool) self::with_real(static fn () => rename($from, $to));
+    }
+
+    public function unlink($path): bool
+    {
+        return (bool) self::with_real(static fn () => unlink($path));
+    }
+
+    public function dir_opendir($path, $options): bool
+    {
+        $handle = self::with_real(static fn () => opendir($path));
+        if (! is_resource($handle)) {
+            return false;
+        }
+        $this->handle = $handle;
+
+        return true;
+    }
+
+    public function dir_readdir(): string|false
+    {
+        $handle = $this->handle;
+        if (! is_resource($handle)) {
+            return false;
+        }
+
+        return readdir($handle);
+    }
+
+    public function dir_rewinddir(): bool
+    {
+        $handle = $this->handle;
+        if (! is_resource($handle)) {
+            return false;
+        }
+        rewinddir($handle);
+
+        return true;
+    }
+
+    public function dir_closedir(): void
+    {
+        if (is_resource($this->handle)) {
+            closedir($this->handle);
+        }
+        $this->handle = null;
+    }
+
+    private static function flush_pending(): void
+    {
+        if (self::$pending === null) {
+            return;
+        }
+        self::add_run(self::$pending, (int) (hrtime(true) - self::$pending_t));
+        self::$pending = null;
+    }
+
+    private static function add_run(string $path, int $ns): void
+    {
+        if (! isset(self::$stats[$path])) {
+            self::$stats[$path] = ['read_ns' => 0, 'run_ns' => 0, 'bytes' => 0];
+        }
+        self::$stats[$path]['run_ns'] += max(0, $ns);
+    }
+
+    private static function with_real(callable $fn): mixed
+    {
+        if (self::$nest === 0) {
+            stream_wrapper_restore('file');
+        }
+        self::$nest++;
+        try {
+            return $fn();
+        } finally {
+            self::$nest--;
+            if (self::$nest === 0 && self::$active) {
+                stream_wrapper_unregister('file');
+                stream_wrapper_register('file', self::class);
+            }
+        }
+    }
 }
 
 // use Webkernel\Console\Input\ArgvInput;
@@ -85,7 +402,7 @@ final class Server
     private bool $banner_shown = false;
     private bool $address_in_use = false;
 
-    /** @var array<int, array{started: int|float, request: string, status: int, render_ms: float|null, files: list<string>, classes: list<string>, mem: int|null}> */
+    /** @var array<int, array{started: int|float, request: string, status: int, render_ms: float|null, times: list<array{ms: float, run_ms: float, read_ms: float, bytes: int, path: string}>, mem: int|null}> */
     private array $requests_pool = [];
 
     public function __construct(string $host = '127.0.0.1', int $port = 8000, bool $profile_lifecycle = false)
@@ -128,12 +445,21 @@ final class Server
             __FILE__,
         ];
 
+        $env = null;
+        if ($this->profile_lifecycle) {
+            $env = getenv();
+            if (! is_array($env)) {
+                $env = [];
+            }
+            $env['WEBKERNEL_PROFILE_LIFECYCLE'] = '1';
+        }
+
         $pipes = [];
         $process = proc_open($command, [
             0 => ['file', '/dev/null', 'r'],
             1 => ['pipe', 'w'],
             2 => ['redirect', 1],
-        ], $pipes, __DIR__);
+        ], $pipes, __DIR__, $env);
 
         if (!is_resource($process)) {
             fwrite(STDERR, "Failed to start PHP development server.\n");
@@ -221,23 +547,28 @@ final class Server
                 'request' => '',
                 'status' => 200,
                 'render_ms' => null,
-                'files' => [],
+                'times' => [],
                 'classes' => [],
                 'mem' => null,
             ];
             return;
         }
 
-        if (str_starts_with($line, 'webkernel-file ')) {
-            $this->trace_push('files', substr($line, 14));
+        if (preg_match('/^webkernel-include (\S+) (\S+) (\S+) (.+)$/', $line, $tm) === 1) {
+            $this->trace_time([
+                'ms' => $tm[1] === '?' ? null : (float) $tm[1],
+                'run_ms' => $tm[2] === '?' ? null : (float) $tm[2],
+                'read_ms' => $tm[3] === '?' ? null : (float) $tm[3],
+                'path' => $tm[4],
+            ]);
             return;
         }
         if (str_starts_with($line, 'webkernel-class ')) {
-            $this->trace_push('classes', substr($line, 15));
+            $this->trace_push('classes', substr($line, 16));
             return;
         }
         if (str_starts_with($line, 'webkernel-mem ')) {
-            $this->trace_push('mem', substr($line, 12));
+            $this->trace_push('mem', substr($line, 14));
             return;
         }
 
@@ -272,7 +603,7 @@ final class Server
 
             $this->log_request($entry['request'], $entry['status'], $entry['started'], [
                 'render_ms' => $entry['render_ms'],
-                'files' => $entry['files'],
+                'times' => $entry['times'],
                 'classes' => $entry['classes'],
                 'mem' => $entry['mem'],
             ]);
@@ -319,13 +650,13 @@ final class Server
         echo "  ".$gray."PHP Version: ".PHP_VERSION." | OPcache: ".$opcache_status.$reset."\n\n";
         echo "  ".$warn_badge." ".$yellow."This server is for local development only. Behavior differs from production (Nginx/Apache/FPM).".$reset."\n\n";
         if ($this->profile_lifecycle) {
-            echo "  ".$info_badge." ".$gray."--profile-lifecycle".$reset."  PHP include traceroute (files + classes this request loaded).\n\n";
+            echo "  ".$info_badge." ".$gray."--profile-lifecycle".$reset."  include cost (run/read); ?? when OPcache hid the file stream.\n\n";
         }
         echo "  ".$gray."Press Ctrl+C to stop the server".$reset."\n\n";
     }
 
     /**
-     * @param array{render_ms?: float|null, files?: list<string>, classes?: list<string>, mem?: int|string|null} $timings
+     * @param array{render_ms?: float|null, times?: list<array{ms: float|null, run_ms: float|null, read_ms: float|null, path: string}>, classes?: list<string>, mem?: int|string|null} $timings
      */
     private function log_request(string $request, int $status_code, float|int $start_time, array $timings = []): void
     {
@@ -367,28 +698,63 @@ final class Server
             return;
         }
 
-        $files = $timings['files'] ?? [];
+        $times = $timings['times'] ?? [];
         $classes = $timings['classes'] ?? [];
+        if ($times === [] && $classes === []) {
+            return;
+        }
         $mem = $timings['mem'] ?? null;
         $mem_label = is_numeric($mem)
             ? number_format(((int) $mem) / 1048576, 1).'MB'
             : null;
-
+        $known = 0;
+        foreach ($times as $row) {
+            if ($row['ms'] !== null) {
+                $known++;
+            }
+        }
         $summary = [
             $request.'  →  '.$status_code.' '.$reason,
-            count($files).' files',
+            count($times).' files',
+            $known.' timed',
+            (count($times) - $known).' ??',
             count($classes).' classes',
         ];
         if ($mem_label !== null) {
             $summary[] = $mem_label;
         }
         echo "  {$gray}  ".implode(' · ', $summary).$reset."\n";
-        foreach ($files as $i => $included) {
-            echo "  {$gray}    ".str_pad((string) ($i + 1), 2, ' ', STR_PAD_LEFT)."  {$included}{$reset}\n";
+        echo "  {$gray}      total     run    read  file{$reset}\n";
+        foreach ($times as $row) {
+            echo sprintf(
+                "  {$gray}    %7s  %7s  %7s  %s{$reset}\n",
+                $this->format_ms($row['ms']),
+                $this->format_ms($row['run_ms']),
+                $this->format_ms($row['read_ms']),
+                $row['path'],
+            );
         }
         foreach ($classes as $class) {
             echo "  {$gray}      class {$class}{$reset}\n";
         }
+    }
+
+    private function format_ms(?float $ms): string
+    {
+        return $ms === null ? '     ??' : sprintf('%7.3f', $ms);
+    }
+
+    /**
+     * @param array{ms: float|null, run_ms: float|null, read_ms: float|null, path: string} $row
+     */
+    private function trace_time(array $row): void
+    {
+        end($this->requests_pool);
+        $port = key($this->requests_pool);
+        if (! is_int($port)) {
+            return;
+        }
+        $this->requests_pool[$port]['times'][] = $row;
     }
 
     private function trace_push(string $kind, string $value): void
