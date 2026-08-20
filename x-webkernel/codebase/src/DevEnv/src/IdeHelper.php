@@ -69,7 +69,7 @@ final class IdeHelper
             $map = require $classmap;
             if (is_array($map)) {
                 foreach ($map as $class => $file) {
-                    if (! is_string($class) || $class === 'Webkernel\\WebApp' || ! self::is_class_name($class)) {
+                    if (! is_string($class) || str_starts_with($class, 'Webkernel\\') || ! self::is_class_name($class)) {
                         continue;
                     }
                     $slash = strrpos($class, '\\');
@@ -206,69 +206,6 @@ final class IdeHelper
         rename($tmp, $output);
 
         return (int) filesize($output);
-    }
-
-    /**
-     * Stub so Intellephense sees webapp(): WebApp and WebApp::{composable}().
-     *
-     * @param array<string, class-string> $composables
-     * @return array{path: string, bytes: int, skipped: bool}
-     */
-    public static function generate_webapp(array $composables, ?string $output = null): array
-    {
-        $output ??= dirname(__DIR__).'/_ide_helper_webapp.php';
-        ksort($composables);
-        $ctx = hash_init('xxh3');
-        hash_update($ctx, 'container=Webkernel\\Container\\Container'."\n");
-        foreach ($composables as $name => $class) {
-            hash_update($ctx, $name.'='.$class."\n");
-        }
-        $hash = hash_final($ctx);
-        if (is_file($output) && self::stored_hash($output) === $hash) {
-            return ['path' => $output, 'bytes' => (int) filesize($output), 'skipped' => true];
-        }
-
-        $methods = [];
-        foreach ($composables as $name => $class) {
-            $methods[] = '            public function '.$name.'(): \\'.$class.' {}';
-        }
-        $methods[] = '            public function container(): \\Webkernel\\Container\\Container {}';
-        $methods[] = '            public function boot(): self {}';
-        $method_block = implode("\n", $methods);
-        $header = self::generated_header();
-
-        $body = <<<PHP
-<?php declare(strict_types=1);
-
-{$header}
-//> Generated. Do not edit.
-//> hash: {$hash}
-
-namespace Webkernel {
-    if (false) {
-        final class WebApp
-        {
-{$method_block}
-        }
-    }
-}
-
-namespace {
-    if (false) {
-        function webapp(): \\Webkernel\\WebApp
-        {
-        }
-    }
-}
-
-PHP;
-        $dir = dirname($output);
-        if (! is_dir($dir) && ! mkdir($dir, 0775, true) && ! is_dir($dir)) {
-            throw new \RuntimeException('Unable to create '.$dir);
-        }
-        file_put_contents($output, $body, LOCK_EX);
-
-        return ['path' => $output, 'bytes' => (int) filesize($output), 'skipped' => false];
     }
 
     private static function stored_hash(string $file): ?string

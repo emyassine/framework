@@ -131,4 +131,4 @@ Composer lock records the loader path only. Do not list functions/*.php in autol
 
 ## DevEnv / IDE
 
-`Webkernel\DevEnv\IdeHelper` generates `src/DevEnv/_ide_helper.php` from Composer classmap so analyzers see `Composer\InstalledVersions` and the rest of vendor. Dump-autoload also writes `_ide_helper_webapp.php` so Intellephense sees `webapp(): WebApp` and `WebApp::view()` / `route()`. No hardcoded class list, no directory walk. Lifecycle calls it on dump-autoload.
+`Webkernel\DevEnv\IdeHelper` generates `src/DevEnv/_ide_helper.php` from Composer classmap so analyzers see `Composer\InstalledVersions` and the rest of vendor. Webkernel classes are skipped (source is already in-tree). No hardcoded class list, no directory walk. Lifecycle calls it on dump-autoload.

@@ -105,13 +105,6 @@ final class BootGenerator
                 $ide['bytes'],
                 $ide['skipped'] ? ', unchanged' : '',
             ));
-            $webapp_ide = IdeHelper::generate_webapp($composables);
-            self::info($io, sprintf(
-                'webapp ide helper %s (%d bytes%s)',
-                $webapp_ide['path'],
-                $webapp_ide['bytes'],
-                $webapp_ide['skipped'] ? ', unchanged' : '',
-            ));
         } catch (\Throwable $e) {
             self::warn($io, 'ide helper: '.$e->getMessage());
         }
