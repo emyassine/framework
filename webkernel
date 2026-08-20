@@ -288,7 +288,8 @@ final class IncludeClock
 
     public function stream_set_option($option, $arg1, $arg2): bool
     {
-        if ($option === STREAM_OPTION_LOCKING) {
+        // PHP_STREAM_OPTION_LOCKING is 5; not exported as a userland constant.
+        if ((int) $option === 5) {
             return $this->stream_lock($arg1);
         }
         return false;
