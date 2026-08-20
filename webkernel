@@ -607,7 +607,7 @@ final class Server
      */
     private function log_request(string $request, int $status_code, float|int $start_time, array $timings = []): void
     {
-        if (!$this->is_first_request) echo "\n";
+        if (!$this->is_first_request && $this->profile_lifecycle) echo "\n";
         $this->is_first_request = false;
 
         $request_ms = (hrtime(true) - $start_time) / 1e6;
@@ -615,10 +615,10 @@ final class Server
         $width = $this->line_width();
 
         $is_api = $timings['type'] ?? 'WEB';
-        $type_badge = $is_api === 'API' ? UI::badge('API', '45', '97') . " " : UI::badge('WEB', '42', '97') . " ";
+        $type_badge = $is_api === 'API' ? UI::badge('API', '45', '97') : UI::badge('WEB', '42', '97');
         $reason = $this->get_status_reason($status_code);
 
-        $left = sprintf("  %s %s%s %s %s%s%s %s", UI::muted($timestamp), UI::statusColor($status_code), $status_code, $reason, UI::CYAN, $request, UI::RESET, $type_badge);
+        $left = sprintf("  %s %s %s%s %s %s%s%s", $type_badge, UI::muted($timestamp), UI::statusColor($status_code), $status_code, $reason, UI::CYAN, $request, UI::RESET);
         $right_plain = $this->metrics_plain($timings['render_ms'] ?? null, $request_ms);
         $right = UI::muted($right_plain);
 
@@ -630,7 +630,7 @@ final class Server
             $overflow = 2 - $dots;
             $max_req = max(8, strlen($request) - $overflow);
             $request_short = $this->shorten($request, $max_req);
-            $left = sprintf("  %s %s%s %s %s%s%s %s", UI::muted($timestamp), UI::statusColor($status_code), $status_code, $reason, UI::CYAN, $request_short, UI::RESET, $type_badge);
+            $left = sprintf("  %s %s %s%s %s %s%s%s", $type_badge, UI::muted($timestamp), UI::statusColor($status_code), $status_code, $reason, UI::CYAN, $request_short, UI::RESET);
             $dots = max(2, $width - $this->visible_len($left) - $right_len - 2);
         }
 
