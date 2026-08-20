@@ -22,7 +22,7 @@ if (! is_dir($tmp) && ! mkdir($tmp, 0775, true) && ! is_dir($tmp)) {
     exit(1);
 }
 file_put_contents($tmp.'/hello.view.php', '<b>{{ $slot }}</b>');
-file_put_contents($tmp.'/smoke.view.php', '<webkernel::hello>ns</webkernel::hello> <x-webkernel::hello>x</x-webkernel::hello>');
+file_put_contents($tmp.'/smoke.view.php', '<webkernel::hello>ns</webkernel::hello> <x-webkernel::hello>x</x-webkernel::hello> <webkernel::hello />');
 webapp()->declare_component('webkernel', $tmp);
 webapp()->declare_view('webkernel', $tmp);
 \Webkernel\View\View::flush();
@@ -30,5 +30,6 @@ webapp()->declare_view('webkernel', $tmp);
 $html = (string) \Webkernel\View\View::make('webkernel::smoke');
 expect(str_contains($html, '<b>ns</b>'), 'paired webkernel::hello');
 expect(str_contains($html, '<b>x</b>'), 'paired x-webkernel::hello');
+expect(str_contains($html, '<b></b>'), 'self-closing webkernel::hello');
 
 echo "ok\n";

@@ -68,7 +68,7 @@ final class IdeHelper
             $map = require $classmap;
             if (is_array($map)) {
                 foreach ($map as $class => $file) {
-                    if (is_string($class) && self::is_class_name($class)) {
+                    if (is_string($class) && $class !== 'Webkernel\\WebApp' && self::is_class_name($class)) {
                         $names[$class] = true;
                     }
                 }

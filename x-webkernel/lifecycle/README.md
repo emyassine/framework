@@ -14,6 +14,10 @@ On `composer dump-autoload` writes:
 
 - `{vendor}/composer/webkernel.php` — `webapp_root`, `vendor_dir`, `instance_id`
 - `{vendor}/composer/webkernel_classmap.php`
+- `{vendor}/composer/webkernel_files.php` — path/instance helpers
+- `{vendor}/composer/webkernel_composables.php` — `api_name => class`
+- `{vendor}/composer/webkernel_providers.php`
+- `{vendor}/composer/webkernel_views.php` / `webkernel_routes.php` — fallback lists
 - `storage/instance/data/instance_id`
 
 If the app is moved to another host, run `composer dump-autoload`.
