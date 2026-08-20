@@ -60,7 +60,7 @@ final class View implements ComposableContract, \Stringable
 
     public static function exists(string $view): bool
     {
-        return self::compiler()->getTemplateFile($view) !== '';
+        return self::compiler()->get_template_file($view) !== '';
     }
 
     public static function add_location(string $path): void
@@ -78,14 +78,14 @@ final class View implements ComposableContract, \Stringable
         $compiler = self::compiler();
         $compiler->if($name, $callback);
         $compiler->directive('unless'.$name, static function (?string $expression) use ($name, $compiler): string {
-            $tmp = $compiler->stripParentheses($expression);
+            $tmp = $compiler->strip_parentheses($expression);
 
             return ($expression !== null && $expression !== '')
-                ? $compiler->phpTag." if (! \$this->check('$name', $tmp)): ?>"
-                : $compiler->phpTag." if (! \$this->check('$name')): ?>";
+                ? $compiler->php_tag." if (! \$this->check('$name', $tmp)): ?>"
+                : $compiler->php_tag." if (! \$this->check('$name')): ?>";
         });
         $compiler->directive('endunless'.$name, static function () use ($compiler): string {
-            return $compiler->phpTag.' endif; ?>';
+            return $compiler->php_tag.' endif; ?>';
         });
     }
 
@@ -121,10 +121,10 @@ final class View implements ComposableContract, \Stringable
 
         $mode = Compiler::MODE_AUTO;
         $engine = new Compiler($paths, $compiled, $mode);
-        $engine->throwOnError = true;
+        $engine->throw_on_error = true;
         $engine->set_echo_format('\\'.self::class.'::echo(%s)');
-        $engine->addAliasClasses('Js', Js::class);
-        $engine->addAliasClasses('View', self::class);
+        $engine->add_alias_classes('Js', Js::class);
+        $engine->add_alias_classes('View', self::class);
         self::apply_namespaces($engine);
 
         return self::$compiler = $engine;

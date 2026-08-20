@@ -55,35 +55,35 @@ class Compiler
     /** @var array Hold dictionary of translations */
     public static array $dictionary = [];
     /** @var string It is used to mark the start of the stack (regexp). This value must not be used for other purposes */
-    public string $escapeStack0 = '-#1Z#-#2B#';
+    public string $escape_stack0 = '-#1Z#-#2B#';
     /** @var string It is used to mark the end of the stack (regexp). This value must not be used for other purposes */
-    public string $escapeStack1 = '#3R#-#4X#-';
+    public string $escape_stack1 = '#3R#-#4X#-';
     /** @var string PHP tag. You could use < ?php or < ? (if shorttag is active in php.ini) */
-    public string $phpTag = '<?php ';
+    public string $php_tag = '<?php ';
     /** @var string this line is used to easily echo a value */
-    protected string $phpTagEcho = '<?php' . ' echo ';
-    /** @var string|null $currentUser Current user. Example: john */
-    public ?string $currentUser;
-    /** @var string|null $currentRole Current role. Example: admin */
-    public ?string $currentRole;
-    /** @var string[]|null $currentPermission Current permission. Example ['edit','add'] */
-    public ?array $currentPermission = [];
+    protected string $php_tag_echo = '<?php' . ' echo ';
+    /** @var string|null $current_user Current user. Example: john */
+    public ?string $current_user;
+    /** @var string|null $current_role Current role. Example: admin */
+    public ?string $current_role;
+    /** @var string[]|null $current_permission Current permission. Example ['edit','add'] */
+    public ?array $current_permission = [];
     /** @var callable|null callback of validation. It is used for "@can,@cannot" */
-    public $authCallBack;
+    public $auth_call_back;
     /** @var callable|null callback of validation. It is used for @canany */
-    public $authAnyCallBack;
+    public $auth_any_call_back;
     /** @var callable|null callback of errors. It is used for @error */
-    public $errorCallBack;
+    public $error_call_back;
     /** @var bool if true then, if the operation fails, and it is critic, then it throws an error */
-    public bool $throwOnError = false;
+    public bool $throw_on_error = false;
     /** @var string security token */
     public string $csrf_token = '';
     /** @var string The path to the missing translations log file. If empty, then every missing key is not saved. */
-    public string $missingLog = '';
+    public string $missing_log = '';
     /** @var bool if true then pipes commands are available, example {{$a1|strtolower}} */
-    public bool $pipeEnable = false;
+    public bool $pipe_enable = false;
     /** @var array Alias (with or without namespace) of the classes */
-    public array $aliasClasses = [];
+    public array $alias_classes = [];
     protected array $hierarcy = [];
     /**
      * @var callable[] associative array with the callable methods. The key must be the name of the method<br>
@@ -94,143 +94,143 @@ class Compiler
      *                 ```
      */
     protected array $methods = [];
-    protected array $controlStack = [['name' => '', 'args' => [], 'parent' => 0]];
-    protected int $controlStackParent = 0;
+    protected array $control_stack = [['name' => '', 'args' => [], 'parent' => 0]];
+    protected int $control_stack_parent = 0;
     /** @var Compiler it is used to get the last instance */
     public static Compiler $instance;
     /**
      * @var bool if it is true, then the variables defined in the "include" as arguments are scoped to work only
      * inside the "include" statement.<br>
      * If false (default value), then the variables defined in the "include" as arguments are defined globally.<br>
-     * <b>Example: (includeScope=false)</b><br>
+     * <b>Example: (include_scope=false)</b><br>
      * include("template",['a1'=>'abc']) // a1 is equals to abc<br>
      * include("template",[]) // a1 is equals to abc<br>
-     * <br><b>Example: (includeScope=true)</b><br>
+     * <br><b>Example: (include_scope=true)</b><br>
      * include("template",['a1'=>'abc']) // a1 is equals to abc<br>
      * include("template",[]) // a1 is not defined<br>
      */
-    public bool $includeScope = false;
+    public bool $include_scope = false;
     /**
      * @var callable[] It allows to parse the compiled output using a function.
      *      This function doesn't require to return a value<br>
      *      **Example:** this converts all compiled result in uppercase (note, content is a ref)
      *      ```
-     *      $this->compileCallbacks[]= static function (&$content, $templatename=null) {
+     *      $this->compile_callbacks[]= static function (&$content, $templatename=null) {
      *      $content=strtoupper($content);
      *      };
      *      ```
      */
-    public array $compileCallbacks = [];
+    public array $compile_callbacks = [];
     /** @var array All the registered extensions. */
     protected array $extensions = [];
     /** @var array All the finished, captured sections. */
     protected array $sections = [];
     /** @var string The template currently being compiled. For example "folder.template" */
-    protected string $fileName = "";
-    protected string $currentView = "";
-    protected string $notFoundPath = "";
+    protected string $file_name = "";
+    protected string $current_view = "";
+    protected string $not_found_path = "";
     /** @var string File extension for the template files. */
-    protected string $fileExtension = '.view.php';
+    protected string $file_extension = '.view.php';
     /** @var array The stack of in-progress sections. */
-    protected array $sectionStack = [];
+    protected array $section_stack = [];
     /** @var array The stack of in-progress loops. */
-    protected array $loopsStack = [];
+    protected array $loops_stack = [];
     /** @var array Dictionary of variables */
     protected array $variables = [];
     /** @var array Dictionary of global variables */
-    protected array $variablesGlobal = [];
+    protected array $variables_global = [];
     /** @var array All the available compiler functions. */
     protected array $compilers = [
-        'Extensions',
-        'Components',
-        'Statements',
-        'Comments',
-        'Echos',
+        'extensions',
+        'components',
+        'statements',
+        'comments',
+        'echos',
     ];
     /** @var string|null it allows to set the stack */
-    protected ?string $viewStack = null;
+    protected ?string $view_stack = null;
     /** @var array used by $this->composer() */
-    protected array $composerStack = [];
+    protected array $composer_stack = [];
     /** @var array The stack of in-progress push sections. */
-    protected array $pushStack = [];
+    protected array $push_stack = [];
     /** @var array All the finished, captured push sections. */
     protected array $pushes = [];
     /** @var int The number of active rendering operations. */
-    protected int $renderCount = 0;
+    protected int $render_count = 0;
     /** @var string[] Get the template path for the compiled views. */
-    protected array $templatePath = [];
+    protected array $template_path = [];
     /** @var array<string, list<string>> namespaced view dirs */
-    protected array $viewNamespaces = [];
+    protected array $view_namespaces = [];
     /** @var array<string, list<string>> namespaced component dirs */
-    protected array $componentNamespaces = [];
+    protected array $component_namespaces = [];
     /** @var string|null Get the compiled path for the compiled views. If null then it uses the default path */
-    protected ?string $compiledPath = null;
+    protected ?string $compile_dpath = null;
     /** @var string the extension of the compiled file. */
-    protected string $compileExtension = '.view.php.compiled';
+    protected string $compile_extension = '.view.php.compiled';
     /**
      * @var string=['auto','sha1','md5'][$i] It determines how the compiled filename will be called.<br>
      *            **auto** (default mode) the mode is "sha1"<br>
      *            **sha1** the filename is converted into a sha1 hash<br>
      *            **md5** the filename is converted into a md5 hash<br>
      */
-    protected string $compileTypeFileName = 'auto';
+    protected string $compile_typefilename = 'auto';
     /** @var array Custom "directive" dictionary. Those directives run at compile time. */
-    protected array $customDirectives = [];
+    protected array $custom_directives = [];
     /** @var bool[] Custom directive dictionary. Those directives run at runtime. */
-    protected array $customDirectivesRT = [];
+    protected array $custom_directives_rt = [];
     /** @var callable Function used for resolving injected classes. */
-    protected $injectResolver;
+    protected $inject_resolver;
     /** @var array Used for conditional if. */
     protected array $conditions = [];
     /** @var int Unique counter. It's used for extends */
-    protected int $uidCounter = 0;
+    protected int $uid_counter = 0;
     /** @var string The main url of the system. Don't use raw $_SERVER values unless the value is sanitized */
-    protected string $baseUrl = '.';
-    protected string $cdnUrl = '.';
+    protected string $base_url = '.';
+    protected string $cdn_url = '.';
     /** @var string|null The base domain of the system */
-    protected ?string $baseDomain;
+    protected ?string $base_domain;
     /** @var string|null It stores the current canonical url. */
-    protected ?string $canonicalUrl;
+    protected ?string $canonical_url;
     /** @var string|null It stores the current url including arguments */
-    protected ?string $currentUrl;
-    /** @var string it is a relative path calculated between baseUrl and the current url. Example ../../ */
-    protected string $relativePath = '';
+    protected ?string $current_url;
+    /** @var string it is a relative path calculated between base_url and the current url. Example ../../ */
+    protected string $relative_path = '';
     /** @var string[] Dictionary of assets */
-    protected array $assetDict = [];
-    protected array $assetDictCDN = [];
+    protected array $asset_dict = [];
+    protected array $asset_dict_cdn = [];
     /** @var bool if true then it removes tabs and unneeded spaces */
     protected bool $optimize = true;
     /** @var bool if false, then the template is not compiled (but executed on memory). */
-    protected bool $isCompiled = true;
+    protected bool $is_compiled = true;
     /** @var bool */
-    protected bool $isRunFast = false; // stored for historical purpose.
+    protected bool $is_run_fast = false; // stored for historical purpose.
     /** @var array Array of opening and closing tags for raw echos. */
-    protected array $rawTags = ['{!!', '!!}'];
+    protected array $raw_tags = ['{!!', '!!}'];
     /** @var array Array of opening and closing tags for regular echos. */
-    protected array $contentTags = ['{{', '}}'];
-    protected int $commentMode = 0;
+    protected array $content_tags = ['{{', '}}'];
+    protected int $comment_mode = 0;
     /** @var array Array of opening and closing tags for escaped echos. */
-    protected array $escapedTags = ['{{{', '}}}'];
+    protected array $escaped_tags = ['{{{', '}}}'];
     /** @var string The "regular" / legacy echo string format. */
-    protected string $echoFormat = '\htmlentities(%s??\'\', ENT_QUOTES, \'UTF-8\', false)';
+    protected string $echo_format = '\htmlentities(%s??\'\', ENT_QUOTES, \'UTF-8\', false)';
     /** @var string */
-    protected string $echoFormatOld = 'static::e(%s)';
+    protected string $echo_format_old = 'static::e(%s)';
     /** @var array Lines that will be added at the footer of the template */
     protected array $footer = [];
     /** @var string Placeholder to temporary mark the position of verbatim blocks. */
-    protected string $verbatimPlaceholder = '$__verbatim__$';
+    protected string $verbatim_placeholder = '$__verbatim__$';
     /** @var array Array to temporary store the verbatim blocks found in the template. */
-    protected array $verbatimBlocks = [];
+    protected array $verbatim_blocks = [];
     /** @var int Counter to keep track of nested forelse statements. */
-    protected int $forelseCounter = 0;
+    protected int $forelse_counter = 0;
     /** @var array The components being rendered. */
-    protected array $componentStack = [];
+    protected array $component_stack = [];
     /** @var array The original data passed to the component. */
-    protected array $componentData = [];
+    protected array $component_data = [];
     /** @var array The slot contents for the component. */
     protected array $slots = [];
     /** @var array The names of the slots being rendered. */
-    protected array $slotStack = [];
+    protected array $slot_stack = [];
     /** @var string tag unique */
     protected string $PARENTKEY = '@parentXYZABC';
     /**
@@ -241,60 +241,60 @@ class Compiler
      */
     protected int $mode;
     /** @var int Indicates the number of open switches */
-    protected int $switchCount = 0;
+    protected int $switch_count = 0;
     /** @var bool Indicates if the switch is recently open */
-    protected bool $firstCaseInSwitch = true;
+    protected bool $first_case_in_switch = true;
     //</editor-fold>
     //<editor-fold desc="constructor">
     /**
-     * It creates an instance of Compiler. The folder at $compiledPath is created in case it doesn't exist.<br>
+     * It creates an instance of Compiler. The folder at $compile_dpath is created in case it doesn't exist.<br>
      * **Example**
      * ```
      * $blade=new Compiler("pathtemplate","pathcompile",Compiler::MODE_AUTO,2);
      * ```
      *
-     * @param string|null $templatePath If null then it uses (caller_folder)/views
-     * @param string|null $compiledPath If null then it uses (caller_folder)/compiles
+     * @param string|null $template_path If null then it uses (caller_folder)/views
+     * @param string|null $compile_dpath If null then it uses (caller_folder)/compiles
      * @param int         $mode         =[Compiler::MODE_AUTO,Compiler::MODE_DEBUG,Compiler::MODE_FAST,Compiler::MODE_SLOW][$i]<br>
      *                                  **Compiler::MODE_AUTO** (default mode)<br>
      *                                  **Compiler::MODE_DEBUG** errors will be more verbose, and it will compile code
      *                                  every time<br>
      *                                  **Compiler::MODE_FAST** it will not check if the compiled file exists<br>
      *                                  **Compiler::MODE_SLOW** it will compile the code everytime<br>
-     * @param int         $commentMode  =[0,1,2][$i] <br>
+     * @param int         $comment_mode  =[0,1,2][$i] <br>
      *                                  **0** comments are generated as php code.<br>
      *                                  **1** comments are generated as html code<br>
      *                                  **2** comments are ignored (no code is generated)<br>
      */
-    public function __construct($templatePath = null, $compiledPath = null, $mode = 0, $commentMode = 0)
+    public function __construct($template_path = null, $compile_dpath = null, $mode = 0, $comment_mode = 0)
     {
-        if ($templatePath === null) {
-            $templatePath = \getcwd() . '/views';
+        if ($template_path === null) {
+            $template_path = \getcwd() . '/views';
         }
-        if ($compiledPath === null) {
-            $compiledPath = \getcwd() . '/compiles';
+        if ($compile_dpath === null) {
+            $compile_dpath = \getcwd() . '/compiles';
         }
-        $this->templatePath = (is_array($templatePath)) ? $templatePath : [$templatePath];
-        $this->compiledPath = $compiledPath;
-        $this->setMode($mode);
-        $this->setCommentMode($commentMode);
+        $this->template_path = (is_array($template_path)) ? $template_path : [$template_path];
+        $this->compile_dpath = $compile_dpath;
+        $this->set_mode($mode);
+        $this->set_comment_mode($comment_mode);
         self::$instance = $this;
-        $this->authCallBack = function(
+        $this->auth_call_back = function(
             $action = null,
             /** @noinspection PhpUnusedParameterInspection */
             $subject = null
         ) {
-            return \in_array($action, $this->currentPermission, true);
+            return \in_array($action, $this->current_permission, true);
         };
-        $this->authAnyCallBack = function($array = []) {
+        $this->auth_any_call_back = function($array = []) {
             foreach ($array as $permission) {
-                if (\in_array($permission, $this->currentPermission ?? [], true)) {
+                if (\in_array($permission, $this->current_permission ?? [], true)) {
                     return true;
                 }
             }
             return false;
         };
-        $this->errorCallBack = static function(
+        $this->error_call_back = static function(
             /** @noinspection PhpUnusedParameterInspection */
             $key = null
         ) {
@@ -323,11 +323,11 @@ class Compiler
      * It gets an instance of Bladeone or will create a new one. This function is useful if you want a singleton<br>
      * **Example**
      * ```
-     * $blade=Compiler::getInstance();
-     * $blade=Compiler::getInstance("templatepath","compilepath",Compiler::MODE_AUTO,0);
+     * $blade=Compiler::get_instance();
+     * $blade=Compiler::get_instance("templatepath","compilepath",Compiler::MODE_AUTO,0);
      * ```
-     * @param string|array $templatePath If null then it uses (caller_folder)/views
-     * @param string       $compiledPath If null then it uses (caller_folder)/compiles
+     * @param string|array $template_path If null then it uses (caller_folder)/views
+     * @param string       $compile_dpath If null then it uses (caller_folder)/compiles
      * @param int          $mode         =[Compiler::MODE_AUTO,Compiler::MODE_DEBUG,Compiler::MODE_FAST,Compiler::MODE_SLOW][$i]<br>
      *                                   **Compiler::MODE_AUTO** (default mode)<br>
      *                                   **Compiler::MODE_DEBUG** errors will be more
@@ -336,17 +336,17 @@ class Compiler
      *                                   compiled file exists<br>
      *                                   **Compiler::MODE_SLOW** it will compile the code
      *                                   everytime<br>
-     * @param int          $commentMode  =[0,1,2][$i] <br>
+     * @param int          $comment_mode  =[0,1,2][$i] <br>
      *                                   **0** comments are generated as php code.<br>
      *                                   **1** comments are generated as html code<br>
      *                                   **2** comments are ignored (no code is
      *                                   generated)<br>
      * @return Compiler
      */
-    public static function getInstance($templatePath = null, $compiledPath = null, $mode = 0, $commentMode = 0): Compiler
+    public static function get_instance($template_path = null, $compile_dpath = null, $mode = 0, $comment_mode = 0): Compiler
     {
         if (self::$instance === null) {
-            new self($templatePath, $compiledPath, $mode, $commentMode);
+            new self($template_path, $compile_dpath, $mode, $comment_mode);
         }
         return self::$instance;
     }
@@ -355,45 +355,45 @@ class Compiler
      * It adds a control to the stack<br>
      * **Example:**<br>
      * ```
-     * $this->addControlStackChild('alert',['message'=>'hello']);
+     * $this->add_control_stack_child('alert',['message'=>'hello']);
      * ```
      * @param string $name the nametag of the stack
      * @param array  $args
      * @return void
      */
-    public function addControlStackChild(string $name, array $args): void
+    public function add_control_stack_child(string $name, array $args): void
     {
-        $this->controlStack[] = ['name' => $name, 'args' => $args, 'parent' => $this->controlStackParent];
-        $this->controlStackParent = array_key_last($this->controlStack);
+        $this->control_stack[] = ['name' => $name, 'args' => $args, 'parent' => $this->control_stack_parent];
+        $this->control_stack_parent = array_key_last($this->control_stack);
     }
 
-    public function addControlStackSibling(string $name, array $args): void
+    public function add_control_stack_sibling(string $name, array $args): void
     {
-        $grandparent = $this->controlStack[$this->controlStackParent]['parent'];
-        $this->controlStack[] = ['name' => $name, 'args' => $args, 'parent' => $grandparent];
+        $grandparent = $this->control_stack[$this->control_stack_parent]['parent'];
+        $this->control_stack[] = ['name' => $name, 'args' => $args, 'parent' => $grandparent];
     }
 
     /**
      * It returns the lastest control from the stack and removes it.
      * @return mixed|null
      */
-    public function closeControlStack()
+    public function close_control_stack()
     {
-        $this->controlStackParent = $this->controlStack[$this->controlStackParent]['parent'];
-        return array_pop($this->controlStack);
+        $this->control_stack_parent = $this->control_stack[$this->control_stack_parent]['parent'];
+        return array_pop($this->control_stack);
     }
 
     /**
      * It removes the last parent and returns the new parent (the previous grandparent)<br>
-     * Usually this method and closeControlStack must return the same if every child was closed correctly.
+     * Usually this method and close_control_stack must return the same if every child was closed correctly.
      * @return mixed|null
      */
-    public function closeControlStackParent()
+    public function close_control_stack_parent()
     {
-        $grandparent = $this->controlStack[$this->controlStackParent]['parent'];
-        unset($this->controlStack[$this->controlStackParent]);
-        $this->controlStackParent = $grandparent;
-        return $this->controlStack[$this->controlStackParent];
+        $grandparent = $this->control_stack[$this->control_stack_parent]['parent'];
+        unset($this->control_stack[$this->control_stack_parent]);
+        $this->control_stack_parent = $grandparent;
+        return $this->control_stack[$this->control_stack_parent];
     }
 
     /**
@@ -401,42 +401,42 @@ class Compiler
      * It is useful to get the previous control, it could be a parent or a sibling.
      * @return array
      */
-    public function lastControlStack(): array
+    public function last_control_stack(): array
     {
-        return @end($this->controlStack);
+        return @end($this->control_stack);
     }
 
     /**
      * It gets the parent control stack
      * @return array
      */
-    public function parentControlStack(): array
+    public function parent_control_stack(): array
     {
-        return $this->controlStack[$this->controlStackParent];
+        return $this->control_stack[$this->control_stack_parent];
     }
 
     /**
      * It clears the whole control stack
      * @return void
      */
-    public function clearControlStack(): void
+    public function clear_control_stack(): void
     {
-        $this->controlStack = [['name' => '', 'args' => [], 'parent' => 0]];
+        $this->control_stack = [['name' => '', 'args' => [], 'parent' => 0]];
     }
 
     /**
      * It adds a new method<br>
      * **Example:**<br>
      * ```
-     * $this->addMethod('compile','alert',static function(?string $expression=null) { return });
-     * $this->addMethod('runtime','alert',function(?array $arguments=null) { return });
+     * $this->add_method('compile','alert',static function(?string $expression=null) { return });
+     * $this->add_method('runtime','alert',function(?array $arguments=null) { return });
      * ```
      * @param string   $type     =['compile','runtime'][$i] if you want to add a compile method or a runtime method
      * @param string   $name     the name of the method. Commonly it is in lowercase.
      * @param callable $callable the callable method
      * @return Compiler
      */
-    public function addMethod(string $type, string $name, callable $callable): Compiler
+    public function add_method(string $type, string $name, callable $callable): Compiler
     {
         $fullName = $type . ucfirst($name);
         $this->methods[$fullName] = $callable;
@@ -447,7 +447,7 @@ class Compiler
      * It clears all the methods defined.
      * @return $this
      */
-    public function clearMethods(): self
+    public function clear_methods(): self
     {
         $this->methods = [];
         return $this;
@@ -464,10 +464,10 @@ class Compiler
      * @return string
      * @throws \RuntimeException
      */
-    public function showError($id, $text, $critic = false, $alwaysThrow = false): string
+    public function show_error($id, $text, $critic = false, $alwaysThrow = false): string
     {
         \ob_get_clean();
-        if ($this->throwOnError || $alwaysThrow || $critic === true) {
+        if ($this->throw_on_error || $alwaysThrow || $critic === true) {
             throw new \RuntimeException("Compiler Error [$id] $text");
         }
         $msg = "<div style='background-color: red; color: black; padding: 3px; border: solid 1px black;'>";
@@ -501,7 +501,7 @@ class Compiler
         return \htmlentities($value, ENT_QUOTES, 'UTF-8', false);
     }
 
-    protected static function convertArgCallBack($k, $v): string
+    protected static function convert_arg_call_back($k, $v): string
     {
         return $k . "='$v' ";
     }
@@ -525,11 +525,11 @@ class Compiler
      * It converts a text into a php code with echo<br>
      * **Example:**<br>
      * ```
-     * $this->wrapPHP('$hello'); // "< ?php echo $this->e($hello); ? >"
-     * $this->wrapPHP('$hello',''); // < ?php echo $this->e($hello); ? >
-     * $this->wrapPHP('$hello','',false); // < ?php echo $hello; ? >
-     * $this->wrapPHP('"hello"'); // "< ?php echo $this->e("hello"); ? >"
-     * $this->wrapPHP('hello()'); // "< ?php echo $this->e(hello()); ? >"
+     * $this->wrap_php('$hello'); // "< ?php echo $this->e($hello); ? >"
+     * $this->wrap_php('$hello',''); // < ?php echo $this->e($hello); ? >
+     * $this->wrap_php('$hello','',false); // < ?php echo $hello; ? >
+     * $this->wrap_php('"hello"'); // "< ?php echo $this->e("hello"); ? >"
+     * $this->wrap_php('hello()'); // "< ?php echo $this->e(hello()); ? >"
      * ```
      *
      * @param ?string $input The input value
@@ -537,16 +537,16 @@ class Compiler
      * @param bool    $parse If the result will be parsed or not. If false then it's returned without $this->e
      * @return string
      */
-    public function wrapPHP($input, $quote = '"', $parse = true): string
+    public function wrap_php($input, $quote = '"', $parse = true): string
     {
         if ($input === null) {
             return 'null';
         }
-        if (strpos($input, '(') !== false && !$this->isQuoted($input)) {
+        if (strpos($input, '(') !== false && !$this->is_quoted($input)) {
             if ($parse) {
-                return $quote . $this->phpTagEcho . '$this->e(' . $input . ');?>' . $quote;
+                return $quote . $this->php_tag_echo . '$this->e(' . $input . ');?>' . $quote;
             }
-            return $quote . $this->phpTagEcho . $input . ';?>' . $quote;
+            return $quote . $this->php_tag_echo . $input . ';?>' . $quote;
         }
         if (strpos($input, '$') === false) {
             if ($parse) {
@@ -555,9 +555,9 @@ class Compiler
             return $input;
         }
         if ($parse) {
-            return $quote . $this->phpTagEcho . '$this->e(' . $input . ');?>' . $quote;
+            return $quote . $this->php_tag_echo . '$this->e(' . $input . ');?>' . $quote;
         }
-        return $quote . $this->phpTagEcho . $input . ';?>' . $quote;
+        return $quote . $this->php_tag_echo . $input . ';?>' . $quote;
     }
 
     /**
@@ -566,7 +566,7 @@ class Compiler
      * @param string|null $text
      * @return bool
      */
-    public function isQuoted($text): bool
+    public function is_quoted($text): bool
     {
         if (!$text || strlen($text) < 2) {
             return false;
@@ -595,15 +595,15 @@ class Compiler
      * @param string      $view  example "folder.template"
      * @param string|null $alias example "mynewop". If null then it uses the name of the template.
      */
-    public function addInclude($view, $alias = null): void
+    public function add_include($view, $alias = null): void
     {
         if (!isset($alias)) {
             $alias = \explode('.', $view);
             $alias = \end($alias);
         }
         $this->directive($alias, function($expression) use ($view) {
-            $expression = $this->stripParentheses($expression) ?: '[]';
-            return "$this->phpTag echo \$this->runChild('$view', $expression); ?>";
+            $expression = $this->strip_parentheses($expression) ?: '[]';
+            return "$this->php_tag echo \$this->run_child('$view', $expression); ?>";
         });
     }
 
@@ -616,8 +616,8 @@ class Compiler
      */
     public function directive($name, callable $handler): void
     {
-        $this->customDirectives[$name] = $handler;
-        $this->customDirectivesRT[$name] = false;
+        $this->custom_directives[$name] = $handler;
+        $this->custom_directives_rt[$name] = false;
     }
 
     /**
@@ -626,12 +626,12 @@ class Compiler
      * @param string|null $expression
      * @return string
      */
-    public function stripParentheses($expression): string
+    public function strip_parentheses($expression): string
     {
         if (\is_null($expression)) {
             return '';
         }
-        if (static::startsWith($expression, '(')) {
+        if (static::starts_with($expression, '(')) {
             $expression = \substr($expression, 1, -1);
         }
         return $expression;
@@ -644,7 +644,7 @@ class Compiler
      * @param string|array $needles
      * @return bool
      */
-    public static function startsWith($haystack, $needles): bool
+    public static function starts_with($haystack, $needles): bool
     {
         foreach ((array)$needles as $needle) {
             if ($needle != '') {
@@ -667,39 +667,39 @@ class Compiler
      *
      * @param bool $bool
      * @return Compiler
-     * @see Compiler::setMode
+     * @see Compiler::set_mode
      */
-    public function setIsCompiled($bool = false): Compiler
+    public function set_is_compiled($bool = false): Compiler
     {
-        $this->isCompiled = $bool;
+        $this->is_compiled = $bool;
         if (!$bool) {
-            $this->setMode(self::MODE_SLOW);
+            $this->set_mode(self::MODE_SLOW);
         }
         return $this;
     }
 
     /**
      * It sets the template and compile path (without trailing slash).
-     * <p>Example:setPath("somefolder","otherfolder");
+     * <p>Example:set_path("somefolder","otherfolder");
      *
-     * @param null|string|string[] $templatePath If null then it uses the current path /views folder
-     * @param null|string          $compiledPath If null then it uses the current path /views folder
+     * @param null|string|string[] $template_path If null then it uses the current path /views folder
+     * @param null|string          $compile_dpath If null then it uses the current path /views folder
      */
-    public function setPath($templatePath, $compiledPath): void
+    public function set_path($template_path, $compile_dpath): void
     {
-        if ($templatePath === null) {
-            $templatePath = \getcwd() . '/views';
+        if ($template_path === null) {
+            $template_path = \getcwd() . '/views';
         }
-        if ($compiledPath === null) {
-            $compiledPath = \getcwd() . '/compiles';
+        if ($compile_dpath === null) {
+            $compile_dpath = \getcwd() . '/compiles';
         }
-        $this->templatePath = (is_array($templatePath)) ? $templatePath : [$templatePath];
-        $this->compiledPath = $compiledPath;
+        $this->template_path = (is_array($template_path)) ? $template_path : [$template_path];
+        $this->compile_dpath = $compile_dpath;
     }
 
     public function set_echo_format(string $format): void
     {
-        $this->echoFormat = $format;
+        $this->echo_format = $format;
     }
 
     /**
@@ -707,47 +707,47 @@ class Compiler
      */
     public function template_paths(): array
     {
-        return $this->templatePath;
+        return $this->template_path;
     }
 
     public function add_template_path(string $path): void
     {
-        $this->templatePath[] = rtrim($path, '/\\');
+        $this->template_path[] = rtrim($path, '/\\');
     }
 
     public function add_view_namespace(string $namespace, string $path): void
     {
-        $this->viewNamespaces[$namespace][] = rtrim($path, '/\\');
+        $this->view_namespaces[$namespace][] = rtrim($path, '/\\');
     }
 
     public function add_component_namespace(string $namespace, string $path): void
     {
-        $this->componentNamespaces[$namespace][] = rtrim($path, '/\\');
+        $this->component_namespaces[$namespace][] = rtrim($path, '/\\');
     }
 
     /**
      * @return array
      */
-    public function getAliasClasses(): array
+    public function get_alias_classes(): array
     {
-        return $this->aliasClasses;
+        return $this->alias_classes;
     }
 
     /**
-     * @param array $aliasClasses
+     * @param array $alias_classes
      */
-    public function setAliasClasses($aliasClasses): void
+    public function set_alias_classes($alias_classes): void
     {
-        $this->aliasClasses = $aliasClasses;
+        $this->alias_classes = $alias_classes;
     }
 
     /**
      * @param string $aliasName
      * @param string $classWithNS
      */
-    public function addAliasClasses($aliasName, $classWithNS): void
+    public function add_alias_classes($aliasName, $classWithNS): void
     {
-        $this->aliasClasses[$aliasName] = $classWithNS;
+        $this->alias_classes[$aliasName] = $classWithNS;
     }
     //</editor-fold>
     //<editor-fold desc="compile">
@@ -758,11 +758,11 @@ class Compiler
      * @param null   $role
      * @param array  $permission
      */
-    public function setAuth($user = '', $role = null, $permission = []): void
+    public function set_auth($user = '', $role = null, $permission = []): void
     {
-        $this->currentUser = $user;
-        $this->currentRole = $role;
-        $this->currentPermission = $permission;
+        $this->current_user = $user;
+        $this->current_role = $role;
+        $this->current_permission = $permission;
     }
 
     /**
@@ -773,9 +773,9 @@ class Compiler
      * @return string It returns a parsed string
      * @throws Exception
      */
-    public function runString($string, $data = []): string
+    public function run_string($string, $data = []): string
     {
-        $php = $this->compileString($string);
+        $php = $this->compile_string($string);
         $obLevel = \ob_get_level();
         \ob_start();
         \extract($data, EXTR_SKIP);
@@ -791,7 +791,7 @@ class Compiler
             while (\ob_get_level() > $obLevel) {
                 \ob_end_clean();
             }
-            $this->showError('runString', $e->getMessage() . ' ' . $e->getCode(), true);
+            $this->show_error('run_string', $e->getMessage() . ' ' . $e->getCode(), true);
             return '';
         }
         $lastError = \error_get_last(); // PHP 5.6
@@ -799,10 +799,10 @@ class Compiler
             while (\ob_get_level() > $obLevel) {
                 \ob_end_clean();
             }
-            $this->showError('runString', $lastError['message'] . ' ' . $lastError['type'], true);
+            $this->show_error('run_string', $lastError['message'] . ' ' . $lastError['type'], true);
             return '';
         }
-        return $this->postRun(\ob_get_clean());
+        return $this->post_run(\ob_get_clean());
     }
 
     /**
@@ -811,21 +811,21 @@ class Compiler
      * @param string $value
      * @return string
      */
-    public function compileString($value): string
+    public function compile_string($value): string
     {
         $result = '';
         if (\strpos($value, '@verbatim') !== false) {
-            $value = $this->storeVerbatimBlocks($value);
+            $value = $this->store_verbatim_blocks($value);
         }
         $this->footer = [];
         // Here we will loop through all the tokens returned by the Zend lexer and
         // parse each one into the corresponding valid PHP. We will then have this
         // template as the correctly rendered PHP that can be rendered natively.
         foreach (\token_get_all($value) as $token) {
-            $result .= \is_array($token) ? $this->parseToken($token) : $token;
+            $result .= \is_array($token) ? $this->parse_token($token) : $token;
         }
-        if (!empty($this->verbatimBlocks)) {
-            $result = $this->restoreVerbatimBlocks($result);
+        if (!empty($this->verbatim_blocks)) {
+            $result = $this->restore_verbatim_blocks($result);
         }
         // If there are any footer lines that need to get added to a template we will
         // add them here at the end of the template. This gets used mainly for the
@@ -843,11 +843,11 @@ class Compiler
      * @param string $value
      * @return string
      */
-    protected function storeVerbatimBlocks($value): string
+    protected function store_verbatim_blocks($value): string
     {
         return \preg_replace_callback('/(?<!@)@verbatim(.*?)@endverbatim/s', function($matches) {
-            $this->verbatimBlocks[] = $matches[1];
-            return $this->verbatimPlaceholder;
+            $this->verbatim_blocks[] = $matches[1];
+            return $this->verbatim_placeholder;
         }, $value);
     }
 
@@ -858,17 +858,17 @@ class Compiler
      *
      * @return string
      *
-     * @see Compiler::compileStatements
-     * @see Compiler::compileExtends
-     * @see Compiler::compileComments
-     * @see Compiler::compileEchos
+     * @see Compiler::compile_statements
+     * @see Compiler::compile_extends
+     * @see Compiler::compile_comments
+     * @see Compiler::compile_echos
      */
-    protected function parseToken($token): string
+    protected function parse_token($token): string
     {
         [$id, $content] = $token;
         if ($id == T_INLINE_HTML) {
             foreach ($this->compilers as $type) {
-                $content = $this->{"compile$type"}($content);
+                $content = $this->{"compile_$type"}($content);
             }
         }
         return $content;
@@ -880,12 +880,12 @@ class Compiler
      * @param string $result
      * @return string
      */
-    protected function restoreVerbatimBlocks($result): string
+    protected function restore_verbatim_blocks($result): string
     {
-        $result = \preg_replace_callback('/' . \preg_quote($this->verbatimPlaceholder) . '/', function() {
-            return \array_shift($this->verbatimBlocks);
+        $result = \preg_replace_callback('/' . \preg_quote($this->verbatim_placeholder) . '/', function() {
+            return \array_shift($this->verbatim_blocks);
         }, $result);
-        $this->verbatimBlocks = [];
+        $this->verbatim_blocks = [];
         return $result;
     }
 
@@ -898,32 +898,32 @@ class Compiler
      */
     public function relative($relativeWeb): string
     {
-        return $this->assetDict[$relativeWeb] ?? ($this->relativePath . $relativeWeb);
+        return $this->asset_dict[$relativeWeb] ?? ($this->relative_path . $relativeWeb);
     }
 
     /**
      * It adds an alias to the link of the resources.<br>
-     * addAssetDict('name','url/res.jpg')<br>
-     * addAssetDict(['name'=>'url/res.jpg','name2'=>'url/res2.jpg']);
+     * add_asset_dict('name','url/res.jpg')<br>
+     * add_asset_dict(['name'=>'url/res.jpg','name2'=>'url/res2.jpg']);
      *
      * @param string|array $name example 'css/style.css', you could also add an array
      * @param string       $url  example https://www.web.com/style.css'
      */
-    public function addAssetDict($name, $url = ''): void
+    public function add_asset_dict($name, $url = ''): void
     {
         if (\is_array($name)) {
-            $this->assetDict = \array_merge($this->assetDict, $name);
+            $this->asset_dict = \array_merge($this->asset_dict, $name);
         } else {
-            $this->assetDict[$name] = $url;
+            $this->asset_dict[$name] = $url;
         }
     }
 
-    public function addAssetDictCDN($name, $url = ''): void
+    public function add_asset_dict_cdn($name, $url = ''): void
     {
         if (\is_array($name)) {
-            $this->assetDictCDN = \array_merge($this->assetDictCDN, $name);
+            $this->asset_dict_cdn = \array_merge($this->asset_dict_cdn, $name);
         } else {
-            $this->assetDictCDN[$name] = $url;
+            $this->asset_dict_cdn[$name] = $url;
         }
     }
 
@@ -932,11 +932,11 @@ class Compiler
      *
      * @param string $expression
      * @return string
-     * @see Compiler::startPush
+     * @see Compiler::start_push
      */
-    public function compilePush($expression): string
+    public function compile_push($expression): string
     {
-        return $this->phpTag . "\$this->startPush$expression; ?>";
+        return $this->php_tag . "\$this->start_push$expression; ?>";
     }
 
     /**
@@ -944,12 +944,12 @@ class Compiler
      *
      * @param string $expression
      * @return string
-     * @see Compiler::startPush
+     * @see Compiler::start_push
      */
-    public function compilePushOnce($expression): string
+    public function compile_pushonce($expression): string
     {
         $key = '$__pushonce__' . \trim(\substr($expression, 2, -2));
-        return $this->phpTag . "if(!isset($key)): $key=1;  \$this->startPush$expression; ?>";
+        return $this->php_tag . "if(!isset($key)): $key=1;  \$this->start_push$expression; ?>";
     }
 
     /**
@@ -957,11 +957,11 @@ class Compiler
      *
      * @param string $expression
      * @return string
-     * @see Compiler::startPush
+     * @see Compiler::start_push
      */
-    public function compilePrepend($expression): string
+    public function compile_prepend($expression): string
     {
-        return $this->phpTag . "\$this->startPush$expression; ?>";
+        return $this->php_tag . "\$this->start_push$expression; ?>";
     }
 
     /**
@@ -971,14 +971,14 @@ class Compiler
      * @param string $content
      * @return void
      */
-    public function startPush($section, $content = ''): void
+    public function start_push($section, $content = ''): void
     {
         if ($content === '') {
             if (\ob_start()) {
-                $this->pushStack[] = $section;
+                $this->push_stack[] = $section;
             }
         } else {
-            $this->extendPush($section, $content);
+            $this->extend_push($section, $content);
         }
     }
 
@@ -992,15 +992,15 @@ class Compiler
      * @param string $content
      * @return void
      */
-    protected function extendPush($section, $content): void
+    protected function extend_push($section, $content): void
     {
         if (!isset($this->pushes[$section])) {
             $this->pushes[$section] = []; // start an empty section
         }
-        if (!isset($this->pushes[$section][$this->renderCount])) {
-            $this->pushes[$section][$this->renderCount] = $content;
+        if (!isset($this->pushes[$section][$this->render_count])) {
+            $this->pushes[$section][$this->render_count] = $content;
         } else {
-            $this->pushes[$section][$this->renderCount] .= $content;
+            $this->pushes[$section][$this->render_count] .= $content;
         }
     }
 
@@ -1011,14 +1011,14 @@ class Compiler
      * @param string $content
      * @return void
      */
-    public function startPrepend($section, $content = ''): void
+    public function start_prepend($section, $content = ''): void
     {
         if ($content === '') {
             if (\ob_start()) {
-                \array_unshift($this->pushStack[], $section);
+                \array_unshift($this->push_stack[], $section);
             }
         } else {
-            $this->extendPush($section, $content);
+            $this->extend_push($section, $content);
         }
     }
 
@@ -1027,13 +1027,13 @@ class Compiler
      *
      * @return string
      */
-    public function stopPush(): string
+    public function stop_push(): string
     {
-        if (empty($this->pushStack)) {
-            $this->showError('stopPush', 'Cannot end a section without first starting one', true);
+        if (empty($this->push_stack)) {
+            $this->show_error('stop_push', 'Cannot end a section without first starting one', true);
         }
-        $last = \array_pop($this->pushStack);
-        $this->extendPush($last, \ob_get_clean());
+        $last = \array_pop($this->push_stack);
+        $this->extend_push($last, \ob_get_clean());
         return $last;
     }
 
@@ -1042,13 +1042,13 @@ class Compiler
      *
      * @return string
      */
-    public function stopPrepend(): string
+    public function stop_prepend(): string
     {
-        if (empty($this->pushStack)) {
-            $this->showError('stopPrepend', 'Cannot end a section without first starting one', true);
+        if (empty($this->push_stack)) {
+            $this->show_error('stop_prepend', 'Cannot end a section without first starting one', true);
         }
-        $last = \array_shift($this->pushStack);
-        $this->extendStartPush($last, \ob_get_clean());
+        $last = \array_shift($this->push_stack);
+        $this->extend_start_push($last, \ob_get_clean());
         return $last;
     }
 
@@ -1059,15 +1059,15 @@ class Compiler
      * @param string $content
      * @return void
      */
-    protected function extendStartPush($section, $content): void
+    protected function extend_start_push($section, $content): void
     {
         if (!isset($this->pushes[$section])) {
             $this->pushes[$section] = []; // start an empty section
         }
-        if (!isset($this->pushes[$section][$this->renderCount])) {
-            $this->pushes[$section][$this->renderCount] = $content;
+        if (!isset($this->pushes[$section][$this->render_count])) {
+            $this->pushes[$section][$this->render_count] = $content;
         } else {
-            $this->pushes[$section][$this->renderCount] = $content . $this->pushes[$section][$this->renderCount];
+            $this->pushes[$section][$this->render_count] = $content . $this->pushes[$section][$this->render_count];
         }
     }
 
@@ -1078,7 +1078,7 @@ class Compiler
      * @param string $default the default name of the section is not found.
      * @return string
      */
-    public function yieldPushContent($section, $default = ''): string
+    public function yield_push_content($section, $default = ''): string
     {
         if ($section === null || $section === '') {
             return $default;
@@ -1109,9 +1109,9 @@ class Compiler
      * @param string     $splitEnd
      * @return string
      */
-    public function splitForeach($each = 1, $splitText = ',', $splitEnd = ''): string
+    public function split_foreach($each = 1, $splitText = ',', $splitEnd = ''): string
     {
-        $loopStack = static::last($this->loopsStack); // array(7) { ["index"]=> int(0) ["remaining"]=> int(6) ["count"]=> int(5) ["first"]=> bool(true) ["last"]=> bool(false) ["depth"]=> int(1) ["parent"]=> NULL }
+        $loopStack = static::last($this->loops_stack); // array(7) { ["index"]=> int(0) ["remaining"]=> int(6) ["count"]=> int(5) ["first"]=> bool(true) ["last"]=> bool(false) ["depth"]=> int(1) ["parent"]=> NULL }
         if (($loopStack['index']) == $loopStack['count'] - 1) {
             return $splitEnd;
         }
@@ -1188,9 +1188,9 @@ class Compiler
     public function __call($name, $args)
     {
         if ($name === 'if') {
-            return $this->registerIfStatement($args[0] ?? null, $args[1] ?? null);
+            return $this->register_if_statement($args[0] ?? null, $args[1] ?? null);
         }
-        $this->showError('call', "function $name is not defined<br>", true, true);
+        $this->show_error('call', "function $name is not defined<br>", true, true);
         return '';
     }
 
@@ -1201,23 +1201,23 @@ class Compiler
      * @param callable $callback
      * @return string
      */
-    public function registerIfStatement($name, callable $callback): string
+    public function register_if_statement($name, callable $callback): string
     {
         $this->conditions[$name] = $callback;
         $this->directive($name, function($expression) use ($name) {
-            $tmp = $this->stripParentheses($expression);
+            $tmp = $this->strip_parentheses($expression);
             return $expression !== ''
-                ? $this->phpTag . " if (\$this->check('$name', $tmp)): ?>"
-                : $this->phpTag . " if (\$this->check('$name')): ?>";
+                ? $this->php_tag . " if (\$this->check('$name', $tmp)): ?>"
+                : $this->php_tag . " if (\$this->check('$name')): ?>";
         });
         $this->directive('else' . $name, function($expression) use ($name) {
-            $tmp = $this->stripParentheses($expression);
+            $tmp = $this->strip_parentheses($expression);
             return $expression !== ''
-                ? $this->phpTag . " elseif (\$this->check('$name', $tmp)): ?>"
-                : $this->phpTag . " elseif (\$this->check('$name')): ?>";
+                ? $this->php_tag . " elseif (\$this->check('$name', $tmp)): ?>"
+                : $this->php_tag . " elseif (\$this->check('$name')): ?>";
         });
         $this->directive('end' . $name, function() {
-            return $this->phpTag . ' endif; ?>';
+            return $this->php_tag . ' endif; ?>';
         });
         return '';
     }
@@ -1241,10 +1241,10 @@ class Compiler
      * @return string
      * @throws Exception
      */
-    public function includeWhen($bool = false, $view = '', $value = []): string
+    public function include_when($bool = false, $view = '', $value = []): string
     {
         if ($bool) {
-            return $this->runChild($view, $value);
+            return $this->run_child($view, $value);
         }
         return '';
     }
@@ -1258,29 +1258,29 @@ class Compiler
      * @return string
      * @throws Exception
      */
-    public function runChild($view, $variables = []): string
+    public function run_child($view, $variables = []): string
     {
         if (\is_array($variables)) {
-            if ($this->includeScope) {
+            if ($this->include_scope) {
                 $backup = $this->variables;
             } else {
                 $backup = null;
             }
             $newVariables = \array_merge($this->variables, $variables);
-            $backupControlStack = $this->controlStack;
-            $backupSectionStack = $this->sectionStack;
-            $backupLookStack = $this->loopsStack;
+            $backupControlStack = $this->control_stack;
+            $backupSectionStack = $this->section_stack;
+            $backupLookStack = $this->loops_stack;
         } else {
-            $this->showError('run/include', "RunChild: Include/run variables should be defined as array ['idx'=>'value']", true);
+            $this->show_error('run/include', "RunChild: Include/run variables should be defined as array ['idx'=>'value']", true);
             return '';
         }
-        $r = $this->runInternal($view, $newVariables, false, $this->isRunFast);
+        $r = $this->run_internal($view, $newVariables, false, $this->is_run_fast);
         if ($backup !== null) {
             $this->variables = $backup;
         }
-        $this->controlStack = $backupControlStack;
-        $this->sectionStack = $backupSectionStack;
-        $this->loopsStack = $backupLookStack;
+        $this->control_stack = $backupControlStack;
+        $this->section_stack = $backupSectionStack;
+        $this->loops_stack = $backupLookStack;
         return $r;
     }
 
@@ -1296,15 +1296,15 @@ class Compiler
      * @throws Exception
      * @noinspection PhpUnusedParameterInspection
      */
-    protected function runInternal(string $view, $variables = [], $forced = false, $runFast = false): string
+    protected function run_internal(string $view, $variables = [], $forced = false, $runFast = false): string
     {
-        $this->currentView = $view;
-        if (@\count($this->composerStack)) {
-            $this->evalComposer($view);
+        $this->current_view = $view;
+        if (@\count($this->composer_stack)) {
+            $this->eval_composer($view);
         }
-        if (@\count($this->variablesGlobal) > 0) {
-            $this->variables = \array_merge($variables, $this->variablesGlobal);
-            //$this->variablesGlobal = []; // used so we delete it.
+        if (@\count($this->variables_global) > 0) {
+            $this->variables = \array_merge($variables, $this->variables_global);
+            //$this->variables_global = []; // used so we delete it.
         } else {
             $this->variables = $variables;
         }
@@ -1313,26 +1313,26 @@ class Compiler
             // b) if the "compile" is not forced then we read the datetime of both file, and we compared.
             // c) in both cases, if the compiled doesn't exist then we compile.
             if ($view) {
-                $this->fileName = $view;
+                $this->file_name = $view;
             }
             $result = $this->compile($view, $forced);
-            if (!$this->isCompiled) {
-                return $this->postRun($this->evaluateText($result, $this->variables));
+            if (!$this->is_compiled) {
+                return $this->post_run($this->evaluate_text($result, $this->variables));
             }
         } elseif ($view) {
-            $this->fileName = $view;
+            $this->file_name = $view;
         }
-        $this->isRunFast = $runFast;
-        return $this->postRun($this->evaluatePath($this->getCompiledFile(), $this->variables));
+        $this->is_run_fast = $runFast;
+        return $this->post_run($this->evaluate_path($this->get_compiled_file(), $this->variables));
     }
 
-    protected function evalComposer($view): void
+    protected function eval_composer($view): void
     {
-        foreach ($this->composerStack as $viewKey => $fn) {
-            if ($this->wildCardComparison($view, $viewKey)) {
+        foreach ($this->composer_stack as $viewKey => $fn) {
+            if ($this->wild_card_comparison($view, $viewKey)) {
                 if (is_callable($fn)) {
                     $fn($this);
-                } elseif ($this->methodExistsStatic($fn, 'composer')) {
+                } elseif ($this->method_exists_static($fn, 'composer')) {
                     // if the method exists statically then $fn is the class and 'composer' is the name of the method
                     $fn::composer($this);
                 } elseif (is_object($fn) || class_exists($fn)) {
@@ -1343,14 +1343,14 @@ class Compiler
                         $instance->composer($this);
                     } else {
                         if ($this->mode === self::MODE_DEBUG) {
-                            $this->showError('evalComposer', "Compiler: composer() added an incorrect method [$fn]", true, true);
+                            $this->show_error('eval_composer', "Compiler: composer() added an incorrect method [$fn]", true, true);
                             return;
                         }
-                        $this->showError('evalComposer', 'Compiler: composer() added an incorrect method', true, true);
+                        $this->show_error('eval_composer', 'Compiler: composer() added an incorrect method', true, true);
                         return;
                     }
                 } else {
-                    $this->showError('evalComposer', 'Compiler: composer() added an incorrect method', true, true);
+                    $this->show_error('eval_composer', 'Compiler: composer() added an incorrect method', true, true);
                 }
             }
         }
@@ -1361,11 +1361,11 @@ class Compiler
      * The wildcards only works at the beginning and/or at the end of the string.<br>
      * **Example:**<br>
      * ```
-     * Text::wildCardComparison('abcdef','abc*'); // true
-     * Text::wildCardComparison('abcdef','*def'); // true
-     * Text::wildCardComparison('abcdef','*abc*'); // true
-     * Text::wildCardComparison('abcdef','*cde*'); // true
-     * Text::wildCardComparison('abcdef','*cde'); // false
+     * Text::wild_card_comparison('abcdef','abc*'); // true
+     * Text::wild_card_comparison('abcdef','*def'); // true
+     * Text::wild_card_comparison('abcdef','*abc*'); // true
+     * Text::wild_card_comparison('abcdef','*cde*'); // true
+     * Text::wild_card_comparison('abcdef','*cde'); // false
      *
      * ```
      *
@@ -1374,7 +1374,7 @@ class Compiler
      *
      * @return bool
      */
-    protected function wildCardComparison($text, $textWithWildcard): bool
+    protected function wild_card_comparison($text, $textWithWildcard): bool
     {
         if (($textWithWildcard === null || $textWithWildcard === '')
             || strpos($textWithWildcard, '*') === false
@@ -1406,7 +1406,7 @@ class Compiler
         return (substr($text, -$len) === $textWithWildcardClean);
     }
 
-    protected function methodExistsStatic($class, $method): bool
+    protected function method_exists_static($class, $method): bool
     {
         try {
             return (new \ReflectionMethod($class, $method))->isStatic();
@@ -1421,22 +1421,22 @@ class Compiler
      * @param string $templateName The name of the template. Example folder.template
      * @param bool   $forced       If the compilation will be forced (always compile) or not.
      * @return boolean|string True if the operation was correct, or false (if not exception)
-     *                             if it fails. It returns a string (the content compiled) if isCompiled=false
+     *                             if it fails. It returns a string (the content compiled) if is_compiled=false
      * @throws Exception
      */
     public function compile($templateName = null, $forced = false)
     {
-        $compiled = $this->getCompiledFile($templateName);
-        $template = $this->getTemplateFile($templateName);
-        if (!$this->isCompiled) {
-            $contents = $this->compileString($this->getFile($template));
-            $this->compileCallBacks($contents, $templateName);
+        $compiled = $this->get_compiled_file($templateName);
+        $template = $this->get_template_file($templateName);
+        if (!$this->is_compiled) {
+            $contents = $this->compile_string($this->get_file($template));
+            $this->compile_callbacks($contents, $templateName);
             return $contents;
         }
-        if ($forced || $this->isExpired($templateName)) {
+        if ($forced || $this->is_expired($templateName)) {
             // compile the original file
-            $contents = $this->compileString($this->getFile($template));
-            $this->compileCallBacks($contents, $templateName);
+            $contents = $this->compile_string($this->get_file($template));
+            $this->compile_callbacks($contents, $templateName);
             if ($this->optimize) {
                 // removes space and tabs and replaces by a single space
                 $contents = \preg_replace('/^ {2,}/m', ' ', $contents);
@@ -1444,7 +1444,7 @@ class Compiler
             }
             $ok = @\file_put_contents($compiled, $contents);
             if ($ok === false) {
-                $this->showError(
+                $this->show_error(
                     'Compiling',
                     "Unable to save the file [$compiled]. Check the compile folder is defined and has the right permission"
                 );
@@ -1460,19 +1460,19 @@ class Compiler
      * @param string $templateName
      * @return string
      */
-    public function getCompiledFile($templateName = ''): string
+    public function get_compiled_file($templateName = ''): string
     {
-        $templateName = (empty($templateName)) ? $this->fileName : $templateName;
-        $fullPath = $this->getTemplateFile($templateName);
+        $templateName = (empty($templateName)) ? $this->file_name : $templateName;
+        $fullPath = $this->get_template_file($templateName);
         if ($fullPath == '') {
-            throw new \RuntimeException('Template not found: ' . ($this->mode == self::MODE_DEBUG ? $this->templatePath[0] . '/' . $templateName : $templateName));
+            throw new \RuntimeException('Template not found: ' . ($this->mode == self::MODE_DEBUG ? $this->template_path[0] . '/' . $templateName : $templateName));
         }
-        $style = $this->compileTypeFileName;
+        $style = $this->compile_typefilename;
         if ($style === 'auto') {
             $style = 'sha1';
         }
         $hash = $style === 'md5' ? \md5($fullPath) : \sha1($fullPath);
-        return $this->compiledPath . '/' . basename($templateName) . '_' . $hash . $this->compileExtension;
+        return $this->compile_dpath . '/' . basename($templateName) . '_' . $hash . $this->compile_extension;
     }
 
     /**
@@ -1480,7 +1480,7 @@ class Compiler
      *
      * @return int=[self::MODE_AUTO,self::MODE_DEBUG,self::MODE_FAST,self::MODE_SLOW][$i]
      */
-    public function getMode(): int
+    public function get_mode(): int
     {
         if (\defined('BLADEONE_MODE')) {
             $this->mode = BLADEONE_MODE;
@@ -1494,34 +1494,34 @@ class Compiler
      * @param $mode int=[self::MODE_AUTO,self::MODE_DEBUG,self::MODE_FAST,self::MODE_SLOW][$i]
      * @return void
      */
-    public function setMode($mode): void
+    public function set_mode($mode): void
     {
         $this->mode = $mode;
     }
 
     /**
      * It sets the comment mode<br>
-     * @param int $commentMode =[0,1,2][$i] <br>
+     * @param int $comment_mode =[0,1,2][$i] <br>
      *                         **0** comments are generated as php code.<br>
      *                         **1** comments are generated as html code<br>
      *                         **2** comments are ignored (no code is generated)<br>
      * @return void
      */
-    public function setCommentMode(int $commentMode): void
+    public function set_comment_mode(int $comment_mode): void
     {
-        $this->commentMode = $commentMode;
+        $this->comment_mode = $comment_mode;
     }
 
     /**
      * Get the full path of the template file.
-     * <p>Example: getTemplateFile('.abc.def')</p>
+     * <p>Example: get_template_file('.abc.def')</p>
      *
      * @param string $templateName template name. If not template is set then it uses the base template.
      * @return string
      */
-    public function getTemplateFile($templateName = ''): string
+    public function get_template_file($templateName = ''): string
     {
-        $templateName = (empty($templateName)) ? $this->fileName : $templateName;
+        $templateName = (empty($templateName)) ? $this->file_name : $templateName;
         $namespace = '';
         $name = $templateName;
         $sep = \strpos($templateName, '::');
@@ -1530,18 +1530,18 @@ class Compiler
             $name = \substr($templateName, $sep + 2);
         }
         if (\strpos($name, '/') !== false) {
-            return $this->locateTemplate($name, $namespace); // it's a literal
+            return $this->locate_template($name, $namespace); // it's a literal
         }
         $arr = \explode('.', $name);
         $c = \count($arr);
         if ($c == 1) {
             // it's in the root of the template folder.
-            return $this->locateTemplate($name . $this->fileExtension, $namespace);
+            return $this->locate_template($name . $this->file_extension, $namespace);
         }
         $file = $arr[$c - 1];
         \array_splice($arr, $c - 1, $c - 1); // delete the last element
         $path = \implode('/', $arr);
-        return $this->locateTemplate($path . '/' . $file . $this->fileExtension, $namespace);
+        return $this->locate_template($path . '/' . $file . $this->file_extension, $namespace);
     }
 
     /**
@@ -1551,15 +1551,15 @@ class Compiler
      * @param string $namespace View/component namespace (`webkernel`), empty for default
      * @return string template file
      */
-    protected function locateTemplate($name, $namespace = ''): string
+    protected function locate_template($name, $namespace = ''): string
     {
-        $this->notFoundPath = '';
+        $this->not_found_path = '';
         foreach ($this->template_dirs((string) $namespace) as $dir) {
             $path = $dir . '/' . $name;
             if (\is_file($path)) {
                 return $path;
             }
-            $this->notFoundPath .= $path . ",";
+            $this->not_found_path .= $path . ",";
         }
         return '';
     }
@@ -1570,10 +1570,10 @@ class Compiler
     private function template_dirs(string $namespace): array
     {
         if ($namespace === '') {
-            return $this->templatePath;
+            return $this->template_path;
         }
-        $dirs = $this->viewNamespaces[$namespace] ?? [];
-        foreach ($this->componentNamespaces[$namespace] ?? [] as $dir) {
+        $dirs = $this->view_namespaces[$namespace] ?? [];
+        foreach ($this->component_namespaces[$namespace] ?? [] as $dir) {
             if (! \in_array($dir, $dirs, true)) {
                 $dirs[] = $dir;
             }
@@ -1588,19 +1588,19 @@ class Compiler
      *
      * @return string
      */
-    public function getFile($fullFileName): string
+    public function get_file($fullFileName): string
     {
         if (\is_file($fullFileName)) {
             return \file_get_contents($fullFileName);
         }
-        $this->showError('getFile', "File does not exist at paths (separated by comma) [$this->notFoundPath] or permission denied");
+        $this->show_error('get_file', "File does not exist at paths (separated by comma) [$this->not_found_path] or permission denied");
         return '';
     }
 
-    protected function compileCallBacks(&$contents, $templateName): void
+    protected function compile_callbacks(&$contents, $templateName): void
     {
-        if (!empty($this->compileCallbacks)) {
-            foreach ($this->compileCallbacks as $callback) {
+        if (!empty($this->compile_callbacks)) {
+            foreach ($this->compile_callbacks as $callback) {
                 if (is_callable($callback)) {
                     $callback($contents, $templateName);
                 }
@@ -1611,24 +1611,24 @@ class Compiler
     /**
      * Determine if the view has expired.
      *
-     * @param string|null $fileName
+     * @param string|null $file_name
      * @return bool
      */
-    public function isExpired($fileName): bool
+    public function is_expired($file_name): bool
     {
-        $compiled = $this->getCompiledFile($fileName);
-        $template = $this->getTemplateFile($fileName);
+        $compiled = $this->get_compiled_file($file_name);
+        $template = $this->get_template_file($file_name);
         if (!\is_file($template)) {
             if ($this->mode == self::MODE_DEBUG) {
-                $this->showError('Read file', 'Template not found :' . $this->fileName . " on file: $template", true);
+                $this->show_error('Read file', 'Template not found :' . $this->file_name . " on file: $template", true);
             } else {
-                $this->showError('Read file', 'Template not found :' . $this->fileName, true);
+                $this->show_error('Read file', 'Template not found :' . $this->file_name, true);
             }
         }
         // If the compiled file doesn't exist we will indicate that the view is expired
         // so that it can be re-compiled. Else, we will verify the last modification
         // of the views is less than the modification times of the compiled views.
-        if (!$this->compiledPath || !\is_file($compiled)) {
+        if (!$this->compile_dpath || !\is_file($compiled)) {
             return true;
         }
         return \filemtime($compiled) < \filemtime($template);
@@ -1642,7 +1642,7 @@ class Compiler
      * @return string
      * @throws Exception
      */
-    protected function evaluateText($content, $variables): string
+    protected function evaluate_text($content, $variables): string
     {
         \ob_start();
         \extract($variables);
@@ -1650,9 +1650,9 @@ class Compiler
         // flush out any stray output that might get out before an error occurs or
         // an exception is thrown. This prevents any partial views from leaking.
         try {
-            eval(' ?>' . $content . $this->phpTag);
+            eval(' ?>' . $content . $this->php_tag);
         } catch (\Throwable $e) {
-            $this->handleViewException($e);
+            $this->handle_view_exception($e);
         }
         return \ltrim(\ob_get_clean());
     }
@@ -1664,7 +1664,7 @@ class Compiler
      * @return void
      * @throws $e
      */
-    protected function handleViewException($e): void
+    protected function handle_view_exception($e): void
     {
         \ob_get_clean();
         throw $e;
@@ -1678,7 +1678,7 @@ class Compiler
      * @return string
      * @throws Exception
      */
-    protected function evaluatePath($compiledFile, $variables): string
+    protected function evaluate_path($compiledFile, $variables): string
     {
         \ob_start();
         // note, the variables are extracted locally inside this method,
@@ -1690,7 +1690,7 @@ class Compiler
         try {
             include $compiledFile;
         } catch (\Throwable $e) {
-            $this->handleViewException($e);
+            $this->handle_view_exception($e);
         }
         return \ltrim(\ob_get_clean());
     }
@@ -1701,11 +1701,11 @@ class Compiler
      * @return string
      * @throws Exception
      */
-    public function includeFirst($views = [], $value = []): string
+    public function include_first($views = [], $value = []): string
     {
         foreach ($views as $view) {
-            if ($this->templateExist($view)) {
-                return $this->runChild($view, $value);
+            if ($this->template_exist($view)) {
+                return $this->run_child($view, $value);
             }
         }
         return '';
@@ -1717,9 +1717,9 @@ class Compiler
      * @param $templateName
      * @return bool
      */
-    protected function templateExist($templateName): bool
+    protected function template_exist($templateName): bool
     {
-        $file = $this->getTemplateFile($templateName);
+        $file = $this->get_template_file($templateName);
         return \is_file($file);
     }
 
@@ -1729,12 +1729,12 @@ class Compiler
      * @param array|string $array array to convert
      * @return string
      */
-    public function convertArg($array): string
+    public function convert_arg($array): string
     {
         if (!\is_array($array)) {
             return $array;  // nothing to convert.
         }
-        return \implode(' ', \array_map(self::convertArgCallBack(...), \array_keys($array), $array));
+        return \implode(' ', \array_map(self::convert_arg_call_back(...), \array_keys($array), $array));
     }
 
     /**
@@ -1746,13 +1746,13 @@ class Compiler
      *
      * @return string
      */
-    public function getCsrfToken($fullToken = false, $tokenId = '_token'): string
+    public function get_csrf_token($fullToken = false, $tokenId = '_token'): string
     {
         if ($this->csrf_token == '') {
-            $this->regenerateToken($tokenId);
+            $this->regenerate_token($tokenId);
         }
         if ($fullToken) {
-            return $this->csrf_token . '|' . $this->ipClient();
+            return $this->csrf_token . '|' . $this->ip_client();
         }
         return $this->csrf_token;
     }
@@ -1763,17 +1763,17 @@ class Compiler
      *
      * @param string $tokenId [optional] Name of the token.
      */
-    public function regenerateToken($tokenId = '_token'): void
+    public function regenerate_token($tokenId = '_token'): void
     {
         try {
             $this->csrf_token = \bin2hex(\random_bytes(10));
         } catch (\Throwable $e) {
             $this->csrf_token = '123456789012345678901234567890'; // unable to generates a random token.
         }
-        @$_SESSION[$tokenId] = $this->csrf_token . '|' . $this->ipClient();
+        @$_SESSION[$tokenId] = $this->csrf_token . '|' . $this->ip_client();
     }
 
-    public function ipClient()
+    public function ip_client()
     {
         if (
             isset($_SERVER['HTTP_X_FORWARDED_FOR'])
@@ -1798,15 +1798,15 @@ class Compiler
      *
      * @return bool It returns true if the token is valid, or it is generated. Otherwise, false.
      */
-    public function csrfIsValid($alwaysRegenerate = false, $tokenId = '_token'): bool
+    public function csrf_is_valid($alwaysRegenerate = false, $tokenId = '_token'): bool
     {
         if (@$_SERVER['REQUEST_METHOD'] === 'POST' && $alwaysRegenerate === false) {
             $this->csrf_token = $_POST[$tokenId] ?? null; // ping pong the token.
-            return $this->csrf_token . '|' . $this->ipClient() === ($_SESSION[$tokenId] ?? null);
+            return $this->csrf_token . '|' . $this->ip_client() === ($_SESSION[$tokenId] ?? null);
         }
         if ($this->csrf_token == '' || $alwaysRegenerate) {
             // if not token then we generate a new one
-            $this->regenerateToken($tokenId);
+            $this->regenerate_token($tokenId);
         }
         return true;
     }
@@ -1816,9 +1816,9 @@ class Compiler
      *
      * @return string
      */
-    public function yieldSection(): ?string
+    public function yield_section(): ?string
     {
-        $sc = $this->stopSection();
+        $sc = $this->stop_section();
         return $this->sections[$sc] ?? null;
     }
 
@@ -1828,16 +1828,16 @@ class Compiler
      * @param bool $overwrite
      * @return string
      */
-    public function stopSection($overwrite = false): string
+    public function stop_section($overwrite = false): string
     {
-        if (empty($this->sectionStack)) {
-            $this->showError('stopSection', 'Cannot end a section without first starting one.', true, true);
+        if (empty($this->section_stack)) {
+            $this->show_error('stop_section', 'Cannot end a section without first starting one.', true, true);
         }
-        $last = \array_pop($this->sectionStack);
+        $last = \array_pop($this->section_stack);
         if ($overwrite) {
             $this->sections[$last] = \ob_get_clean();
         } else {
-            $this->extendSection($last, \ob_get_clean());
+            $this->extend_section($last, \ob_get_clean());
         }
         return $last;
     }
@@ -1849,7 +1849,7 @@ class Compiler
      * @param string $content
      * @return void
      */
-    protected function extendSection($section, $content): void
+    protected function extend_section($section, $content): void
     {
         if (isset($this->sections[$section])) {
             $content = \str_replace($this->PARENTKEY, $content, $this->sections[$section]);
@@ -1883,12 +1883,12 @@ class Compiler
      * @param string $content
      * @return void
      */
-    public function startSection($section, $content = ''): void
+    public function start_section($section, $content = ''): void
     {
         if ($content === '') {
-            \ob_start() && $this->sectionStack[] = $section;
+            \ob_start() && $this->section_stack[] = $section;
         } else {
-            $this->extendSection($section, $content);
+            $this->extend_section($section, $content);
         }
     }
 
@@ -1898,12 +1898,12 @@ class Compiler
      * @return string
      * @throws InvalidArgumentException
      */
-    public function appendSection(): string
+    public function append_section(): string
     {
-        if (empty($this->sectionStack)) {
-            $this->showError('appendSection', 'Cannot end a section without first starting one.', true, true);
+        if (empty($this->section_stack)) {
+            $this->show_error('append_section', 'Cannot end a section without first starting one.', true, true);
         }
-        $last = \array_pop($this->sectionStack);
+        $last = \array_pop($this->section_stack);
         if (isset($this->sections[$last])) {
             $this->sections[$last] .= \ob_get_clean();
         } else {
@@ -1949,9 +1949,9 @@ class Compiler
     public function share($varname, $value = null): Compiler
     {
         if (is_array($varname)) {
-            $this->variablesGlobal = \array_merge($this->variablesGlobal, $varname);
+            $this->variables_global = \array_merge($this->variables_global, $varname);
         } else {
-            $this->variablesGlobal[$varname] = $value;
+            $this->variables_global[$varname] = $value;
         }
         return $this;
     }
@@ -1963,7 +1963,7 @@ class Compiler
      * @param string $default
      * @return string
      */
-    public function yieldContent($section, $default = ''): string
+    public function yield_content($section, $default = ''): string
     {
         if (isset($this->sections[$section])) {
             return \str_replace($this->PARENTKEY, $default, $this->sections[$section]);
@@ -1989,10 +1989,10 @@ class Compiler
      * @param callable $handler
      * @return void
      */
-    public function directiveRT($name, callable $handler): void
+    public function directive_rt($name, callable $handler): void
     {
-        $this->customDirectives[$name] = $handler;
-        $this->customDirectivesRT[$name] = true;
+        $this->custom_directives[$name] = $handler;
+        $this->custom_directives_rt[$name] = true;
     }
 
     /**
@@ -2002,9 +2002,9 @@ class Compiler
      * @param string $closeTag
      * @return void
      */
-    public function setEscapedContentTags($openTag, $closeTag): void
+    public function set_escaped_content_tags($openTag, $closeTag): void
     {
-        $this->setContentTags($openTag, $closeTag, true);
+        $this->set_content_tags($openTag, $closeTag, true);
     }
 
     /**
@@ -2012,9 +2012,9 @@ class Compiler
      *
      * @return array
      */
-    public function getContentTags(): array
+    public function get_content_tags(): array
     {
-        return $this->getTags();
+        return $this->get_tags();
     }
 
     /**
@@ -2025,9 +2025,9 @@ class Compiler
      * @param bool   $escaped
      * @return void
      */
-    public function setContentTags($openTag, $closeTag, $escaped = false): void
+    public function set_content_tags($openTag, $closeTag, $escaped = false): void
     {
-        $property = ($escaped === true) ? 'escapedTags' : 'contentTags';
+        $property = ($escaped === true) ? 'escaped_tags' : 'content_tags';
         $this->{$property} = [\preg_quote($openTag), \preg_quote($closeTag)];
     }
 
@@ -2037,9 +2037,9 @@ class Compiler
      * @param bool $escaped
      * @return array
      */
-    protected function getTags($escaped = false): array
+    protected function get_tags($escaped = false): array
     {
-        $tags = $escaped ? $this->escapedTags : $this->contentTags;
+        $tags = $escaped ? $this->escaped_tags : $this->content_tags;
         return \array_map('stripcslashes', $tags);
     }
 
@@ -2048,9 +2048,9 @@ class Compiler
      *
      * @return array
      */
-    public function getEscapedContentTags(): array
+    public function get_escaped_content_tags(): array
     {
-        return $this->getTags(true);
+        return $this->get_tags(true);
     }
 
     /**
@@ -2058,9 +2058,9 @@ class Compiler
      *
      * @param callable $function
      */
-    public function setInjectResolver(callable $function): void
+    public function set_inject_resolver(callable $function): void
     {
-        $this->injectResolver = $function;
+        $this->inject_resolver = $function;
     }
 
     /**
@@ -2068,20 +2068,20 @@ class Compiler
      *
      * @return string
      */
-    public function getFileExtension(): string
+    public function get_file_extension(): string
     {
-        return $this->fileExtension;
+        return $this->file_extension;
     }
 
     /**
      * Set the file extension for the template files.
      * It must include the leading dot e.g. ".view.php"
      *
-     * @param string $fileExtension Example: .prefix.ext
+     * @param string $file_extension Example: .prefix.ext
      */
-    public function setFileExtension($fileExtension): void
+    public function set_file_extension($file_extension): void
     {
-        $this->fileExtension = $fileExtension;
+        $this->file_extension = $file_extension;
     }
 
     /**
@@ -2089,29 +2089,29 @@ class Compiler
      *
      * @return string
      */
-    public function getCompiledExtension(): string
+    public function get_compiled_extension(): string
     {
-        return $this->compileExtension;
+        return $this->compile_extension;
     }
 
     /**
      * Set the file extension for the compiled files.
      * Including the leading dot for the extension is required, e.g. ".view.php.compiled"
      *
-     * @param $fileExtension
+     * @param $file_extension
      */
-    public function setCompiledExtension($fileExtension): void
+    public function set_compiled_extension($file_extension): void
     {
-        $this->compileExtension = $fileExtension;
+        $this->compile_extension = $file_extension;
     }
 
     /**
      * @return string
-     * @see Compiler::setCompileTypeFileName
+     * @see Compiler::set_compile_type_file_name
      */
-    public function getCompileTypeFileName(): string
+    public function get_compile_type_file_name(): string
     {
-        return $this->compileTypeFileName;
+        return $this->compile_typefilename;
     }
 
     /**
@@ -2119,12 +2119,12 @@ class Compiler
      * * **auto** (default mode) the mode is "sha1"<br>
      * * **sha1** the filename is converted into a sha1 hash (it's the slow method, but it is safest)<br>
      * * **md5** the filename is converted into a md5 hash (it's faster than sha1, and it uses less space)<br>
-     * @param string $compileTypeFileName =['auto','sha1','md5'][$i]
+     * @param string $compile_typefilename =['auto','sha1','md5'][$i]
      * @return Compiler
      */
-    public function setCompileTypeFileName(string $compileTypeFileName): Compiler
+    public function set_compile_type_file_name(string $compile_typefilename): Compiler
     {
-        $this->compileTypeFileName = $compileTypeFileName;
+        $this->compile_typefilename = $compile_typefilename;
         return $this;
     }
 
@@ -2134,11 +2134,11 @@ class Compiler
      * @param array|Countable $data
      * @return void
      */
-    public function addLoop($data): void
+    public function add_loop($data): void
     {
         $length = \is_countable($data) || $data instanceof Countable ? \count($data) : null;
-        $parent = static::last($this->loopsStack);
-        $this->loopsStack[] = [
+        $parent = static::last($this->loops_stack);
+        $this->loops_stack[] = [
             'index' => -1,
             'iteration' => 0,
             'remaining' => isset($length) ? $length + 1 : null,
@@ -2147,7 +2147,7 @@ class Compiler
             'even' => true,
             'odd' => false,
             'last' => isset($length) ? $length == 1 : null,
-            'depth' => \count($this->loopsStack) + 1,
+            'depth' => \count($this->loops_stack) + 1,
             'parent' => $parent ? (object)$parent : null,
         ];
     }
@@ -2157,10 +2157,10 @@ class Compiler
      *
      * @return object
      */
-    public function incrementLoopIndices(): object
+    public function increment_loop_indices(): object
     {
-        $c = \count($this->loopsStack) - 1;
-        $loop = &$this->loopsStack[$c];
+        $c = \count($this->loops_stack) - 1;
+        $loop = &$this->loops_stack[$c];
         $loop['index']++;
         $loop['iteration']++;
         $loop['first'] = $loop['index'] == 0;
@@ -2178,9 +2178,9 @@ class Compiler
      *
      * @return void
      */
-    public function popLoop(): void
+    public function pop_loop(): void
     {
-        \array_pop($this->loopsStack);
+        \array_pop($this->loops_stack);
     }
 
     /**
@@ -2188,9 +2188,9 @@ class Compiler
      *
      * @return object|null
      */
-    public function getFirstLoop(): ?object
+    public function get_first_loop(): ?object
     {
-        return ($last = static::last($this->loopsStack)) ? (object)$last : null;
+        return ($last = static::last($this->loops_stack)) ? (object)$last : null;
     }
 
     /**
@@ -2203,7 +2203,7 @@ class Compiler
      * @return string
      * @throws Exception
      */
-    public function renderEach($view, $data, $iterator, $empty = 'raw|'): string
+    public function render_each($view, $data, $iterator, $empty = 'raw|'): string
     {
         $result = '';
         if (\count($data) > 0) {
@@ -2212,9 +2212,9 @@ class Compiler
             // iterated value of this data array, allowing the views to access them.
             foreach ($data as $key => $value) {
                 $data = ['key' => $key, $iterator => $value];
-                $result .= $this->runChild($view, $data);
+                $result .= $this->run_child($view, $data);
             }
-        } elseif (static::startsWith($empty, 'raw|')) {
+        } elseif (static::starts_with($empty, 'raw|')) {
             $result = \substr($empty, 4);
         } else {
             $result = $this->run($empty);
@@ -2232,46 +2232,46 @@ class Compiler
      */
     public function run($view = null, $variables = []): string
     {
-        $mode = $this->getMode();
+        $mode = $this->get_mode();
         if ($view === null) {
-            $view = $this->viewStack;
+            $view = $this->view_stack;
         }
-        $this->viewStack = null;
+        $this->view_stack = null;
         if ($view === null) {
-            $this->showError('run', 'Compiler: view not set', true);
+            $this->show_error('run', 'Compiler: view not set', true);
             return '';
         }
         $forced = ($mode & 1) !== 0; // mode=1 forced:it recompiles no matter if the compiled file exists or not.
         $runFast = ($mode & 2) !== 0; // mode=2 runfast: the code is not compiled neither checked, and it runs directly the compiled
         $this->sections = [];
         if ($mode == 3) {
-            $this->showError('run', "we can't force and run fast at the same time", true);
+            $this->show_error('run', "we can't force and run fast at the same time", true);
         }
-        return $this->runInternal($view, $variables, $forced, $runFast);
+        return $this->run_internal($view, $variables, $forced, $runFast);
     }
 
     /**
      * It executes a post run execution. It is used to display the stacks.
      * @noinspection PhpVariableIsUsedOnlyInClosureInspection
      */
-    protected function postRun(?string $string)
+    protected function post_run(?string $string)
     {
         if (!$string) {
             return $string;
         }
-        if (strpos($string, $this->escapeStack0) === false) {
+        if (strpos($string, $this->escape_stack0) === false) {
             // nothing to post run
             return $string;
         }
         $me = $this;
         // we returned the escape character.
-        return preg_replace_callback('/' . $this->escapeStack0 . '\s?([A-Za-z0-9_:() ,*.@$]+)\s?' . $this->escapeStack1 . '/u',
+        return preg_replace_callback('/' . $this->escape_stack0 . '\s?([A-Za-z0-9_:() ,*.@$]+)\s?' . $this->escape_stack1 . '/u',
             static function($matches) use ($me) {
-                $l0 = strlen($me->escapeStack0);
-                $l1 = strlen($me->escapeStack1);
+                $l0 = strlen($me->escape_stack0);
+                $l1 = strlen($me->escape_stack1);
                 $item = trim(is_array($matches) ? substr($matches[0], $l0, -$l1) : substr($matches, $l0, -$l1));
                 $items = explode(',', $item);
-                return $me->yieldPushContent($items[0], $items[1] ?? null);
+                return $me->yield_push_content($items[0], $items[1] ?? null);
                 //return is_array($r) ? $flagtxt . json_encode($r) : $flagtxt . $r;
             }, $string);
     }
@@ -2281,15 +2281,15 @@ class Compiler
      * This value is cleared when it is used (method run).<br>
      * **Example:**<br>
      * ```
-     * $this->setView('folder.view')->share(['var1'=>20])->run(); // or $this->run('folder.view',['var1'=>20]);
+     * $this->set_view('folder.view')->share(['var1'=>20])->run(); // or $this->run('folder.view',['var1'=>20]);
      * ```
      *
      * @param string $view
      * @return Compiler
      */
-    public function setView($view): Compiler
+    public function set_view($view): Compiler
     {
-        $this->viewStack = $view;
+        $this->view_stack = $view;
         return $this;
     }
 
@@ -2314,15 +2314,15 @@ class Compiler
     public function composer($view = null, $functionOrClass = null): Compiler
     {
         if ($view === null && $functionOrClass === null) {
-            $this->composerStack = [];
+            $this->composer_stack = [];
             return $this;
         }
         if (is_array($view)) {
             foreach ($view as $v) {
-                $this->composerStack[$v] = $functionOrClass;
+                $this->composer_stack[$v] = $functionOrClass;
             }
         } else {
-            $this->composerStack[$view] = $functionOrClass;
+            $this->composer_stack[$view] = $functionOrClass;
         }
         return $this;
     }
@@ -2334,12 +2334,12 @@ class Compiler
      * @param array  $data
      * @return void
      */
-    public function startComponent($name, array $data = []): void
+    public function start_component($name, array $data = []): void
     {
         if (\ob_start()) {
-            $this->componentStack[] = $name;
-            $this->componentData[$this->currentComponent()] = $data;
-            $this->slots[$this->currentComponent()] = [];
+            $this->component_stack[] = $name;
+            $this->component_data[$this->current_component()] = $data;
+            $this->slots[$this->current_component()] = [];
         }
     }
 
@@ -2348,9 +2348,9 @@ class Compiler
      *
      * @return int
      */
-    protected function currentComponent(): int
+    protected function current_component(): int
     {
-        return \count($this->componentStack) - 1;
+        return \count($this->component_stack) - 1;
     }
 
     /**
@@ -2359,14 +2359,14 @@ class Compiler
      * @return string
      * @throws Exception
      */
-    public function renderComponent(): string
+    public function render_component(): string
     {
         //echo "<hr>render<br>";
-        $name = \array_pop($this->componentStack);
-        //return $this->runChild($name, $this->componentData());
-        $cd = $this->componentData();
+        $name = \array_pop($this->component_stack);
+        //return $this->run_child($name, $this->component_data());
+        $cd = $this->component_data();
         $clean = array_keys($cd);
-        $r = $this->runChild($name, $cd);
+        $r = $this->run_child($name, $cd);
         // we clean variables defined inside the component (so they are garbaged when the component is used)
         foreach ($clean as $key) {
             unset($this->variables[$key]);
@@ -2379,16 +2379,16 @@ class Compiler
      *
      * @return array
      */
-    protected function componentData(): array
+    protected function component_data(): array
     {
-        $cs = count($this->componentStack);
+        $cs = count($this->component_stack);
         //echo "<hr>";
         //echo "<br>data:<br>";
-        //var_dump($this->componentData);
+        //var_dump($this->component_data);
         //echo "<br>datac:<br>";
-        //var_dump(count($this->componentStack));
+        //var_dump(count($this->component_stack));
         return array_merge(
-            $this->componentData[$cs],
+            $this->component_data[$cs],
             ['slot' => trim(ob_get_clean())],
             $this->slots[$cs]
         );
@@ -2404,10 +2404,10 @@ class Compiler
     public function slot($name, $content = null): void
     {
         if (\count(\func_get_args()) === 2) {
-            $this->slots[$this->currentComponent()][$name] = $content;
+            $this->slots[$this->current_component()][$name] = $content;
         } elseif (\ob_start()) {
-            $this->slots[$this->currentComponent()][$name] = '';
-            $this->slotStack[$this->currentComponent()][] = $name;
+            $this->slots[$this->current_component()][$name] = '';
+            $this->slot_stack[$this->current_component()][] = $name;
         }
     }
 
@@ -2416,77 +2416,77 @@ class Compiler
      *
      * @return void
      */
-    public function endSlot(): void
+    public function end_slot(): void
     {
-        static::last($this->componentStack);
+        static::last($this->component_stack);
         $currentSlot = \array_pop(
-            $this->slotStack[$this->currentComponent()]
+            $this->slot_stack[$this->current_component()]
         );
-        $this->slots[$this->currentComponent()][$currentSlot] = \trim(\ob_get_clean());
+        $this->slots[$this->current_component()][$currentSlot] = \trim(\ob_get_clean());
     }
 
     /**
      * @return string
      */
-    public function getPhpTag(): string
+    public function get_php_tag(): string
     {
-        return $this->phpTag;
+        return $this->php_tag;
     }
 
     /**
-     * @param string $phpTag
+     * @param string $php_tag
      */
-    public function setPhpTag($phpTag): void
+    public function set_php_tag($php_tag): void
     {
-        $this->phpTag = $phpTag;
-    }
-
-    /**
-     * @return string
-     */
-    public function getCurrentUser(): string
-    {
-        return $this->currentUser;
-    }
-
-    /**
-     * @param string $currentUser
-     */
-    public function setCurrentUser($currentUser): void
-    {
-        $this->currentUser = $currentUser;
+        $this->php_tag = $php_tag;
     }
 
     /**
      * @return string
      */
-    public function getCurrentRole(): string
+    public function get_current_user(): string
     {
-        return $this->currentRole;
+        return $this->current_user;
     }
 
     /**
-     * @param string $currentRole
+     * @param string $current_user
      */
-    public function setCurrentRole($currentRole): void
+    public function set_current_user($current_user): void
     {
-        $this->currentRole = $currentRole;
+        $this->current_user = $current_user;
+    }
+
+    /**
+     * @return string
+     */
+    public function get_current_role(): string
+    {
+        return $this->current_role;
+    }
+
+    /**
+     * @param string $current_role
+     */
+    public function set_current_role($current_role): void
+    {
+        $this->current_role = $current_role;
     }
 
     /**
      * @return string[]
      */
-    public function getCurrentPermission(): array
+    public function get_current_permission(): array
     {
-        return $this->currentPermission;
+        return $this->current_permission;
     }
 
     /**
-     * @param string[] $currentPermission
+     * @param string[] $current_permission
      */
-    public function setCurrentPermission($currentPermission): void
+    public function set_current_permission($current_permission): void
     {
-        $this->currentPermission = $currentPermission;
+        $this->current_permission = $current_permission;
     }
 
     /**
@@ -2494,9 +2494,9 @@ class Compiler
      *
      * @return string
      */
-    public function getBaseUrl(): string
+    public function get_base_url(): string
     {
-        return $this->baseUrl;
+        return $this->base_url;
     }
 
     /**
@@ -2508,31 +2508,31 @@ class Compiler
      * **Note:** We should not use arguments or name of the script.<br>
      * **Examples:**<br>
      * ```
-     * $this->setBaseUrl('http://domain.dom/myblog');
-     * $this->setBaseUrl('http://domain.dom/corporate/erp');
-     * $this->setBaseUrl('http://domain.dom/blog.php?args=20'); // avoid this one.
-     * $this->setBaseUrl('http://another.dom');
+     * $this->set_base_url('http://domain.dom/myblog');
+     * $this->set_base_url('http://domain.dom/corporate/erp');
+     * $this->set_base_url('http://domain.dom/blog.php?args=20'); // avoid this one.
+     * $this->set_base_url('http://another.dom');
      * ```
      *
-     * @param string $baseUrl Example http://www.web.com/folder  https://www.web.com/folder/anotherfolder
+     * @param string $base_url Example http://www.web.com/folder  https://www.web.com/folder/anotherfolder
      * @return Compiler
      */
-    public function setBaseUrl(string $baseUrl): Compiler
+    public function set_base_url(string $base_url): Compiler
     {
-        $this->baseUrl = \rtrim($baseUrl, '/'); // base with the url trimmed
-        $this->baseDomain = @parse_url($this->baseUrl)['host'];
-        $currentUrl = $this->getCurrentUrlCalculated();
-        if ($currentUrl === '') {
-            $this->relativePath = '';
+        $this->base_url = \rtrim($base_url, '/'); // base with the url trimmed
+        $this->base_domain = @parse_url($this->base_url)['host'];
+        $current_url = $this->get_current_url_calculated();
+        if ($current_url === '') {
+            $this->relative_path = '';
             return $this;
         }
-        if (\strpos($currentUrl, $this->baseUrl) === 0) {
-            $part = \str_replace($this->baseUrl, '', $currentUrl);
+        if (\strpos($current_url, $this->base_url) === 0) {
+            $part = \str_replace($this->base_url, '', $current_url);
             $numf = \substr_count($part, '/') - 1;
             $numf = ($numf > 10) ? 10 : $numf; // avoid overflow
-            $this->relativePath = ($numf < 0) ? '' : \str_repeat('../', $numf);
+            $this->relative_path = ($numf < 0) ? '' : \str_repeat('../', $numf);
         } else {
-            $this->relativePath = '';
+            $this->relative_path = '';
         }
         return $this;
     }
@@ -2541,15 +2541,15 @@ class Compiler
      * It sets a CDN Url used by @assetcdn("someresource.jpg")<br>
      * **Example:**
      * ```
-     * $this->setCDNUrl('http://domain.dom/myblog');
+     * $this->set_cdn_url('http://domain.dom/myblog');
      * ```
      *
      * @param string $cdnurl the full path url without the trailing slash
      * @return $this
      */
-    public function setCDNUrl(string $cdnurl): Compiler
+    public function set_cdn_url(string $cdnurl): Compiler
     {
-        $this->cdnUrl = $cdnurl;
+        $this->cdn_url = $cdnurl;
         return $this;
     }
 
@@ -2562,12 +2562,12 @@ class Compiler
      * @param bool $noArgs if true then it excludes the arguments.
      * @return string
      */
-    public function getCurrentUrlCalculated($noArgs = false): string
+    public function get_current_url_calculated($noArgs = false): string
     {
         if (!isset($_SERVER['HTTP_HOST'], $_SERVER['REQUEST_URI'])) {
             return '';
         }
-        $host = $this->baseDomain ?? $_SERVER['HTTP_HOST']; // <-- it could be forged!
+        $host = $this->base_domain ?? $_SERVER['HTTP_HOST']; // <-- it could be forged!
         $link = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http');
         $port = $_SERVER['SERVER_PORT'];
         $port2 = (($link === 'http' && $port === '80') || ($link === 'https' && $port === '443')) ? '' : ':' . $port;
@@ -2583,35 +2583,35 @@ class Compiler
      * **Example:**<br>
      * ```
      * // current url='http://domain.dom/page/subpage/web.php?aaa=2
-     * $this->setBaseUrl('http://domain.dom/');
-     * $this->getRelativePath(); // '../../'
-     * $this->setBaseUrl('http://domain.dom/');
-     * $this->getRelativePath(); // '../../'
+     * $this->set_base_url('http://domain.dom/');
+     * $this->get_relative_path(); // '../../'
+     * $this->set_base_url('http://domain.dom/');
+     * $this->get_relative_path(); // '../../'
      * ```
      * **Note:**The relative path is calculated when we set the base url.
      *
      * @return string
-     * @see Compiler::setBaseUrl
+     * @see Compiler::set_base_url
      */
-    public function getRelativePath(): string
+    public function get_relative_path(): string
     {
-        return $this->relativePath;
+        return $this->relative_path;
     }
 
     /**
      * It gets the full current canonical url.<br>
      * **Example:** https://www.mysite.com/aaa/bb/php.php?aa=bb
      * <ul>
-     * <li>It returns the $this->canonicalUrl value if is not null</li>
-     * <li>Otherwise, it returns the $this->currentUrl if not null</li>
+     * <li>It returns the $this->canonical_url value if is not null</li>
+     * <li>Otherwise, it returns the $this->current_url if not null</li>
      * <li>Otherwise, the url is calculated with the information sends by the user</li>
      * </ul>
      *
      * @return string|null
      */
-    public function getCanonicalUrl(): ?string
+    public function get_canonical_url(): ?string
     {
-        return $this->canonicalUrl ?? $this->getCurrentUrl();
+        return $this->canonical_url ?? $this->get_current_url();
     }
 
     /**
@@ -2621,9 +2621,9 @@ class Compiler
      * @param string|null $canonUrl
      * @return Compiler
      */
-    public function setCanonicalUrl($canonUrl = null): Compiler
+    public function set_canonical_url($canonUrl = null): Compiler
     {
-        $this->canonicalUrl = $canonUrl;
+        $this->canonical_url = $canonUrl;
         return $this;
     }
 
@@ -2631,16 +2631,16 @@ class Compiler
      * It gets the full current url<br>
      * **Example:** https://www.mysite.com/aaa/bb/php.php?aa=bb
      * <ul>
-     * <li>It returns the $this->currentUrl if not null</li>
+     * <li>It returns the $this->current_url if not null</li>
      * <li>Otherwise, the url is calculated with the information sends by the user</li>
      * </ul>
      *
      * @param bool $noArgs if true then it ignores the arguments.
      * @return string|null
      */
-    public function getCurrentUrl($noArgs = false): ?string
+    public function get_current_url($noArgs = false): ?string
     {
-        $link = $this->currentUrl ?? $this->getCurrentUrlCalculated();
+        $link = $this->current_url ?? $this->get_current_url_calculated();
         if ($noArgs) {
             $link = @explode('?', $link)[0];
         }
@@ -2652,12 +2652,12 @@ class Compiler
      * **Example:** https://www.mysite.com/aaa/bb/php.php?aa=bb
      * **Note:** If the current url is not set, then the system could calculate the current url.
      *
-     * @param string|null $currentUrl
+     * @param string|null $current_url
      * @return Compiler
      */
-    public function setCurrentUrl($currentUrl = null): Compiler
+    public function set_current_url($current_url = null): Compiler
     {
-        $this->currentUrl = $currentUrl;
+        $this->current_url = $current_url;
         return $this;
     }
 
@@ -2667,7 +2667,7 @@ class Compiler
      * @param bool $bool
      * @return Compiler
      */
-    public function setOptimize($bool = false): Compiler
+    public function set_optimize($bool = false): Compiler
     {
         $this->optimize = $bool;
         return $this;
@@ -2678,9 +2678,9 @@ class Compiler
      *
      * @param callable $fn
      */
-    public function setCanFunction(callable $fn): void
+    public function set_can_function(callable $fn): void
     {
-        $this->authCallBack = $fn;
+        $this->auth_call_back = $fn;
     }
 
     /**
@@ -2688,9 +2688,9 @@ class Compiler
      *
      * @param callable $fn
      */
-    public function setAnyFunction(callable $fn): void
+    public function set_any_function(callable $fn): void
     {
-        $this->authAnyCallBack = $fn;
+        $this->auth_any_call_back = $fn;
     }
 
     /**
@@ -2698,9 +2698,9 @@ class Compiler
      *
      * @param callable $fn
      */
-    public function setErrorFunction(callable $fn): void
+    public function set_error_function(callable $fn): void
     {
-        $this->errorCallBack = $fn;
+        $this->error_call_back = $fn;
     }
 
     //</editor-fold>
@@ -2710,26 +2710,26 @@ class Compiler
      *
      * @return array
      */
-    public function getLoopStack(): array
+    public function get_loop_stack(): array
     {
-        return $this->loopsStack;
+        return $this->loops_stack;
     }
 
     /**
      * It adds a string inside a quoted string<br>
      * **example:**<br>
      * ```
-     * $this->addInsideQuote("'hello'"," world"); // 'hello world'
-     * $this->addInsideQuote("hello"," world"); // hello world
+     * $this->add_inside_quote("'hello'"," world"); // 'hello world'
+     * $this->add_inside_quote("hello"," world"); // hello world
      * ```
      *
      * @param $quoted
      * @param $newFragment
      * @return string
      */
-    public function addInsideQuote($quoted, $newFragment): string
+    public function add_inside_quote($quoted, $newFragment): string
     {
-        if ($this->isQuoted($quoted)) {
+        if ($this->is_quoted($quoted)) {
             return substr($quoted, 0, -1) . $newFragment . substr($quoted, -1);
         }
         return $quoted . $newFragment;
@@ -2741,7 +2741,7 @@ class Compiler
      * @param string|null $text
      * @return bool
      */
-    public function isVariablePHP($text): bool
+    public function is_variable_php($text): bool
     {
         if (!$text || strlen($text) < 2) {
             return false;
@@ -2777,30 +2777,30 @@ class Compiler
     public function _e($phrase): string
     {
         if ((!\array_key_exists($phrase, static::$dictionary))) {
-            $this->missingTranslation($phrase);
+            $this->missing_translation($phrase);
             return $phrase;
         }
         return static::$dictionary[$phrase];
     }
 
     /**
-     * Log a missing translation into the file $this->missingLog.<br>
+     * Log a missing translation into the file $this->missing_log.<br>
      * If the file is not defined, then it doesn't write the log.
      *
      * @param string $txt Message to write on.
      */
-    protected function missingTranslation($txt): void
+    protected function missing_translation($txt): void
     {
-        if (!$this->missingLog) {
+        if (!$this->missing_log) {
             return; // if there is not a file assigned then it skips saving.
         }
-        $fz = @\filesize($this->missingLog);
+        $fz = @\filesize($this->missing_log);
         if (\is_object($txt) || \is_array($txt)) {
             $txt = \print_r($txt, true);
         }
         // Rewrite file if more than 100000 bytes
         $mode = ($fz > 100000) ? 'w' : 'a';
-        $fp = \fopen($this->missingLog, $mode);
+        $fp = \fopen($this->missing_log, $mode);
         \fwrite($fp, $txt . "\n");
         \fclose($fp);
     }
@@ -2818,7 +2818,7 @@ class Compiler
     public function _n($phrase, $phrases, $num = 0): string
     {
         if ((!\array_key_exists($phrase, static::$dictionary))) {
-            $this->missingTranslation($phrase);
+            $this->missing_translation($phrase);
             return ($num <= 1) ? $phrase : $phrases;
         }
         return ($num <= 1) ? $this->_e($phrase) : $this->_e($phrases);
@@ -2827,63 +2827,63 @@ class Compiler
     /**
      * @param $expression
      * @return string
-     * @see Compiler::getCanonicalUrl
+     * @see Compiler::get_canonical_url
      */
-    public function compileCanonical($expression = null): string
+    public function compile_canonical($expression = null): string
     {
-        return '<link rel="canonical" href="' . $this->phpTag
-            . ' echo $this->getCanonicalUrl();?>" />';
+        return '<link rel="canonical" href="' . $this->php_tag
+            . ' echo $this->get_canonical_url();?>" />';
     }
 
     /**
      * @param $expression
      * @return string
-     * @see Compiler::getBaseUrl
+     * @see Compiler::get_base_url
      */
-    public function compileBase($expression = null): string
+    public function compile_base($expression = null): string
     {
-        return '<base rel="canonical" href="' . $this->phpTag
-            . ' echo $this->getBaseUrl() ;?>" />';
+        return '<base rel="canonical" href="' . $this->php_tag
+            . ' echo $this->get_base_url() ;?>" />';
     }
 
-    protected function compileUse($expression): string
+    protected function compile_use($expression): string
     {
-        return $this->phpTag . 'use ' . $this->stripParentheses($expression) . '; ?>';
+        return $this->php_tag . 'use ' . $this->strip_parentheses($expression) . '; ?>';
     }
 
-    protected function compileSwitch($expression): string
+    protected function compile_switch($expression): string
     {
-        $this->switchCount++;
-        $this->firstCaseInSwitch = true;
-        return $this->phpTag . "switch $expression {";
+        $this->switch_count++;
+        $this->first_case_in_switch = true;
+        return $this->php_tag . "switch $expression {";
     }
     //</editor-fold>
     //<editor-fold desc="compile extras">
-    protected function compileDump($expression): string
+    protected function compile_dump($expression): string
     {
-        return $this->phpTagEcho . "\$this->dump$expression;?>";
+        return $this->php_tag_echo . "\$this->dump$expression;?>";
     }
 
-    protected function compileRelative($expression): string
+    protected function compile_relative($expression): string
     {
-        return $this->phpTagEcho . "\$this->relative$expression;?>";
+        return $this->php_tag_echo . "\$this->relative$expression;?>";
     }
 
-    protected function compileMethod($expression): string
+    protected function compile_method($expression): string
     {
-        $v = $this->stripParentheses($expression);
-        return "<input type='hidden' name='_method' value='{$this->phpTag}echo $v; " . "?>'/>";
+        $v = $this->strip_parentheses($expression);
+        return "<input type='hidden' name='_method' value='{$this->php_tag}echo $v; " . "?>'/>";
     }
 
     protected function compilecsrf($expression = null): string
     {
         $expression = $expression ?? "'_token'";
-        return "<input type='hidden' name='$this->phpTag echo $expression; ?>' value='{$this->phpTag}echo \$this->csrf_token; " . "?>'/>";
+        return "<input type='hidden' name='$this->php_tag echo $expression; ?>' value='{$this->php_tag}echo \$this->csrf_token; " . "?>'/>";
     }
 
-    protected function compileDd($expression): string
+    protected function compile_dd($expression): string
     {
-        return $this->phpTagEcho . "'<pre>'; var_dump$expression; echo '</pre>';?>";
+        return $this->php_tag_echo . "'<pre>'; var_dump$expression; echo '</pre>';?>";
     }
 
     /**
@@ -2892,13 +2892,13 @@ class Compiler
      * @param $expression
      * @return string
      */
-    protected function compileCase($expression): string
+    protected function compile_case($expression): string
     {
-        if ($this->firstCaseInSwitch) {
-            $this->firstCaseInSwitch = false;
+        if ($this->first_case_in_switch) {
+            $this->first_case_in_switch = false;
             return 'case ' . $expression . ': ?>';
         }
-        return $this->phpTag . "case $expression: ?>";
+        return $this->php_tag . "case $expression: ?>";
     }
 
     /**
@@ -2907,9 +2907,9 @@ class Compiler
      * @param string $expression
      * @return string
      */
-    protected function compileWhile($expression): string
+    protected function compile_while($expression): string
     {
-        return $this->phpTag . "while$expression: ?>";
+        return $this->php_tag . "while$expression: ?>";
     }
 
     /**
@@ -2917,21 +2917,21 @@ class Compiler
      *
      * @return string
      */
-    protected function compileDefault(): string
+    protected function compile_default(): string
     {
-        if ($this->firstCaseInSwitch) {
-            return $this->showError('@default', '@switch without any @case', true);
+        if ($this->first_case_in_switch) {
+            return $this->show_error('@default', '@switch without any @case', true);
         }
-        return $this->phpTag . 'default: ?>';
+        return $this->php_tag . 'default: ?>';
     }
 
-    protected function compileEndSwitch(): string
+    protected function compile_endswitch(): string
     {
-        --$this->switchCount;
-        if ($this->switchCount < 0) {
-            return $this->showError('@endswitch', 'Missing @switch', true);
+        --$this->switch_count;
+        if ($this->switch_count < 0) {
+            return $this->show_error('@endswitch', 'Missing @switch', true);
         }
-        return $this->phpTag . '} // end switch ?>';
+        return $this->php_tag . '} // end switch ?>';
     }
 
     /**
@@ -2940,18 +2940,18 @@ class Compiler
      * @param string $expression
      * @return string
      */
-    protected function compileInject($expression): string
+    protected function compile_inject($expression): string
     {
-        $ex = $this->stripParentheses($expression);
+        $ex = $this->strip_parentheses($expression);
         $p0 = \strpos($ex, ',');
         if (!$p0) {
-            $var = $this->stripQuotes($ex);
+            $var = $this->strip_quotes($ex);
             $namespace = '';
         } else {
-            $var = $this->stripQuotes(\substr($ex, 0, $p0));
-            $namespace = $this->stripQuotes(\substr($ex, $p0 + 1));
+            $var = $this->strip_quotes(\substr($ex, 0, $p0));
+            $namespace = $this->strip_quotes(\substr($ex, $p0 + 1));
         }
-        return $this->phpTag . "\$$var = \$this->injectClass('$namespace', '$var'); ?>";
+        return $this->php_tag . "\$$var = \$this->inject_class('$namespace', '$var'); ?>";
     }
 
     /**
@@ -2960,7 +2960,7 @@ class Compiler
      * @param mixed $text
      * @return null|string|string[]
      */
-    public function stripQuotes($text)
+    public function strip_quotes($text)
     {
         if (!$text || strlen($text) < 2) {
             return $text;
@@ -2980,7 +2980,7 @@ class Compiler
      * @param string $value
      * @return string
      */
-    protected function compileExtensions($value): string
+    protected function compile_extensions($value): string
     {
         foreach ($this->extensions as $compiler) {
             $value = $compiler($value, $this);
@@ -2994,12 +2994,12 @@ class Compiler
      * @param string $value
      * @return string
      */
-    protected function compileComments($value): string
+    protected function compile_comments($value): string
     {
-        $pattern = "/" . $this->contentTags[0] . "--(.*?)--" . $this->contentTags[1] . "/s";
-        switch ($this->commentMode) {
+        $pattern = "/" . $this->content_tags[0] . "--(.*?)--" . $this->content_tags[1] . "/s";
+        switch ($this->comment_mode) {
             case 0:
-                return \preg_replace($pattern, $this->phpTag . '/*$1*/ ?>', $value);
+                return \preg_replace($pattern, $this->php_tag . '/*$1*/ ?>', $value);
             case 1:
                 return \preg_replace($pattern, '<!-- $1 -->', $value);
             default:
@@ -3014,9 +3014,9 @@ class Compiler
      * @return string
      * @throws Exception
      */
-    protected function compileEchos($value): string
+    protected function compile_echos($value): string
     {
-        foreach ($this->getEchoMethods() as $method => $length) {
+        foreach ($this->get_echo_methods() as $method => $length) {
             $value = $this->$method($value);
         }
         return $value;
@@ -3027,12 +3027,12 @@ class Compiler
      *
      * @return array
      */
-    protected function getEchoMethods(): array
+    protected function get_echo_methods(): array
     {
         $methods = [
-            'compileRawEchos' => \strlen(\stripcslashes($this->rawTags[0])),
-            'compileEscapedEchos' => \strlen(\stripcslashes($this->escapedTags[0])),
-            'compileRegularEchos' => \strlen(\stripcslashes($this->contentTags[0])),
+            'compile_rawechos' => \strlen(\stripcslashes($this->raw_tags[0])),
+            'compile_escapedechos' => \strlen(\stripcslashes($this->escaped_tags[0])),
+            'compile_regularechos' => \strlen(\stripcslashes($this->content_tags[0])),
         ];
         \uksort($methods, static function($method1, $method2) use ($methods) {
             // Ensure the longest tags are processed first
@@ -3043,16 +3043,16 @@ class Compiler
                 return 1;
             }
             // Otherwise, give preference to raw tags (assuming they've overridden)
-            if ($method1 === 'compileRawEchos') {
+            if ($method1 === 'compile_rawechos') {
                 return -1;
             }
-            if ($method2 === 'compileRawEchos') {
+            if ($method2 === 'compile_rawechos') {
                 return 1;
             }
-            if ($method1 === 'compileEscapedEchos') {
+            if ($method1 === 'compile_escapedechos') {
                 return -1;
             }
-            if ($method2 === 'compileEscapedEchos') {
+            if ($method2 === 'compile_escapedechos') {
                 return 1;
             }
             throw new BadMethodCallException("Method [$method1] not defined");
@@ -3067,15 +3067,15 @@ class Compiler
      *
      * @return array|string|string[]|null
      */
-    protected function compileComponents($value)
+    protected function compile_components($value)
     {
         $namespaced = function ($match) {
             if (isset($match[5])) {
-                $match[5] = $this->compileComponents($match[5]);
+                $match[5] = $this->compile_components($match[5]);
             }
-            $paramsCompiled = $this->parseParams($match[3] ?? '');
+            $paramsCompiled = $this->parse_params($match[3] ?? '');
             $str = "('" . $match[1] . '::' . $match[2] . "'," . $paramsCompiled . ")";
-            return self::compileComponent($str) . ($match[5] ?? '') . self::compileEndComponent();
+            return self::compile_component($str) . ($match[5] ?? '') . self::compile_endcomponent();
         };
         $value = preg_replace_callback(
             '/<(?:x-)?([a-z0-9.-]+)::([a-z0-9.-]+)(\s[^>]*)?(>((?:(?!<\/(?:x-)?\1::\2>).)*)<\/(?:x-)?\1::\2>|\/>)/ms',
@@ -3084,23 +3084,23 @@ class Compiler
         );
         $callback = function($match) {
             if (isset($match[4]) && static::contains($match[0], 'x-')) {
-                $match[4] = $this->compileComponents($match[4]);
+                $match[4] = $this->compile_components($match[4]);
             }
-            $paramsCompiled = $this->parseParams($match[2]);
+            $paramsCompiled = $this->parse_params($match[2]);
             $str = "('components." . $match[1] . "'," . $paramsCompiled . ")";
-            return self::compileComponent($str) . ($match[4] ?? '') . self::compileEndComponent();
+            return self::compile_component($str) . ($match[4] ?? '') . self::compile_endcomponent();
         };
         return preg_replace_callback('/<x-([a-z0-9.-]+)(\s[^>]*)?(>((?:(?!<\/x-\1>).)*)<\/x-\1>|\/>)/ms', $callback, $value);
     }
 
-    protected function parseParams($params): string
+    protected function parse_params($params): string
     {
         preg_match_all('/([a-zA-Z0-9:-]*?)\s*?=\s*?(.+?)(\s|$)/ms', $params, $matches);
         $paramsCompiled = [];
         foreach ($matches[1] as $i => $key) {
             $value = str_replace('"', '', $matches[2][$i]);
             //its php code
-            if (self::startsWith($key, ':')) {
+            if (self::starts_with($key, ':')) {
                 $key = substr($key, 1);
                 $paramsCompiled[] = '"' . $key . '"' . '=>' . $value;
                 continue;
@@ -3117,7 +3117,7 @@ class Compiler
      *
      * @return array|string|string[]|null
      */
-    protected function compileStatements($value)
+    protected function compile_statements($value)
     {
         /**
          * @param array $match
@@ -3136,19 +3136,19 @@ class Compiler
             } else {
                 if (strpos($match[1], '::') !== false) {
                     // Someclass::method
-                    return $this->compileStatementClass($match);
+                    return $this->compile_statementclass($match);
                 }
-                if (isset($this->customDirectivesRT[$match[1]])) {
-                    if ($this->customDirectivesRT[$match[1]]) {
-                        $match[0] = $this->compileStatementCustom($match);
+                if (isset($this->custom_directives_rt[$match[1]])) {
+                    if ($this->custom_directives_rt[$match[1]]) {
+                        $match[0] = $this->compile_statementcustom($match);
                     } else {
                         $match[0] = \call_user_func(
-                            $this->customDirectives[$match[1]],
-                            $this->stripParentheses(static::get($match, 3))
+                            $this->custom_directives[$match[1]],
+                            $this->strip_parentheses(static::get($match, 3))
                         );
                     }
                 } else {
-                    $nameMethod = 'compile' . \ucfirst($match[1]);
+                    $nameMethod = 'compile_' . $match[1];
                     if (isset($this->methods[$nameMethod])) {
                         return $this->methods[$nameMethod](static::get($match, 3));
                     }
@@ -3156,7 +3156,7 @@ class Compiler
                         // it calls the function compile<name of the tag>
                         return $this->$nameMethod(static::get($match, 3));
                     }
-                    $nameMethod = 'runtime' . \ucfirst($match[1]);
+                    $nameMethod = 'runtime_' . $match[1];
                     $m4 = $match[4] ?? '';
                     if (isset($this->methods[$nameMethod])) {
                         return $this->autoruntime($m4, $nameMethod);
@@ -3179,21 +3179,21 @@ class Compiler
      *                                   For compile, it is of the type "($a2,"222")"
      *                                   For runtime, it is of the time "arg1=$a2 arg2="222""
      * @param string      $nameFunction  The name of the function.
-     * @param bool        $compileMethod If the method is a compiled method, or it is a runtime method.
+     * @param bool        $compile_method If the method is a compiled method, or it is a runtime method.
      * @return string
      */
-    protected function autoruntime(?string $expression, string $nameFunction, $compileMethod = false): string
+    protected function autoruntime(?string $expression, string $nameFunction, $compile_method = false): string
     {
-        $args = $this->parseArgs($expression, ' ', '=', false);
+        $args = $this->parse_args($expression, ' ', '=', false);
         $argsV = '[';
         foreach ($args as $k => $v) {
             $argsV .= "'$k'=>$v,";
         }
         $argsV .= ']';
-        if ($compileMethod) {
-            return $this->wrapPHP("\$this->$nameFunction($argsV)", '', false);
+        if ($compile_method) {
+            return $this->wrap_php("\$this->$nameFunction($argsV)", '', false);
         }
-        return $this->wrapPHP("\$this->methods['$nameFunction']($argsV)", '', false);
+        return $this->wrap_php("\$this->methods['$nameFunction']($argsV)", '', false);
     }
 
     /**
@@ -3219,12 +3219,12 @@ class Compiler
         return false;
     }
 
-    protected function compileStatementClass($match): string
+    protected function compile_statementclass($match): string
     {
         if (isset($match[3])) {
-            return $this->phpTagEcho . $this->fixNamespaceClass($match[1]) . $match[3] . '; ?>';
+            return $this->php_tag_echo . $this->fix_namespace_class($match[1]) . $match[3] . '; ?>';
         }
-        return $this->phpTagEcho . $this->fixNamespaceClass($match[1]) . '(); ?>';
+        return $this->php_tag_echo . $this->fix_namespace_class($match[1]) . '(); ?>';
     }
 
     /**
@@ -3236,14 +3236,14 @@ class Compiler
      * @return string
      * @see Compiler
      */
-    protected function fixNamespaceClass($text): string
+    protected function fix_namespace_class($text): string
     {
         if (strpos($text, '::') === false) {
             return $text;
         }
         $classPart = explode('::', $text, 2);
-        if (isset($this->aliasClasses[$classPart[0]])) {
-            $classPart[0] = $this->aliasClasses[$classPart[0]];
+        if (isset($this->alias_classes[$classPart[0]])) {
+            $classPart[0] = $this->alias_classes[$classPart[0]];
         }
         return $classPart[0] . '::' . $classPart[1];
     }
@@ -3254,11 +3254,11 @@ class Compiler
      * @param $match
      * @return string
      */
-    protected function compileStatementCustom($match): string
+    protected function compile_statementcustom($match): string
     {
-        $v = $this->stripParentheses(static::get($match, 3));
+        $v = $this->strip_parentheses(static::get($match, 3));
         $v = ($v == '') ? '' : ',' . $v;
-        return $this->phpTag . 'call_user_func($this->customDirectives[\'' . $match[1] . '\']' . $v . '); ?>';
+        return $this->php_tag . 'call_user_func($this->custom_directives[\'' . $match[1] . '\']' . $v . '); ?>';
     }
 
     /**
@@ -3311,9 +3311,9 @@ class Compiler
      * @param string $expression
      * @return array
      */
-    protected function getArgs($expression): array
+    protected function get_args($expression): array
     {
-        return $this->parseArgs($this->stripParentheses($expression), ' ');
+        return $this->parse_args($this->strip_parentheses($expression), ' ');
     }
 
     /**
@@ -3321,12 +3321,12 @@ class Compiler
      * It excludes quotes,double quotes and the "¬" symbol.<br>
      * **Example**<br>
      * ```
-     * $this->parseArgs('a=2,b='a,b,c',d'); // ['a'=>'2','b'=>'a,b,c','d'=>null]
-     * $this->parseArgs('a=2,b=c,d'); // ['a'=>'2','b'=>'c','d'=>null]
-     * $this->parseArgs('a=2 b=c',' '); // ['a'=>'2','b'=>'c']
-     * $this->parseArgs('a:2 b:c',' ',':'); // ['a'=>'2','b'=>'c']
+     * $this->parse_args('a=2,b='a,b,c',d'); // ['a'=>'2','b'=>'a,b,c','d'=>null]
+     * $this->parse_args('a=2,b=c,d'); // ['a'=>'2','b'=>'c','d'=>null]
+     * $this->parse_args('a=2 b=c',' '); // ['a'=>'2','b'=>'c']
+     * $this->parse_args('a:2 b:c',' ',':'); // ['a'=>'2','b'=>'c']
      * ```
-     * Note: parseArgs('a = 2 b = c',' '); with return 4 values instead of 2.
+     * Note: parse_args('a = 2 b = c',' '); with return 4 values instead of 2.
      *
      * @param string $text      the text to separate
      * @param string $separator the separator of arguments
@@ -3334,7 +3334,7 @@ class Compiler
      * @param bool   $emptyKey  if the argument is without value, we return it as key (true) or value (false) ?
      * @return array
      */
-    public function parseArgs($text, $separator = ',', $assigment = '=', $emptyKey = true): array
+    public function parse_args($text, $separator = ',', $assigment = '=', $emptyKey = true): array
     {
         if ($text === null || $text === '') {
             return []; //nothing to convert.
@@ -3413,7 +3413,7 @@ class Compiler
         return $result;
     }
 
-    public function parseArgsOld($text, $separator = ','): array
+    public function parse_args_old($text, $separator = ','): array
     {
         if ($text === null || $text === '') {
             return []; //nothing to convert.
@@ -3455,15 +3455,15 @@ class Compiler
      * @param string $value
      * @return string
      */
-    protected function compileRawEchos($value): string
+    protected function compile_rawechos($value): string
     {
-        $pattern = \sprintf('/(@)?%s\s*(.+?)\s*%s(\r?\n)?/s', $this->rawTags[0], $this->rawTags[1]);
+        $pattern = \sprintf('/(@)?%s\s*(.+?)\s*%s(\r?\n)?/s', $this->raw_tags[0], $this->raw_tags[1]);
         $callback = function($matches) {
             $whitespace = empty($matches[3]) ? '' : $matches[3] . $matches[3];
             return $matches[1] ? \substr(
                 $matches[0],
                 1
-            ) : $this->phpTagEcho . $this->compileEchoDefaults($matches[2]) . '; ?>' . $whitespace;
+            ) : $this->php_tag_echo . $this->compile_echodefaults($matches[2]) . '; ?>' . $whitespace;
         };
         return \preg_replace_callback($pattern, $callback, $value);
     }
@@ -3476,15 +3476,15 @@ class Compiler
      * @param string $value
      * @return string
      */
-    protected function compileEchoDefaults($value): string
+    protected function compile_echodefaults($value): string
     {
         // Source: https://www.php.net/manual/en/language.variables.basics.php
         $patternPHPVariableName = '\$[a-zA-Z_\x80-\xff][a-zA-Z0-9_\x80-\xff]*';
         $result = \preg_replace('/^(' . $patternPHPVariableName . ')\s+or\s+(.+?)$/s', 'isset($1) ? $1 : $2', $value);
-        if (!$this->pipeEnable) {
-            return $this->fixNamespaceClass($result);
+        if (!$this->pipe_enable) {
+            return $this->fix_namespace_class($result);
         }
-        return $this->pipeDream($this->fixNamespaceClass($result));
+        return $this->pipe_dream($this->fix_namespace_class($result));
     }
 
     /**
@@ -3493,18 +3493,18 @@ class Compiler
      * If the method exists (in this class) then it is used<br>
      * Otherwise, it uses a global function.<br>
      * If you want to escape the "|", then you could use "/|"<br>
-     * **Note:** It only works if $this->pipeEnable=true and by default it is false<br>
+     * **Note:** It only works if $this->pipe_enable=true and by default it is false<br>
      * **Example:**<br>
      * ```
-     * $this->pipeDream('$name | strtolower | substr:0,4'); // strtolower(substr($name ,0,4)
-     * $this->pipeDream('$name| getMode') // $this->getMode($name)
+     * $this->pipe_dream('$name | strtolower | substr:0,4'); // strtolower(substr($name ,0,4)
+     * $this->pipe_dream('$name| get_mode') // $this->get_mode($name)
      * ```
      *
      * @param string $result
      * @return string
-     * Compiler::$pipeEnable
+     * Compiler::$pipe_enable
      */
-    protected function pipeDream($result): string
+    protected function pipe_dream($result): string
     {
         $array = preg_split('~\\\\.(*SKIP)(*FAIL)|\|~s', $result);
         $c = count($array) - 1; // base zero.
@@ -3518,8 +3518,8 @@ class Compiler
             $fnNameF = $fnName[0]; // first character
             if ($fnNameF === '"' || $fnNameF === '\'' || $fnNameF === '$' || is_numeric($fnNameF)) {
                 $fnName = '!isset(' . $array[0] . ') ? ' . $fnName . ' : ';
-            } elseif (isset($this->customDirectives[$fnName])) {
-                $fnName = '$this->customDirectives[\'' . $fnName . '\']';
+            } elseif (isset($this->custom_directives[$fnName])) {
+                $fnName = '$this->custom_directives[\'' . $fnName . '\']';
             } elseif (method_exists($this, $fnName)) {
                 $fnName = '$this->' . $fnName;
             }
@@ -3548,13 +3548,13 @@ class Compiler
      * @param string $value
      * @return string
      */
-    protected function compileRegularEchos($value): string
+    protected function compile_regularechos($value): string
     {
-        $pattern = \sprintf('/(@)?%s\s*(.+?)\s*%s(\r?\n)?/s', $this->contentTags[0], $this->contentTags[1]);
+        $pattern = \sprintf('/(@)?%s\s*(.+?)\s*%s(\r?\n)?/s', $this->content_tags[0], $this->content_tags[1]);
         $callback = function($matches) {
             $whitespace = empty($matches[3]) ? '' : $matches[3] . $matches[3];
-            $wrapped = \sprintf($this->echoFormat, $this->compileEchoDefaults($matches[2]));
-            return $matches[1] ? \substr($matches[0], 1) : $this->phpTagEcho . $wrapped . '; ?>' . $whitespace;
+            $wrapped = \sprintf($this->echo_format, $this->compile_echodefaults($matches[2]));
+            return $matches[1] ? \substr($matches[0], 1) : $this->php_tag_echo . $wrapped . '; ?>' . $whitespace;
         };
         return \preg_replace_callback($pattern, $callback, $value);
     }
@@ -3565,16 +3565,16 @@ class Compiler
      * @param string $value
      * @return string
      */
-    protected function compileEscapedEchos($value): string
+    protected function compile_escapedechos($value): string
     {
-        $pattern = \sprintf('/(@)?%s\s*(.+?)\s*%s(\r?\n)?/s', $this->escapedTags[0], $this->escapedTags[1]);
+        $pattern = \sprintf('/(@)?%s\s*(.+?)\s*%s(\r?\n)?/s', $this->escaped_tags[0], $this->escaped_tags[1]);
         $callback = function($matches) {
             $whitespace = empty($matches[3]) ? '' : $matches[3] . $matches[3];
-            return $matches[1] ? $matches[0] : $this->phpTag
-                . \sprintf($this->echoFormat, $this->compileEchoDefaults($matches[2])) . '; ?>'
+            return $matches[1] ? $matches[0] : $this->php_tag
+                . \sprintf($this->echo_format, $this->compile_echodefaults($matches[2])) . '; ?>'
                 . $whitespace;
-            //return $matches[1] ? $matches[0] : $this->phpTag
-            // . 'echo static::e(' . $this->compileEchoDefaults($matches[2]) . '); ? >' . $whitespace;
+            //return $matches[1] ? $matches[0] : $this->php_tag
+            // . 'echo static::e(' . $this->compile_echodefaults($matches[2]) . '); ? >' . $whitespace;
         };
         return \preg_replace_callback($pattern, $callback, $value);
     }
@@ -3585,17 +3585,17 @@ class Compiler
      * @param string $expression
      * @return string
      */
-    protected function compileEach($expression): string
+    protected function compile_each($expression): string
     {
-        return $this->phpTagEcho . "\$this->renderEach$expression; ?>";
+        return $this->php_tag_echo . "\$this->render_each$expression; ?>";
     }
 
-    protected function compileSet($expression): string
+    protected function compile_set($expression): string
     {
         //$segments = \explode('=', \preg_replace("/[()\\\']/", '', $expression));
-        $segments = \explode('=', $this->stripParentheses($expression));
+        $segments = \explode('=', $this->strip_parentheses($expression));
         $value = (\count($segments) >= 2) ? '=@' . implode('=', array_slice($segments, 1)) : '++';
-        return $this->phpTag . \trim($segments[0]) . $value . ';?>';
+        return $this->php_tag . \trim($segments[0]) . $value . ';?>';
     }
 
     /**
@@ -3604,9 +3604,9 @@ class Compiler
      * @param string $expression
      * @return string
      */
-    protected function compileYield($expression): string
+    protected function compile_yield($expression): string
     {
-        return $this->phpTagEcho . "\$this->yieldContent$expression; ?>";
+        return $this->php_tag_echo . "\$this->yield_content$expression; ?>";
     }
 
     /**
@@ -3614,9 +3614,9 @@ class Compiler
      *
      * @return string
      */
-    protected function compileShow(): string
+    protected function compile_show(): string
     {
-        return $this->phpTagEcho . '$this->yieldSection(); ?>';
+        return $this->php_tag_echo . '$this->yield_section(); ?>';
     }
 
     /**
@@ -3625,9 +3625,9 @@ class Compiler
      * @param string $expression
      * @return string
      */
-    protected function compileSection($expression): string
+    protected function compile_section($expression): string
     {
-        return $this->phpTag . "\$this->startSection$expression; ?>";
+        return $this->php_tag . "\$this->start_section$expression; ?>";
     }
 
     /**
@@ -3635,9 +3635,9 @@ class Compiler
      *
      * @return string
      */
-    protected function compileAppend(): string
+    protected function compile_append(): string
     {
-        return $this->phpTag . '$this->appendSection(); ?>';
+        return $this->php_tag . '$this->append_section(); ?>';
     }
 
     /**
@@ -3646,13 +3646,13 @@ class Compiler
      * @param string $expression
      * @return string
      */
-    protected function compileAuth($expression = ''): string
+    protected function compile_auth($expression = ''): string
     {
-        $role = $this->stripParentheses($expression);
+        $role = $this->strip_parentheses($expression);
         if ($role == '') {
-            return $this->phpTag . 'if(isset($this->currentUser)): ?>';
+            return $this->php_tag . 'if(isset($this->current_user)): ?>';
         }
-        return $this->phpTag . "if(isset(\$this->currentUser) && \$this->currentRole==$role): ?>";
+        return $this->php_tag . "if(isset(\$this->current_user) && \$this->current_role==$role): ?>";
     }
 
     /**
@@ -3661,13 +3661,13 @@ class Compiler
      * @param string $expression
      * @return string
      */
-    protected function compileElseAuth($expression = ''): string
+    protected function compile_elseauth($expression = ''): string
     {
-        $role = $this->stripParentheses($expression);
+        $role = $this->strip_parentheses($expression);
         if ($role == '') {
-            return $this->phpTag . 'else: ?>';
+            return $this->php_tag . 'else: ?>';
         }
-        return $this->phpTag . "elseif(isset(\$this->currentUser) && \$this->currentRole==$role): ?>";
+        return $this->php_tag . "elseif(isset(\$this->current_user) && \$this->current_role==$role): ?>";
     }
 
     /**
@@ -3675,15 +3675,15 @@ class Compiler
      *
      * @return string
      */
-    protected function compileEndAuth(): string
+    protected function compile_endauth(): string
     {
-        return $this->phpTag . 'endif; ?>';
+        return $this->php_tag . 'endif; ?>';
     }
 
-    protected function compileCan($expression): string
+    protected function compile_can($expression): string
     {
-        $v = $this->stripParentheses($expression);
-        return $this->phpTag . 'if (call_user_func($this->authCallBack,' . $v . ')): ?>';
+        $v = $this->strip_parentheses($expression);
+        return $this->php_tag . 'if (call_user_func($this->auth_call_back,' . $v . ')): ?>';
     }
 
     /**
@@ -3692,20 +3692,20 @@ class Compiler
      * @param string $expression
      * @return string
      */
-    protected function compileElseCan($expression = ''): string
+    protected function compile_elsecan($expression = ''): string
     {
-        $v = $this->stripParentheses($expression);
+        $v = $this->strip_parentheses($expression);
         if ($v) {
-            return $this->phpTag . 'elseif (call_user_func($this->authCallBack,' . $v . ')): ?>';
+            return $this->php_tag . 'elseif (call_user_func($this->auth_call_back,' . $v . ')): ?>';
         }
-        return $this->phpTag . 'else: ?>';
+        return $this->php_tag . 'else: ?>';
     }
     //</editor-fold>
     //<editor-fold desc="file members">
-    protected function compileCannot($expression): string
+    protected function compile_cannot($expression): string
     {
-        $v = $this->stripParentheses($expression);
-        return $this->phpTag . 'if (!call_user_func($this->authCallBack,' . $v . ')): ?>';
+        $v = $this->strip_parentheses($expression);
+        return $this->php_tag . 'if (!call_user_func($this->auth_call_back,' . $v . ')): ?>';
     }
 
     /**
@@ -3714,13 +3714,13 @@ class Compiler
      * @param string $expression
      * @return string
      */
-    protected function compileElseCannot($expression = ''): string
+    protected function compile_elsecannot($expression = ''): string
     {
-        $v = $this->stripParentheses($expression);
+        $v = $this->strip_parentheses($expression);
         if ($v) {
-            return $this->phpTag . 'elseif (!call_user_func($this->authCallBack,' . $v . ')): ?>';
+            return $this->php_tag . 'elseif (!call_user_func($this->auth_call_back,' . $v . ')): ?>';
         }
-        return $this->phpTag . 'else: ?>';
+        return $this->php_tag . 'else: ?>';
     }
 
     /**
@@ -3730,10 +3730,10 @@ class Compiler
      * @param $expression
      * @return string
      */
-    protected function compileCanAny($expression): string
+    protected function compile_canany($expression): string
     {
-        $role = $this->stripParentheses($expression);
-        return $this->phpTag . 'if (call_user_func($this->authAnyCallBack,' . $role . ')): ?>';
+        $role = $this->strip_parentheses($expression);
+        return $this->php_tag . 'if (call_user_func($this->auth_any_call_back,' . $role . ')): ?>';
     }
 
     /**
@@ -3742,13 +3742,13 @@ class Compiler
      * @param $expression
      * @return string
      */
-    protected function compileElseCanAny($expression): string
+    protected function compile_elsecanany($expression): string
     {
-        $role = $this->stripParentheses($expression);
+        $role = $this->strip_parentheses($expression);
         if ($role == '') {
-            return $this->phpTag . 'else: ?>';
+            return $this->php_tag . 'else: ?>';
         }
-        return $this->phpTag . 'elseif (call_user_func($this->authAnyCallBack,' . $role . ')): ?>';
+        return $this->php_tag . 'elseif (call_user_func($this->auth_any_call_back,' . $role . ')): ?>';
     }
 
     /**
@@ -3757,16 +3757,16 @@ class Compiler
      * @param null $expression
      * @return string
      */
-    protected function compileGuest($expression = null): string
+    protected function compile_guest($expression = null): string
     {
         if ($expression === null) {
-            return $this->phpTag . 'if(!isset($this->currentUser)): ?>';
+            return $this->php_tag . 'if(!isset($this->current_user)): ?>';
         }
-        $role = $this->stripParentheses($expression);
+        $role = $this->strip_parentheses($expression);
         if ($role == '') {
-            return $this->phpTag . 'if(!isset($this->currentUser)): ?>';
+            return $this->php_tag . 'if(!isset($this->current_user)): ?>';
         }
-        return $this->phpTag . "if(!isset(\$this->currentUser) || \$this->currentRole!=$role): ?>";
+        return $this->php_tag . "if(!isset(\$this->current_user) || \$this->current_role!=$role): ?>";
     }
 
     /**
@@ -3775,13 +3775,13 @@ class Compiler
      * @param $expression
      * @return string
      */
-    protected function compileElseGuest($expression): string
+    protected function compile_elseguest($expression): string
     {
-        $role = $this->stripParentheses($expression);
+        $role = $this->strip_parentheses($expression);
         if ($role == '') {
-            return $this->phpTag . 'else: ?>';
+            return $this->php_tag . 'else: ?>';
         }
-        return $this->phpTag . "elseif(!isset(\$this->currentUser) || \$this->currentRole!=$role): ?>";
+        return $this->php_tag . "elseif(!isset(\$this->current_user) || \$this->current_role!=$role): ?>";
     }
 
     /**
@@ -3790,9 +3790,9 @@ class Compiler
      *
      * @return string
      */
-    protected function compileEndGuest(): string
+    protected function compile_endguest(): string
     {
-        return $this->phpTag . 'endif; ?>';
+        return $this->php_tag . 'endif; ?>';
     }
 
     /**
@@ -3800,9 +3800,9 @@ class Compiler
      *
      * @return string
      */
-    protected function compileEndsection(): string
+    protected function compile_endsection(): string
     {
-        return $this->phpTag . '$this->stopSection(); ?>';
+        return $this->php_tag . '$this->stop_section(); ?>';
     }
 
     /**
@@ -3810,9 +3810,9 @@ class Compiler
      *
      * @return string
      */
-    protected function compileStop(): string
+    protected function compile_stop(): string
     {
-        return $this->phpTag . '$this->stopSection(); ?>';
+        return $this->php_tag . '$this->stop_section(); ?>';
     }
 
     /**
@@ -3820,9 +3820,9 @@ class Compiler
      *
      * @return string
      */
-    protected function compileOverwrite(): string
+    protected function compile_overwrite(): string
     {
-        return $this->phpTag . '$this->stopSection(true); ?>';
+        return $this->php_tag . '$this->stop_section(true); ?>';
     }
 
     /**
@@ -3831,9 +3831,9 @@ class Compiler
      * @param string $expression
      * @return string
      */
-    protected function compileUnless($expression): string
+    protected function compile_unless($expression): string
     {
-        return $this->phpTag . "if ( ! $expression): ?>";
+        return $this->php_tag . "if ( ! $expression): ?>";
     }
 
     /**
@@ -3841,9 +3841,9 @@ class Compiler
      *
      * @return string
      */
-    protected function compileUser(): string
+    protected function compile_user(): string
     {
-        return $this->phpTagEcho . "'" . $this->currentUser . "'; ?>";
+        return $this->php_tag_echo . "'" . $this->current_user . "'; ?>";
     }
 
     /**
@@ -3851,9 +3851,9 @@ class Compiler
      *
      * @return string
      */
-    protected function compileEndunless(): string
+    protected function compile_endunless(): string
     {
-        return $this->phpTag . 'endif; ?>';
+        return $this->php_tag . 'endif; ?>';
     }
     //</editor-fold>
     //<editor-fold desc="Array Functions">
@@ -3863,10 +3863,10 @@ class Compiler
      * @param $expression
      * @return string
      */
-    protected function compileError($expression): string
+    protected function compile_error($expression): string
     {
-        $key = $this->stripParentheses($expression);
-        return $this->phpTag . '$message = call_user_func($this->errorCallBack,' . $key . '); if ($message): ?>';
+        $key = $this->strip_parentheses($expression);
+        return $this->php_tag . '$message = call_user_func($this->error_call_back,' . $key . '); if ($message): ?>';
     }
 
     /**
@@ -3874,9 +3874,9 @@ class Compiler
      *
      * @return string
      */
-    protected function compileEndError(): string
+    protected function compile_enderror(): string
     {
-        return $this->phpTag . 'endif; ?>';
+        return $this->php_tag . 'endif; ?>';
     }
 
     /**
@@ -3884,9 +3884,9 @@ class Compiler
      *
      * @return string
      */
-    protected function compileElse(): string
+    protected function compile_else(): string
     {
-        return $this->phpTag . 'else: ?>';
+        return $this->php_tag . 'else: ?>';
     }
 
     /**
@@ -3895,9 +3895,9 @@ class Compiler
      * @param string $expression
      * @return string
      */
-    protected function compileFor($expression): string
+    protected function compile_for($expression): string
     {
-        return $this->phpTag . "for$expression: ?>";
+        return $this->php_tag . "for$expression: ?>";
     }
     //</editor-fold>
     //<editor-fold desc="string functions">
@@ -3907,7 +3907,7 @@ class Compiler
      * @param string $expression
      * @return string
      */
-    protected function compileForeach($expression): string
+    protected function compile_foreach($expression): string
     {
         //\preg_match('/\( *(.*) * as *([^\)]*)/', $expression, $matches);
         if ($expression === null) {
@@ -3916,9 +3916,9 @@ class Compiler
         \preg_match('/\( *(.*) * as *([^)]*)/', $expression, $matches);
         $iteratee = \trim($matches[1]);
         $iteration = \trim($matches[2]);
-        $initLoop = "\$__currentLoopData = $iteratee; \$this->addLoop(\$__currentLoopData);\$this->getFirstLoop();\n";
-        $iterateLoop = '$loop = $this->incrementLoopIndices(); ';
-        return $this->phpTag . "$initLoop foreach(\$__currentLoopData as $iteration): $iterateLoop ?>";
+        $initLoop = "\$__currentLoopData = $iteratee; \$this->add_loop(\$__currentLoopData);\$this->get_first_loop();\n";
+        $iterateLoop = '$loop = $this->increment_loop_indices(); ';
+        return $this->php_tag . "$initLoop foreach(\$__currentLoopData as $iteration): $iterateLoop ?>";
     }
 
     /**
@@ -3927,9 +3927,9 @@ class Compiler
      * @param string $expression
      * @return string
      */
-    protected function compileSplitForeach($expression): string
+    protected function compile_splitforeach($expression): string
     {
-        return $this->phpTagEcho . '$this::splitForeach' . $expression . '; ?>';
+        return $this->php_tag_echo . '$this::split_foreach' . $expression . '; ?>';
     }
 
     /**
@@ -3938,9 +3938,9 @@ class Compiler
      * @param string $expression
      * @return string
      */
-    protected function compileBreak($expression): string
+    protected function compile_break($expression): string
     {
-        return $expression ? $this->phpTag . "if$expression break; ?>" : $this->phpTag . 'break; ?>';
+        return $expression ? $this->php_tag . "if$expression break; ?>" : $this->php_tag . 'break; ?>';
     }
 
     /**
@@ -3949,9 +3949,9 @@ class Compiler
      * @param string $expression
      * @return string
      */
-    protected function compileContinue($expression): string
+    protected function compile_continue($expression): string
     {
-        return $expression ? $this->phpTag . "if$expression continue; ?>" : $this->phpTag . 'continue; ?>';
+        return $expression ? $this->php_tag . "if$expression continue; ?>" : $this->php_tag . 'continue; ?>';
     }
 
     /**
@@ -3960,10 +3960,10 @@ class Compiler
      * @param string $expression
      * @return string
      */
-    protected function compileForelse($expression): string
+    protected function compile_forelse($expression): string
     {
-        $empty = '$__empty_' . ++$this->forelseCounter;
-        return $this->phpTag . "$empty = true; foreach$expression: $empty = false; ?>";
+        $empty = '$__empty_' . ++$this->forelse_counter;
+        return $this->php_tag . "$empty = true; foreach$expression: $empty = false; ?>";
     }
 
     /**
@@ -3972,9 +3972,9 @@ class Compiler
      * @param string $expression
      * @return string
      */
-    protected function compileIf($expression): string
+    protected function compile_if($expression): string
     {
-        return $this->phpTag . "if$expression: ?>";
+        return $this->php_tag . "if$expression: ?>";
     }
     //</editor-fold>
     //<editor-fold desc="loop functions">
@@ -3984,9 +3984,9 @@ class Compiler
      * @param string $expression
      * @return string
      */
-    protected function compileElseif($expression): string
+    protected function compile_elseif($expression): string
     {
-        return $this->phpTag . "elseif$expression: ?>";
+        return $this->php_tag . "elseif$expression: ?>";
     }
 
     /**
@@ -3995,13 +3995,13 @@ class Compiler
      * @param string $expression empty if it's inside a for loop.
      * @return string
      */
-    protected function compileEmpty($expression = ''): string
+    protected function compile_empty($expression = ''): string
     {
         if ($expression == '') {
-            $empty = '$__empty_' . $this->forelseCounter--;
-            return $this->phpTag . "endforeach; if ($empty): ?>";
+            $empty = '$__empty_' . $this->forelse_counter--;
+            return $this->php_tag . "endforeach; if ($empty): ?>";
         }
-        return $this->phpTag . "if (empty$expression): ?>";
+        return $this->php_tag . "if (empty$expression): ?>";
     }
 
     /**
@@ -4010,9 +4010,9 @@ class Compiler
      * @param string $expression
      * @return string
      */
-    protected function compileHasSection($expression): string
+    protected function compile_hassection($expression): string
     {
-        return $this->phpTag . "if (! empty(trim(\$this->yieldContent$expression))): ?>";
+        return $this->php_tag . "if (! empty(trim(\$this->yield_content$expression))): ?>";
     }
 
     /**
@@ -4020,9 +4020,9 @@ class Compiler
      *
      * @return string
      */
-    protected function compileEndwhile(): string
+    protected function compile_endwhile(): string
     {
-        return $this->phpTag . 'endwhile; ?>';
+        return $this->php_tag . 'endwhile; ?>';
     }
 
     /**
@@ -4030,9 +4030,9 @@ class Compiler
      *
      * @return string
      */
-    protected function compileEndfor(): string
+    protected function compile_endfor(): string
     {
-        return $this->phpTag . 'endfor; ?>';
+        return $this->php_tag . 'endfor; ?>';
     }
 
     /**
@@ -4040,9 +4040,9 @@ class Compiler
      *
      * @return string
      */
-    protected function compileEndforeach(): string
+    protected function compile_endforeach(): string
     {
-        return $this->phpTag . 'endforeach; $this->popLoop(); $loop = $this->getFirstLoop(); ?>';
+        return $this->php_tag . 'endforeach; $this->pop_loop(); $loop = $this->get_first_loop(); ?>';
     }
 
     /**
@@ -4050,9 +4050,9 @@ class Compiler
      *
      * @return string
      */
-    protected function compileEndcan(): string
+    protected function compile_endcan(): string
     {
-        return $this->phpTag . 'endif; ?>';
+        return $this->php_tag . 'endif; ?>';
     }
 
     /**
@@ -4060,9 +4060,9 @@ class Compiler
      *
      * @return string
      */
-    protected function compileEndcanany(): string
+    protected function compile_endcanany(): string
     {
-        return $this->phpTag . 'endif; ?>';
+        return $this->php_tag . 'endif; ?>';
     }
 
     /**
@@ -4070,9 +4070,9 @@ class Compiler
      *
      * @return string
      */
-    protected function compileEndcannot(): string
+    protected function compile_endcannot(): string
     {
-        return $this->phpTag . 'endif; ?>';
+        return $this->php_tag . 'endif; ?>';
     }
 
     /**
@@ -4080,9 +4080,9 @@ class Compiler
      *
      * @return string
      */
-    protected function compileEndif(): string
+    protected function compile_endif(): string
     {
-        return $this->phpTag . 'endif; ?>';
+        return $this->php_tag . 'endif; ?>';
     }
 
     /**
@@ -4090,9 +4090,9 @@ class Compiler
      *
      * @return string
      */
-    protected function compileEndforelse(): string
+    protected function compile_endforelse(): string
     {
-        return $this->phpTag . 'endif; ?>';
+        return $this->php_tag . 'endif; ?>';
     }
 
     /**
@@ -4101,9 +4101,9 @@ class Compiler
      * @param string $expression
      * @return string
      */
-    protected function compilePhp($expression): string
+    protected function compile_php($expression): string
     {
-        return $expression ? $this->phpTag . "$expression; ?>" : $this->phpTag;
+        return $expression ? $this->php_tag . "$expression; ?>" : $this->php_tag;
     }
 
     //<editor-fold desc="setter and getters">
@@ -4113,7 +4113,7 @@ class Compiler
      *
      * @return string
      */
-    protected function compileEndphp(): string
+    protected function compile_endphp(): string
     {
         return ' ?>';
     }
@@ -4124,9 +4124,9 @@ class Compiler
      * @param string $expression
      * @return string
      */
-    protected function compileUnset($expression): string
+    protected function compile_unset($expression): string
     {
-        return $this->phpTag . "unset$expression; ?>";
+        return $this->php_tag . "unset$expression; ?>";
     }
 
     /**
@@ -4135,25 +4135,25 @@ class Compiler
      * @param string $expression
      * @return string
      */
-    protected function compileExtends($expression): string
+    protected function compile_extends($expression): string
     {
-        $expression = $this->stripParentheses($expression);
+        $expression = $this->strip_parentheses($expression);
         // $_shouldextend avoids to runchild if it's not evaluated.
         // For example @if(something) @extends('aaa.bb') @endif()
         // If something is false then it's not rendered at the end (footer) of the script.
-        $this->uidCounter++;
-        $data = $this->phpTag . 'if (isset($_shouldextend[' . $this->uidCounter . '])) { echo $this->runChild(' . $expression . '); } ?>';
+        $this->uid_counter++;
+        $data = $this->php_tag . 'if (isset($_shouldextend[' . $this->uid_counter . '])) { echo $this->run_child(' . $expression . '); } ?>';
         $this->footer[] = $data;
-        return $this->phpTag . '$_shouldextend[' . $this->uidCounter . ']=1; ?>';
+        return $this->php_tag . '$_shouldextend[' . $this->uid_counter . ']=1; ?>';
     }
 
     /**
-     * Execute the @parent command. This operation works in tandem with extendSection
+     * Execute the @parent command. This operation works in tandem with extend_section
      *
      * @return string
-     * @see extendSection
+     * @see extend_section
      */
-    protected function compileParent(): string
+    protected function compile_parent(): string
     {
         return $this->PARENTKEY;
     }
@@ -4164,10 +4164,10 @@ class Compiler
      * @param string $expression
      * @return string
      */
-    protected function compileInclude($expression): string
+    protected function compile_include($expression): string
     {
-        $expression = $this->stripParentheses($expression);
-        return $this->phpTagEcho . '$this->runChild(' . $expression . '); ?>';
+        $expression = $this->strip_parentheses($expression);
+        return $this->php_tag_echo . '$this->run_child(' . $expression . '); ?>';
     }
 
     /**
@@ -4178,18 +4178,18 @@ class Compiler
      * @return string
      * @throws Exception
      */
-    protected function compileIncludeFast($expression): string
+    protected function compile_includefast($expression): string
     {
-        $expression = $this->stripParentheses($expression);
-        $ex = $this->stripParentheses($expression);
+        $expression = $this->strip_parentheses($expression);
+        $ex = $this->strip_parentheses($expression);
         $exp = \explode(',', $ex);
-        $file = $this->stripQuotes($exp[0] ?? null);
-        $fileC = $this->getCompiledFile($file);
+        $file = $this->strip_quotes($exp[0] ?? null);
+        $fileC = $this->get_compiled_file($file);
         if (!@\is_file($fileC)) {
             // if the file doesn't exist then it's created
             $this->compile($file, true);
         }
-        return $this->getFile($fileC);
+        return $this->get_file($fileC);
     }
 
     /**
@@ -4198,9 +4198,9 @@ class Compiler
      * @param string $expression
      * @return string
      */
-    protected function compileIncludeIf($expression): string
+    protected function compile_includeif($expression): string
     {
-        return $this->phpTag . 'if ($this->templateExist' . $expression . ') echo $this->runChild' . $expression . '; ?>';
+        return $this->php_tag . 'if ($this->template_exist' . $expression . ') echo $this->run_child' . $expression . '; ?>';
     }
 
     /**
@@ -4209,10 +4209,10 @@ class Compiler
      * @param string $expression
      * @return string
      */
-    protected function compileIncludeWhen($expression): string
+    protected function compile_includewhen($expression): string
     {
-        $expression = $this->stripParentheses($expression);
-        return $this->phpTagEcho . '$this->includeWhen(' . $expression . '); ?>';
+        $expression = $this->strip_parentheses($expression);
+        return $this->php_tag_echo . '$this->include_when(' . $expression . '); ?>';
     }
 
     /**
@@ -4221,10 +4221,10 @@ class Compiler
      * @param string $expression
      * @return string
      */
-    protected function compileIncludeFirst($expression): string
+    protected function compile_includefirst($expression): string
     {
-        $expression = $this->stripParentheses($expression);
-        return $this->phpTagEcho . '$this->includeFirst(' . $expression . '); ?>';
+        $expression = $this->strip_parentheses($expression);
+        return $this->php_tag_echo . '$this->include_first(' . $expression . '); ?>';
     }
 
     /**
@@ -4234,9 +4234,9 @@ class Compiler
      *
      * @return false|string
      */
-    protected function compileCompileStamp($expression)
+    protected function compile_compilestamp($expression)
     {
-        $expression = $this->stripQuotes($this->stripParentheses($expression));
+        $expression = $this->strip_quotes($this->strip_parentheses($expression));
         $expression = ($expression === '') ? 'Y-m-d H:i:s' : $expression;
         return date($expression);
     }
@@ -4251,16 +4251,16 @@ class Compiler
      *
      * @return string
      */
-    protected function compileViewName($expression): string
+    protected function compile_viewname($expression): string
     {
-        $expression = $this->stripQuotes($this->stripParentheses($expression));
+        $expression = $this->strip_quotes($this->strip_parentheses($expression));
         switch ($expression) {
             case 'compiled':
-                return $this->getCompiledFile($this->fileName);
+                return $this->get_compiled_file($this->file_name);
             case 'template':
-                return $this->getTemplateFile($this->fileName);
+                return $this->get_template_file($this->file_name);
             default:
-                return $this->fileName;
+                return $this->file_name;
         }
     }
 
@@ -4269,16 +4269,16 @@ class Compiler
      *
      * @param string $expression
      * @return string
-     * @see Compiler::yieldPushContent
+     * @see Compiler::yield_push_content
      */
-    protected function compileStack($expression): string
+    protected function compile_stack($expression): string
     {
-        return $this->phpTagEcho . " \$this->CompileStackFinal$expression; ?>";
+        return $this->php_tag_echo . " \$this->compile_stack_final$expression; ?>";
     }
 
-    public function CompileStackFinal($a = null, $b = null): string
+    public function compile_stack_final($a = null, $b = null): string
     {
-        return $this->escapeStack0 . $a . ',' . $b . $this->escapeStack1;
+        return $this->escape_stack0 . $a . ',' . $b . $this->escape_stack1;
     }
 
     /**
@@ -4286,9 +4286,9 @@ class Compiler
      *
      * @return string
      */
-    protected function compileEndpush(): string
+    protected function compile_endpush(): string
     {
-        return $this->phpTag . '$this->stopPush(); ?>';
+        return $this->php_tag . '$this->stop_push(); ?>';
     }
 
     /**
@@ -4296,9 +4296,9 @@ class Compiler
      *
      * @return string
      */
-    protected function compileEndpushOnce(): string
+    protected function compile_endpushonce(): string
     {
-        return $this->phpTag . '$this->stopPush(); endif; ?>';
+        return $this->php_tag . '$this->stop_push(); endif; ?>';
     }
 
     /**
@@ -4306,9 +4306,9 @@ class Compiler
      *
      * @return string
      */
-    protected function compileEndPrepend(): string
+    protected function compile_endprepend(): string
     {
-        return $this->phpTag . '$this->stopPrepend(); ?>';
+        return $this->php_tag . '$this->stop_prepend(); ?>';
     }
 
     /**
@@ -4317,9 +4317,9 @@ class Compiler
      * @param string $expression
      * @return string
      */
-    protected function compileComponent($expression): string
+    protected function compile_component($expression): string
     {
-        return $this->phpTag . " \$this->startComponent$expression; ?>";
+        return $this->php_tag . " \$this->start_component$expression; ?>";
     }
 
     /**
@@ -4327,9 +4327,9 @@ class Compiler
      *
      * @return string
      */
-    protected function compileEndComponent(): string
+    protected function compile_endcomponent(): string
     {
-        return $this->phpTagEcho . '$this->renderComponent(); ?>';
+        return $this->php_tag_echo . '$this->render_component(); ?>';
     }
 
     /**
@@ -4338,9 +4338,9 @@ class Compiler
      * @param string $expression
      * @return string
      */
-    protected function compileSlot($expression): string
+    protected function compile_slot($expression): string
     {
-        return $this->phpTag . " \$this->slot$expression; ?>";
+        return $this->php_tag . " \$this->slot$expression; ?>";
     }
 
     /**
@@ -4348,27 +4348,27 @@ class Compiler
      *
      * @return string
      */
-    protected function compileEndSlot(): string
+    protected function compile_endslot(): string
     {
-        return $this->phpTag . ' $this->endSlot(); ?>';
+        return $this->php_tag . ' $this->end_slot(); ?>';
     }
 
-    protected function compileAsset($expression): string
+    protected function compile_asset($expression): string
     {
-        return $this->phpTagEcho . "(isset(\$this->assetDict[$expression]))?\$this->assetDict[$expression]:\$this->baseUrl.'/'.$expression; ?>";
+        return $this->php_tag_echo . "(isset(\$this->asset_dict[$expression]))?\$this->asset_dict[$expression]:\$this->base_url.'/'.$expression; ?>";
     }
 
-    protected function compileAssetCDN($expression): string
+    protected function compile_assetcdn($expression): string
     {
-        return $this->phpTagEcho . "(isset(\$this->assetDictCDN[$expression]))?\$this->assetDictCDN[$expression]:\$this->cdnUrl.'/'.$expression; ?>";
+        return $this->php_tag_echo . "(isset(\$this->asset_dict_cdn[$expression]))?\$this->asset_dict_cdn[$expression]:\$this->cdn_url.'/'.$expression; ?>";
     }
 
-    protected function compileJSon($expression): string
+    protected function compile_json($expression): string
     {
-        $parts = \explode(',', $this->stripParentheses($expression));
+        $parts = \explode(',', $this->strip_parentheses($expression));
         $options = isset($parts[1]) ? \trim($parts[1]) : JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT;
         $depth = isset($parts[2]) ? \trim($parts[2]) : 512;
-        return $this->phpTagEcho . "json_encode($parts[0], $options, $depth); ?>";
+        return $this->php_tag_echo . "json_encode($parts[0], $options, $depth); ?>";
     }
     //</editor-fold>
     //<editor-fold desc="attributes">
@@ -4378,22 +4378,22 @@ class Compiler
      * @param string $expression
      * @return string
      */
-    protected function compileChecked($expression): string
+    protected function compile_checked($expression): string
     {
-        return $this->phpTag . "if$expression echo 'checked'; ?>";
+        return $this->php_tag . "if$expression echo 'checked'; ?>";
     }
 
-    protected function compileStyle($expression): string
+    protected function compile_style($expression): string
     {
-        return $this->phpTag . "echo 'class=\"'.\$this->runtimeStyle($expression).'\"' ?>";
+        return $this->php_tag . "echo 'class=\"'.\$this->runtime_style($expression).'\"' ?>";
     }
 
-    protected function compileClass($expression): string
+    protected function compile_class($expression): string
     {
-        return $this->phpTag . "echo 'class=\"'.\$this->runtimeStyle($expression).'\"'; ?>";
+        return $this->php_tag . "echo 'class=\"'.\$this->runtime_style($expression).'\"'; ?>";
     }
 
-    protected function runtimeStyle($expression = null, $separator = ' '): string
+    protected function runtime_style($expression = null, $separator = ' '): string
     {
         if ($expression === null) {
             return '';
@@ -4418,9 +4418,9 @@ class Compiler
      * @param string $expression
      * @return string
      */
-    protected function compileSelected($expression): string
+    protected function compile_selected($expression): string
     {
-        return $this->phpTag . "if$expression echo 'selected'; ?>";
+        return $this->php_tag . "if$expression echo 'selected'; ?>";
     }
 
     /**
@@ -4429,9 +4429,9 @@ class Compiler
      * @param string $expression
      * @return string
      */
-    protected function compileDisabled($expression): string
+    protected function compile_disabled($expression): string
     {
-        return $this->phpTag . "if$expression echo 'disabled'; ?>";
+        return $this->php_tag . "if$expression echo 'disabled'; ?>";
     }
 
     /**
@@ -4440,9 +4440,9 @@ class Compiler
      * @param string $expression
      * @return string
      */
-    protected function compileReadonly($expression): string
+    protected function compile_readonly($expression): string
     {
-        return $this->phpTag . "if$expression echo 'readonly'; ?>";
+        return $this->php_tag . "if$expression echo 'readonly'; ?>";
     }
 
     /**
@@ -4451,40 +4451,40 @@ class Compiler
      * @param string $expression
      * @return string
      */
-    protected function compileRequired($expression): string
+    protected function compile_required($expression): string
     {
-        return $this->phpTag . "if$expression echo 'required'; ?>";
+        return $this->php_tag . "if$expression echo 'required'; ?>";
     }
     //</editor-fold>
     // <editor-fold desc='language'>
-    protected function compileIsset($expression): string
+    protected function compile_isset($expression): string
     {
-        return $this->phpTag . "if(isset$expression): ?>";
+        return $this->php_tag . "if(isset$expression): ?>";
     }
 
-    protected function compileEndIsset(): string
+    protected function compile_endisset(): string
     {
-        return $this->phpTag . 'endif; ?>';
+        return $this->php_tag . 'endif; ?>';
     }
 
-    protected function compileEndEmpty(): string
+    protected function compile_endempty(): string
     {
-        return $this->phpTag . 'endif; ?>';
+        return $this->php_tag . 'endif; ?>';
     }
 
     //<editor-fold desc="compile">
 
     /**
-     * Resolve a given class using the injectResolver callable.
+     * Resolve a given class using the inject_resolver callable.
      *
      * @param string      $className
      * @param string|null $variableName
      * @return mixed
      */
-    protected function injectClass($className, $variableName = null)
+    protected function inject_class($className, $variableName = null)
     {
-        if (isset($this->injectResolver)) {
-            return call_user_func($this->injectResolver, $className, $variableName);
+        if (isset($this->inject_resolver)) {
+            return call_user_func($this->inject_resolver, $className, $variableName);
         }
         $fullClassName = $className . "\\" . $variableName;
         return new $fullClassName();
@@ -4499,7 +4499,7 @@ class Compiler
      */
     protected function compile_e($expression): string
     {
-        return $this->phpTagEcho . "\$this->_e$expression; ?>";
+        return $this->php_tag_echo . "\$this->_e$expression; ?>";
     }
 
     /**
@@ -4511,7 +4511,7 @@ class Compiler
      */
     protected function compile_ef($expression): string
     {
-        return $this->phpTagEcho . "\$this->_ef$expression; ?>";
+        return $this->php_tag_echo . "\$this->_ef$expression; ?>";
     }
 
     //</editor-fold>
@@ -4525,11 +4525,11 @@ class Compiler
      */
     protected function compile_n($expression): string
     {
-        return $this->phpTagEcho . "\$this->_n$expression; ?>";
+        return $this->php_tag_echo . "\$this->_n$expression; ?>";
     }
     // </editor-fold>
     //<editor-fold desc="cli">
-    public static function isCli(): bool
+    public static function is_cli(): bool
     {
         return !http_response_code();
     }
@@ -4541,7 +4541,7 @@ class Compiler
      * @param bool      $set      it is the value returned when the argument is set but there is no value assigned
      * @return string
      */
-    public static function getParameterCli($key, $default = '', $set = true)
+    public static function get_parameter_cli($key, $default = '', $set = true)
     {
         global $argv;
         $p = array_search('-' . $key, $argv, true);
@@ -4549,12 +4549,12 @@ class Compiler
             return $default;
         }
         if (isset($argv[$p + 1])) {
-            return self::removeTrailSlash($argv[$p + 1]);
+            return self::remove_trail_slash($argv[$p + 1]);
         }
         return $set;
     }
 
-    protected static function removeTrailSlash($txt): string
+    protected static function remove_trail_slash($txt): string
     {
         return rtrim($txt, '/\\');
     }
@@ -4564,7 +4564,7 @@ class Compiler
      * @param string $type =['i','e','s','w'][$i]
      * @return string
      */
-    public static function colorLog($str, $type = 'i'): string
+    public static function color_log($str, $type = 'i'): string
     {
         switch ($type) {
             case 'e': //error
@@ -4582,78 +4582,78 @@ class Compiler
         }
     }
 
-    public function checkHealthPath(): bool
+    public function check_health_path(): bool
     {
-        echo self::colorLog("Checking Health\n");
+        echo self::color_log("Checking Health\n");
         $status = true;
-        if (is_dir($this->compiledPath)) {
-            echo "Compile-path [$this->compiledPath] is a folder " . self::colorLog("OK") . "\n";
+        if (is_dir($this->compile_dpath)) {
+            echo "Compile-path [$this->compile_dpath] is a folder " . self::color_log("OK") . "\n";
         } else {
             $status = false;
-            echo "Compile-path [$this->compiledPath] is not a folder " . self::colorLog("ERROR", 'e') . "\n";
+            echo "Compile-path [$this->compile_dpath] is not a folder " . self::color_log("ERROR", 'e') . "\n";
         }
-        foreach ($this->templatePath as $t) {
+        foreach ($this->template_path as $t) {
             if (is_dir($t)) {
-                echo "Template-path (view) [$t] is a folder " . self::colorLog("OK") . "\n";
+                echo "Template-path (view) [$t] is a folder " . self::color_log("OK") . "\n";
             } else {
                 $status = false;
-                echo "Template-path (view) [$t] is not a folder " . self::colorLog("ERROR", 'e') . "\n";
+                echo "Template-path (view) [$t] is not a folder " . self::color_log("ERROR", 'e') . "\n";
             }
         }
-        $error = self::colorLog('OK');
+        $error = self::color_log('OK');
         try {
             /** @noinspection RandomApiMigrationInspection */
-            $rnd = $this->compiledPath . '/dummy' . rand(10000, 900009);
+            $rnd = $this->compile_dpath . '/dummy' . rand(10000, 900009);
             $f = @file_put_contents($rnd, 'dummy');
             if ($f === false) {
                 $status = false;
-                $error = self::colorLog("Unable to create file [" . $this->compiledPath . '/dummy]', 'e');
+                $error = self::color_log("Unable to create file [" . $this->compile_dpath . '/dummy]', 'e');
             }
             @unlink($rnd);
         } catch (\Throwable $ex) {
             $status = false;
-            $error = self::colorLog($ex->getMessage(), 'e');
+            $error = self::color_log($ex->getMessage(), 'e');
         }
         echo "Testing write in the compile folder [$rnd] $error\n";
-        $files = @glob($this->templatePath[0] . '/*');
-        echo "Testing reading in the view folder [" . $this->templatePath[0] . "].\n";
+        $files = @glob($this->template_path[0] . '/*');
+        echo "Testing reading in the view folder [" . $this->template_path[0] . "].\n";
         echo "View(s) found :" . count($files) . "\n";
         return $status;
     }
 
-    public function createFolders(): void
+    public function create_folders(): void
     {
-        echo self::colorLog("Creating Folder\n");
-        echo "Creating compile folder[" . self::colorLog($this->compiledPath, 'b') . "] ";
-        if (!\is_dir($this->compiledPath)) {
-            $ok = @\mkdir($this->compiledPath, 0770, true);
+        echo self::color_log("Creating Folder\n");
+        echo "Creating compile folder[" . self::color_log($this->compile_dpath, 'b') . "] ";
+        if (!\is_dir($this->compile_dpath)) {
+            $ok = @\mkdir($this->compile_dpath, 0770, true);
             if ($ok === false) {
-                echo self::colorLog("Error: Unable to create folder, check the permissions\n", 'e');
+                echo self::color_log("Error: Unable to create folder, check the permissions\n", 'e');
             } else {
-                echo self::colorLog("OK\n");
+                echo self::color_log("OK\n");
             }
         } else {
-            echo self::colorLog("Note: folder already exist.\n", 'w');
+            echo self::color_log("Note: folder already exist.\n", 'w');
         }
-        foreach ($this->templatePath as $t) {
-            echo "Creating template folder [" . self::colorLog($t, 'b') . "] ";
+        foreach ($this->template_path as $t) {
+            echo "Creating template folder [" . self::color_log($t, 'b') . "] ";
             if (!\is_dir($t)) {
                 $ok = @\mkdir($t, 0770, true);
                 if ($ok === false) {
-                    echo self::colorLog("Error: Unable to create folder, check the permissions\n", 'e');
+                    echo self::color_log("Error: Unable to create folder, check the permissions\n", 'e');
                 } else {
-                    echo self::colorLog("OK\n");
+                    echo self::color_log("OK\n");
                 }
             } else {
-                echo self::colorLog("Note: folder already exist.\n", 'w');
+                echo self::color_log("Note: folder already exist.\n", 'w');
             }
         }
     }
 
     public function clearcompile(): int
     {
-        echo self::colorLog("Clearing Compile Folder\n");
-        $files = glob($this->compiledPath . '/*'); // get all file names
+        echo self::color_log("Clearing Compile Folder\n");
+        $files = glob($this->compile_dpath . '/*'); // get all file names
         $count = 0;
         foreach ($files as $file) { // iterate files
             if (is_file($file)) {
@@ -4661,9 +4661,9 @@ class Compiler
                 echo "deleting [$file] ";
                 $r = @unlink($file); // delete file
                 if ($r) {
-                    echo self::colorLog("OK\n");
+                    echo self::color_log("OK\n");
                 } else {
-                    echo self::colorLog("ERROR\n", 'e');
+                    echo self::color_log("ERROR\n", 'e');
                 }
             }
         }
@@ -4671,11 +4671,11 @@ class Compiler
         return $count;
     }
 
-    public function cliEngine(): void
+    public function cli_engine(): void
     {
-        $clearcompile = self::getParameterCli('clearcompile');
-        $createfolder = self::getParameterCli('createfolder');
-        $check = self::getParameterCli('check');
+        $clearcompile = self::get_parameter_cli('clearcompile');
+        $createfolder = self::get_parameter_cli('createfolder');
+        $check = self::get_parameter_cli('check');
         echo '  ____  _           _       ____             ' . "\n";
         echo ' |  _ \| |         | |     / __ \            ' . "\n";
         echo ' | |_) | | __ _  __| | ___| |  | |_ __   ___ ' . "\n";
@@ -4686,7 +4686,7 @@ class Compiler
         $done = false;
         if ($check) {
             $done = true;
-            $this->checkHealthPath();
+            $this->check_health_path();
         }
         if ($clearcompile) {
             $done = true;
@@ -4694,26 +4694,26 @@ class Compiler
         }
         if ($createfolder) {
             $done = true;
-            $this->createFolders();
+            $this->create_folders();
         }
         if (!$done) {
             echo " Syntax:\n";
-            echo " " . self::colorLog("-templatepath", "b") . " <templatepath> (optional) the template-path (view path).\n";
+            echo " " . self::color_log("-templatepath", "b") . " <templatepath> (optional) the template-path (view path).\n";
             echo "    Default value: 'views'\n";
             echo "    Example: 'php /vendor/bin/bladeonecli /folder/views' (absolute)\n";
             echo "    Example: 'php /vendor/bin/bladeonecli folder/view1' (relative)\n";
-            echo " " . self::colorLog("-compilepath", "b") . " <compilepath>  (optional) the compile-path.\n";
+            echo " " . self::color_log("-compilepath", "b") . " <compilepath>  (optional) the compile-path.\n";
             echo "    Default value: 'compiles'\n";
             echo "    Example: 'php /vendor/bin/bladeonecli /folder/compiles' (absolute)\n";
             echo "    Example: 'php /vendor/bin/bladeonecli compiles' (relative)\n";
-            echo " " . self::colorLog("-createfolder", "b") . " it creates the folders if they don't exist.\n";
+            echo " " . self::color_log("-createfolder", "b") . " it creates the folders if they don't exist.\n";
             echo "    Example: php ./vendor/bin/bladeonecli -createfolder\n";
-            echo " " . self::colorLog("-clearcompile", "b") . " It deletes the content of the compile path\n";
-            echo " " . self::colorLog("-check", "b") . " It checks the folders and permissions\n";
+            echo " " . self::color_log("-clearcompile", "b") . " It deletes the content of the compile path\n";
+            echo " " . self::color_log("-check", "b") . " It checks the folders and permissions\n";
         }
     }
 
-    public static function isAbsolutePath($path): bool
+    public static function is_absolute_path($path): bool
     {
         if (!$path) {
             return true;

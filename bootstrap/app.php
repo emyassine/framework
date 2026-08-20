@@ -2,12 +2,10 @@
 //> This file is part of Webkernel.
 //> (c) 2025 - 2027 Numerimondes, El Moumen Yassine
 
-require __DIR__.'/fast-boot.php'; // does installation of third_party and some preparation actions
+require __DIR__.'/fast-boot.php';
 
 use Webkernel\Http\Request;
-use Webkernel\Platform\{
-	Exceptions, Middleware
-};
+use Webkernel\Platform\{Exceptions, Middleware};
 use Webkernel\WebApp;
 
 // ---- Global WebApp Configuration ----------------------------------------------------------
@@ -19,7 +17,8 @@ use Webkernel\WebApp;
 // Including the autoloader takes
 
 return WebApp::configure()
-    ->with_middleware(function (Middleware $middleware): void {})
+    ->with_middleware(function (Middleware $middleware): void {
+    })
     ->with_exceptions(function (Exceptions $exceptions): void {
         $exceptions->should_render_json_when(
             fn (Request $request) => $request->is('api/*'),
