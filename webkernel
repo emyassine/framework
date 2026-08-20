@@ -820,7 +820,9 @@ final class Server
     }
 }
 
-if (($argv[1] ?? null) === 'server') {
+$command = $argv[1] ?? null;
+
+if ($command === 'server') {
     $host = '127.0.0.1';
     $port = 8000;
     $profile_lifecycle = false;
@@ -831,3 +833,60 @@ if (($argv[1] ?? null) === 'server') {
     }
     (new Server($host, $port, $profile_lifecycle))->start();
 }
+
+if ($command === 'routes:list') {
+    require __DIR__.'/bootstrap/app.php';
+    $routes = Route::list();
+    if ($routes === []) {
+        echo "  ".UI::muted('No routes defined.')."\n";
+        exit(0);
+    }
+
+    $method_w = 7;
+    $uri_w = 3;
+    $name_w = 4;
+    $action_w = 6;
+    $rows = [];
+    foreach ($routes as $route) {
+        $methods = implode('|', $route['methods']);
+        $rows[] = [
+            'methods' => $methods,
+            'uri' => $route['uri'] === '' ? '/' : $route['uri'],
+            'name' => $route['name'] !== '' ? $route['name'] : '-',
+            'action' => $route['action'],
+        ];
+        $method_w = max($method_w, strlen($methods));
+        $uri_w = max($uri_w, strlen($rows[array_key_last($rows)]['uri']));
+        $name_w = max($name_w, strlen($rows[array_key_last($rows)]['name']));
+        $action_w = max($action_w, strlen($route['action']));
+    }
+
+    echo "\n";
+    echo '  '.UI::muted(sprintf('%-'.$method_w.'s  %-'.$uri_w.'s  %-'.$name_w.'s  %s', 'METHOD', 'URI', 'NAME', 'ACTION'))."\n";
+    echo '  '.UI::muted(str_repeat('-', $method_w + $uri_w + $name_w + $action_w + 6))."\n";
+    foreach ($rows as $row) {
+        echo sprintf(
+            "  %s%-{$method_w}s%s  %s%-{$uri_w}s%s  %-{$name_w}s  %s\n",
+            UI::CYAN,
+            $row['methods'],
+            UI::RESET,
+            UI::BOLD,
+            $row['uri'],
+            UI::RESET,
+            $row['name'],
+            UI::muted($row['action']),
+        );
+    }
+    echo "\n  ".UI::muted(count($rows).' '.(count($rows) === 1 ? 'route' : 'routes'))."\n\n";
+    exit(0);
+}
+
+if ($command === null || $command === 'help' || $command === '--help' || $command === '-h') {
+    echo "\n  ".UI::BOLD."webkernel".UI::RESET." ".UI::muted('<command>')."\n\n";
+    echo "  ".UI::CYAN."server".UI::RESET."        ".UI::muted('Local HTTP server')."\n";
+    echo "  ".UI::CYAN."routes:list".UI::RESET."   ".UI::muted('List registered HTTP routes')."\n\n";
+    exit($command === null ? 1 : 0);
+}
+
+fwrite(STDERR, "Unknown command: {$command}\n");
+exit(1);

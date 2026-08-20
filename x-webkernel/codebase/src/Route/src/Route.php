@@ -30,6 +30,8 @@ final class Route
 
     public const REGEX = '_route';
 
+    public const VIEW = '_view';
+
     private static bool $declared_loaded = false;
 
     private static ?self $app = null;
@@ -139,7 +141,7 @@ final class Route
      */
     public static function view(string $uri, string $view, array $data = [], array $extra = []): void
     {
-        self::get($uri, static fn (): \Webkernel\View\View => \Webkernel\View\View::make($view, $data), $extra);
+        self::get($uri, static fn (): \Webkernel\View\View => \Webkernel\View\View::make($view, $data), [self::VIEW => $view] + $extra);
     }
 
     public static function redirect(string $uri, string $destination, int $status = 302): void
@@ -220,6 +222,16 @@ final class Route
     public static function run(): void
     {
         echo self::dispatch();
+    }
+
+    /**
+     * Registered routes, methods merged per URI (GET|HEAD, …).
+     *
+     * @return list<array{methods: list<string>, uri: string, name: string, action: string}>
+     */
+    public static function list(): array
+    {
+        return self::app()->listed();
     }
 
     /**
@@ -312,6 +324,77 @@ final class Route
         }
 
         throw new \RuntimeException('Invalid route action.');
+    }
+
+    /**
+     * @return list<array{methods: list<string>, uri: string, name: string, action: string}>
+     */
+    private function listed(): array
+    {
+        [$static, $dynamic] = $this->generator->get_data();
+        $rows = [];
+
+        foreach ($static as $method => $uris) {
+            foreach ($uris as $uri => [$handler, $extra]) {
+                $this->collect_listed($rows, $method, $uri, $handler, $extra);
+            }
+        }
+
+        foreach ($dynamic as $method => $chunks) {
+            foreach ($chunks as $chunk) {
+                foreach ($chunk['routeMap'] as [$handler, $variables, $extra]) {
+                    unset($variables);
+                    $uri = is_string($extra[self::REGEX] ?? null) ? (string) $extra[self::REGEX] : '';
+                    $this->collect_listed($rows, $method, $uri, $handler, $extra);
+                }
+            }
+        }
+
+        $list = array_values($rows);
+        usort($list, static function (array $a, array $b): int {
+            return [$a['uri'], $a['name']] <=> [$b['uri'], $b['name']];
+        });
+
+        return $list;
+    }
+
+    /**
+     * @param array<string, array{methods: list<string>, uri: string, name: string, action: string}> $rows
+     * @param array<string, string|int|bool|float> $extra
+     */
+    private function collect_listed(array &$rows, string $method, string $uri, mixed $handler, array $extra): void
+    {
+        $name = isset($extra[self::NAME]) && is_string($extra[self::NAME]) ? $extra[self::NAME] : '';
+        $action = self::action_label($handler, $extra);
+        $key = $uri."\0".$name."\0".$action;
+        if (! isset($rows[$key])) {
+            $rows[$key] = [
+                'methods' => [],
+                'uri' => $uri,
+                'name' => $name,
+                'action' => $action,
+            ];
+        }
+        if (! in_array($method, $rows[$key]['methods'], true)) {
+            $rows[$key]['methods'][] = $method;
+        }
+        $order = ['GET' => 0, 'HEAD' => 1, 'POST' => 2, 'PUT' => 3, 'PATCH' => 4, 'DELETE' => 5, 'OPTIONS' => 6];
+        usort($rows[$key]['methods'], static fn (string $a, string $b): int => ($order[$a] ?? 99) <=> ($order[$b] ?? 99));
+    }
+
+    /**
+     * @param array<string, string|int|bool|float> $extra
+     */
+    private static function action_label(mixed $handler, array $extra): string
+    {
+        if (isset($extra[self::VIEW]) && is_string($extra[self::VIEW]) && $extra[self::VIEW] !== '') {
+            return 'view:'.$extra[self::VIEW];
+        }
+        if (is_string($handler) && $handler !== '') {
+            return $handler;
+        }
+
+        return 'Closure';
     }
 
     /**
