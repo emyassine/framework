@@ -1,8 +1,10 @@
 # Agent rules — webkernel/codebase
 
-Zero runtime package dependencies. Target: render under 1 ms.
+Zero runtime Composer package dependencies (PHP 8.4+ only; PSR interfaces allowed when a type is actually required). Target: render under 1 ms.
 
 This tree is not Laravel. No Filament, no Livewire, no Illuminate, no Boost, no Pint, no Pest artisan.
+
+Engines we own in-tree (fork, specialize — do not wrap as a vendor): FastRoute MarkBased → `Webkernel\Route`, BladeOne → `Webkernel\View\Compiler`. Drop strategies / extras we do not run.
 
 `webkernel/lifecycle` is a **sibling** Composer plugin (`x-webkernel/lifecycle`), not nested here.
 
@@ -15,13 +17,14 @@ This tree is not Laravel. No Filament, no Livewire, no Illuminate, no Boost, no 
 | Classes / namespaces | `PascalCase` | `Engine`, `InstanceId` |
 | Constants | `UPPER_SNAKE` | `WEBKERNEL_NS` |
 
-Exceptions: Composer / PSR interface methods you do not own (`activate`, `getSubscribedEvents`, `getInstallPath`, `supports`).
+Exceptions: Composer / PSR interface methods you do not own (`activate`, `getSubscribedEvents`, `getInstallPath`, `supports`); HTTP verbs and Blade helpers that match Laravel usage (`Route::get`, `view()`, `View::make`).
 
 Do not introduce `camelCase` on Webkernel surfaces. Do not keep dual APIs.
 
 ## Dependencies
 
-- Runtime: PHP 8.4+ only.
+- Runtime: PHP 8.4+ only. No nikic/fast-route, no eftec/bladeone (copied and specialized under `src/Route`, `src/View`).
+- PSR allowed only when a type we expose needs it. This slice does not.
 - `composer-plugin-api` is Composer-time, in `webkernel/lifecycle` only.
 - Do not add Laravel, Filament, Symfony HTTP, or a container.
 
@@ -36,9 +39,17 @@ Do not introduce `camelCase` on Webkernel surfaces. Do not keep dual APIs.
 
 `Webkernel\Instance\InstanceId` — fingerprint of host path + machine. Lifecycle writes it. Do not recompute MAC / product uuid per request.
 
-## Views
+## Route
 
-`webkernel/views` is an empty package. Do not add templating until asked.
+`Webkernel\Route\Route` — `Route::get` / `post` / `dispatch`. Extra keys `NAME`, `PANEL`, `CLUSTER`, `RESOURCE`, `PAGE`, `PERMISSION` bind a URI to the platform tree. Permission is recorded, not enforced, until auth exists.
+
+One dispatcher: MarkBased. No CharCount / GroupCount / GroupPos. No PSR-7 URI objects.
+
+## View
+
+`view()` + `Webkernel\View\View`. Compiler is BladeOne in `Webkernel\View\Compiler`. Templates: `resources/views/*.blade.php`. Compiled: `storage/framework/views`.
+
+Platform tree (later, not this package): App owner → Platform (system panel) → Module → Panel → Cluster → Resource → Page → components. Do not invent a second templating stack.
 
 ## Package layout
 

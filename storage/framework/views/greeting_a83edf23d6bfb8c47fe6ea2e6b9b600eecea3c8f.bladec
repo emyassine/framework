@@ -1,0 +1,6 @@
+Hello, <?php echo \Webkernel\View\View::echo($name); ?>.
+<?php if($ok): ?>
+yes
+<?php endif; ?>
+<?php echo $raw; ?>
+

@@ -249,17 +249,17 @@ PHP;
     /**
      * Same rule as Composer AutoloadGenerator::getPathCode().
      */
-    private static function path_code(string $file, string $vendor_dir, string $root): string
-    {
-        if (str_starts_with($file, $vendor_dir.'/')) {
-            return '$v . '.var_export(substr($file, strlen($vendor_dir)), true);
-        }
-        if (str_starts_with($file, $root.'/')) {
-            return '$b . '.var_export(substr($file, strlen($root)), true);
-        }
+     private static function path_code(string $file, string $vendor_dir, string $root): string
+     {
+         if (str_starts_with($file, $vendor_dir.'/')) {
+             return '$v . ' . (string) var_export(substr($file, strlen($vendor_dir)), true);
+         }
+         if (str_starts_with($file, $root.'/')) {
+             return '$b . ' . (string) var_export(substr($file, strlen($root)), true);
+         }
 
-        return var_export($file, true);
-    }
+         return (string) var_export($file, true);
+     }
 
     /**
      * @param list<string> $files
@@ -269,10 +269,12 @@ PHP;
         $vendor_dir = rtrim(str_replace('\\', '/', $vendor_dir), '/');
         $root = rtrim(str_replace('\\', '/', $root), '/');
         $header = IdeHelper::generated_header();
-        $requires = [];
+        $items = [];
         foreach ($files as $file) {
-            $requires[] = 'require '.self::path_code(str_replace('\\', '/', $file), $vendor_dir, $root).';';
+            $items[] = '    '.self::path_code(str_replace('\\', '/', $file), $vendor_dir, $root).',';
         }
+
+        $list = $items === [] ? '' : "\n".implode("\n", $items)."\n";
 
         $body = <<<PHP
 <?php declare(strict_types=1);
@@ -284,8 +286,15 @@ PHP;
 \$v = dirname(__DIR__); // vendor_dir
 \$b = dirname(\$v); // base_dir
 
+\$files = [{$list}];
+
+foreach (\$files as \$file) {
+    if ((@include \$file) === false) {
+        throw new \\RuntimeException('Unable to load required file: '.\$file);
+    }
+}
+
 PHP;
-        $body .= ($requires === [] ? '' : implode("\n", $requires)."\n");
         file_put_contents($path, $body, LOCK_EX);
     }
 

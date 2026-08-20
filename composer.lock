@@ -158,7 +158,7 @@
             "dist": {
                 "type": "path",
                 "url": "x-webkernel/codebase",
-                "reference": "5fb164fb6f9bf22b295f64c9b69e0f035df3d521"
+                "reference": "f3375a4ba821757686b52f0b6aae364a50b36d51"
             },
             "require": {
                 "php": ">=8.4",
@@ -182,14 +182,15 @@
                 "psr-4": {
                     "Webkernel\\Paths\\": "src/Paths/src/",
                     "Webkernel\\Instance\\": "src/Instance/src/",
-                    "Webkernel\\Views\\": "src/Views/src/",
+                    "Webkernel\\Route\\": "src/Route/src/",
+                    "Webkernel\\View\\": "src/View/src/",
                     "Webkernel\\DevEnv\\": "src/DevEnv/src/"
                 }
             },
             "license": [
                 "proprietary"
             ],
-            "description": "Webkernel runtime: paths, instance. Zero runtime package dependencies.",
+            "description": "Webkernel runtime: paths, instance, route, view. Zero runtime package dependencies.",
             "transport-options": {
                 "symlink": true,
                 "relative": true
