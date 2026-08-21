@@ -368,7 +368,7 @@ final readonly class DumpAutoloadCommand
 
     /**
      * @param list<array{path: string, package: array<string, mixed>}> $packages
-     * @return list<class-string>
+     * @return list<string>
      */
     private function providers_list(array $packages): array
     {
@@ -749,7 +749,7 @@ PHP;
     }
 
     /**
-     * @param list<class-string> $classes
+     * @param list<string> $classes
      */
     private function write_class_list(string $path, array $classes): void
     {
