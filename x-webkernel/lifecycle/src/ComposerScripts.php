@@ -16,7 +16,7 @@ final class ComposerScripts
 {
     public static function post_autoload_dump(Event $event): void
     {
-        DumpAutoloadCommand::run($event->getComposer());
+        (new DumpAutoloadCommand())->__invoke();
         if (function_exists('webkernel_boot_flush')) {
             webkernel_boot_flush();
         }

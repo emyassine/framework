@@ -10,7 +10,7 @@ Follows [Custom Installers](https://getcomposer.org/doc/articles/custom-installe
 
 Webkernel packages that use a custom type (`webkernel-business-module`, …) must require this plugin so it is present at install time.
 
-On `composer dump-autoload` writes:
+On `composer dump-autoload` (and `php webkernel dump-autoload`) `DumpAutoloadCommand` writes:
 
 - `{vendor}/composer/webkernel.php` — `webapp_root`, `vendor_dir`, `instance_id`
 - `{vendor}/composer/webkernel_classmap.php`

@@ -45,6 +45,6 @@ webterminal()->confirm('Continue?', default: false);
 
 `webterminal()->fake([...])` queues answers for checks. Non-TTY falls back to fgets / defaults. Validation is a closure returning `?string` — no Laravel validator arrays.
 
-Commands with `#[ConsoleCommand]` are listed at `composer dump-autoload` (`webkernel_commands.php`). Composer `post-autoload-dump` runs `DumpAutoloadCommand` and prints through `Terminal`. `php webkernel dump-autoload` shells out to Composer. No request-path glob.
+Commands with `#[ConsoleCommand]` are listed at dump-autoload (`webkernel_commands.php`). `DumpAutoloadCommand` writes the dump files; Composer `post-autoload-dump` invokes it. No request-path glob.
 
 // ponytail: form / spin / progress / table / task / stream are not built — add when a command needs a spinner or a multi-step form.

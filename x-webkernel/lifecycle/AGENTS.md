@@ -11,7 +11,7 @@ Follow https://getcomposer.org/doc/articles/custom-installers.md :
 
 snake_case on Webkernel methods (`on_post_autoload_dump`, `parent_module`). Keep Composer interface names (`activate`, `getSubscribedEvents`, `getInstallPath`, `supports`).
 
-No Laravel, no Vite, no request-path module scanner. Dump-autoload writes `{vendor}/composer/webkernel.php`, classmap, path/instance function files, `webkernel_views.php`, `webkernel_routes.php`, `webkernel_composables.php`, `webkernel_providers.php`, and `webkernel_commands.php`.
+No Laravel, no Vite, no request-path module scanner. `DumpAutoloadCommand` writes `{vendor}/composer/webkernel.php`, classmap, path/instance function files, `webkernel_views.php`, `webkernel_routes.php`, `webkernel_composables.php`, `webkernel_providers.php`, and `webkernel_commands.php`. The plugin invokes that command on `post-autoload-dump`.
 
 Packages declare themselves in `extra.webkernel`:
 

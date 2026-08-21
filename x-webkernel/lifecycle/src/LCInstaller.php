@@ -35,7 +35,7 @@ final class LCInstaller implements PluginInterface, EventSubscriberInterface
 
     public function on_post_autoload_dump(Event $event): void
     {
-        DumpAutoloadCommand::run($event->getComposer());
+        (new DumpAutoloadCommand())->__invoke();
         if (function_exists('webkernel_boot_flush')) {
             webkernel_boot_flush();
         }
