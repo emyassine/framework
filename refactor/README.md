@@ -14,17 +14,17 @@ composer create-project webkernel/webkernel
 
 Rather than wrapping Laravel or Symfony, Webkernel owns its primitives and speaks PSR (container, log, clock, cache, HTTP message / factory / client). PHP extensions the process needs are declared in Composer. A module that requires extra packages owns that graph; it is not a kernel problem.
 
-The objective is **minimum overhead at all**, not a empty `require` block. See [Getting started](x-webkernel/docs/guides/00-getting-started/getting-started.en.md).
+The objective is **minimum overhead at all**, not an empty `require` block. See [Getting started](x-webkernel/docs/guides/00-getting-started/getting-started.en.md).
 
 ---
 
 ## Architectural Principles
 
-* **Minimum overhead:** Sub-1 ms core kernel CPU with no I/O / sub-10 ms full application responses with I/O, native OPcache. PSR interfaces and PHP extensions are in-bounds. Illuminate, Symfony HTTP, and request-time package discovery are not on the hot path.
-* **Composer is the installer:** `composer create-project`, `composer install`, dump-autoload maps. First-party packages, PSR, extensions, and module dependencies all go through Composer.
-* **PSR interoperability:** Enterprise baseline — `psr/container`, `psr/log`, `psr/clock`, `psr/cache`, `psr/http-message`, `psr/http-factory`, `psr/http-client`, plus discovery for HTTP client/factory implementations.
-* **Zero Magic:** Explicit wiring without magic methods, dynamic auto-discovery, or hidden service provider resolution.
-* **Domain-Centric Abstractions:** Components designed specifically for enterprise business rules, avoiding bloated generic wrappers.
+- **Minimum overhead:** Sub-1 ms core kernel CPU with no I/O / sub-10 ms full application responses with I/O, native OPcache. PSR interfaces and PHP extensions are in-bounds. Illuminate, Symfony HTTP, and request-time package discovery are not on the hot path.
+- **Composer is the installer:** `composer create-project`, `composer install`, dump-autoload maps. First-party packages, PSR, extensions, and module dependencies all go through Composer.
+- **PSR interoperability:** Enterprise baseline — `psr/container`, `psr/log`, `psr/clock`, `psr/cache`, `psr/http-message`, `psr/http-factory`, `psr/http-client`, plus discovery for HTTP client/factory implementations.
+- **Zero magic:** Explicit wiring without magic methods, dynamic auto-discovery, or hidden service provider resolution.
+- **Domain-centric abstractions:** Components designed specifically for enterprise business rules, avoiding bloated generic wrappers.
 
 ---
 
@@ -58,41 +58,39 @@ Guides: [HTTP kernel](x-webkernel/docs/guides/02-http-kernel/http-kernel.en.md) 
 
 Webkernel structures applications using a multi-panel, modular architecture governed by a fine-grained authorization and permission engine.
 
-The **System Admin Panel** is a special platform panel. It is not a sibling of Modules at the same ownership level: the Platform contains Modules; the SAP administers them.
+### Structural rules
+
+- The **Platform** is the root level managed by one or more **App Owners**. It holds global configuration and contains Modules.
+- The **System Admin Panel** is a special *platform-scoped* panel. It administers all Modules but is not a sibling of Modules at the same ownership level. It does not own Module domain models.
+- **Modules** are functional domains residing inside the Platform. A Module can expose one or multiple **Admin Panels**, which are *module-scoped*.
+- Panels are explicitly typed: every panel is either `platform`-scoped or `module`-scoped. This is not a runtime tag — it is part of the panel's registration contract and is enforced at registration time.
 
 ```mermaid
 graph TD
     AO["App Owner(s)"]
-
     subgraph Platform ["Platform"]
-        subgraph Special ["Special panel"]
+        subgraph Special ["Platform-scoped panels"]
             SAP["System Admin Panel<br/>platform-wide management"]
         end
         subgraph Contained ["Contained domains"]
             MOD["Modules (1..N)"]
         end
     end
-
     subgraph Module ["Module Domain"]
-        AP["Admin Panels (1..N)"]
+        AP["Admin Panels — module-scoped (1..N)"]
     end
-
     subgraph Panel ["Panel Domain"]
         CL["Clusters"]
     end
-
     subgraph Cluster ["Cluster Domain"]
         RES["Resources"]
     end
-
     subgraph Resource ["Resource Domain"]
         PG["Pages"]
     end
-
     subgraph Page ["Page Domain"]
         CMP["Components (Tables, Forms, Widgets, Custom Views)"]
     end
-
     AO --> SAP
     AO --> MOD
     SAP -.->|administers| MOD
@@ -101,24 +99,23 @@ graph TD
     CL --> RES
     RES --> PG
     PG --> CMP
-
     AUTH["Granular Permission & Authorization Layer"] -.- AP
     AUTH -.- RES
     AUTH -.- PG
     AUTH -.- CMP
 ```
 
-### Hierarchy Breakdown
+### Hierarchy breakdown
 
-* **Platform:** The root level managed by at least one **App Owner**. It holds global configuration and contains Modules.
-* **System Admin Panel:** A dedicated platform panel for global management (instances, modules, owners, telemetry). It sits above Modules operationally; it does not own their domain model.
-* **Modules:** Functional domains residing inside the platform. Composer packages (custom types). A single module can encapsulate one or multiple **Admin Panels**. Extra Composer dependencies are the module's graph.
-* **Admin Panels:** Operational workspaces containing organized **Clusters**.
-* **Clusters:** Logical groupings used to aggregate related resources within a panel.
-* **Resources:** Core business entities managed within a cluster.
-* **Pages:** Individual functional views constituting a resource (e.g., List, Create, Edit, Custom View).
-* **Components:** UI building blocks inside pages, including data tables, forms, metric widgets, and custom developer-defined views.
-* **Granular Permissions:** A unified security layer enforcing strict authorization down to panels, resources, pages, and individual components/actions.
+- **Platform:** Root level. Managed by at least one App Owner. Holds global configuration and contains Modules.
+- **System Admin Panel:** A platform-scoped panel for global management (instances, modules, owners, telemetry). Sits above Modules operationally; does not own their domain model.
+- **Modules:** Functional domains residing inside the Platform. Composer packages (custom types). A single Module can expose one or multiple module-scoped Admin Panels. Extra Composer dependencies are the Module's graph.
+- **Admin Panels:** Operational workspaces. Each panel is explicitly typed as `platform` or `module`. Module-scoped panels contain organized Clusters. Platform-scoped panels manage cross-module or platform-wide concerns.
+- **Clusters:** Logical groupings used to aggregate related resources within a panel.
+- **Resources:** Core business entities managed within a cluster.
+- **Pages:** Individual functional views constituting a resource (e.g. List, Create, Edit, Custom View).
+- **Components:** UI building blocks inside pages, including data tables, forms, metric widgets, and custom developer-defined views.
+- **Granular permissions:** A unified security layer enforcing strict authorization down to panels, resources, pages, and individual components and actions. Permissions are always namespaced by module — there is no global flat permission table.
 
 Guide: [Domain hierarchy](x-webkernel/docs/guides/03-domain-hierarchy/domain-hierarchy.en.md)
 
@@ -137,7 +134,7 @@ refactor/
 │   ├── storage/                 # Runtime cache, compiled views, instance id
 │   └── telemetry/               # Logs, metrics, traces, profiles, buffers
 └── x-webkernel/
-    ├── docs/guides/             # 00-*, 01-*, … / {name}.{lang}.md
+    ├── docs/guides/             # 00-*, 01-*, ... / 00-*, 01-*, ...{name}.{lang}.md
     └── lifecycle/               # Composer plugin (install paths, dump-autoload)
 ```
 
@@ -149,7 +146,7 @@ Guide: [Project layout](x-webkernel/docs/guides/01-project-layout/project-layout
 
 ### 1. Installation
 
-Ensure PHP 8.4+ and OPcache are installed on your host system. Declare the extensions the process needs (`ext-mbstring`, `ext-intl`, `ext-pdo`, …) in Composer — they are not optional folklore.
+Ensure PHP 8.4+ and OPcache are installed on your host system. Declare the extensions the process needs (`ext-mbstring`, `ext-intl`, `ext-pdo`, ...) in Composer — they are not optional folklore.
 
 Usual install:
 
@@ -174,12 +171,12 @@ Composer installs first-party packages, PSR interfaces, and any module dependenc
 php webkernel server
 ```
 
-*Options:*
+Options:
 
-* `--host=127.0.0.1` : Set binding host (default: `127.0.0.1`).
-* `--port=8000` : Set target port (default: `8000`, auto-increments if port is in use).
-* `--profile-lifecycle` : Enable request profiling for include execution costs, file paths, and memory usage.
-* `--with-jit` : Start the child `php -S` process with Zend JIT enabled (OPcache required).
+- `--host=127.0.0.1` — Set binding host (default: `127.0.0.1`).
+- `--port=8000` — Set target port (default: `8000`, auto-increments if port is in use).
+- `--profile-lifecycle` — Enable request profiling for include execution costs, file paths, and memory usage.
+- `--with-jit` — Start the child `php -S` process with Zend JIT enabled (OPcache required).
 
 ### 3. Server OPcache Verification
 
@@ -200,7 +197,7 @@ Guide: [Performance](x-webkernel/docs/guides/04-performance/performance.en.md)
 Order prefixes sort on disk and are stripped from URLs. Filenames are `{name}.{lang}.md`.
 
 | Guide | Topic |
-| --- | --- |
+|---|---|
 | [Getting started](x-webkernel/docs/guides/00-getting-started/getting-started.en.md) | Composer, PSR, install, CLI |
 | [Project layout](x-webkernel/docs/guides/01-project-layout/project-layout.en.md) | Physical tree |
 | [HTTP kernel](x-webkernel/docs/guides/02-http-kernel/http-kernel.en.md) | Request → Response lifecycle |

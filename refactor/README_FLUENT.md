@@ -100,7 +100,6 @@ This is the canonical platform config. Keys are `snake_case`. No PHP class refer
 // will be overwritten on next boot if the platform detects a drift.
 
 return [
-
     // -------------------------------------------------------------------------
     // Identity — platform-managed. Rewritten on host migration or first boot.
     // -------------------------------------------------------------------------
@@ -130,35 +129,29 @@ return [
         'telemetry_path' => 'platform/telemetry',
         'temporary_path' => 'platform/temporary',
     ],
-
     'dependencies' => [
         'path'             => 'platform/dependencies',
         'packagist_path'   => 'platform/dependencies/packagist',
         'node_modules_path'=> 'platform/dependencies/node_modules',
         'package_json'     => 'platform/dependencies/package.json',
     ],
-
     'modules' => [
         'path'          => 'modules',
         'manifest_path' => 'platform/temporary/modules_manifest.php',
     ],
-
     'public' => [
         'path'  => 'public',
         'index' => 'public/index.php',
     ],
-
     'js' => [
         'manager'          => 'npm',
         'package_json'     => 'platform/dependencies/package.json',
         'node_modules_path'=> 'platform/dependencies/node_modules',
     ],
-
     'telemetry' => [
         'enabled'   => true,
         'logs_path' => 'platform/telemetry/logs',
     ],
-
 ];
 ```
 
@@ -167,9 +160,9 @@ return [
 Config files are merged in this order (later layers win):
 
 ```
-platform/config/platform.php          ← base (platform-managed keys included)
-platform/config/local.php             ← optional local overrides (gitignored)
-modules/{name}/config/{name}.php      ← module-level config (merged under ['modules']['{name}'])
+platform/config/platform.php          <- base (platform-managed keys included)
+platform/config/local.php             <- optional local overrides (gitignored)
+modules/{name}/config/{name}.php      <- module-level config (merged under ['modules']['{name}'])
 ```
 
 The merge is a **deep recursive merge** (`array_replace_recursive`). Module configs are **namespaced** under their module key — they never pollute the root config namespace.
@@ -241,22 +234,22 @@ webapp()->config()->reload(): void;
 
 ```php
 /**
- * @method \Webkernel\Composables\ConfigComposable    config(?string $key = null, mixed $default = null)
- * @method \Webkernel\Composables\PlatformComposable  platform()
- * @method \Webkernel\Composables\StorageComposable   storage()
- * @method \Webkernel\Composables\CacheComposable     cache()
- * @method \Webkernel\Composables\RouteComposable     route()
- * @method \Webkernel\Composables\RequestComposable   request()
- * @method \Webkernel\Composables\ResponseComposable  response()
+ * @method \Webkernel\Composables\ConfigComposable     config(?string $key = null, mixed $default = null)
+ * @method \Webkernel\Composables\PlatformComposable   platform()
+ * @method \Webkernel\Composables\StorageComposable    storage()
+ * @method \Webkernel\Composables\CacheComposable      cache()
+ * @method \Webkernel\Composables\RouteComposable      route()
+ * @method \Webkernel\Composables\RequestComposable    request()
+ * @method \Webkernel\Composables\ResponseComposable   response()
  * @method \Webkernel\Composables\MiddlewareComposable middleware()
- * @method \Webkernel\Composables\ModuleComposable    module(?string $name = null)
- * @method \Webkernel\Composables\PanelComposable     panel(?string $id = null)
- * @method \Webkernel\Composables\ClusterComposable   cluster(string $name)
- * @method \Webkernel\Composables\ResourceComposable  resource(string $class)
- * @method \Webkernel\Composables\PageComposable      page()
- * @method \Webkernel\Composables\ViewComposable      view(?string $template = null, array $data = [])
- * @method \Webkernel\Composables\AuthComposable      auth()
- * @method \Webkernel\Composables\AclComposable       acl(?string $module = null)
+ * @method \Webkernel\Composables\ModuleComposable     module(?string $name = null)
+ * @method \Webkernel\Composables\PanelComposable      panel(?string $id = null)
+ * @method \Webkernel\Composables\ClusterComposable    cluster(string $name)
+ * @method \Webkernel\Composables\ResourceComposable   resource(string $class)
+ * @method \Webkernel\Composables\PageComposable       page()
+ * @method \Webkernel\Composables\ViewComposable       view(?string $template = null, array $data = [])
+ * @method \Webkernel\Composables\AuthComposable       auth()
+ * @method \Webkernel\Composables\AclComposable        acl(?string $module = null)
  */
 final class WebApp { /* ... */ }
 ```
@@ -375,8 +368,9 @@ The hierarchy is: **Platform → Modules → Admin Panels → Clusters → Resou
 
 The System Admin Panel sits *above* Modules (it administers them). Modules are *contained inside* the Platform. The SAP is not a Module.
 
+### 6.1 Modules
+
 ```php
-// ---- Modules ---------------------------------------------------------------
 webapp()->module(): ModuleComposable;            // returns module registry
 webapp()->module('invoicing'): ModuleComposable; // returns a specific module
 webapp()->module()->all(): array;
@@ -384,13 +378,39 @@ webapp()->module()->is_installed(string $name): bool;
 webapp()->module()->register(string $module_class): void;
 webapp()->module('invoicing')->config(): array;           // module-scoped config
 webapp()->module('invoicing')->config('vat_rate'): mixed; // dot-notation read
+```
 
-// ---- Admin panels ----------------------------------------------------------
-webapp()->panel(): PanelComposable;
-webapp()->panel('sales'): PanelComposable;
+### 6.2 Panel taxonomy & hierarchy
+
+Panels are explicitly categorized as either `platform` or `module` scope.
+
+- **Platform panels** administer the core platform or cross-module concerns.
+- **Module panels** administer domain capabilities strictly inside a module.
+
+```php
+// ---- Active panel ----------------------------------------------------------
+webapp()->panel(): PanelComposable;                        // returns currently active panel
+webapp()->panel()->type(): string;                         // returns 'platform' | 'module'
+webapp()->panel()->is_platform_panel(): bool;              // true if platform-scoped panel
+webapp()->panel()->is_module_panel(): bool;                // true if module-scoped panel
+webapp()->panel()->module_name(): ?string;                 // returns module name or null
+
+// ---- Referencing specific panels -------------------------------------------
+webapp()->panel('platform.system_admin'): PanelComposable; // platform panel (explicit)
+webapp()->panel('invoicing.sales'): PanelComposable;       // module panel (explicit)
+webapp()->panel('sales'): PanelComposable;                 // module panel (inferred from current module context)
+
+// ---- Panel navigation ------------------------------------------------------
 webapp()->panel()->current(): AdminPanel;
 webapp()->panel()->clusters(): array;
+```
 
+**Clarification — panel ID format:**
+A fully qualified panel ID uses `{scope}.{panel_name}` notation. When the current module context is unambiguous (e.g. inside a module controller), the module prefix can be omitted and is inferred automatically. Always use the fully qualified form in cross-module or platform-level code to avoid silent scope confusion.
+
+### 6.3 Clusters, resources, pages & components
+
+```php
 // ---- Clusters --------------------------------------------------------------
 webapp()->cluster(string $name): ClusterComposable;
 webapp()->cluster('finance')->resources(): array;
@@ -425,7 +445,7 @@ You do **not** pass a module name to `webapp()->acl()` when you are already insi
 
 There is no global flat permission table. Permissions are always namespaced: `{module}.{resource}.{action}` or `{module}.{panel}.{cluster}.{resource}.{action}` for fine-grained rules.
 
-### Authentication
+### 7.1 Authentication
 
 ```php
 webapp()->auth()->user(): ?UserInterface;
@@ -435,7 +455,7 @@ webapp()->auth()->login(UserInterface $user): void;
 webapp()->auth()->logout(): void;
 ```
 
-### Module-scoped ACL (default — inferred from call site)
+### 7.2 Module-scoped ACL (default — inferred from call site)
 
 When called from inside a module context (controller, resource, page, component), the platform resolves the module automatically:
 
@@ -450,7 +470,7 @@ webapp()->acl()->authorize('approve', $invoice): void;  // throws on denial
 webapp()->acl()->enforce_component_access(string $component_id): bool;
 ```
 
-### Explicit module scoping (cross-module checks)
+### 7.3 Explicit module scoping (cross-module checks)
 
 When the caller is not inside a module context (e.g. System Admin Panel, CLI, telemetry):
 
@@ -464,16 +484,95 @@ webapp()->acl('invoicing')->authorize('approve', $invoice): void;
 webapp()->acl()->can_any('invoicing.export', 'reporting.export'): bool;
 ```
 
-### Permission naming convention
+### 7.4 Permission naming convention
 
 ```
-{module_name}.{action}                         // simple: invoicing.export
-{module_name}.{resource}.{action}              // resource-scoped: invoicing.invoice.delete
-{module_name}.{panel}.{resource}.{action}      // panel-scoped: invoicing.billing.invoice.approve
-platform.{action}                              // platform-level: platform.owner.add
+{module_name}.{action}                         // simple:        invoicing.export
+{module_name}.{resource}.{action}              // resource:      invoicing.invoice.delete
+{module_name}.{panel}.{resource}.{action}      // panel-scoped:  invoicing.billing.invoice.approve
+platform.{action}                              // platform-wide: platform.owner.add
 ```
 
-The ACL layer resolves the full permission name from the call site context + any explicit overrides. Static analysis can verify the full chain because no magic is involved.
+The ACL layer resolves the full permission name from the call site context plus any explicit overrides. Static analysis can verify the full chain because no magic is involved.
+
+### 7.5 View directives & on-the-fly ACL resolution
+
+When using template directives (`@can`, `@cannot`, `@can_any`) in Webkernel views, the view engine auto-detects the active rendering context (`platform` or `module`) and passes short permission names directly to `webapp()->acl()`.
+
+**Short names automatically inherit the context scope** — there is no need to prefix them with the module name inside a module view.
+
+#### View directives syntax
+
+```html
+{{-- Short permission names automatically inherit context scope --}}
+@can('knock_head')
+    <button>Knock Head</button>
+@endcan
+
+@cannot('destroy_world')
+    <p>Access Restricted</p>
+@endcannot
+
+@can_any(['export_csv', 'export_pdf'])
+    <a href="/export">Export Data</a>
+@endcan_any
+```
+
+#### Directives resolution algorithm
+
+```
+View Directives Engine
+   |
+   |-- 1. Identify View Context --> Module View ("invoicing") OR Platform View ("platform")
+   |
+   |-- 2. Expand Permission -----> "knock_head" becomes "invoicing.knock_head" or "platform.knock_head"
+   |
+   |-- 3. Check ACL Manifest ----> Is "invoicing.knock_head" registered?
+   |        |-- YES ------------> Evaluate active user gate/role bindings.
+   |        `-- NO  ------------> Trigger auto-registration on the fly.
+   |
+   `-- 4. On-The-Fly Execution --> Register permission dynamically -> Apply fallback policy gate.
+```
+
+#### On-the-fly permission API
+
+If a permission evaluated in a view or controller is not present in the static module manifest, `webapp()->acl()` creates and registers it at runtime instead of throwing an undefined-permission exception.
+
+```php
+// Toggle on-the-fly creation
+webapp()->acl()->enable_on_the_fly_creation(bool $enabled = true): void;
+webapp()->acl()->is_on_the_fly_enabled(): bool;
+
+// Manually register an on-the-fly permission with a custom fallback gate
+webapp()->acl()->register_on_the_fly(
+    string $permission_name,
+    ?Closure $fallback_evaluator = null
+): void;
+
+// Set a default evaluator for all dynamically created permissions
+webapp()->acl()->set_on_the_fly_fallback(function (string $permission, ?UserInterface $user): bool {
+    // Example: grant dynamically created permissions to platform owners by default
+    if (webapp()->platform()->owners()->is_owner($user?->id())) {
+        return true;
+    }
+    return $user?->has_role('module_admin') ?? false;
+});
+```
+
+**Clarification — on-the-fly vs. static manifest:**
+On-the-fly creation is a safety net, not the preferred path. The static module ACL manifest (declared in the module's registration) is the authoritative source. On-the-fly permissions are useful during development and for edge-case runtime directives, but they should be promoted to the static manifest before shipping to production. Enable or disable on-the-fly creation per environment via the module config.
+
+#### Compiled output
+
+The view compiler replaces template directives with deterministic PHP execution calls. The compiled form is deterministic and statically analysable — no string evaluation, no `eval()`.
+
+```php
+// @can('knock_head') inside module 'invoicing' compiles to:
+if (webapp()->acl()->can('knock_head')):
+
+// Standard view compilation expansion under the hood:
+if (webapp()->acl('invoicing')->can('invoicing.knock_head')):
+```
 
 ---
 
@@ -516,6 +615,9 @@ $conf = webterminal()->confirm('Enable telemetry?');            // returns true
 $mail = webterminal()->text('Admin email');                     // returns 'admin@example.com'
 ```
 
+**Clarification — fake exhaustion:**
+`fake()` consumes answers in FIFO order. If the script requests more prompts than answers were supplied, `webterminal()` throws immediately with a clear message indicating which prompt was unanswered. There are no silent empty-string fallbacks.
+
 ---
 
 ## 9. Fast-boot & config rewrite rules
@@ -535,9 +637,8 @@ $config_path = $webapp_path . '/platform/config/platform.php';
 
 // Raw require — no composable, no container. Config must be a plain array.
 $platform_config = is_file($config_path) ? require $config_path : [];
-
-$autoload_rel = $platform_config['autoload'] ?? 'vendor/autoload.php';
-$autoload_abs = $webapp_path . '/' . $autoload_rel;
+$autoload_rel    = $platform_config['autoload'] ?? 'vendor/autoload.php';
+$autoload_abs    = $webapp_path . '/' . $autoload_rel;
 
 if (
     is_string($autoload_rel) &&
@@ -546,7 +647,7 @@ if (
     is_file($autoload_abs)
 ) {
     require $autoload_abs;
-    return; // ← hot path exits here
+    return; // <- hot path exits here
 }
 
 // Miss path: discover, stamp config, optionally run composer install
@@ -567,6 +668,7 @@ ConfigWriter::atomic_rewrite(
 ```
 
 `ConfigWriter::atomic_rewrite()` is a standalone static utility (no container, no composable) that:
+
 1. Reads the current config array via `require`.
 2. Merges the new keys with `array_replace_recursive`.
 3. Exports the merged array with `var_export`.
@@ -593,23 +695,27 @@ All writes go through `ConfigWriter::atomic_rewrite()`. No key is ever written b
 
 ## 10. Chaining reference table
 
-| Entry point              | Full chain example                                                    |
-|--------------------------|-----------------------------------------------------------------------|
-| Config read              | `webapp()->config('platform.storage_path')`                          |
-| Config write             | `webapp()->config()->set('hostname', gethostname())`                 |
-| Host & identity          | `webapp()->platform()->instance()->machine_uuid()`                   |
-| Telemetry logs           | `webapp()->platform()->telemetry()->access_log()`                    |
-| System Admin Panel       | `webapp()->platform()->system_admin()->audit_logs()`                 |
-| App owners               | `webapp()->platform()->owners()->is_owner($user_id)`                 |
-| Module config            | `webapp()->module('invoicing')->config('vat_rate')`                  |
-| Admin panels             | `webapp()->panel('sales')->cluster('finance')->resources()`          |
-| ACL inferred (in module) | `webapp()->acl()->can('edit', $invoice)`                             |
-| ACL explicit (cross)     | `webapp()->acl('invoicing')->authorize('approve', $invoice)`         |
-| CLI prompt               | `webterminal()->select('Environment', ['dev', 'prod'])`              |
-| View render              | `webapp()->view()->render('admin/dashboard', $data)`                 |
-| HTTP response            | `webapp()->response()->json(['ok' => true])`                         |
-| Cache remember           | `webapp()->cache()->remember('stats', 60, fn() => Stats::compute())` |
-| Storage read             | `webapp()->storage()->read('platform/storage/instance/data/id.txt')` |
+| Entry point                   | Full chain example                                                          |
+|-------------------------------|-----------------------------------------------------------------------------|
+| Config read                   | `webapp()->config('platform.storage_path')`                                 |
+| Config write                  | `webapp()->config()->set('hostname', gethostname())`                        |
+| Host & identity               | `webapp()->platform()->instance()->machine_uuid()`                          |
+| Telemetry logs                | `webapp()->platform()->telemetry()->access_log()`                           |
+| System Admin Panel            | `webapp()->platform()->system_admin()->audit_logs()`                        |
+| App owners                    | `webapp()->platform()->owners()->is_owner($user_id)`                        |
+| Module config                 | `webapp()->module('invoicing')->config('vat_rate')`                         |
+| Panel context check           | `webapp()->panel()->is_platform_panel()`                                    |
+| Module panel lookup           | `webapp()->panel('invoicing.sales')->module_name()`                         |
+| Panel clusters                | `webapp()->panel('sales')->clusters()`                                       |
+| ACL inferred (in module)      | `webapp()->acl()->can('edit', $invoice)`                                    |
+| ACL explicit (cross-module)   | `webapp()->acl('invoicing')->authorize('approve', $invoice)`                |
+| View permission check         | `webapp()->acl()->can('knock_head')`                                        |
+| Dynamic ACL fallback          | `webapp()->acl()->set_on_the_fly_fallback($callback)`                       |
+| CLI prompt                    | `webterminal()->select('Environment', ['dev', 'prod'])`                     |
+| View render                   | `webapp()->view()->render('admin/dashboard', $data)`                        |
+| HTTP response                 | `webapp()->response()->json(['ok' => true])`                                |
+| Cache remember                | `webapp()->cache()->remember('stats', 60, fn() => Stats::compute())`        |
+| Storage read                  | `webapp()->storage()->read('platform/storage/instance/data/id.txt')`        |
 
 ---
 
@@ -629,11 +735,21 @@ Banning `__call` / `__callStatic` in favour of explicit `ComposableContract` imp
 
 `webapp()->config()` is resolved before any other composable. It does not depend on the container. The container depends on it (service paths, lifetimes, and module manifests all come from config). This ordering is explicit and enforced, not emergent.
 
+### Panel taxonomy as a first-class concept
+
+Panels are not generic UI containers — they are scoped administrative workspaces with an explicit `platform` or `module` classification baked in. This classification is not a string tag that can be forgotten: `is_platform_panel()` and `is_module_panel()` are typed boolean predicates that can be checked anywhere in the call chain, including from the SAP when iterating all registered panels. A panel that does not declare its scope fails at registration time, not silently at runtime.
+
 ### Module-scoped ACL by default
 
 The platform knows the containment topology at boot (from the module manifest). When `webapp()->acl()->can('edit', $invoice)` is called from inside `InvoiceResource`, the platform resolves the caller's module from the call-site context — no annotation, no string argument required. Explicit module arguments (`webapp()->acl('invoicing')`) are only needed when crossing module boundaries (System Admin Panel, CLI scripts, cross-module policies).
 
 Permission names are always fully qualified (`{module}.{resource}.{action}`). There is no global flat permission table. This eliminates the class of bugs where two modules define a permission named `export` and one silently shadows the other.
+
+### View-level ACL auto-scoping
+
+View directives expand short permission names into fully qualified ones using the active render context. The expansion happens at compile time, not at render time — the compiled PHP output contains fully qualified calls to `webapp()->acl()`. This means zero runtime overhead for name expansion and full static analysability of compiled views.
+
+On-the-fly permission creation is disabled by default in production. Enable it only in development or staging environments where ACL manifests are still being iterated. See section 7.5.
 
 ### CLI testability
 
