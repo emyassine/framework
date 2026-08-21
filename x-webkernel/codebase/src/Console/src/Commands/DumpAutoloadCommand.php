@@ -255,13 +255,14 @@ final readonly class DumpAutoloadCommand
      */
     private function files_list(array $packages): array
     {
+        /** @var array<string, true> $paths */
         $paths = [];
         foreach ($packages as $row) {
             $install_path = $row['path'];
             if (! isset($this->extra($row['package'])['provider'])) {
                 $this->collect_function_files($paths, $install_path);
             }
-            foreach (glob($install_path.'/src/*/composer.json') ?: [] as $json_file) {
+            foreach ($this->glob_paths($install_path.'/src/*/composer.json') as $json_file) {
                 $raw = file_get_contents($json_file);
                 if ($raw === false) {
                     continue;
@@ -276,7 +277,10 @@ final readonly class DumpAutoloadCommand
                 $this->collect_function_files($paths, str_replace('\\', '/', dirname($json_file)));
             }
         }
-        $list = array_keys($paths);
+        $list = [];
+        foreach ($paths as $file => $_on) {
+            $list[] = $file;
+        }
         sort($list, SORT_STRING);
 
         return $list;
@@ -296,6 +300,7 @@ final readonly class DumpAutoloadCommand
             return [];
         }
 
+        /** @var array<string, class-string<ComposableContract>> $map */
         $map = [];
         foreach ($classmap as $class => $file) {
             if (! is_string($file) || ! is_file($file)) {
@@ -306,7 +311,7 @@ final readonly class DumpAutoloadCommand
                 continue;
             }
             require_once $file;
-            if (! class_exists($class, false) || ! is_a($class, ComposableContract::class, true)) {
+            if (! class_exists($class, false) || ! is_a($class, ComposableContract::class, true) || ! is_string($class)) {
                 continue;
             }
             $map[$class::api_name()] = $class;
@@ -383,11 +388,30 @@ final readonly class DumpAutoloadCommand
      */
     private function collect_function_files(array &$paths, string $dir): void
     {
-        foreach (glob($dir.'/functions/*.php') ?: [] as $file) {
+        foreach ($this->glob_paths($dir.'/functions/*.php') as $file) {
             if (is_file($file)) {
                 $paths[str_replace('\\', '/', $file)] = true;
             }
         }
+    }
+
+    /**
+     * @return list<string>
+     */
+    private function glob_paths(string $pattern): array
+    {
+        $found = glob($pattern);
+        if (! is_array($found)) {
+            return [];
+        }
+        $out = [];
+        foreach ($found as $path) {
+            if (is_string($path) && $path !== '') {
+                $out[] = $path;
+            }
+        }
+
+        return $out;
     }
 
     /**
@@ -396,6 +420,7 @@ final readonly class DumpAutoloadCommand
      */
     private function views_list(array $packages, string $root): array
     {
+        /** @var array<string, true> $dirs */
         $dirs = [];
         $host = rtrim(str_replace('\\', '/', $root), '/').'/resources/views';
         $dirs[$host] = true;
@@ -406,7 +431,7 @@ final readonly class DumpAutoloadCommand
                     $dirs[$dir] = true;
                 }
             }
-            foreach (glob($install_path.'/src/*/views') ?: [] as $nested) {
+            foreach ($this->glob_paths($install_path.'/src/*/views') as $nested) {
                 $nested = str_replace('\\', '/', $nested);
                 if (is_dir($nested) && $this->has_view_templates($nested)) {
                     $dirs[$nested] = true;
@@ -414,7 +439,12 @@ final readonly class DumpAutoloadCommand
             }
         }
 
-        return array_keys($dirs);
+        $list = [];
+        foreach ($dirs as $dir => $_on) {
+            $list[] = $dir;
+        }
+
+        return $list;
     }
 
     /**
@@ -423,6 +453,7 @@ final readonly class DumpAutoloadCommand
      */
     private function routes_list(array $packages, string $root): array
     {
+        /** @var array<string, true> $files */
         $files = [];
         $root = rtrim(str_replace('\\', '/', $root), '/');
         foreach ([$root.'/routes/web.php', $root.'/routes.php'] as $host) {
@@ -437,7 +468,12 @@ final readonly class DumpAutoloadCommand
             }
         }
 
-        return array_keys($files);
+        $list = [];
+        foreach ($files as $file => $_on) {
+            $list[] = $file;
+        }
+
+        return $list;
     }
 
     /**
@@ -449,7 +485,7 @@ final readonly class DumpAutoloadCommand
         $out = [];
         foreach ($packages as $row) {
             $out[$row['path']] = $this->extra($row['package']);
-            foreach (glob($row['path'].'/src/*/composer.json') ?: [] as $json_file) {
+            foreach ($this->glob_paths($row['path'].'/src/*/composer.json') as $json_file) {
                 $raw = file_get_contents($json_file);
                 if ($raw === false) {
                     continue;
