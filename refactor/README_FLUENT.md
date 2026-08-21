@@ -304,11 +304,17 @@ webapp()->route()->post(string $uri, Closure|array $action): Route;
 webapp()->route()->put(string $uri, Closure|array $action): Route;
 webapp()->route()->patch(string $uri, Closure|array $action): Route;
 webapp()->route()->delete(string $uri, Closure|array $action): Route;
+webapp()->route()->query(string $uri, Closure|array $action): Route;
 webapp()->route()->group(array $attributes, Closure $routes): void;
 webapp()->route()->dispatch(ServerRequestInterface $request): ResponseInterface;
 ```
 
 ### HTTP request (PSR-7)
+
+The IETF published RFC 10008 in June 2026, defining a new general-purpose HTTP method called QUERY.
+It is the first new HTTP method added in over two decades.
+It acts as a bridge between GET and POST, allowing safe, cacheable read requests to carry a complex payload in the request body.
+
 ```php
 webapp()->request()->uri(): string;
 webapp()->request()->method(): string;
