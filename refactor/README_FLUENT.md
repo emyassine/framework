@@ -77,9 +77,9 @@ The config system is the **first thing resolved** by `webapp()`, before any comp
 
 Config is a plain PHP array `require`d once and cached by OPcache. Reading a config key at request time is an array key lookup — no file I/O, no parsing, no reflection. This is intentional: config resolution must cost nothing on the hot path.
 
-The platform config file (`platform/platform.php`) is **platform-writable**: the platform itself rewrites specific keys at runtime (e.g. `instance_id` after a host migration, `autoload` after a `composer dump-autoload`, `hostname` after a host change). These writes are atomic (tmp → rename) and OPcache-invalidated immediately. Writes happen outside the request hot path — never during a live request.
+The platform config file (`config/platform.php`) is **platform-writable**: the platform itself rewrites specific keys at runtime (e.g. `instance_id` after a host migration, `autoload` after a `composer dump-autoload`, `hostname` after a host change). These writes are atomic (tmp → rename) and OPcache-invalidated immediately. Writes happen outside the request hot path — never during a live request.
 
-### 2.2 Config file — `platform/platform.php`
+### 2.2 Config file — `config/platform.php`
 This is the canonical platform config. Keys are `snake_case`. No PHP class references at the top level — the `Instance::` calls are resolved during the platform bootstrap and the result is stamped back into this file.
 
 ```php
@@ -150,7 +150,7 @@ return [
 ### 2.3 Config layering & merge
 Config files are merged in this order (later layers win):
 ```
-platform/platform.php       			   <- base (platform-managed keys included)
+config/platform.php       			   <- base (platform-managed keys included)
 platform/platform-overrides.php         <- optional local overrides (gitignored)
 modules/{name}/config/{name}.php     <- module-level config (merged under ['modules']['{name}'])
 ```
@@ -175,7 +175,7 @@ Rewrites are atomic: the platform writes to a `.tmp` sibling, then `rename()`s i
 
 ```php
 // Internal platform method (not public API — shown for clarity)
-ConfigWriter::rewrite('platform/platform.php', [
+ConfigWriter::rewrite('config/platform.php', [
     'hostname' => gethostname(),
     'ip'       => gethostbyname(gethostname()),
     'uuid'     => InstanceFingerprint::machine_uuid(),
@@ -208,7 +208,7 @@ webapp()->config()->has('telemetry.enabled'): bool;
 webapp()->config()->reload(): void;
 ```
 
-**Important:** `webapp()->config()->set()` writes to `platform/platform.php` only. Module configs are read-only at runtime — modules declare their defaults in their own config file and override them via module settings (see section 6).
+**Important:** `webapp()->config()->set()` writes to `config/platform.php` only. Module configs are read-only at runtime — modules declare their defaults in their own config file and override them via module settings (see section 6).
 
 ---
 
@@ -576,17 +576,17 @@ $mail = webterminal()->text('Admin email');                     // returns 'admi
 ## 9. Fast-boot & config rewrite rules
 
 ### Current fast-boot problem
-`platform/bootstrap/fast-boot.php` currently hard-codes paths like `platform/storage/instance/data/autoload.php` and `platform/temporary`. These paths are also declared in `platform/platform.php`. They are **duplicated** — a drift risk.
+`platform/bootstrap/fast-boot.php` currently hard-codes paths like `platform/storage/instance/data/autoload.php` and `platform/temporary`. These paths are also declared in `config/platform.php`. They are **duplicated** — a drift risk.
 
 ### Fix: fast-boot reads config
-After the minimal bootstrap (before any composable is loaded), fast-boot reads `platform/platform.php` directly via a raw `require` — no composable, no container, no overhead. This is the only place a raw `require` of the config file is acceptable.
+After the minimal bootstrap (before any composable is loaded), fast-boot reads `config/platform.php` directly via a raw `require` — no composable, no container, no overhead. This is the only place a raw `require` of the config file is acceptable.
 
 The hot path — when the autoload path is already correct in config — exits after a single `require` of the autoload file. The entire fast-boot overhead on the hot path is: one `require` of the config array (OPcache hit) + one array key read + one `require` of the autoload file (OPcache hit). This is measured in microseconds, well inside the < 1 ms kernel budget.
 
 ```php
 // platform/bootstrap/fast-boot.php — revised hot path
 $webapp_path = dirname(__DIR__, 2); // adjust depth to actual tree
-$config_path = $webapp_path . '/platform/platform.php';
+$config_path = $webapp_path . '/config/platform.php';
 // Raw require — no composable, no container. Config must be a plain array.
 $platform_config = is_file($config_path) ? require $config_path : [];
 $autoload_rel    = $platform_config['autoload'] ?? 'vendor/autoload.php';
@@ -605,7 +605,7 @@ if (
 ```
 
 ### Config rewrite from fast-boot (miss path)
-When fast-boot resolves a new autoload path (after `composer install` or a vendor-dir change), it rewrites the `autoload` key in `platform/platform.php` atomically:
+When fast-boot resolves a new autoload path (after `composer install` or a vendor-dir change), it rewrites the `autoload` key in `config/platform.php` atomically:
 
 ```php
 // After $rel is resolved in the miss path:
@@ -679,7 +679,7 @@ These targets cover the full kernel path: boot, config resolution, routing, midd
 Measured baselines (PHP 8.4, OPcache on, JIT off, localhost): Hello World ~0.02 ms kernel path; dashboard render ~0.33 ms. The headroom is intentional — module code, view rendering, and I/O all land in the < 10 ms full-response budget, not the kernel budget.
 
 ### OPcache is mandatory
-Without OPcache the targets are not achievable. `platform/platform.php` is a plain PHP array — it is `require`d once per process and cached by OPcache thereafter. Config reads at request time are in-memory array key lookups. Config rewrites call `opcache_invalidate()` immediately after the atomic rename.
+Without OPcache the targets are not achievable. `config/platform.php` is a plain PHP array — it is `require`d once per process and cached by OPcache thereafter. Config reads at request time are in-memory array key lookups. Config rewrites call `opcache_invalidate()` immediately after the atomic rename.
 
 ### Lazy composable loading
 The `api_name => FQCN` map is generated at `composer dump-autoload`. A request that only calls `webapp()->response()` never loads `PlatformComposable`, `AuthComposable`, `AclComposable`, or any module. Zero allocation for unused composables on the hot path.
@@ -703,7 +703,7 @@ Permissions are always namespaced (`{module}.{resource}.{action}`). There is no 
 Panels are not generic UI containers — they are scoped administrative workspaces with an explicit `platform` or `module` classification baked in. `is_platform_panel()` and `is_module_panel()` are typed boolean predicates. A panel that does not declare its scope fails at registration time, not silently at runtime.
 
 ### Config writability without drift
-Config keys that the platform manages are declared in one place (`platform/platform.php`) and written through one utility (`ConfigWriter::atomic_rewrite()`). Fast-boot reads them directly via `require` — no abstraction overhead on the hot path. The miss path rewrites them through the same utility. There is no second source of truth for these values. All writes happen outside the live request path.
+Config keys that the platform manages are declared in one place (`config/platform.php`) and written through one utility (`ConfigWriter::atomic_rewrite()`). Fast-boot reads them directly via `require` — no abstraction overhead on the hot path. The miss path rewrites them through the same utility. There is no second source of truth for these values. All writes happen outside the live request path.
 
 ### CLI testability
 `webterminal()->fake([...])` injects predefined answers into the prompt layer. No heavy console kernel. No Symfony Command bus. Tests run headless in CI/CD with a single call before the script under test. The fake is consumed in FIFO order and panics loudly if the answer list is exhausted — no silent empty string defaults.

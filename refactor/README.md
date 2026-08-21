@@ -83,7 +83,7 @@ Environment: PHP 8.4, OPcache on, JIT off, localhost.
 - **Singleton / scoped caching** — composable instances are cached in the container after first resolution. Chaining `webapp()->platform()->instance()->machine_uuid()` costs three object-reference reads on every call after the first within the same request.
 - **Compile-time ACL expansion** — view directive permission names (`@can('export')`) are expanded to fully qualified calls (`webapp()->acl('invoicing')->can('invoicing.export')`) at compile time, not at render time. Zero runtime overhead for name resolution.
 - **No magic methods** — `__call` / `__callStatic` are banned as much as possible. PHPStan / Psalm analyse 100 % of the chain without plugins. No dynamic dispatch on the hot path.
-- **OPcache is mandatory** — `platform/platform.php` is a plain PHP array. It is `require`d once and cached by OPcache. Config rewrites call `opcache_invalidate()` immediately after the atomic rename.
+- **OPcache is mandatory** — `config/platform.php` is a plain PHP array. It is `require`d once and cached by OPcache. Config rewrites call `opcache_invalidate()` immediately after the atomic rename.
 - **Fast-boot reads config directly** — `platform/bootstrap/fast-boot.php` `require`s the config array before any composable or container is initialised. The hot path exits after the autoload `require`. No abstraction overhead.
 
 Guide: [Performance](x-webkernel/docs/guides/04-performance/performance.en.md)
