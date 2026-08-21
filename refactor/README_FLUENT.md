@@ -150,7 +150,7 @@ return [
 Config files are merged in this order (later layers win):
 ```
 platform/platform.php       			   <- base (platform-managed keys included)
-platform/local-overrides.php         <- optional local overrides (gitignored)
+platform/platform-overrides.php         <- optional local overrides (gitignored)
 modules/{name}/config/{name}.php     <- module-level config (merged under ['modules']['{name}'])
 ```
 The merge is a **deep recursive merge** (`array_replace_recursive`). Module configs are **namespaced** under their module key — they never pollute the root config namespace.

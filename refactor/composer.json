@@ -19,7 +19,7 @@
         "webkernel/codebase": "^0.12.0"
     },
     "config": {
-        "vendor-dir": "software/source",
+        "vendor-dir": "platform/dependencies",
         "apcu-autoloader": true,
         "optimize-autoloader": true,
         "preferred-install": "dist",

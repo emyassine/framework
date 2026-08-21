@@ -11,7 +11,7 @@
 
 //> ---- Hot path: resolve stamped autoload and return immediately ------------------
 
-$webapp_path = dirname(__DIR__);
+$webapp_path = dirname(__DIR__, 2);
 $autoload_map = $webapp_path . "/platform/storage/instance/data/autoload.php";
 
 if (is_file($autoload_map)) {

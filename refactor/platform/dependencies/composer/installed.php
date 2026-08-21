@@ -1,9 +1,9 @@
 <?php return array(
     'root' => array(
         'name' => 'webkernel/webkernel',
-        'pretty_version' => '1.0.0+no-version-set',
-        'version' => '1.0.0.0',
-        'reference' => null,
+        'pretty_version' => 'dev-main',
+        'version' => 'dev-main',
+        'reference' => 'c8b90d33e599a8c5079998bb939ad9bd5a02a18b',
         'type' => 'project',
         'install_path' => __DIR__ . '/../../../',
         'aliases' => array(),
@@ -47,9 +47,9 @@
             'dev_requirement' => false,
         ),
         'webkernel/webkernel' => array(
-            'pretty_version' => '1.0.0+no-version-set',
-            'version' => '1.0.0.0',
-            'reference' => null,
+            'pretty_version' => 'dev-main',
+            'version' => 'dev-main',
+            'reference' => 'c8b90d33e599a8c5079998bb939ad9bd5a02a18b',
             'type' => 'project',
             'install_path' => __DIR__ . '/../../../',
             'aliases' => array(),

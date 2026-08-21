@@ -11,7 +11,7 @@
 return array (
   'instance_id' => '0f617657c73510a5b826bced3b27d058',
   'webapp_root' => '/home/yassine/Projects/framework/refactor',
-  'vendor_dir' => '/home/yassine/Projects/framework/refactor/software/source',
-  'vendor_rel' => 'software/source',
-  'generated_at' => '2026-08-21T16:20:11+00:00',
+  'vendor_dir' => '/home/yassine/Projects/framework/refactor/platform/dependencies',
+  'vendor_rel' => 'platform/dependencies',
+  'generated_at' => '2026-08-21T17:29:06+00:00',
 );
