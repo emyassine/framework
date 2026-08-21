@@ -1,5 +1,6 @@
 # Webkernel — Fluent API Reference (`README_FLUENT.md`)
 > **Status:** canonical reference for the `webapp()` / `webterminal()` fluent chain.
+> To be added : `webapi()` for the apis
 > All methods use strict `snake_case`. No camelCase anywhere — not in method names, not in config keys, not in array keys.
 > This document is the single source of truth during the current refactor phase.
 

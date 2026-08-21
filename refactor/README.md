@@ -18,14 +18,56 @@ The objective is **minimum overhead at all**, not an empty `require` block. See 
 > **These are hard targets, not aspirations. Every architectural decision in this codebase is a consequence of them.**
 
 | Scope | Target | What is included |
-|---|---|---|
+| --- | --- | --- |
 | **Kernel CPU — no I/O** | **< 1 ms** | Boot, config resolution, routing, middleware stack, ACL/permission resolution, response dispatch |
 | **Full application response — with I/O** | **< 10 ms** | Everything above + DB queries, cache reads, view render |
 
 **"Included" means included.** Auth checks, permission lookups, module-scoped ACL resolution, view directive expansion, and middleware evaluation all happen inside the < 1 ms kernel budget.
 None of these are exempted. If a composable makes the kernel miss the budget, the composable is the problem — not the target.
 
-We also may want to make the app dynamic if a code changes the next request should show the change.
+---
+
+## Low-Level In-Memory Caching & Hot-Reloading
+
+To guarantee sub-millisecond execution while maintaining dynamic capabilities (where code changes reflect on the immediate next request), the kernel strictly relies on server-local shared memory primitives. Network-bound caches (Redis, Memcached) are forbidden inside the < 1 ms Kernel CPU budget.
+
+### Primary Caching Primitives
+
+* **APCu (Alternative PHP Cache User):** Stores arbitrary PHP variables directly in shared memory (RAM) local to the server process. Operates with zero network hops and zero serialization overhead for native PHP types. Used for resolved routing tables, flattened ACL trees, and compiled config state.
+* **OPcache Bytecode Invalidation:** Keeps compiled PHP scripts in shared memory. When application files change, calling `opcache_invalidate($file, true)` instantly purges the stale bytecode without requiring a service restart.
+* **Shared Memory (`shmop`):** Low-level POSIX shared memory functions built into PHP. Operates without abstraction layer overhead, but requires manual binary packing and lacks key-value indexing or automatic TTL management.
+
+### Caching Layer Comparison
+
+| Caching Layer | Read Speed | Invalidation Speed | Serialization Overhead | Kernel Fit |
+| --- | --- | --- | --- | --- |
+| **APCu** | Nanoseconds (Local RAM) | Instant (`apcu_delete`) | **None** (Stores native PHP types) | **Primary** (Routing, ACL, Config) |
+| **OPcache** | Nanoseconds (Bytecode) | Instant (`opcache_invalidate`) | **N/A** (Compiled PHP code) | **Primary** (Dynamic Code Execution) |
+| **`shmop`** | Nanoseconds (Local RAM) | Manual pointer reset | **High** (Requires manual binary packing) | Special Use Only |
+| **Redis / Memcached** | Sub-millisecond (IPC/Network) | Instant (Network command) | **High** (Requires `serialize` / `json_encode`) | Full I/O Budget Only (< 10 ms) |
+
+---
+
+## Dynamic Hot-Reloading Strategy
+
+To show immediate changes on the next request when source files change without sacrificing the < 1 ms CPU target:
+
+1. **Bytecode Invalidation:** Hook file-change listeners or dev-mode file-stat checks to trigger `opcache_invalidate($filePath)` on changed files.
+2. **User Cache Eviction:** Cache calculated state (e.g., route maps or ACL structures derived from those files) in APCu. Purge affected APCu keys synchronously via `apcu_delete($key)` or atomic tag flushing when a file update is detected.
+
+---
+
+## Low-Level Implementation Considerations & Gotchas
+
+* **APCu TTL Lock-Out Bug:** Updating an existing key while providing a TTL inside a rapid loop or single long-running request can cause APCu to stop updating the key once the original TTL expires. When mutating high-frequency counters or states in shared memory, prefer atomic operations (`apcu_inc`, `apcu_dec`, `apcu_cas`) or use `apcu_entry()` for lock-free generation.
+* **Concurrency Protection:** For high-concurrency writes to APCu (such as cache warming during cold boots), use `apcu_entry()` to ensure atomic generation and prevent cache stampedes.
+
+### Essential APCu API Methods
+
+* `apcu_fetch($key)` / `apcu_store($key, $var, $ttl)` — Core zero-copy read/write operations.
+* `apcu_entry($key, $generator_func, $ttl)` — Atomic lock-free fetch-or-create execution.
+* `apcu_cas($key, $old_val, $new_val)` — Atomic Compare-And-Swap for concurrency controls.
+* `apcu_delete($key)` / `apcu_clear_cache()` — Instant user-space memory invalidation.
 
 ### Measured baselines
 Environment: PHP 8.4, OPcache on, JIT off, localhost.
