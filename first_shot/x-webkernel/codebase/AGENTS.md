@@ -42,7 +42,7 @@ Do not introduce `camelCase` on Webkernel surfaces. Do not keep dual APIs.
 
 ## Host API
 
-`webapp()` is the eager helper. `WebApp` is the facade. `__call` resolves dump-autoload map `{vendor}/composer/webkernel_composables.php` (`api_name => class`) then `container()->make()`. Unknown segment throws. No request-time class glob.
+`webapp()` is the eager helper. `WebApp` is the host (boot, config, declare, handle_request). Fluent segments are composables. `__call` resolves the dump-autoload map `{vendor}/composer/webkernel_composables.php` (`api_name => class`) then `container()->make()`. Do not add one method per segment on `WebApp`. Arguments go to the composable `__invoke` when present (`module('invoicing')`, `acl('invoicing')`, …). `@method` stubs are generated into `src/DevEnv/_ide_webapp.php` at dump-autoload. Unknown segment throws. No request-time class glob. `webapp()->config()` is resolved before any other composable.
 
 Providers (`PlatformProvider`) declare view paths, component dirs, route files, extra bindings at boot. Composables are lazy fluent segments (`webapp()->view()`, `webapp()->route()`, later `webapp()->auth()`). Path helpers stay dumped; route/view function files load with the composable class.
 

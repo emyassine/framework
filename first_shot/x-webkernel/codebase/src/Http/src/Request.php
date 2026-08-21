@@ -2,16 +2,31 @@
 
 namespace Webkernel\Http;
 
+use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Message\UploadedFileInterface;
+use Webkernel\Composables\ComposableContract;
+use Webkernel\Http\Psr\ServerRequest;
+
 /**
- * Current HTTP request. Path helpers only — no PSR-7.
+ * Current HTTP request. Path helpers plus a PSR-7 adapter.
  */
-final class Request
+final class Request implements ComposableContract
 {
     public function __construct(
         private readonly string $path,
         private readonly string $method = 'GET',
         private readonly string $host = '',
     ) {
+    }
+
+    public static function api_name(): string
+    {
+        return 'request';
+    }
+
+    public static function container_lifetime(): string
+    {
+        return 'scoped';
     }
 
     public static function capture(): self
@@ -49,6 +64,37 @@ final class Request
     public function host(): string
     {
         return $this->host;
+    }
+
+    public function header(string $name): ?string
+    {
+        $key = 'HTTP_'.strtoupper(str_replace('-', '_', $name));
+        $value = $_SERVER[$key] ?? null;
+
+        return is_string($value) ? $value : null;
+    }
+
+    public function input(?string $key = null, mixed $default = null): mixed
+    {
+        $bag = $_POST + $_GET;
+        if ($key === null) {
+            return $bag;
+        }
+
+        return $bag[$key] ?? $default;
+    }
+
+    public function file(string $key): ?UploadedFileInterface
+    {
+        $files = $this->psr()->getUploadedFiles();
+        $file = $files[$key] ?? null;
+
+        return $file instanceof UploadedFileInterface ? $file : null;
+    }
+
+    public function psr(): ServerRequestInterface
+    {
+        return ServerRequest::from_globals();
     }
 
     public function is(string ...$patterns): bool

@@ -18,7 +18,13 @@ final class Cache
 
     public static function path(string $hash): string
     {
-        return webapp_path('storage/framework/cache').'/routes_'.$hash.'.php';
+        $rel = 'platform/storage/framework/cache';
+        $configured = webapp()->config('platform.storage_path');
+        if (is_string($configured) && $configured !== '') {
+            $rel = $configured.'/framework/cache';
+        }
+
+        return webapp_path($rel).'/routes_'.$hash.'.php';
     }
 
     /**

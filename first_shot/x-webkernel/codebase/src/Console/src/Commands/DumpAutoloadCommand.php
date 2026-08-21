@@ -6,6 +6,7 @@ use FilesystemIterator;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 use Webkernel\Composables\ComposableContract;
+use Webkernel\Config\ConfigWriter;
 use Webkernel\Console\Attribute\ConsoleCommand;
 use Webkernel\Console\ExitCode;
 use Webkernel\Console\Terminal;
@@ -45,6 +46,7 @@ final readonly class DumpAutoloadCommand
 
         $instance_id = InstanceId::record($root);
         $vendor_rel = $this->relative($root, $vendor_dir) ?? basename($vendor_dir);
+        $this->stamp_platform_config($root, str_replace('\\', '/', $vendor_rel), $instance_id);
         $packages = $this->packages($vendor_dir);
 
         $boot = [
@@ -87,6 +89,7 @@ final readonly class DumpAutoloadCommand
             $composer_dir.DIRECTORY_SEPARATOR.self::COMPOSABLES_BASENAME,
             $composables,
         );
+        $this->write_webapp_ide($composables);
         $this->write_class_list(
             $composer_dir.DIRECTORY_SEPARATOR.self::PROVIDERS_BASENAME,
             $this->providers_list($packages),
@@ -138,6 +141,36 @@ final readonly class DumpAutoloadCommand
         }
 
         throw new \RuntimeException('Cannot resolve project root.');
+    }
+
+    private function stamp_platform_config(string $root, string $vendor_rel, string $instance_id): void
+    {
+        $config_path = $root.DIRECTORY_SEPARATOR.'config'.DIRECTORY_SEPARATOR.'platform.php';
+        if (! is_file($config_path)) {
+            return;
+        }
+        $current = require $config_path;
+        if (! is_array($current)) {
+            $current = [];
+        }
+        $parts = InstanceId::parts($root);
+        $writes = [
+            'hostname' => $parts['host'],
+            'ip' => $parts['ip'],
+            'uuid' => $parts['machine_uuid'],
+            'macs' => $parts['macs'],
+            'instance_file_path' => 'platform/storage/instance',
+            'autoload' => $vendor_rel.'/autoload.php',
+        ];
+        $id = $current['id'] ?? null;
+        if (! is_string($id) || $id === '') {
+            $writes['id'] = $instance_id;
+        }
+        $created = $current['created'] ?? null;
+        if (! is_string($created) || $created === '') {
+            $writes['created'] = gmdate('c');
+        }
+        ConfigWriter::atomic_rewrite($config_path, $writes);
     }
 
     private function vendor_dir(string $root): string
@@ -721,6 +754,114 @@ return [{$list}];
 
 PHP;
         file_put_contents($path, $body, LOCK_EX);
+    }
+
+    /**
+     * @param array<string, class-string> $map
+     */
+    private function write_webapp_ide(array $map): void
+    {
+        $path = dirname(IdeHelper::output_path()).'/_ide_webapp.php';
+        $header = IdeHelper::generated_header();
+        $methods = [
+            '     * @method \Webkernel\Composables\ConfigComposable|mixed config(?string $key = null, mixed $default = null)',
+        ];
+        ksort($map);
+        foreach ($map as $name => $class) {
+            if ($name === 'config') {
+                continue;
+            }
+            $methods[] = '     * '.$this->composable_phpdoc($name, $class);
+        }
+        $block = implode("\n", $methods);
+        $body = <<<PHP
+<?php declare(strict_types=1);
+
+{$header}
+//>
+//> Generated. Do not edit. IDE / PHPStan stub for webapp() composables.
+
+namespace Webkernel;
+
+if (false) {
+    /**
+{$block}
+     */
+    final class WebApp
+    {
+    }
+}
+
+PHP;
+        file_put_contents($path, $body, LOCK_EX);
+    }
+
+    /**
+     * @param class-string $class
+     */
+    private function composable_phpdoc(string $name, string $class): string
+    {
+        if (method_exists($class, '__invoke')) {
+            try {
+                $ref = new \ReflectionMethod($class, '__invoke');
+            } catch (\ReflectionException) {
+                return '@method \\'.$class.' '.$name.'()';
+            }
+            $params = [];
+            foreach ($ref->getParameters() as $parameter) {
+                $params[] = $this->phpdoc_parameter($parameter, $class);
+            }
+            $return = $this->phpdoc_type($ref->getReturnType(), $class) ?? ('\\'.$class);
+
+            return '@method '.$return.' '.$name.'('.implode(', ', $params).')';
+        }
+
+        return '@method \\'.$class.' '.$name.'()';
+    }
+
+    /**
+     * @param class-string $class
+     */
+    private function phpdoc_parameter(\ReflectionParameter $parameter, string $class): string
+    {
+        $type = $this->phpdoc_type($parameter->getType(), $class);
+        $piece = ($type !== null ? $type.' ' : '').'$'.$parameter->getName();
+        if ($parameter->isDefaultValueAvailable()) {
+            $default = $parameter->getDefaultValue();
+            if ($default === []) {
+                $piece .= ' = []';
+            } elseif ($default === null) {
+                $piece .= ' = null';
+            } else {
+                $piece .= ' = '.var_export($default, true);
+            }
+        } elseif ($parameter->isOptional() || $parameter->allowsNull()) {
+            $piece .= ' = null';
+        }
+
+        return $piece;
+    }
+
+    /**
+     * @param class-string $class
+     */
+    private function phpdoc_type(?\ReflectionType $type, string $class): ?string
+    {
+        if ($type instanceof \ReflectionNamedType) {
+            $name = $type->getName();
+            if ($name === 'self' || $name === 'static') {
+                $name = '\\'.$class;
+            } elseif (! $type->isBuiltin()) {
+                $name = '\\'.$name;
+            }
+            if ($type->allowsNull() && $name !== 'mixed' && $name !== 'null') {
+                return '?'.$name;
+            }
+
+            return $name;
+        }
+
+        return null;
     }
 
     /**

@@ -111,6 +111,11 @@ final class Route implements ComposableContract
         return self::app()->add('OPTIONS', $uri, $action);
     }
 
+    public static function query(string $uri, mixed $action): Binding
+    {
+        return self::app()->add('QUERY', $uri, $action);
+    }
+
     public static function any(string $uri, mixed $action): Binding
     {
         return self::app()->add('*', $uri, $action);
@@ -194,8 +199,17 @@ final class Route implements ComposableContract
         return self::app()->uri_generator()->for_name($name, $parameters);
     }
 
-    public static function dispatch(?string $method = null, ?string $uri = null, ?string $host = null): mixed
+    public static function dispatch(\Psr\Http\Message\ServerRequestInterface|string|null $method = null, ?string $uri = null, ?string $host = null): mixed
     {
+        if ($method instanceof \Psr\Http\Message\ServerRequestInterface) {
+            $request = $method;
+            $body = self::dispatch($request->getMethod(), $request->getUri()->getPath(), $request->getUri()->getHost());
+            if ($body instanceof \Psr\Http\Message\ResponseInterface) {
+                return $body;
+            }
+
+            return webapp()->response()->html((string) $body);
+        }
         $method ??= $_SERVER['REQUEST_METHOD'] ?? 'GET';
         $uri ??= $_SERVER['REQUEST_URI'] ?? '/';
         if (false !== $q = strpos($uri, '?')) {
@@ -448,7 +462,7 @@ final class Route implements ComposableContract
         $rows = [];
         foreach ($this->bindings as $binding) {
             $methods = $binding->methods();
-            $order = ['GET' => 0, 'HEAD' => 1, 'POST' => 2, 'PUT' => 3, 'PATCH' => 4, 'DELETE' => 5, 'OPTIONS' => 6];
+            $order = ['GET' => 0, 'HEAD' => 1, 'QUERY' => 2, 'POST' => 3, 'PUT' => 4, 'PATCH' => 5, 'DELETE' => 6, 'OPTIONS' => 7];
             usort($methods, static fn (string $a, string $b): int => ($order[$a] ?? 99) <=> ($order[$b] ?? 99));
             $rows[] = [
                 'methods' => $methods,

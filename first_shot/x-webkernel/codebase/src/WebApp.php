@@ -2,30 +2,43 @@
 
 namespace Webkernel;
 
+//> This file is part of Webkernel.
+//> (c) 2025 - 2027 Numerimondes, El Moumen Yassine
+//> Yassine El Moumen <yassine@numerimondes.com> | <platform@webkernelphp.com>
+//> For the full copyright and license information, please view the LICENSE
+//> file that was distributed with this source code.
+
+//>>>---> TODO : Fix Phpactor/Phpantom static analysis warnings:
+//>>>---> TODO : - Add @method annotations on WebApp for dynamic __call magic (console(), route(), etc.)
+//>>>---> TODO : - Fix type mismatches: ?Middleware nullable argument & class-string<T> generic constraints
+//>>>---> TODO : - Fix Psr\Http\Message\ResponseInterface method resolution (getHeaders)
+
 use Psr\Container\ContainerInterface;
-use Webkernel\Container\Container;
+use Psr\Http\Message\ResponseInterface;
+use Webkernel\Composables\ComposableContract;
+use Webkernel\Composables\ConfigComposable;
+use Webkernel\Composables\PanelComposable;
 use Webkernel\Console\Input\ArgvInput;
+use Webkernel\Container\Container;
 use Webkernel\Http\Request;
 use Webkernel\Platform\Exceptions;
 use Webkernel\Platform\Middleware;
-use Webkernel\Composables\ComposableContract;
 
 /**
- * Host application facade. Composables are lazy API segments
- * (webapp()->view(), webapp()->route(), webapp()->console()).
- * Providers declare paths at boot.
+ * Host application. Fluent segments are composables from the dump-autoload map
+ * (`api_name => FQCN`). Do not add one method per segment here.
  *
- * @method \Webkernel\View\View view()
- * @method \Webkernel\Route\Route route()
- * @method \Webkernel\Performance\Performance performance()
- * @method \Webkernel\Console\Kernel console()
- * @method \Webkernel\Console\Terminal terminal()
+ * @see vendor/composer/webkernel_composables.php
+ * @see src/DevEnv/_ide_webapp.php
+ * @method getStatusCode() \Psr\Http\Message\ResponseInterface
  */
 final class WebApp
 {
     private static ?self $instance = null;
 
     private Container $container;
+
+    private ?ConfigComposable $config_composable = null;
 
     /** @var array<string, class-string<ComposableContract>> */
     private array $composables = [];
@@ -72,6 +85,7 @@ final class WebApp
     public static function flush(): void
     {
         self::$instance = null;
+        PanelComposable::flush();
     }
 
     public function container(): Container
@@ -79,13 +93,54 @@ final class WebApp
         return $this->container;
     }
 
+    public function env(?string $key = null, mixed $default = null): mixed
+    {
+        if ($key === null) {
+            $all = getenv();
+
+            return is_array($all) ? $all : $default;
+        }
+        $value = getenv($key);
+
+        return $value === false ? $default : $value;
+    }
+
+    public function is_production(): bool
+    {
+        $env = $this->env('WEBKERNEL_ENV', $this->env('APP_ENV'));
+
+        return $env === 'production' || $env === 'prod';
+    }
+
+    public function is_debug(): bool
+    {
+        return ! $this->is_production();
+    }
+
+    /**
+     * First primitive. Loaded before the composable map.
+     *
+     * @return ($key is null ? ConfigComposable : mixed)
+     */
+    public function config(?string $key = null, mixed $default = null): mixed
+    {
+        $config = $this->config_composable ??= ConfigComposable::load();
+        if (! $this->container->has(ConfigComposable::class)) {
+            $this->container->instance(ConfigComposable::class, $config);
+        }
+        if ($key === null) {
+            return $config;
+        }
+
+        return $config->get($key, $default);
+    }
+
     /**
      * @param callable(Middleware): void $callback
      */
     public function with_middleware(callable $callback): self
     {
-        $this->middleware ??= new Middleware();
-        $callback($this->middleware);
+        $callback($this->middleware());
 
         return $this;
     }
@@ -118,25 +173,49 @@ final class WebApp
 
     public function handle_request(Request $request): void
     {
+        $this->boot();
         $this->container->instance(Request::class, $request);
-        echo $this->route()::dispatch($request->method(), $request->uri(), $request->host());
+
+        $stack = $this->middleware()->stack();
+        $next = function () use ($request): mixed {
+            return $this->route()::dispatch($request->psr());
+        };
+        for ($i = count($stack) - 1; $i >= 0; $i--) {
+            $mw = $stack[$i];
+            $previous = $next;
+            $next = static function () use ($mw, $previous, $request): mixed {
+                if (is_callable($mw)) {
+                    return $mw($request, $previous);
+                }
+                if (is_string($mw) && class_exists($mw)) {
+                    $object = new $mw();
+                    if (is_callable($object)) {
+                        return $object($request, $previous);
+                    }
+                }
+
+                return $previous();
+            };
+        }
+
+        $this->emit($next());
     }
 
     public function handle_command(ArgvInput $input): int
     {
         $this->boot();
         $this->container->instance(ArgvInput::class, $input);
-        if (! $this->container->has(\Webkernel\Console\Kernel::class)) {
-            $this->container->singleton(\Webkernel\Console\Kernel::class);
-        }
-        /** @var \Webkernel\Console\Kernel $kernel */
-        $kernel = $this->container->make(\Webkernel\Console\Kernel::class);
 
-        return $kernel->handle($input)->value;
+        return $this->console()->handle($input)->value;
     }
 
-    public function middleware(): ?Middleware
+    public function middleware(): Middleware
     {
+        $this->middleware ??= new Middleware();
+        if (! $this->container->has(Middleware::class)) {
+            $this->container->instance(Middleware::class, $this->middleware);
+        }
+
         return $this->middleware;
     }
 
@@ -224,8 +303,6 @@ final class WebApp
     }
 
     /**
-     * Unnamed view dirs (host first) plus dump-autoload fallback.
-     *
      * @return list<string>
      */
     public function view_dirs(): array
@@ -259,8 +336,6 @@ final class WebApp
     }
 
     /**
-     * Host-declared command classes. Discovery dump is merged in the console kernel.
-     *
      * @return list<class-string>
      */
     public function command_classes(): array
@@ -274,6 +349,8 @@ final class WebApp
             return $this;
         }
         $this->booted = true;
+        $this->config();
+        $this->config_composable?->stamp_identity();
         $this->load_dumped();
         $host_views = webapp_path('resources/views');
         if (is_dir($host_views)) {
@@ -291,14 +368,24 @@ final class WebApp
 
     public function __call(string $name, array $arguments): mixed
     {
-        $this->boot();
-        $class = $this->composables[$name] ?? null;
-        if ($class === null) {
-            throw new \BadMethodCallException('Unknown composable ['.$name.'].');
+        $instance = $this->resolve_named($name);
+        if ($arguments === []) {
+            return $instance;
         }
-        if ($arguments !== []) {
-            throw new \BadMethodCallException('webapp()->'.$name.'() does not take arguments.');
+        if (is_callable($instance)) {
+            return $instance(...$arguments);
         }
+
+        throw new \BadMethodCallException('webapp()->'.$name.'() does not take arguments.');
+    }
+
+    /**
+     * @template T of ComposableContract
+     * @param class-string<T> $class
+     * @return T
+     */
+    private function resolve_composable(string $class): object
+    {
         if (! $this->container->has($class)) {
             $lifetime = $class::container_lifetime();
             if ($lifetime !== 'singleton' && $lifetime !== 'bind' && $lifetime !== 'scoped') {
@@ -307,7 +394,45 @@ final class WebApp
             $this->container->{$lifetime}($class);
         }
 
-        return $this->container->make($class);
+        /** @var T $resolved */
+        $resolved = $this->container->make($class);
+
+        return $resolved;
+    }
+
+    private function resolve_named(string $name): object
+    {
+        $this->boot();
+        $class = $this->composables[$name] ?? null;
+        if (! is_string($class) || $class === '') {
+            throw new \BadMethodCallException('Unknown composable ['.$name.'].');
+        }
+        if ($name === 'middleware') {
+            return $this->middleware();
+        }
+        if ($name === 'request' && ! $this->container->has($class)) {
+            $this->container->instance($class, Request::capture());
+        }
+
+        return $this->resolve_composable($class);
+    }
+
+    private function emit(mixed $out): void
+    {
+        if ($out instanceof ResponseInterface) {
+            http_response_code($out->getStatusCode());
+            foreach ($out->getHeaders() as $name => $values) {
+                $first = true;
+                foreach ($values as $value) {
+                    header($name.': '.$value, $first);
+                    $first = false;
+                }
+            }
+            echo (string) $out->getBody();
+
+            return;
+        }
+        echo $out;
     }
 
     private function load_dumped(): void

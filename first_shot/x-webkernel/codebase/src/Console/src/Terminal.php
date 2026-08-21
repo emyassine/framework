@@ -101,13 +101,77 @@ final class Terminal implements ComposableContract
             && stream_isatty(STDIN);
     }
 
-    public function next_fake(): mixed
+    public function next_fake(string $prompt = ''): mixed
     {
         if ($this->fakes === []) {
-            throw new \RuntimeException('No fake terminal answers left.');
+            throw new \RuntimeException(
+                'webterminal()->fake() exhausted: no answer left for prompt'
+                .($prompt !== '' ? ' ['.$prompt.']' : '').'.'
+            );
         }
 
         return array_shift($this->fakes);
+    }
+
+    public function secret(string $label, bool $required = false): string
+    {
+        return $this->password($label, required: $required);
+    }
+
+    /**
+     * @param array<int|string, string> $options
+     * @param list<int|string> $default
+     * @return list<mixed>
+     */
+    public function multi_select(string $label, array $options, array $default = []): array
+    {
+        return $this->multiselect($label, $options, $default);
+    }
+
+    /**
+     * @param list<string> $headers
+     * @param list<list<mixed>> $rows
+     */
+    public function table(array $headers, array $rows): void
+    {
+        $widths = [];
+        foreach ($headers as $i => $header) {
+            $widths[$i] = strlen((string) $header);
+        }
+        foreach ($rows as $row) {
+            foreach (array_values($row) as $i => $cell) {
+                $widths[$i] = max($widths[$i] ?? 0, strlen((string) $cell));
+            }
+        }
+        $line = static function (array $cells) use ($widths): string {
+            $out = [];
+            foreach (array_values($cells) as $i => $cell) {
+                $out[] = str_pad((string) $cell, $widths[$i] ?? 0);
+            }
+
+            return '  '.implode('  ', $out);
+        };
+        echo $line($headers).PHP_EOL;
+        echo '  '.str_repeat('-', max(1, array_sum($widths) + 2 * max(0, count($widths) - 1))).PHP_EOL;
+        foreach ($rows as $row) {
+            echo $line(array_values($row)).PHP_EOL;
+        }
+    }
+
+    public function spinner(\Closure $task, string $title = ''): mixed
+    {
+        if ($title !== '') {
+            $this->info($title);
+        }
+
+        return $task();
+    }
+
+    public function progress(int $total_steps, \Closure $callback): void
+    {
+        for ($i = 1; $i <= $total_steps; $i++) {
+            $callback($i, $total_steps);
+        }
     }
 
     /**

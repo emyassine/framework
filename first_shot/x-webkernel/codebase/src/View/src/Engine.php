@@ -313,7 +313,16 @@ final class Engine
             if (! is_dir($this->compile_dpath) && ! mkdir($this->compile_dpath, 0775, true) && ! is_dir($this->compile_dpath)) {
                 throw new \RuntimeException('Unable to create '.$this->compile_dpath);
             }
-            $this->compiler()->compile($view);
+            $compiler = $this->compiler();
+            $module = null;
+            if (str_contains($view, '::')) {
+                $module = explode('::', $view, 2)[0];
+                if ($module === 'webkernel') {
+                    $module = 'platform';
+                }
+            }
+            $compiler->acl_view_module = $module;
+            $compiler->compile($view);
             unset($this->compiled_files[$view], $this->template_files[$view]);
         }
     }

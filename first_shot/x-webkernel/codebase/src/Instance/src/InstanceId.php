@@ -10,7 +10,7 @@ final class InstanceId
 {
     public static function file_path(string $webapp_root): string
     {
-        return rtrim($webapp_root, '/\\').'/storage/instance/data/instance_id';
+        return rtrim($webapp_root, '/\\').'/platform/storage/instance/data/instance_id';
     }
 
     public static function fingerprint(string $webapp_root): string
@@ -64,7 +64,7 @@ final class InstanceId
         ];
     }
 
-    private static function macs(): string
+    public static function macs(): string
     {
         $macs = [];
         $files = glob('/sys/class/net/*/address');
@@ -81,7 +81,7 @@ final class InstanceId
         return implode(',', $macs);
     }
 
-    private static function machine_uuid(): string
+    public static function machine_uuid(): string
     {
         $uuid = @file_get_contents('/sys/class/dmi/id/product_uuid');
         if (is_string($uuid) && trim($uuid) !== '') {

@@ -68,6 +68,9 @@ class Compiler
     public ?string $current_role;
     /** @var string[]|null $current_permission Current permission. Example ['edit','add'] */
     public ?array $current_permission = [];
+    /** @var string|null Module or platform context used to expand @can at compile time */
+    public ?string $acl_view_module = null;
+
     /** @var callable|null callback of validation. It is used for "@can,@cannot" */
     public $auth_call_back;
     /** @var callable|null callback of validation. It is used for @canany */
@@ -3682,8 +3685,7 @@ class Compiler
 
     protected function compile_can($expression): string
     {
-        $v = $this->strip_parentheses($expression);
-        return $this->php_tag . 'if (call_user_func($this->auth_call_back,' . $v . ')): ?>';
+        return $this->php_tag . 'if ('.$this->acl_can_call($expression).'): ?>';
     }
 
     /**
@@ -3696,7 +3698,7 @@ class Compiler
     {
         $v = $this->strip_parentheses($expression);
         if ($v) {
-            return $this->php_tag . 'elseif (call_user_func($this->auth_call_back,' . $v . ')): ?>';
+            return $this->php_tag . 'elseif ('.$this->acl_can_call($expression).'): ?>';
         }
         return $this->php_tag . 'else: ?>';
     }
@@ -3705,7 +3707,7 @@ class Compiler
     protected function compile_cannot($expression): string
     {
         $v = $this->strip_parentheses($expression);
-        return $this->php_tag . 'if (!call_user_func($this->auth_call_back,' . $v . ')): ?>';
+        return $this->php_tag . 'if (!'.$this->acl_can_call($expression).'): ?>';
     }
 
     /**
@@ -3718,7 +3720,7 @@ class Compiler
     {
         $v = $this->strip_parentheses($expression);
         if ($v) {
-            return $this->php_tag . 'elseif (!call_user_func($this->auth_call_back,' . $v . ')): ?>';
+            return $this->php_tag . 'elseif (!'.$this->acl_can_call($expression).'): ?>';
         }
         return $this->php_tag . 'else: ?>';
     }
@@ -3732,8 +3734,12 @@ class Compiler
      */
     protected function compile_canany($expression): string
     {
-        $role = $this->strip_parentheses($expression);
-        return $this->php_tag . 'if (call_user_func($this->auth_any_call_back,' . $role . ')): ?>';
+        return $this->php_tag . 'if ('.$this->acl_can_any_call($expression).'): ?>';
+    }
+
+    protected function compile_can_any($expression): string
+    {
+        return $this->compile_canany($expression);
     }
 
     /**
@@ -3748,7 +3754,7 @@ class Compiler
         if ($role == '') {
             return $this->php_tag . 'else: ?>';
         }
-        return $this->php_tag . 'elseif (call_user_func($this->auth_any_call_back,' . $role . ')): ?>';
+        return $this->php_tag . 'elseif ('.$this->acl_can_any_call($expression).'): ?>';
     }
 
     /**
@@ -4063,6 +4069,33 @@ class Compiler
     protected function compile_endcanany(): string
     {
         return $this->php_tag . 'endif; ?>';
+    }
+
+    protected function compile_endcan_any(): string
+    {
+        return $this->compile_endcanany();
+    }
+
+    private function acl_can_call($expression): string
+    {
+        $v = $this->strip_parentheses($expression);
+        $module = $this->acl_view_module;
+        if (is_string($module) && $module !== '') {
+            return 'webapp()->acl('.var_export($module, true).')->can('.$v.')';
+        }
+
+        return 'webapp()->acl()->can('.$v.')';
+    }
+
+    private function acl_can_any_call($expression): string
+    {
+        $v = $this->strip_parentheses($expression);
+        $module = $this->acl_view_module;
+        if (is_string($module) && $module !== '') {
+            return 'webapp()->acl('.var_export($module, true).')->can_any('.$v.')';
+        }
+
+        return 'webapp()->acl()->can_any('.$v.')';
     }
 
     /**

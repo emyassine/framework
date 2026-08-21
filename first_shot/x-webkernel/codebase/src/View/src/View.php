@@ -43,6 +43,14 @@ final class View implements ComposableContract, \Stringable
 
     /**
      * @param array<string, mixed> $data
+     */
+    public function __invoke(?string $template = null, array $data = []): self
+    {
+        return $template === null ? $this : self::make($template, $data);
+    }
+
+    /**
+     * @param array<string, mixed> $data
      * @param array<string, mixed> $merge_data
      */
     public static function make(string $view, array $data = [], array $merge_data = []): self
@@ -112,7 +120,12 @@ final class View implements ComposableContract, \Stringable
         if (self::$engine instanceof Engine) {
             return self::$engine;
         }
-        $engine = new Engine(self::template_paths(), webapp_path('storage/framework/views'), Engine::MODE_AUTO);
+        $rel = 'platform/storage/framework/views';
+        $configured = webapp()->config('platform.storage_path');
+        if (is_string($configured) && $configured !== '') {
+            $rel = $configured.'/framework/views';
+        }
+        $engine = new Engine(self::template_paths(), webapp_path($rel), Engine::MODE_AUTO);
         $engine->set_echo_format('\\'.self::class.'::echo(%s)');
         $engine->add_alias_classes('Js', Js::class);
         $engine->add_alias_classes('View', self::class);
@@ -178,8 +191,15 @@ final class View implements ComposableContract, \Stringable
         return $this;
     }
 
-    public function render(): string
+    /**
+     * @param array<string, mixed> $data
+     */
+    public function render(?string $template = null, array $data = []): string
     {
+        if ($template !== null) {
+            return self::engine()->run($template, $data);
+        }
+
         return self::engine()->run($this->name, $this->data);
     }
 

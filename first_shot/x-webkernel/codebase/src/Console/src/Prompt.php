@@ -30,7 +30,7 @@ final class Prompt
         return $this->until_valid(
             function () use ($label, $placeholder, $default, $hint, $hidden, $suggest, $options): string {
                 if ($this->io->is_faking()) {
-                    $fake = $this->io->next_fake();
+                    $fake = $this->io->next_fake($label);
 
                     return is_scalar($fake) ? (string) $fake : $default;
                 }
@@ -62,7 +62,7 @@ final class Prompt
         return $this->until_valid(
             function () use ($label, $placeholder, $default_s, $hint, $default): string {
                 if ($this->io->is_faking()) {
-                    $fake = $this->io->next_fake();
+                    $fake = $this->io->next_fake($label);
                     if ($fake === null) {
                         return $default_s;
                     }
@@ -121,7 +121,7 @@ final class Prompt
         return $this->until_valid(
             function () use ($label, $placeholder, $default, $hint): string {
                 if ($this->io->is_faking()) {
-                    $fake = $this->io->next_fake();
+                    $fake = $this->io->next_fake($label);
 
                     return is_scalar($fake) ? (string) $fake : $default;
                 }
@@ -150,7 +150,7 @@ final class Prompt
         return $this->until_valid(
             function () use ($label, $default, $yes, $no, $hint): bool {
                 if ($this->io->is_faking()) {
-                    $fake = $this->io->next_fake();
+                    $fake = $this->io->next_fake($label);
                     if (is_bool($fake)) {
                         return $fake;
                     }
@@ -203,7 +203,7 @@ final class Prompt
         return $this->until_valid(
             function () use ($label, $options, $default, $scroll, $hint, $info, $search): mixed {
                 if ($this->io->is_faking()) {
-                    return $this->fake_choice($options, $this->io->next_fake(), false);
+                    return $this->fake_choice($options, $this->io->next_fake($label), false);
                 }
                 if (! $this->io->is_interactive()) {
                     return $this->default_choice($options, $default);
@@ -243,7 +243,7 @@ final class Prompt
         return $this->until_valid(
             function () use ($label, $options, $default, $scroll, $hint, $info): array {
                 if ($this->io->is_faking()) {
-                    $fake = $this->io->next_fake();
+                    $fake = $this->io->next_fake($label);
                     if (! is_array($fake)) {
                         $fake = $fake === null || $fake === '' ? [] : [$fake];
                     }

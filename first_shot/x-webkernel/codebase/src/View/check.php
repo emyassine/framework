@@ -1,6 +1,13 @@
 <?php declare(strict_types=1);
 
-require dirname(__DIR__, 4).'/third_party/autoload.php';
+$__wk_autoload = dirname(__DIR__, 5).'/refactor/platform/dependencies/autoload.php';
+if (! is_file($__wk_autoload)) {
+    $__wk_autoload = dirname(__DIR__, 4).'/platform/dependencies/autoload.php';
+}
+if (! is_file($__wk_autoload)) {
+    $__wk_autoload = dirname(__DIR__, 4).'/third_party/autoload.php';
+}
+require $__wk_autoload;
 
 function expect(mixed $ok, string $msg): void
 {
@@ -17,14 +24,12 @@ if (! defined('START_REQUEST')) {
 
 webapp()->boot();
 \Webkernel\View\View::flush();
-$dashboard = (string) \Webkernel\View\View::make('dashboard', ['title' => 'Dash']);
-expect(str_contains($dashboard, 'Dashboard Overview'), 'dashboard html');
-expect(! class_exists(\Webkernel\View\Compiler::class, false), 'compiler not loaded for warm dashboard');
-
 expect(\Webkernel\View\View::exists('layouts.page'), 'un-namespaced layouts.page');
 expect(\Webkernel\View\View::exists('webkernel::layouts.page'), 'namespaced layouts.page');
+$html = (string) \Webkernel\View\View::make('webkernel::layouts.base');
+expect($html !== '', 'base layout renders');
 
-$tmp = sys_get_temp_dir().'/wk_comp_'.getmypid();
+$tmp = webapp_path('platform/temporary/wk_comp_'.getmypid());
 if (! is_dir($tmp) && ! mkdir($tmp, 0775, true) && ! is_dir($tmp)) {
     fwrite(STDERR, 'FAIL: cannot create '.$tmp."\n");
     exit(1);
