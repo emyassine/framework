@@ -23,7 +23,8 @@
             "Webkernel\\Route\\": "src/Route/src/",
             "Webkernel\\View\\": "src/View/src/",
             "Webkernel\\Performance\\": "src/Performance/src/",
-            "Webkernel\\DevEnv\\": "src/DevEnv/src/"
+            "Webkernel\\DevEnv\\": "src/DevEnv/src/",
+            "Webkernel\\Console\\": "src/Console/src/"
         }
     },
     "require": {

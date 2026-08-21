@@ -211,7 +211,7 @@
             "dist": {
                 "type": "path",
                 "url": "x-webkernel/codebase",
-                "reference": "ab35b6a2879ad3c3b87bcbd8fe0b34c356a42f70"
+                "reference": "0798de1962213c73702b17b6ac92192193b2c8c2"
             },
             "require": {
                 "php": ">=8.4",
@@ -244,7 +244,8 @@
                     "Webkernel\\Route\\": "src/Route/src/",
                     "Webkernel\\View\\": "src/View/src/",
                     "Webkernel\\Performance\\": "src/Performance/src/",
-                    "Webkernel\\DevEnv\\": "src/DevEnv/src/"
+                    "Webkernel\\DevEnv\\": "src/DevEnv/src/",
+                    "Webkernel\\Console\\": "src/Console/src/"
                 }
             },
             "license": [

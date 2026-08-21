@@ -17,6 +17,7 @@ On `composer dump-autoload` writes:
 - `{vendor}/composer/webkernel_files.php` — path/instance helpers
 - `{vendor}/composer/webkernel_composables.php` — `api_name => class`
 - `{vendor}/composer/webkernel_providers.php`
+- `{vendor}/composer/webkernel_commands.php` — `#[ConsoleCommand]` classes
 - `{vendor}/composer/webkernel_views.php` / `webkernel_routes.php` — fallback lists
 - `storage/instance/data/instance_id`
 

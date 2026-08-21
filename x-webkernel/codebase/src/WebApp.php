@@ -4,6 +4,7 @@ namespace Webkernel;
 
 use Psr\Container\ContainerInterface;
 use Webkernel\Container\Container;
+use Webkernel\Console\Input\ArgvInput;
 use Webkernel\Http\Request;
 use Webkernel\Platform\Exceptions;
 use Webkernel\Platform\Middleware;
@@ -11,11 +12,14 @@ use Webkernel\Composables\ComposableContract;
 
 /**
  * Host application facade. Composables are lazy API segments
- * (webapp()->view(), webapp()->route()). Providers declare paths at boot.
+ * (webapp()->view(), webapp()->route(), webapp()->console()).
+ * Providers declare paths at boot.
  *
  * @method \Webkernel\View\View view()
  * @method \Webkernel\Route\Route route()
  * @method \Webkernel\Performance\Performance performance()
+ * @method \Webkernel\Console\Kernel console()
+ * @method \Webkernel\Console\Terminal terminal()
  */
 final class WebApp
 {
@@ -37,6 +41,9 @@ final class WebApp
 
     /** @var list<string> */
     private array $route_files = [];
+
+    /** @var list<class-string> */
+    private array $command_classes = [];
 
     private ?Middleware $middleware = null;
 
@@ -115,6 +122,19 @@ final class WebApp
         echo $this->route()::dispatch($request->method(), $request->uri(), $request->host());
     }
 
+    public function handle_command(ArgvInput $input): int
+    {
+        $this->boot();
+        $this->container->instance(ArgvInput::class, $input);
+        if (! $this->container->has(\Webkernel\Console\Kernel::class)) {
+            $this->container->singleton(\Webkernel\Console\Kernel::class);
+        }
+        /** @var \Webkernel\Console\Kernel $kernel */
+        $kernel = $this->container->make(\Webkernel\Console\Kernel::class);
+
+        return $kernel->handle($input)->value;
+    }
+
     public function middleware(): ?Middleware
     {
         return $this->middleware;
@@ -126,7 +146,7 @@ final class WebApp
     }
 
     /**
-     * @param 'providers'|'routes' $key
+     * @param 'providers'|'routes'|'commands' $key
      * @param list<string>|string  $value
      */
     public function declare(string $key, mixed $value): self
@@ -147,6 +167,16 @@ final class WebApp
                     continue;
                 }
                 $this->route_files[] = $path;
+            }
+
+            return $this;
+        }
+        if ($key === 'commands') {
+            foreach ((array) $value as $class) {
+                if (! is_string($class) || $class === '' || in_array($class, $this->command_classes, true)) {
+                    continue;
+                }
+                $this->command_classes[] = $class;
             }
 
             return $this;
@@ -226,6 +256,16 @@ final class WebApp
         }
 
         return $this->dumped_paths('webkernel_routes.php');
+    }
+
+    /**
+     * Host-declared command classes. Discovery dump is merged in the console kernel.
+     *
+     * @return list<class-string>
+     */
+    public function command_classes(): array
+    {
+        return $this->command_classes;
     }
 
     public function boot(): self

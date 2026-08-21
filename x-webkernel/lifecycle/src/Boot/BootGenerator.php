@@ -3,14 +3,15 @@
 namespace Webkernel\Lifecycle\Boot;
 
 use Composer\Composer;
-use Composer\IO\IOInterface;
 use Composer\Package\PackageInterface;
+use Webkernel\Console\Terminal;
 use FilesystemIterator;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 use Webkernel\DevEnv\IdeHelper;
 use Webkernel\Instance\InstanceId;
 use Webkernel\Composables\ComposableContract;
+use Webkernel\Console\Attribute\ConsoleCommand;
 
 /**
  * Writes {vendor}/composer/webkernel.php and related dump files.
@@ -32,7 +33,9 @@ final class BootGenerator
 
     public const PROVIDERS_BASENAME = 'webkernel_providers.php';
 
-    public static function write(Composer $composer, ?IOInterface $io = null): void
+    public const COMMANDS_BASENAME = 'webkernel_commands.php';
+
+    public static function write(Composer $composer): void
     {
         $vendor_dir = rtrim(
             str_replace(['\\', '/'], DIRECTORY_SEPARATOR, (string) $composer->getConfig()->get('vendor-dir')),
@@ -42,7 +45,7 @@ final class BootGenerator
         $composer_dir = $vendor_dir.DIRECTORY_SEPARATOR.'composer';
 
         if (! is_dir($composer_dir) && ! mkdir($composer_dir, 0775, true) && ! is_dir($composer_dir)) {
-            self::warn($io, 'cannot create '.$composer_dir);
+            self::warn('cannot create '.$composer_dir);
 
             return;
         }
@@ -94,11 +97,15 @@ final class BootGenerator
             $composer_dir.DIRECTORY_SEPARATOR.self::PROVIDERS_BASENAME,
             self::providers_list($composer),
         );
-        self::info($io, 'wrote composer/'.self::BOOT_BASENAME.' (instance '.$instance_id.')');
+        self::write_class_list(
+            $composer_dir.DIRECTORY_SEPARATOR.self::COMMANDS_BASENAME,
+            self::commands_list($classmap),
+        );
+        self::success('wrote composer/'.self::BOOT_BASENAME.' (instance '.$instance_id.')');
 
         try {
             $ide = IdeHelper::generate($vendor_dir);
-            self::info($io, sprintf(
+            self::info(sprintf(
                 'ide helper %s (%d classes, %d bytes%s)',
                 $ide['path'],
                 $ide['classes'],
@@ -106,7 +113,7 @@ final class BootGenerator
                 $ide['skipped'] ? ', unchanged' : '',
             ));
         } catch (\Throwable $e) {
-            self::warn($io, 'ide helper: '.$e->getMessage());
+            self::warn('ide helper: '.$e->getMessage());
         }
     }
 
@@ -278,6 +285,53 @@ final class BootGenerator
         ksort($map);
 
         return $map;
+    }
+
+    /**
+     * Classes with a `#[ConsoleCommand]` method. Composer-time only.
+     *
+     * @param array<string, string> $classmap
+     * @return list<class-string>
+     */
+    private static function commands_list(array $classmap): array
+    {
+        $attribute = ConsoleCommand::class;
+        $attr_file = $classmap[$attribute] ?? null;
+        if (is_string($attr_file) && is_file($attr_file)) {
+            require_once $attr_file;
+        }
+        if (! class_exists($attribute, false)) {
+            return [];
+        }
+
+        $out = [];
+        foreach ($classmap as $class => $file) {
+            if (! is_string($file) || ! is_file($file)) {
+                continue;
+            }
+            $src = file_get_contents($file);
+            if ($src === false || ! str_contains($src, 'ConsoleCommand')) {
+                continue;
+            }
+            require_once $file;
+            if (! class_exists($class, false)) {
+                continue;
+            }
+            try {
+                $ref = new \ReflectionClass($class);
+            } catch (\Throwable) {
+                continue;
+            }
+            foreach ($ref->getMethods() as $method) {
+                if ($method->getAttributes($attribute) !== []) {
+                    $out[] = $class;
+                    break;
+                }
+            }
+        }
+        sort($out, SORT_STRING);
+
+        return $out;
     }
 
     /**
@@ -695,17 +749,23 @@ PHP;
         file_put_contents($path, $body, LOCK_EX);
     }
 
-    private static function info(?IOInterface $io, string $message): void
+    private static function success(string $message): void
     {
-        if ($io !== null) {
-            $io->write('<info>webkernel:</info> '.$message);
-        }
+        self::terminal()->success($message);
     }
 
-    private static function warn(?IOInterface $io, string $message): void
+    private static function info(string $message): void
     {
-        if ($io !== null) {
-            $io->writeError('<warning>webkernel:</warning> '.$message);
-        }
+        self::terminal()->info($message);
+    }
+
+    private static function warn(string $message): void
+    {
+        self::terminal()->warning($message);
+    }
+
+    private static function terminal(): Terminal
+    {
+        return new Terminal();
     }
 }

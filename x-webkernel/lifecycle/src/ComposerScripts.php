@@ -3,7 +3,7 @@
 namespace Webkernel\Lifecycle;
 
 use Composer\Script\Event;
-use Webkernel\Lifecycle\Boot\BootGenerator;
+use Webkernel\Console\Commands\DumpAutoloadCommand;
 
 /**
  * Optional host composer.json hook. The plugin already runs on post-autoload-dump.
@@ -16,7 +16,7 @@ final class ComposerScripts
 {
     public static function post_autoload_dump(Event $event): void
     {
-        BootGenerator::write($event->getComposer(), $event->getIO());
+        DumpAutoloadCommand::run($event->getComposer());
         if (function_exists('webkernel_boot_flush')) {
             webkernel_boot_flush();
         }

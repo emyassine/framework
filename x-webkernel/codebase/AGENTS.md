@@ -100,6 +100,10 @@ Layouts (Filament-shaped, CSS split by chrome):
 | `layouts.simple` | tokens + centered card (no sidebar) |
 | `layouts.page` | tokens + shell (sidebar / topnav / horizontal) + components |
 
+## Console
+
+`Webkernel\Console`. Host binary is `webkernel` (Laravel artisan-shaped): `handle_command(new ArgvInput)`. Commands are `#[ConsoleCommand]` methods on plain classes — no parent, constructor is for DI. Method parameters are the signature (Tempest). `webterminal()` is the prompts composable (`text`, `select`, `confirm`, …). Dump `webkernel_commands.php` at dump-autoload. No Symfony Console, no Laravel Prompts package.
+
 Do not boot Route or View classes on requests that do not call them. `class_alias` of `Route` / `View` / `Js` is lazy (autoload).
 
 Platform tree (later, not this package): App owner → Platform (system panel) → Module → Panel → Cluster → Resource → Page → components. Do not invent a second templating stack.
