@@ -1,26 +1,56 @@
 # Webkernel Platform
-
 A high-performance PHP web kernel and enterprise application builder. Minimum overhead on the request path. Composer for install and dependencies. PSR for interoperability.
-
 Webkernel replaces generic framework overhead with explicit PHP primitives designed for complex business environments. It does not reject Composer. It does not skip PSR. It rejects request-path bloat.
 
 ## Vision & Product Philosophy
-
 Webkernel is an **application builder**. The kernel stays lean. Composer is how the platform is installed and how dependencies are managed — in the majority of cases:
-
 ```bash
 composer create-project webkernel/webkernel
 ```
-
 Rather than wrapping Laravel or Symfony, Webkernel owns its primitives and speaks PSR (container, log, clock, cache, HTTP message / factory / client). PHP extensions the process needs are declared in Composer. A module that requires extra packages owns that graph; it is not a kernel problem.
 
 The objective is **minimum overhead at all**, not an empty `require` block. See [Getting started](x-webkernel/docs/guides/00-getting-started/getting-started.en.md).
 
 ---
 
+## Performance Contract
+
+> **These are hard targets, not aspirations. Every architectural decision in this codebase is a consequence of them.**
+
+| Scope | Target | What is included |
+|---|---|---|
+| **Kernel CPU — no I/O** | **< 1 ms** | Boot, config resolution, routing, middleware stack, ACL/permission resolution, response dispatch |
+| **Full application response — with I/O** | **< 10 ms** | Everything above + DB queries, cache reads, view render |
+
+**"Included" means included.** Auth checks, permission lookups, module-scoped ACL resolution, view directive expansion, and middleware evaluation all happen inside the < 1 ms kernel budget.
+None of these are exempted. If a composable makes the kernel miss the budget, the composable is the problem — not the target.
+
+We also may want to make the app dynamic if a code changes the next request should show the change.
+
+### Measured baselines
+Environment: PHP 8.4, OPcache on, JIT off, localhost.
+
+| Scenario | Measured |
+|---|---|
+| Hello World — kernel path only | ~0.02 ms |
+| Dashboard render | ~0.33 ms |
+
+### How the targets are enforced architecturally
+
+- **Lazy composable loading** — only composables actually called in a request are resolved. A request that only calls `webapp()->response()` never loads `PlatformComposable`, `AuthComposable`, or any module. Zero allocation for unused composables on the hot path.
+- **Singleton / scoped caching** — composable instances are cached in the container after first resolution. Chaining `webapp()->platform()->instance()->machine_uuid()` costs three object-reference reads on every call after the first within the same request.
+- **Compile-time ACL expansion** — view directive permission names (`@can('export')`) are expanded to fully qualified calls (`webapp()->acl('invoicing')->can('invoicing.export')`) at compile time, not at render time. Zero runtime overhead for name resolution.
+- **No magic methods** — `__call` / `__callStatic` are banned as much as possible. PHPStan / Psalm analyse 100 % of the chain without plugins. No dynamic dispatch on the hot path.
+- **OPcache is mandatory** — `platform/platform.php` is a plain PHP array. It is `require`d once and cached by OPcache. Config rewrites call `opcache_invalidate()` immediately after the atomic rename.
+- **Fast-boot reads config directly** — `platform/bootstrap/fast-boot.php` `require`s the config array before any composable or container is initialised. The hot path exits after the autoload `require`. No abstraction overhead.
+
+Guide: [Performance](x-webkernel/docs/guides/04-performance/performance.en.md)
+
+---
+
 ## Architectural Principles
 
-- **Minimum overhead:** Sub-1 ms core kernel CPU with no I/O / sub-10 ms full application responses with I/O, native OPcache. PSR interfaces and PHP extensions are in-bounds. Illuminate, Symfony HTTP, and request-time package discovery are not on the hot path.
+- **Sub-millisecond kernel:** See [Performance Contract](#performance-contract) above. The budget covers routing, middleware, and ACL — not just the empty boot path.
 - **Composer is the installer:** `composer create-project`, `composer install`, dump-autoload maps. First-party packages, PSR, extensions, and module dependencies all go through Composer.
 - **PSR interoperability:** Enterprise baseline — `psr/container`, `psr/log`, `psr/clock`, `psr/cache`, `psr/http-message`, `psr/http-factory`, `psr/http-client`, plus discovery for HTTP client/factory implementations.
 - **Zero magic:** Explicit wiring without magic methods, dynamic auto-discovery, or hidden service provider resolution.
@@ -29,7 +59,6 @@ The objective is **minimum overhead at all**, not an empty `require` block. See 
 ---
 
 ## HTTP Kernel
-
 Webkernel is named for the request lifecycle, not only the UI tree.
 
 ```mermaid
@@ -55,11 +84,9 @@ Guides: [HTTP kernel](x-webkernel/docs/guides/02-http-kernel/http-kernel.en.md) 
 ---
 
 ## Domain & UI Hierarchy
-
 Webkernel structures applications using a multi-panel, modular architecture governed by a fine-grained authorization and permission engine.
 
 ### Structural rules
-
 - The **Platform** is the root level managed by one or more **App Owners**. It holds global configuration and contains Modules.
 - The **System Admin Panel** is a special *platform-scoped* panel. It administers all Modules but is not a sibling of Modules at the same ownership level. It does not own Module domain models.
 - **Modules** are functional domains residing inside the Platform. A Module can expose one or multiple **Admin Panels**, which are *module-scoped*.
@@ -106,7 +133,6 @@ graph TD
 ```
 
 ### Hierarchy breakdown
-
 - **Platform:** Root level. Managed by at least one App Owner. Holds global configuration and contains Modules.
 - **System Admin Panel:** A platform-scoped panel for global management (instances, modules, owners, telemetry). Sits above Modules operationally; does not own their domain model.
 - **Modules:** Functional domains residing inside the Platform. Composer packages (custom types). A single Module can expose one or multiple module-scoped Admin Panels. Extra Composer dependencies are the Module's graph.
@@ -115,7 +141,7 @@ graph TD
 - **Resources:** Core business entities managed within a cluster.
 - **Pages:** Individual functional views constituting a resource (e.g. List, Create, Edit, Custom View).
 - **Components:** UI building blocks inside pages, including data tables, forms, metric widgets, and custom developer-defined views.
-- **Granular permissions:** A unified security layer enforcing strict authorization down to panels, resources, pages, and individual components and actions. Permissions are always namespaced by module — there is no global flat permission table.
+- **Granular permissions:** A unified security layer enforcing strict authorization down to panels, resources, pages, and individual components and actions. Permissions are always namespaced by module — there is no global flat permission table. Permission resolution, including module-scoped ACL checks and view directive expansion, is part of the < 1 ms kernel CPU budget.
 
 Guide: [Domain hierarchy](x-webkernel/docs/guides/03-domain-hierarchy/domain-hierarchy.en.md)
 
@@ -145,17 +171,14 @@ Guide: [Project layout](x-webkernel/docs/guides/01-project-layout/project-layout
 ## Local Development & Setup
 
 ### 1. Installation
-
 Ensure PHP 8.4+ and OPcache are installed on your host system. Declare the extensions the process needs (`ext-mbstring`, `ext-intl`, `ext-pdo`, ...) in Composer — they are not optional folklore.
 
 Usual install:
-
 ```bash
 composer create-project webkernel/webkernel
 ```
 
 This tree (path repositories):
-
 ```bash
 composer install
 composer dump-autoload
@@ -164,7 +187,6 @@ composer dump-autoload
 Composer installs first-party packages, PSR interfaces, and any module dependencies. It also dumps the PSR-4 autoloader and Webkernel maps. Dev tools stay in `--dev`.
 
 ### 2. Local HTTP Server
-
 `php webkernel server` is a custom CLI process manager wrapping PHP's built-in development server (`php -S`) plus a Webkernel router script. It is not Swoole, Workerman, or a production process manager. Production is Nginx / Apache / FPM.
 
 ```bash
@@ -172,23 +194,17 @@ php webkernel server
 ```
 
 Options:
-
 - `--host=127.0.0.1` — Set binding host (default: `127.0.0.1`).
 - `--port=8000` — Set target port (default: `8000`, auto-increments if port is in use).
 - `--profile-lifecycle` — Enable request profiling for include execution costs, file paths, and memory usage.
 - `--with-jit` — Start the child `php -S` process with Zend JIT enabled (OPcache required).
 
-### 3. Server OPcache Verification
-
-Verify OPcache status in production environment to guarantee targeted performance benchmarks:
+### 3. Verify OPcache (mandatory)
+OPcache is not optional. Without it the < 1 ms kernel target is not achievable. Verify before benchmarking:
 
 ```bash
 php -r "echo opcache_get_status()['opcache_enabled'] ? 'OPcache Active' : 'OPcache Disabled';"
 ```
-
-Local measured baselines (PHP 8.4, OPcache on, JIT off, localhost): Hello World ~0.02 ms kernel path; dashboard render ~0.33 ms. Targets: **under 1 ms kernel CPU with no I/O**, **under 10 ms full application response with I/O**.
-
-Guide: [Performance](x-webkernel/docs/guides/04-performance/performance.en.md)
 
 ---
 
@@ -202,5 +218,5 @@ Order prefixes sort on disk and are stripped from URLs. Filenames are `{name}.{l
 | [Project layout](x-webkernel/docs/guides/01-project-layout/project-layout.en.md) | Physical tree |
 | [HTTP kernel](x-webkernel/docs/guides/02-http-kernel/http-kernel.en.md) | Request → Response lifecycle |
 | [Domain hierarchy](x-webkernel/docs/guides/03-domain-hierarchy/domain-hierarchy.en.md) | Platform → Page model |
-| [Performance](x-webkernel/docs/guides/04-performance/performance.en.md) | Under 1 ms / under 10 ms |
+| [Performance](x-webkernel/docs/guides/04-performance/performance.en.md) | < 1 ms kernel / < 10 ms full response |
 | [Telemetry](x-webkernel/docs/guides/05-telemetry/telemetry.en.md) | On-disk observability contract |
