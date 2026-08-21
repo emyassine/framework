@@ -13,5 +13,5 @@ return array (
   'webapp_root' => '/home/yassine/Projects/framework/refactor',
   'vendor_dir' => '/home/yassine/Projects/framework/refactor/platform/dependencies',
   'vendor_rel' => 'platform/dependencies',
-  'generated_at' => '2026-08-21T18:32:15+00:00',
+  'generated_at' => '2026-08-21T18:39:53+00:00',
 );
