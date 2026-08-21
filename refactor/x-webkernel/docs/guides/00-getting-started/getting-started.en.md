@@ -24,7 +24,7 @@ Regenerate classmaps and Webkernel dump files after a host move:
 composer dump-autoload
 ```
 
-Equivalent CLI: `php webkernel dump-autoload`. `vendor-dir` is `third_party`.
+Equivalent CLI: `php webkernel dump-autoload`. `vendor-dir` is `platform/dependencies`.
 
 There is no `php webkernel setup` command.
 

@@ -34,7 +34,7 @@ Modules are Composer packages (custom types via `webkernel/lifecycle`). If a mod
 | **Page** | One functional view of a resource (List, Create, Edit, custom). |
 | **Component** | Table, form, widget, or custom view inside a page. |
 
-Authorization is a cross-cutting layer. It is intended to bind at panel, resource, page, and component/action. It is recorded on routes today; it is not enforced until the auth engine exists.
+Authorization is a cross-cutting layer. Permissions are module-scoped (`webapp()->acl()` infers the module from the active panel; `webapp()->acl('invoicing')` is explicit). View directives (`@can`, `@cannot`, `@can_any`) expand to fully qualified `webapp()->acl()` calls at compile time.
 
 ## Routing attachment
 

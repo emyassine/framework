@@ -59,11 +59,11 @@ Compiled routes: `platform/storage/framework/cache/routes_{hash}.php`. Hash/mtim
 
 ### 5. Pipeline
 
-`Webkernel\Platform\Middleware` records the stack. Route bindings record middleware names. **Neither is executed yet** — there is no HTTP kernel runner that walks the pipeline. Permission keys are recorded the same way: stored, not enforced, until auth exists.
+`Webkernel\Platform\Middleware` records the stack via `webapp()->middleware()->with_middleware()`. `WebApp::handle_request()` runs it as a flat pipeline, then dispatches the router. Permission checks go through `webapp()->acl()`.
 
 ### 6. Response
 
-`WebApp::handle_request()` currently echoes `Route::dispatch(...)`. A PSR `ResponseInterface` is the target boundary, not a Laravel `Illuminate\Http\Response`. Status codes on the local server come from `http_response_code()` in the `php -S` router.
+`WebApp::handle_request()` emits a PSR `ResponseInterface` when the dispatcher returns one (status, headers, body). String bodies still echo. Status codes on the local server come from `http_response_code()`.
 
 ### 7. Telemetry
 

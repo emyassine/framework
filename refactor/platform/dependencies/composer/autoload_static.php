@@ -19,17 +19,27 @@ class ComposerStaticInit8c81a70f300bccf9fc35c21e08ef128b
             'Webkernel\\Platform\\' => 19,
             'Webkernel\\Performance\\' => 22,
             'Webkernel\\Paths\\' => 16,
+            'Webkernel\\Panel\\' => 16,
             'Webkernel\\Lifecycle\\' => 20,
             'Webkernel\\Instance\\' => 19,
             'Webkernel\\Http\\' => 15,
             'Webkernel\\DevEnv\\' => 17,
             'Webkernel\\Container\\' => 20,
             'Webkernel\\Console\\' => 18,
+            'Webkernel\\Config\\' => 17,
             'Webkernel\\Composables\\' => 22,
+            'Webkernel\\Auth\\' => 15,
+            'Webkernel\\Acl\\' => 14,
         ),
         'P' =>
         array (
+            'Psr\\SimpleCache\\' => 16,
+            'Psr\\Log\\' => 8,
+            'Psr\\Http\\Message\\' => 17,
+            'Psr\\Http\\Client\\' => 16,
             'Psr\\Container\\' => 14,
+            'Psr\\Clock\\' => 10,
+            'Psr\\Cache\\' => 10,
         ),
         'C' =>
         array (
@@ -58,6 +68,10 @@ class ComposerStaticInit8c81a70f300bccf9fc35c21e08ef128b
         array (
             0 => __DIR__ . '/..' . '/webkernel/codebase/src/Paths/src',
         ),
+        'Webkernel\\Panel\\' =>
+        array (
+            0 => __DIR__ . '/..' . '/webkernel/codebase/src/Panel/src',
+        ),
         'Webkernel\\Lifecycle\\' =>
         array (
             0 => __DIR__ . '/..' . '/webkernel/lifecycle/src/Lifecycle',
@@ -82,13 +96,50 @@ class ComposerStaticInit8c81a70f300bccf9fc35c21e08ef128b
         array (
             0 => __DIR__ . '/..' . '/webkernel/codebase/src/Console/src',
         ),
+        'Webkernel\\Config\\' =>
+        array (
+            0 => __DIR__ . '/..' . '/webkernel/codebase/src/Config/src',
+        ),
         'Webkernel\\Composables\\' =>
         array (
             0 => __DIR__ . '/..' . '/webkernel/codebase/src/Composables',
         ),
+        'Webkernel\\Auth\\' =>
+        array (
+            0 => __DIR__ . '/..' . '/webkernel/codebase/src/Auth/src',
+        ),
+        'Webkernel\\Acl\\' =>
+        array (
+            0 => __DIR__ . '/..' . '/webkernel/codebase/src/Acl/src',
+        ),
+        'Psr\\SimpleCache\\' =>
+        array (
+            0 => __DIR__ . '/..' . '/psr/simple-cache/src',
+        ),
+        'Psr\\Log\\' =>
+        array (
+            0 => __DIR__ . '/..' . '/psr/log/src',
+        ),
+        'Psr\\Http\\Message\\' =>
+        array (
+            0 => __DIR__ . '/..' . '/psr/http-factory/src',
+            1 => __DIR__ . '/..' . '/psr/http-message/src',
+        ),
+        'Psr\\Http\\Client\\' =>
+        array (
+            0 => __DIR__ . '/..' . '/psr/http-client/src',
+        ),
         'Psr\\Container\\' =>
         array (
             0 => __DIR__ . '/..' . '/psr/container/src',
+        ),
+        'Psr\\Clock\\' =>
+        array (
+            0 => __DIR__ . '/..' . '/psr/clock/src',
+        ),
+        'Psr\\Cache\\' =>
+        array (
+            0 => __DIR__ . '/..' . '/psr/cache/src',
         ),
         'Composer\\Installers\\' =>
         array (
@@ -197,10 +248,62 @@ class ComposerStaticInit8c81a70f300bccf9fc35c21e08ef128b
         'Composer\\Installers\\YawikInstaller' => __DIR__ . '/..' . '/composer/installers/src/Composer/Installers/YawikInstaller.php',
         'Composer\\Installers\\ZendInstaller' => __DIR__ . '/..' . '/composer/installers/src/Composer/Installers/ZendInstaller.php',
         'Composer\\Installers\\ZikulaInstaller' => __DIR__ . '/..' . '/composer/installers/src/Composer/Installers/ZikulaInstaller.php',
+        'Psr\\Cache\\CacheException' => __DIR__ . '/..' . '/psr/cache/src/CacheException.php',
+        'Psr\\Cache\\CacheItemInterface' => __DIR__ . '/..' . '/psr/cache/src/CacheItemInterface.php',
+        'Psr\\Cache\\CacheItemPoolInterface' => __DIR__ . '/..' . '/psr/cache/src/CacheItemPoolInterface.php',
+        'Psr\\Cache\\InvalidArgumentException' => __DIR__ . '/..' . '/psr/cache/src/InvalidArgumentException.php',
+        'Psr\\Clock\\ClockInterface' => __DIR__ . '/..' . '/psr/clock/src/ClockInterface.php',
         'Psr\\Container\\ContainerExceptionInterface' => __DIR__ . '/..' . '/psr/container/src/ContainerExceptionInterface.php',
         'Psr\\Container\\ContainerInterface' => __DIR__ . '/..' . '/psr/container/src/ContainerInterface.php',
         'Psr\\Container\\NotFoundExceptionInterface' => __DIR__ . '/..' . '/psr/container/src/NotFoundExceptionInterface.php',
+        'Psr\\Http\\Client\\ClientExceptionInterface' => __DIR__ . '/..' . '/psr/http-client/src/ClientExceptionInterface.php',
+        'Psr\\Http\\Client\\ClientInterface' => __DIR__ . '/..' . '/psr/http-client/src/ClientInterface.php',
+        'Psr\\Http\\Client\\NetworkExceptionInterface' => __DIR__ . '/..' . '/psr/http-client/src/NetworkExceptionInterface.php',
+        'Psr\\Http\\Client\\RequestExceptionInterface' => __DIR__ . '/..' . '/psr/http-client/src/RequestExceptionInterface.php',
+        'Psr\\Http\\Message\\MessageInterface' => __DIR__ . '/..' . '/psr/http-message/src/MessageInterface.php',
+        'Psr\\Http\\Message\\RequestFactoryInterface' => __DIR__ . '/..' . '/psr/http-factory/src/RequestFactoryInterface.php',
+        'Psr\\Http\\Message\\RequestInterface' => __DIR__ . '/..' . '/psr/http-message/src/RequestInterface.php',
+        'Psr\\Http\\Message\\ResponseFactoryInterface' => __DIR__ . '/..' . '/psr/http-factory/src/ResponseFactoryInterface.php',
+        'Psr\\Http\\Message\\ResponseInterface' => __DIR__ . '/..' . '/psr/http-message/src/ResponseInterface.php',
+        'Psr\\Http\\Message\\ServerRequestFactoryInterface' => __DIR__ . '/..' . '/psr/http-factory/src/ServerRequestFactoryInterface.php',
+        'Psr\\Http\\Message\\ServerRequestInterface' => __DIR__ . '/..' . '/psr/http-message/src/ServerRequestInterface.php',
+        'Psr\\Http\\Message\\StreamFactoryInterface' => __DIR__ . '/..' . '/psr/http-factory/src/StreamFactoryInterface.php',
+        'Psr\\Http\\Message\\StreamInterface' => __DIR__ . '/..' . '/psr/http-message/src/StreamInterface.php',
+        'Psr\\Http\\Message\\UploadedFileFactoryInterface' => __DIR__ . '/..' . '/psr/http-factory/src/UploadedFileFactoryInterface.php',
+        'Psr\\Http\\Message\\UploadedFileInterface' => __DIR__ . '/..' . '/psr/http-message/src/UploadedFileInterface.php',
+        'Psr\\Http\\Message\\UriFactoryInterface' => __DIR__ . '/..' . '/psr/http-factory/src/UriFactoryInterface.php',
+        'Psr\\Http\\Message\\UriInterface' => __DIR__ . '/..' . '/psr/http-message/src/UriInterface.php',
+        'Psr\\Log\\AbstractLogger' => __DIR__ . '/..' . '/psr/log/src/AbstractLogger.php',
+        'Psr\\Log\\InvalidArgumentException' => __DIR__ . '/..' . '/psr/log/src/InvalidArgumentException.php',
+        'Psr\\Log\\LogLevel' => __DIR__ . '/..' . '/psr/log/src/LogLevel.php',
+        'Psr\\Log\\LoggerAwareInterface' => __DIR__ . '/..' . '/psr/log/src/LoggerAwareInterface.php',
+        'Psr\\Log\\LoggerAwareTrait' => __DIR__ . '/..' . '/psr/log/src/LoggerAwareTrait.php',
+        'Psr\\Log\\LoggerInterface' => __DIR__ . '/..' . '/psr/log/src/LoggerInterface.php',
+        'Psr\\Log\\LoggerTrait' => __DIR__ . '/..' . '/psr/log/src/LoggerTrait.php',
+        'Psr\\Log\\NullLogger' => __DIR__ . '/..' . '/psr/log/src/NullLogger.php',
+        'Psr\\SimpleCache\\CacheException' => __DIR__ . '/..' . '/psr/simple-cache/src/CacheException.php',
+        'Psr\\SimpleCache\\CacheInterface' => __DIR__ . '/..' . '/psr/simple-cache/src/CacheInterface.php',
+        'Psr\\SimpleCache\\InvalidArgumentException' => __DIR__ . '/..' . '/psr/simple-cache/src/InvalidArgumentException.php',
+        'Webkernel\\Acl\\AuthorizationException' => __DIR__ . '/..' . '/webkernel/codebase/src/Acl/src/AuthorizationException.php',
+        'Webkernel\\Auth\\UserInterface' => __DIR__ . '/..' . '/webkernel/codebase/src/Auth/src/UserInterface.php',
+        'Webkernel\\Composables\\AclComposable' => __DIR__ . '/..' . '/webkernel/codebase/src/Composables/AclComposable.php',
+        'Webkernel\\Composables\\AuthComposable' => __DIR__ . '/..' . '/webkernel/codebase/src/Composables/AuthComposable.php',
+        'Webkernel\\Composables\\CacheComposable' => __DIR__ . '/..' . '/webkernel/codebase/src/Composables/CacheComposable.php',
+        'Webkernel\\Composables\\ClusterComposable' => __DIR__ . '/..' . '/webkernel/codebase/src/Composables/ClusterComposable.php',
         'Webkernel\\Composables\\ComposableContract' => __DIR__ . '/..' . '/webkernel/codebase/src/Composables/ComposableContract.php',
+        'Webkernel\\Composables\\ConfigComposable' => __DIR__ . '/..' . '/webkernel/codebase/src/Composables/ConfigComposable.php',
+        'Webkernel\\Composables\\InstanceComposable' => __DIR__ . '/..' . '/webkernel/codebase/src/Composables/InstanceComposable.php',
+        'Webkernel\\Composables\\ModuleComposable' => __DIR__ . '/..' . '/webkernel/codebase/src/Composables/ModuleComposable.php',
+        'Webkernel\\Composables\\OwnersComposable' => __DIR__ . '/..' . '/webkernel/codebase/src/Composables/OwnersComposable.php',
+        'Webkernel\\Composables\\PageComposable' => __DIR__ . '/..' . '/webkernel/codebase/src/Composables/PageComposable.php',
+        'Webkernel\\Composables\\PanelComposable' => __DIR__ . '/..' . '/webkernel/codebase/src/Composables/PanelComposable.php',
+        'Webkernel\\Composables\\PlatformComposable' => __DIR__ . '/..' . '/webkernel/codebase/src/Composables/PlatformComposable.php',
+        'Webkernel\\Composables\\ResourceComposable' => __DIR__ . '/..' . '/webkernel/codebase/src/Composables/ResourceComposable.php',
+        'Webkernel\\Composables\\ResponseComposable' => __DIR__ . '/..' . '/webkernel/codebase/src/Composables/ResponseComposable.php',
+        'Webkernel\\Composables\\StorageComposable' => __DIR__ . '/..' . '/webkernel/codebase/src/Composables/StorageComposable.php',
+        'Webkernel\\Composables\\SystemAdminComposable' => __DIR__ . '/..' . '/webkernel/codebase/src/Composables/SystemAdminComposable.php',
+        'Webkernel\\Composables\\TelemetryComposable' => __DIR__ . '/..' . '/webkernel/codebase/src/Composables/TelemetryComposable.php',
+        'Webkernel\\Config\\ConfigWriter' => __DIR__ . '/..' . '/webkernel/codebase/src/Config/src/ConfigWriter.php',
         'Webkernel\\Console\\Attribute\\ConsoleCommand' => __DIR__ . '/..' . '/webkernel/codebase/src/Console/src/Attribute/ConsoleCommand.php',
         'Webkernel\\Console\\Cancelled' => __DIR__ . '/..' . '/webkernel/codebase/src/Console/src/Cancelled.php',
         'Webkernel\\Console\\Commands\\DumpAutoloadCommand' => __DIR__ . '/..' . '/webkernel/codebase/src/Console/src/Commands/DumpAutoloadCommand.php',
@@ -218,6 +321,11 @@ class ComposerStaticInit8c81a70f300bccf9fc35c21e08ef128b
         'Webkernel\\Container\\ContainerException' => __DIR__ . '/..' . '/webkernel/codebase/src/Container/src/ContainerException.php',
         'Webkernel\\Container\\NotFound' => __DIR__ . '/..' . '/webkernel/codebase/src/Container/src/NotFound.php',
         'Webkernel\\DevEnv\\IdeHelper' => __DIR__ . '/..' . '/webkernel/codebase/src/DevEnv/src/IdeHelper.php',
+        'Webkernel\\Http\\Psr\\Response' => __DIR__ . '/..' . '/webkernel/codebase/src/Http/src/Psr/Response.php',
+        'Webkernel\\Http\\Psr\\ServerRequest' => __DIR__ . '/..' . '/webkernel/codebase/src/Http/src/Psr/ServerRequest.php',
+        'Webkernel\\Http\\Psr\\Stream' => __DIR__ . '/..' . '/webkernel/codebase/src/Http/src/Psr/Stream.php',
+        'Webkernel\\Http\\Psr\\UploadedFile' => __DIR__ . '/..' . '/webkernel/codebase/src/Http/src/Psr/UploadedFile.php',
+        'Webkernel\\Http\\Psr\\Uri' => __DIR__ . '/..' . '/webkernel/codebase/src/Http/src/Psr/Uri.php',
         'Webkernel\\Http\\Request' => __DIR__ . '/..' . '/webkernel/codebase/src/Http/src/Request.php',
         'Webkernel\\Instance\\InstanceId' => __DIR__ . '/..' . '/webkernel/codebase/src/Instance/src/InstanceId.php',
         'Webkernel\\Lifecycle\\ComposerScripts' => __DIR__ . '/..' . '/webkernel/lifecycle/src/Lifecycle/ComposerScripts.php',
@@ -225,6 +333,7 @@ class ComposerStaticInit8c81a70f300bccf9fc35c21e08ef128b
         'Webkernel\\Lifecycle\\Installer\\LCInstallerLocations' => __DIR__ . '/..' . '/webkernel/lifecycle/src/Lifecycle/Installer/LCInstallerLocations.php',
         'Webkernel\\Lifecycle\\Installer\\LCPackageType' => __DIR__ . '/..' . '/webkernel/lifecycle/src/Lifecycle/Installer/LCPackageType.php',
         'Webkernel\\Lifecycle\\LCInstaller' => __DIR__ . '/..' . '/webkernel/lifecycle/src/Lifecycle/LCInstaller.php',
+        'Webkernel\\Panel\\AdminPanel' => __DIR__ . '/..' . '/webkernel/codebase/src/Panel/src/AdminPanel.php',
         'Webkernel\\Paths\\Composer' => __DIR__ . '/..' . '/webkernel/codebase/src/Paths/src/Composer.php',
         'Webkernel\\Paths\\Package' => __DIR__ . '/..' . '/webkernel/codebase/src/Paths/src/Package.php',
         'Webkernel\\Paths\\Path' => __DIR__ . '/..' . '/webkernel/codebase/src/Paths/src/Path.php',
@@ -232,8 +341,12 @@ class ComposerStaticInit8c81a70f300bccf9fc35c21e08ef128b
         'Webkernel\\Performance\\Performance' => __DIR__ . '/..' . '/webkernel/codebase/src/Performance/src/Performance.php',
         'Webkernel\\Performance\\Status' => __DIR__ . '/..' . '/webkernel/codebase/src/Performance/src/Status.php',
         'Webkernel\\PlatformProvider' => __DIR__ . '/..' . '/webkernel/codebase/src/PlatformProvider.php',
+        'Webkernel\\Platform\\AppOwner' => __DIR__ . '/..' . '/webkernel/codebase/src/Platform/src/AppOwner.php',
         'Webkernel\\Platform\\Exceptions' => __DIR__ . '/..' . '/webkernel/codebase/src/Platform/src/Exceptions.php',
         'Webkernel\\Platform\\Middleware' => __DIR__ . '/..' . '/webkernel/codebase/src/Platform/src/Middleware.php',
+        'Webkernel\\Platform\\Telemetry\\AccessLogWriter' => __DIR__ . '/..' . '/webkernel/codebase/src/Platform/src/Telemetry/AccessLogWriter.php',
+        'Webkernel\\Platform\\Telemetry\\MetricsCollector' => __DIR__ . '/..' . '/webkernel/codebase/src/Platform/src/Telemetry/MetricsCollector.php',
+        'Webkernel\\Platform\\Telemetry\\ProfileResult' => __DIR__ . '/..' . '/webkernel/codebase/src/Platform/src/Telemetry/ProfileResult.php',
         'Webkernel\\Route\\Action\\RedirectAction' => __DIR__ . '/..' . '/webkernel/codebase/src/Route/src/Action/RedirectAction.php',
         'Webkernel\\Route\\Action\\ViewAction' => __DIR__ . '/..' . '/webkernel/codebase/src/Route/src/Action/ViewAction.php',
         'Webkernel\\Route\\Binding' => __DIR__ . '/..' . '/webkernel/codebase/src/Route/src/Binding.php',

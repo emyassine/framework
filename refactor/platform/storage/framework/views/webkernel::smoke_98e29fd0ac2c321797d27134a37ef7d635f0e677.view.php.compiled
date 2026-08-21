@@ -1,0 +1,1 @@
+<?php  $this->start_component('webkernel::hello',[]); ?>ns<?php echo $this->render_component(); ?> <?php  $this->start_component('webkernel::hello',[]); ?>x<?php echo $this->render_component(); ?> <?php  $this->start_component('webkernel::hello',[]); ?><?php echo $this->render_component(); ?>

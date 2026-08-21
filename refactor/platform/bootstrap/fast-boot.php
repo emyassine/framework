@@ -5,229 +5,182 @@
 //> For the full copyright and license information, please view the LICENSE
 //> file that was distributed with this source code.
 //>
-//> Hot path: require the stamped autoload relative path and return.
-//> Stamp: platform/storage/instance/data/autoload.php (generated).
-//> Miss: read composer.json vendor-dir, optional composer install (CLI), restamp.
-
-//> ---- Hot path: resolve stamped autoload and return immediately ------------------
+//> Hot path: require config/platform.php (OPcache), read autoload, require it, return.
+//> Miss: discover vendor-dir, optional CLI composer install, stamp autoload via ConfigWriter.
 
 $webapp_path = dirname(__DIR__, 2);
-$autoload_map = $webapp_path . "/platform/storage/instance/data/autoload.php";
+$config_path = $webapp_path.'/config/platform.php';
+$platform_config = is_file($config_path) ? require $config_path : [];
+if (! is_array($platform_config)) {
+    $platform_config = [];
+}
+$autoload_rel = $platform_config['autoload'] ?? 'platform/dependencies/autoload.php';
+if (
+    is_string($autoload_rel) &&
+    $autoload_rel !== '' &&
+    ! str_contains($autoload_rel, '..')
+) {
+    $autoload_abs = $webapp_path.'/'.$autoload_rel;
+    if (is_file($autoload_abs)) {
+        require $autoload_abs;
 
-if (is_file($autoload_map)) {
-    $autoload_rel = require $autoload_map;
-    if (
-        is_string($autoload_rel) &&
-        $autoload_rel !== "" &&
-        !str_contains($autoload_rel, "..")
-    ) {
-        $autoload_abs = $webapp_path . "/" . $autoload_rel;
-        if (is_file($autoload_abs)) {
-            require $autoload_abs;
-            return;
-        }
+        return;
     }
 }
 
 /**
- * Miss path: discover vendor dir, stamp cache, optionally install composer
+ * Miss path: discover vendor dir, stamp config/platform.php, optionally install composer.
  */
-(static function (string $webapp_path, string $autoload_map): void {
-    //---- Helpers ---------------------------------------------------------------
-
+(static function (string $webapp_path, string $config_path): void {
     $fail = static function (string $message): never {
-        fwrite(STDERR, "fast-boot: " . $message . PHP_EOL);
+        fwrite(STDERR, 'fast-boot: '.$message.PHP_EOL);
         exit(1);
+    };
+
+    $load_writer = static function (string $webapp_path): void {
+        if (class_exists(\Webkernel\Config\ConfigWriter::class, false)) {
+            return;
+        }
+        foreach ([
+            $webapp_path.'/x-webkernel/codebase/src/Config/src/ConfigWriter.php',
+            $webapp_path.'/platform/dependencies/webkernel/codebase/src/Config/src/ConfigWriter.php',
+        ] as $file) {
+            if (is_file($file)) {
+                require_once $file;
+
+                return;
+            }
+        }
     };
 
     /** Validate and normalise a vendor-dir string to a relative autoload path. */
     $normalize_rel = static function (string $vendor): ?string {
-        $vendor = trim(str_replace("\\", "/", $vendor), "/");
-        if ($vendor === "" || $vendor[0] === "/") {
+        $vendor = trim(str_replace('\\', '/', $vendor), '/');
+        if ($vendor === '' || $vendor[0] === '/') {
             return null;
         }
-        foreach (explode("/", $vendor) as $segment) {
-            if ($segment === "" || $segment === "." || $segment === "..") {
+        foreach (explode('/', $vendor) as $segment) {
+            if ($segment === '' || $segment === '.' || $segment === '..') {
                 return null;
             }
         }
-        return $vendor . "/autoload.php";
-    };
 
-    //---- Build candidate list: composer.json first, then hard-coded fallbacks ---
+        return $vendor.'/autoload.php';
+    };
 
     $candidates = [];
 
-    $composer_json_path = $webapp_path . "/composer.json";
+    $composer_json_path = $webapp_path.'/composer.json';
     if (is_file($composer_json_path)) {
         $raw = file_get_contents($composer_json_path);
         if ($raw === false) {
-            $fail("unable to read composer.json");
+            $fail('unable to read composer.json');
         }
-        assert(is_string($raw)); // narrows string|false → string for static analysis
+        assert(is_string($raw));
         try {
             $decoded = json_decode($raw, true, 512, JSON_THROW_ON_ERROR);
         } catch (\JsonException $e) {
-            $fail("composer.json is not valid JSON: " . $e->getMessage());
+            $fail('composer.json is not valid JSON: '.$e->getMessage());
         }
-        if (!is_array($decoded)) {
-            $fail("composer.json is not an object.");
+        if (! is_array($decoded)) {
+            $fail('composer.json is not an object.');
         }
-        $vendor_dir = $decoded["config"]["vendor-dir"] ?? "vendor";
-        if (!is_string($vendor_dir)) {
-            $fail("invalid composer config.vendor-dir.");
+        $vendor_dir = $decoded['config']['vendor-dir'] ?? 'vendor';
+        if (! is_string($vendor_dir)) {
+            $fail('invalid composer config.vendor-dir.');
         }
         $from_json = $normalize_rel($vendor_dir);
         if ($from_json === null) {
-            $fail("invalid composer config.vendor-dir.");
+            $fail('invalid composer config.vendor-dir.');
         }
-        $candidates[$from_json] = true; // keyed set: O(1) dedup
+        $candidates[$from_json] = true;
     }
 
-    $candidates["third_party/autoload.php"] = true;
-    $candidates["vendor/autoload.php"] = true;
-    $candidate_list = array_keys($candidates); // resolve once, reuse everywhere
-
-    //> ---- Find first existing autoload from candidate list ----------------------
+    $candidates['platform/dependencies/autoload.php'] = true;
+    $candidates['vendor/autoload.php'] = true;
+    $candidate_list = array_keys($candidates);
 
     $find = static function () use ($webapp_path, $candidate_list): ?string {
         foreach ($candidate_list as $rel) {
-            if (is_file($webapp_path . "/" . $rel)) {
+            if (is_file($webapp_path.'/'.$rel)) {
                 return $rel;
             }
         }
+
         return null;
     };
 
-    //---- Atomically write the stamp file (tmp_path → rename) ------------------
-
-    $stamp = static function (string $rel) use (
-        $webapp_path,
-        $autoload_map
-    ): void {
-        $stamp_dir = dirname($autoload_map);
-        if (
-            !is_dir($stamp_dir) &&
-            !mkdir($stamp_dir, 0775, true) &&
-            !is_dir($stamp_dir)
-        ) {
-            return; // non-fatal: next request retries
+    $boot = static function (string $rel) use ($webapp_path, $config_path, $load_writer): void {
+        $load_writer($webapp_path);
+        if (class_exists(\Webkernel\Config\ConfigWriter::class, false)) {
+            \Webkernel\Config\ConfigWriter::atomic_rewrite($config_path, ['autoload' => $rel]);
         }
-
-        $exported = var_export($rel, true);
-        if (!is_string($exported)) {
-            return;
-        }
-
-        $body =
-            "<?php declare(strict_types=1);" .PHP_EOL
-            ."//> This file is part of Webkernel." .PHP_EOL
-            ."//> (c) 2025 - 2027 Numerimondes, El Moumen Yassine" .PHP_EOL
-            ."//> Yassine El Moumen <yassine@numerimondes.com> | <platform@webkernelphp.com>" .PHP_EOL
-            ."//> For the full copyright and license information, please view the LICENSE" .PHP_EOL
-            ."//> file that was distributed with this source code." .PHP_EOL ."//>" .PHP_EOL
-            ."//> Generated by platform/bootstrap/fast-boot.php. Do not edit." .PHP_EOL .
-            "return " . $exported . ";" . PHP_EOL;
-
-        // Write to a sibling tmp_path, then atomically rename to avoid torn reads.
-        $tmp_path = $autoload_map . "." . bin2hex(random_bytes(4)) . ".tmp";
-        if (file_put_contents($tmp_path, $body, LOCK_EX) === false) {
-            return;
-        }
-        if (!rename($tmp_path, $autoload_map)) {
-            @unlink($tmp_path);
-            return;
-        }
-        if (function_exists("opcache_invalidate")) {
-            opcache_invalidate($autoload_map, true);
-        }
+        require $webapp_path.'/'.$rel;
     };
-
-    //---- Stamp + require (used after both find and install) --------------------
-
-    $boot = static function (string $rel) use ($webapp_path, $stamp): void {
-        $stamp($rel);
-        require $webapp_path . "/" . $rel;
-    };
-
-    //---- First find attempt (no install yet) -----------------------------------
 
     $rel = $find();
     if ($rel !== null) {
         $boot($rel);
+
         return;
     }
 
-    //---- CLI only: resolve composer binary or download phar -------------------
-
-    if (PHP_SAPI !== "cli") {
-        $fail("vendor autoload missing. Run: composer install");
+    if (PHP_SAPI !== 'cli') {
+        $fail('vendor autoload missing. Run: composer install');
     }
 
-    fwrite(STDERR, "fast-boot: installing PHP dependencies…" . PHP_EOL);
+    fwrite(STDERR, 'fast-boot: installing PHP dependencies…'.PHP_EOL);
 
-    $tmp_phar = null; // path to a downloaded composer.phar, cleaned up in finally
+    $tmp_phar = null;
 
     $composer_argv = (static function () use (
         $fail,
         $webapp_path,
         &$tmp_phar
     ): array {
-        //---- Try PATH first (fastest: no network) ------------------------------
-
-        $path_env = getenv("PATH");
-        if (is_string($path_env) && $path_env !== "") {
+        $path_env = getenv('PATH');
+        if (is_string($path_env) && $path_env !== '') {
             foreach (explode(PATH_SEPARATOR, $path_env) as $dir) {
-                $bin = rtrim($dir, "/\\") . DIRECTORY_SEPARATOR . "composer";
+                $bin = rtrim($dir, '/\\').DIRECTORY_SEPARATOR.'composer';
                 if (is_file($bin) && is_executable($bin)) {
                     return [$bin];
                 }
             }
         }
 
-        //---- Fallback: download composer.phar with checksum verification -------
-
-        if (!ini_get("allow_url_fopen")) {
-            $fail("allow_url_fopen is disabled. Run: composer install");
+        if (! ini_get('allow_url_fopen')) {
+            $fail('allow_url_fopen is disabled. Run: composer install');
         }
 
         $http_ctx = stream_context_create([
-            "http" => ["timeout" => 120, "follow_location" => 1],
-            "ssl" => ["verify_peer" => true, "verify_peer_name" => true],
+            'http' => ['timeout' => 120, 'follow_location' => 1],
+            'ssl' => ['verify_peer' => true, 'verify_peer_name' => true],
         ]);
 
         $phar_bytes = file_get_contents(
-            "https://getcomposer.org/download/latest-stable/composer.phar",
+            'https://getcomposer.org/download/latest-stable/composer.phar',
             false,
             $http_ctx
         );
         $phar_sha256 = file_get_contents(
-            "https://getcomposer.org/download/latest-stable/composer.phar.sha256sum",
+            'https://getcomposer.org/download/latest-stable/composer.phar.sha256sum',
             false,
             $http_ctx
         );
 
         if (
             $phar_bytes === false ||
-            $phar_bytes === "" ||
+            $phar_bytes === '' ||
             $phar_sha256 === false ||
-            $phar_sha256 === ""
+            $phar_sha256 === ''
         ) {
-            fwrite(
-                STDERR,
-                "fast-boot: unable to download composer. Run: composer install" .
-                    PHP_EOL
-            );
+            fwrite(STDERR, 'fast-boot: unable to download composer. Run: composer install'.PHP_EOL);
             exit(1);
         }
 
         $checksum_token = strtok(trim($phar_sha256), " \t");
-
         if ($checksum_token === false) {
-            fwrite(
-                STDERR,
-                "fast-boot: composer.phar checksum mismatch." . PHP_EOL
-            );
+            fwrite(STDERR, 'fast-boot: composer.phar checksum mismatch.'.PHP_EOL);
             exit(1);
         }
 
@@ -236,45 +189,27 @@ if (is_file($autoload_map)) {
 
         if (
             preg_match('/^[a-f0-9]{64}$/', $expected) !== 1 ||
-            !hash_equals($expected, hash("sha256", $phar_bytes)) ||
-            (!str_starts_with($phar_trimmed, "<?php") &&
-                !str_starts_with($phar_trimmed, "#!/usr/bin/env php"))
+            ! hash_equals($expected, hash('sha256', $phar_bytes)) ||
+            (! str_starts_with($phar_trimmed, '<?php') &&
+                ! str_starts_with($phar_trimmed, '#!/usr/bin/env php'))
         ) {
-            fwrite(
-                STDERR,
-                "fast-boot: composer.phar checksum mismatch." . PHP_EOL
-            );
+            fwrite(STDERR, 'fast-boot: composer.phar checksum mismatch.'.PHP_EOL);
             exit(1);
         }
 
-        //> ---- Write verified phar to tmp_dir ------------------------------------
-
-        $tmp_dir = $webapp_path . "/platform/temporary";
-        if (
-            !is_dir($tmp_dir) &&
-            !mkdir($tmp_dir, 0775, true) &&
-            !is_dir($tmp_dir)
-        ) {
-            fwrite(
-                STDERR,
-                "fast-boot: unable to create platform/temporary." . PHP_EOL
-            );
+        $tmp_dir = $webapp_path.'/platform/temporary';
+        if (! is_dir($tmp_dir) && ! mkdir($tmp_dir, 0775, true) && ! is_dir($tmp_dir)) {
+            fwrite(STDERR, 'fast-boot: unable to create platform/temporary.'.PHP_EOL);
             exit(1);
         }
 
-        $tmp_phar = tempnam($tmp_dir, "wkc"); // tmp_phar: the downloaded phar path
+        $tmp_phar = tempnam($tmp_dir, 'wkc');
         if ($tmp_phar === false) {
-            fwrite(
-                STDERR,
-                "fast-boot: unable to write platform/temporary." . PHP_EOL
-            );
+            fwrite(STDERR, 'fast-boot: unable to write platform/temporary.'.PHP_EOL);
             exit(1);
         }
         if (file_put_contents($tmp_phar, $phar_bytes, LOCK_EX) === false) {
-            fwrite(
-                STDERR,
-                "fast-boot: unable to write temporary composer.phar." . PHP_EOL
-            );
+            fwrite(STDERR, 'fast-boot: unable to write temporary composer.phar.'.PHP_EOL);
             exit(1);
         }
         chmod($tmp_phar, 0444);
@@ -282,15 +217,11 @@ if (is_file($autoload_map)) {
         return [PHP_BINARY, $tmp_phar];
     })();
 
-    //> ---- Run composer install --------------------------------------------------
-
     $env = getenv();
-
-    if (!is_array($env)) {
+    if (! is_array($env)) {
         $env = [];
     }
-
-    unset($env["COMPOSER_HOME"]); // ensure clean composer home resolution
+    unset($env['COMPOSER_HOME']);
 
     $exit_code = 1;
 
@@ -299,45 +230,38 @@ if (is_file($autoload_map)) {
         $process = proc_open(
             [
                 ...$composer_argv,
-                "install",
-                "--working-dir=" . $webapp_path,
-                "--no-interaction",
-                "--no-ansi",
-                "--no-scripts",
+                'install',
+                '--working-dir='.$webapp_path,
+                '--no-interaction',
+                '--no-ansi',
+                '--no-scripts',
             ],
             [0 => STDIN, 1 => STDOUT, 2 => STDERR],
             $pipes,
             $webapp_path,
             $env,
-            ["bypass_shell" => true]
+            ['bypass_shell' => true]
         );
 
         if ($process === false) {
-            fwrite(
-                STDERR,
-                "fast-boot: unable to start composer. Run: composer install" .
-                    PHP_EOL
-            );
+            fwrite(STDERR, 'fast-boot: unable to start composer. Run: composer install'.PHP_EOL);
             exit(1);
         }
 
         $status = proc_close($process);
         $exit_code = is_int($status) ? $status : 1;
     } finally {
-        // Always clean up the downloaded tmp_phar regardless of outcome.
         if (is_string($tmp_phar) && is_file($tmp_phar)) {
             unlink($tmp_phar);
         }
     }
 
-    //> ---- Second find attempt (post-install) ------------------------------------
-
     $rel = $find();
 
     if ($exit_code !== 0 || $rel === null) {
-        $fail("dependency installation failed. Run: composer install");
+        $fail('dependency installation failed. Run: composer install');
     }
 
-    fwrite(STDERR, "fast-boot: PHP dependencies installed." . PHP_EOL);
+    fwrite(STDERR, 'fast-boot: PHP dependencies installed.'.PHP_EOL);
     $boot($rel);
-})($webapp_path, $autoload_map);
+})($webapp_path, $config_path);
