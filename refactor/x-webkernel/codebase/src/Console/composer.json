@@ -1,0 +1,21 @@
+{
+    "$schema": "https://getcomposer.org/schema.json",
+    "name": "webkernel/console",
+    "description": "CLI kernel. Attribute commands, no Symfony Console.",
+    "type": "library",
+    "license": "proprietary",
+    "version": "0.12.0",
+    "require": {
+        "php": ">=8.4"
+    },
+    "autoload": {
+        "psr-4": {
+            "Webkernel\\Console\\": "src/"
+        }
+    },
+    "extra": {
+        "webkernel": {
+            "prefix": "console"
+        }
+    }
+}

@@ -1,0 +1,24 @@
+{
+    "$schema": "https://getcomposer.org/schema.json",
+    "name": "webkernel/instance",
+    "description": "Host instance fingerprint. Written by webkernel/lifecycle.",
+    "type": "library",
+    "license": "proprietary",
+    "version": "0.12.0",
+    "require": {
+        "php": ">=8.4"
+    },
+    "autoload": {
+        "psr-4": {
+            "Webkernel\\Instance\\": "src/"
+        },
+        "files": [
+            "load.instance.package-function.php"
+        ]
+    },
+    "extra": {
+        "webkernel": {
+            "prefix": "instance"
+        }
+    }
+}

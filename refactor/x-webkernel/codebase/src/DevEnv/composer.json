@@ -1,0 +1,24 @@
+{
+    "$schema": "https://getcomposer.org/schema.json",
+    "name": "webkernel/devenv",
+    "description": "IDE helper stubs generated from Composer classmap.",
+    "type": "library",
+    "license": "proprietary",
+    "version": "0.12.0",
+    "require": {
+        "php": ">=8.4"
+    },
+    "autoload": {
+        "psr-4": {
+            "Webkernel\\DevEnv\\": "src/"
+        },
+        "files": [
+            "load.devenv.package-function.php"
+        ]
+    },
+    "extra": {
+        "webkernel": {
+            "prefix": "devenv"
+        }
+    }
+}
