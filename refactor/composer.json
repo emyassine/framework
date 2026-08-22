@@ -15,7 +15,7 @@
     "minimum-stability": "stable",
     "prefer-stable": true,
     "config": {
-        "vendor-dir": "platform/dependencies",
+        "vendor-dir": "platform/dependencies/packagist",
         "apcu-autoloader": true,
         "optimize-autoloader": true,
         "preferred-install": "dist",

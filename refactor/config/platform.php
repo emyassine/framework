@@ -17,7 +17,7 @@ return array (
   'macs' => '88:a4:c2:f3:ac:22,00:00:00:00:00:00,10:66:6a:00:00:00,d8:80:83:06:45:d5',
   'instance_file_path' => 'platform/storage/instance',
   'created' => '2026-08-21T00:00:00+00:00',
-  'autoload' => 'platform/dependencies/autoload.php',
+  'autoload' => 'platform/dependencies/packagist/autoload.php',
   'platform' => 
   array (
     'path' => 'platform',

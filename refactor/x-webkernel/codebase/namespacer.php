@@ -1,14 +1,18 @@
 <?php declare(strict_types=1);
 
-/**
- * Webkernel autoloader. Classmap + dumped function files from lifecycle
- * (vendor/composer/webkernel_classmap.php, webkernel_files.php).
- *
- * Short names (Route, View, Js) alias on first use — class_alias at boot
- * would load the target class on every request.
- *
- * Path helpers stay dumped. Route/view composables load on webapp()->{name}().
- */
+//> This file is part of Webkernel.
+//> (c) 2025 - 2027 Numerimondes, El Moumen Yassine
+//> Yassine El Moumen <yassine@numerimondes.com> | <platform@webkernelphp.com>
+//> For the full copyright and license information, please view the LICENSE
+//> file that was distributed with this source code.
+
+//> This is the Webkernel autoloader.
+//> Classmap + dumped function files from lifecycle
+//> (vendor/composer/webkernel_classmap.php, webkernel_files.php).
+//> Short names (Route, View, Js) alias on first use — class_alias at boot
+//> would load the target class on every request.
+//> Path helpers stay dumped. Route/view composables load on webapp()->{name}().
+
 const WEBKERNEL_NS = 'Webkernel\\';
 const WEBKERNEL_NS_LEN = 10;
 
