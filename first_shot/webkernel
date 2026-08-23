@@ -1,7 +1,0 @@
-#!/usr/bin/env php
-<?php declare(strict_types=1);
-use Webkernel\Console\Input\ArgvInput;
-define('START_REQUEST', hrtime(true));
-/** @var \Webkernel\WebApp $webapp */
-$webapp = require_once __DIR__.'/bootstrap/app.php';
-exit($webapp->handle_command(new ArgvInput));
