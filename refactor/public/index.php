@@ -7,30 +7,25 @@
 
 define('START_REQUEST', hrtime(true));
 
-(static function (): void {
-    $webapp_path = dirname(__DIR__);
-    $maint = $webapp_path.'/platform/maintenance.php';
-    if (is_file($maint)) {
-        require $maint;
-        return;
-    }
+$webapp_path = dirname(__DIR__);
+$maint = $webapp_path.'/platform/maintenance.php';
 
-    $uri = $_SERVER['REQUEST_URI'] ?? '/';
-    $path = parse_url($uri, PHP_URL_PATH);
-    $path = is_string($path) && $path !== '' ? $path : '/';
-    if ($path === '/healthz' || $path === '/ready') {
-        http_response_code(200);
-        header('Content-Type: text/plain');
-        echo 'OK';
+if (is_file($maint)) {
+    require $maint;
+    return;
+}
 
-        return;
-    }
+$uri  = $_SERVER['REQUEST_URI'] ?? '/';
+$path = parse_url($uri, PHP_URL_PATH);
+$path = is_string($path) && $path !== '' ? $path : '/';
 
-    require $webapp_path.'/platform/bootstrap/fast-boot.php';
+if ($path === '/healthz' || $path === '/ready') {
+    http_response_code(200);
+    header('Content-Type: text/plain');
+    echo 'OK';
+    return;
+}
 
-    $container = \Webkernel\Container\Container::get_instance();
-    $method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
-    $route_map = \Webkernel\Cache\CompilationStore::get('webkernel.global.routes', $container);
-    $handler = (new \Webkernel\Http\RequestClassifier())->classify($path, $method);
-    $handler->handle(is_array($route_map) ? $route_map : [], $container)->emit();
-})();
+require $webapp_path.'/platform/bootstrap/fast-boot.php';
+
+\Webkernel\Index::start_http();
