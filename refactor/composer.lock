@@ -569,7 +569,7 @@
             "dist": {
                 "type": "path",
                 "url": "x-webkernel/codebase",
-                "reference": "879a94cac707c02425c5f5f5430f98f39b05eacb"
+                "reference": "f981fb111a33582a78b878a24f1cecac39c5a1b9"
             },
             "require": {
                 "php": ">=8.4",
@@ -593,26 +593,8 @@
                 "files": [
                     "load.codebase.package-function.php"
                 ],
-                "classmap": [
-                    "src/WebApp.php",
-                    "src/PlatformProvider.php"
-                ],
                 "psr-4": {
-                    "Webkernel\\Composables\\": "src/Composables/",
-                    "Webkernel\\Config\\": "src/Config/src/",
-                    "Webkernel\\Auth\\": "src/Auth/src/",
-                    "Webkernel\\Acl\\": "src/Acl/src/",
-                    "Webkernel\\Panel\\": "src/Panel/src/",
-                    "Webkernel\\Container\\": "src/Container/src/",
-                    "Webkernel\\Http\\": "src/Http/src/",
-                    "Webkernel\\Platform\\": "src/Platform/src/",
-                    "Webkernel\\Paths\\": "src/Paths/src/",
-                    "Webkernel\\Instance\\": "src/Instance/src/",
-                    "Webkernel\\Route\\": "src/Route/src/",
-                    "Webkernel\\View\\": "src/View/src/",
-                    "Webkernel\\Performance\\": "src/Performance/src/",
-                    "Webkernel\\DevEnv\\": "src/DevEnv/src/",
-                    "Webkernel\\Console\\": "src/Console/src/"
+                    "Webkernel\\": "src/"
                 }
             },
             "license": [

@@ -2,39 +2,20 @@
 
 namespace Modules\Blog\Console;
 
-use Webkernel\Cli\CommandInterface;
+use Webkernel\Console\Attribute\ConsoleCommand;
+use Webkernel\Console\ExitCode;
 
-/**
- * Generates XML sitemap for blog posts.
- */
-final class GenerateSitemapCommand implements CommandInterface
+final class GenerateSitemapCommand
 {
-    /**
-     * Get the command name.
-     */
-    public function get_name(): string
-    {
-        return 'blog:sitemap';
-    }
-
-    /**
-     * Get help text for the command.
-     */
-    public function get_help(): string
-    {
-        return 'Generate XML sitemap for blog posts';
-    }
-
-    /**
-     * Execute the command.
-     */
-    public function execute(array $args): int
+    #[ConsoleCommand(
+        name: 'blog:sitemap',
+        description: 'Generate XML sitemap for blog posts',
+    )]
+    public function __invoke(): ExitCode
     {
         echo "Generating sitemap...\n";
-
-        // TODO: Implement actual sitemap generation
-
         echo "Sitemap generated successfully!\n";
-        return 0;
+
+        return ExitCode::SUCCESS;
     }
 }

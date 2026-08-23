@@ -1,12 +1,15 @@
 #!/usr/bin/env php
 <?php declare(strict_types=1);
+//> This file is part of Webkernel.
+//> (c) 2025 - 2027 Numerimondes, El Moumen Yassine
+//> Yassine El Moumen <yassine@numerimondes.com> | <platform@webkernelphp.com>
+//> For the full copyright and license information, please view the LICENSE
+//> file that was distributed with this source code.
 
-require __DIR__ . '/platform/dependencies/packagist/autoload.php';
+use Webkernel\Console\Input\ArgvInput;
 
-use Webkernel\Container\Container;
-use Webkernel\Cli\CliHandler;
+define('START_REQUEST', hrtime(true));
 
-$container = Container::get_instance();
-$handler = new CliHandler($container);
-$exit_code = $handler->handle($argv);
-exit($exit_code);
+/** @var \Webkernel\WebApp $webapp */
+$webapp = require_once __DIR__.'/platform/bootstrap/app.php';
+exit($webapp->handle_command(new ArgvInput));

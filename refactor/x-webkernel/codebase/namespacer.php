@@ -100,14 +100,7 @@ function webkernel_autoload(string $class): bool
     }
 
     $rest = substr($class, WEBKERNEL_NS_LEN);
-    $slash = strpos($rest, '\\');
-    if ($slash === false) {
-        $file = $base.$rest.'.php';
-    } else {
-        $pkg = substr($rest, 0, $slash);
-        $rel = str_replace('\\', '/', substr($rest, $slash + 1));
-        $file = $base.$pkg.'/src/'.$rel.'.php';
-    }
+    $file = $base.str_replace('\\', '/', $rest).'.php';
 
     if (is_file($file)) {
         $hit[$class] = $file;

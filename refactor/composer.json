@@ -10,7 +10,9 @@
         }
     ],
     "autoload": {
-        "psr-4": {}
+        "psr-4": {
+            "Modules\\": "modules/"
+        }
     },
     "minimum-stability": "stable",
     "prefer-stable": true,

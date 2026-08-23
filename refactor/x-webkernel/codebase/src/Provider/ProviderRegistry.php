@@ -3,16 +3,15 @@
 namespace Webkernel\Provider;
 
 /**
- * Auto-discovers providers from the modules/ directory.
- * Eliminates the need to manually edit the registry when adding new modules.
+ * Discovers module providers and always includes core providers.
  */
 final class ProviderRegistry
 {
+    /** @var list<class-string>|null */
     private static ?array $providers = null;
 
     /**
-     * Get all registered provider class names.
-     * Auto-discovers from modules/*/*Provider.php and includes core providers.
+     * @return list<class-string>
      */
     public static function providers(): array
     {
@@ -20,40 +19,34 @@ final class ProviderRegistry
             return self::$providers;
         }
 
-        $providers = [];
+        $providers = [
+            \Webkernel\Http\CoreProvider::class,
+        ];
 
-        // Auto-discover module providers
-        $refactorDir = __DIR__ . '/../../../../..';
-        $modulesDir = $refactorDir . '/modules';
+        $modules_dir = function_exists('webapp_path')
+            ? webapp_path('modules')
+            : dirname(__DIR__, 4).'/modules';
 
-        if (is_dir($modulesDir)) {
-            foreach (glob($modulesDir . '/*/*Provider.php') ?: [] as $file) {
+        if (is_dir($modules_dir)) {
+            foreach (glob($modules_dir.'/*/*Provider.php') ?: [] as $file) {
                 $module_name = basename(dirname($file));
-                $class_name = 'Modules\\' . $module_name . '\\' . basename($file, '.php');
+                $class_name = 'Modules\\'.$module_name.'\\'.basename($file, '.php');
                 if (class_exists($class_name)) {
                     $providers[] = $class_name;
                 }
             }
         }
 
-        // Core providers (always included)
-        $providers[] = \Webkernel\Http\CoreProvider::class;
-
         self::$providers = $providers;
-        return $providers;
+
+        return self::$providers;
     }
 
-    /**
-     * Get the path to this file (used for staleness checking).
-     */
     public static function file(): string
     {
         return __FILE__;
     }
 
-    /**
-     * Reset the cached provider list (useful for testing).
-     */
     public static function reset(): void
     {
         self::$providers = null;

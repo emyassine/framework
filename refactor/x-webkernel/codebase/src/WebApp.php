@@ -23,6 +23,8 @@ use Webkernel\Container\Container;
 use Webkernel\Http\Request;
 use Webkernel\Platform\Exceptions;
 use Webkernel\Platform\Middleware;
+use Webkernel\Provider\PlatformProvider;
+use Webkernel\Provider\ProviderRegistry;
 
 /**
  * Host application. Fluent segments are composables from the dump-autoload map
@@ -66,9 +68,10 @@ final class WebApp
 
     private function __construct()
     {
-        $this->container = new Container();
+        $this->container = Container::get_instance();
         $this->container->instance(Container::class, $this->container);
         $this->container->instance(ContainerInterface::class, $this->container);
+        $this->container->instance(self::class, $this);
     }
 
     public static function get(): self
@@ -158,8 +161,7 @@ final class WebApp
 
     public function with_routes(?string $web = null): self
     {
-        $web ??= webapp_path('routes/web.php');
-        if (is_file($web)) {
+        if ($web !== null && is_file($web)) {
             $this->declare('routes', [$web]);
         }
 
@@ -356,14 +358,41 @@ final class WebApp
         if (is_dir($host_views)) {
             $this->declare_view('', $host_views);
         }
+        $instances = [];
         foreach ($this->providers as $class) {
             if (! is_a($class, PlatformProvider::class, true)) {
                 throw new \RuntimeException($class.' is not a PlatformProvider.');
             }
-            (new $class())->register($this);
+            /** @var PlatformProvider $provider */
+            $provider = new $class();
+            $provider->register($this->container);
+            $this->ingest_provider($provider);
+            $instances[] = $provider;
+        }
+        foreach ($instances as $provider) {
+            $provider->boot($this->container);
         }
 
         return $this;
+    }
+
+    private function ingest_provider(PlatformProvider $provider): void
+    {
+        foreach ($provider->declaration('ROUTES', 'routes') as $path) {
+            if (is_string($path) && $path !== '') {
+                $this->declare('routes', [$path]);
+            }
+        }
+        foreach ($provider->declaration('COMMANDS', 'commands') as $entry) {
+            if (is_string($entry) && class_exists($entry)) {
+                $this->declare('commands', [$entry]);
+            }
+        }
+        foreach ($provider->declaration('VIEWS', 'views') as $dir) {
+            if (is_string($dir) && is_dir($dir)) {
+                $this->declare_view('', $dir);
+            }
+        }
     }
 
     public function __call(string $name, array $arguments): mixed
@@ -455,6 +484,7 @@ final class WebApp
                 $this->declare('providers', $list);
             }
         }
+        $this->declare('providers', ProviderRegistry::providers());
     }
 
     /**

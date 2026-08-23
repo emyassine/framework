@@ -12,7 +12,7 @@ final class IdeHelper
 {
     public static function output_path(): string
     {
-        return dirname(__DIR__).'/_ide_helper.php';
+        return __DIR__.'/_ide_helper.php';
     }
 
     /**

@@ -112,4 +112,24 @@ abstract class PlatformProvider
     {
         return [];
     }
+
+    /**
+     * Resolve a declaration: constant first, then method.
+     *
+     * @return list<mixed>|array<string, mixed>
+     */
+    public function declaration(string $constant, string $method): array
+    {
+        if (defined(static::class.'::'.$constant)) {
+            $value = constant(static::class.'::'.$constant);
+
+            return is_array($value) ? $value : [];
+        }
+        if (! method_exists($this, $method)) {
+            return [];
+        }
+        $value = $this->{$method}();
+
+        return is_array($value) ? $value : [];
+    }
 }

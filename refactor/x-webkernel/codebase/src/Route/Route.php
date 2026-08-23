@@ -532,4 +532,4 @@ final class Route implements ComposableContract
     }
 }
 
-require_once dirname(__DIR__).'/functions/route.php';
+require_once __DIR__.'/functions/route.php';

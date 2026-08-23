@@ -646,6 +646,23 @@ final readonly class DumpAutoloadCommand
             if ($rel === false) {
                 continue;
             }
+            $rel = str_replace('\\', '/', $rel);
+            $base_name = basename($rel);
+            if (
+                str_contains($rel, '/functions/')
+                || str_starts_with($rel, 'functions/')
+                || $base_name === 'check.php'
+                || $base_name === 'router.php'
+                || $base_name === 'config.php'
+                || str_starts_with($base_name, 'load.')
+                || str_starts_with($base_name, '_')
+            ) {
+                continue;
+            }
+            $src = file_get_contents($file->getPathname());
+            if (! is_string($src) || preg_match('/\b(?:class|interface|enum|trait)\s+/', $src) !== 1) {
+                continue;
+            }
             $class = $namespace.str_replace('/', '\\', substr($rel, 0, -4));
             $map[$class] = str_replace('\\', '/', $file->getPathname());
         }

@@ -2,36 +2,22 @@
 
 namespace Webkernel\Http;
 
-use Webkernel\Provider\PlatformProvider;
 use Webkernel\Container\Container;
+use Webkernel\Provider\PlatformProvider;
 
 /**
- * Core HTTP provider for Webkernel.
- * Registers essential HTTP services like the router.
+ * Core HTTP provider. Declares kernel route files; modules own their own routes.
  */
 final class CoreProvider extends PlatformProvider
 {
-    /**
-     * Core routes file.
-     */
-    public const ROUTES = [__DIR__ . '/../../../x-webkernel/codebase/routes.php'];
-
-    /**
-     * Register container bindings.
-     */
-    public function register(Container $container): void
+    public function routes(): array
     {
-        // Register the router
-        $container->singleton(\Webkernel\Router\Router::class, function () {
-            return new \Webkernel\Router\Router();
-        });
+        $file = dirname(__DIR__, 2).'/routes.php';
+
+        return is_file($file) ? [$file] : [];
     }
 
-    /**
-     * Boot the provider.
-     */
-    public function boot(Container $container): void
+    public function register(Container $container): void
     {
-        // Nothing to do on boot for now
     }
 }

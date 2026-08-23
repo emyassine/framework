@@ -58,7 +58,7 @@ final class Compiler
         $artifacts['webkernel.global.classmap'] = self::compile_classmap($providers);
 
         CompilationStore::store_all($artifacts);
-        apcu_store('webkernel.compiled_at', time());
+        CompilationStore::put('webkernel.compiled_at', time());
     }
 
     /**
@@ -111,17 +111,30 @@ final class Compiler
      */
     private static function resolve_declaration(object $provider, string $constant, string $method): array
     {
-        $class = get_class($provider);
+        if ($provider instanceof \Webkernel\Provider\PlatformProvider) {
+            try {
+                return $provider->declaration($constant, $method);
+            } catch (\Throwable $e) {
+                self::log_error('Declaration '.$method.' failed for '.get_class($provider).': '.$e->getMessage());
 
-        if (defined("{$class}::{$constant}")) {
-            return constant("{$class}::{$constant}");
+                return [];
+            }
         }
 
+        $class = get_class($provider);
+        if (defined($class.'::'.$constant)) {
+            $value = constant($class.'::'.$constant);
+
+            return is_array($value) ? $value : [];
+        }
         if (method_exists($provider, $method)) {
             try {
-                return $provider->$method();
+                $value = $provider->$method();
+
+                return is_array($value) ? $value : [];
             } catch (\Throwable $e) {
-                self::log_error("Declaration method {$method} failed for {$class}: " . $e->getMessage());
+                self::log_error('Declaration method '.$method.' failed for '.$class.': '.$e->getMessage());
+
                 return [];
             }
         }
@@ -138,25 +151,18 @@ final class Compiler
      */
     private static function compile_routes(array $providers, Container $container): array
     {
-        $router = $container->get(\Webkernel\Router\Router::class);
-
+        $app = \Webkernel\WebApp::get()->boot();
         foreach ($providers as $provider) {
             $entries = self::resolve_declaration($provider, 'ROUTES', 'routes');
-
             foreach ($entries as $entry) {
-                try {
-                    if (is_string($entry) && file_exists($entry)) {
-                        (static function () use ($entry, $router) { require $entry; })();
-                    } elseif (is_string($entry) && class_exists($entry)) {
-                        (new $entry())->register($router);
-                    }
-                } catch (\Throwable $e) {
-                    self::log_error("Route registration failed for " . get_class($provider) . ": " . $e->getMessage());
+                if (is_string($entry) && is_file($entry)) {
+                    $app->declare('routes', [$entry]);
                 }
             }
         }
+        \Webkernel\Route\Route::app();
 
-        return $router->flat_map();
+        return \Webkernel\Route\Route::list();
     }
 
     /**
@@ -166,14 +172,12 @@ final class Compiler
     {
         $config = [];
 
-        // Load base config
-        $refactorDir = __DIR__ . '/../../../../..';
-        $base_config = self::load_config_file($refactorDir . '/config/app.php');
+        $root = function_exists('webapp_path') ? webapp_path() : dirname(__DIR__, 4);
+        $base_config = self::load_config_file($root.'/config/app.php');
         $config = array_merge($config, $base_config);
 
-        // Load environment-specific config
         $env = $_ENV['APP_ENV'] ?? ($_SERVER['APP_ENV'] ?? 'prod');
-        $env_config = self::load_config_file($refactorDir . "/config/app.{$env}.php");
+        $env_config = self::load_config_file($root.'/config/app.'.$env.'.php');
         $config = array_merge($config, $env_config);
 
         // Merge provider configs (providers override env config)
@@ -267,25 +271,17 @@ final class Compiler
             }
         }
 
-        // Filter to only valid command classes implementing CommandInterface
-        return array_filter($commands, function($command) {
-            if (is_string($command) && class_exists($command)) {
-                return is_subclass_of($command, \Webkernel\Cli\CommandInterface::class);
-            }
-            return false;
-        });
+        return array_values(array_filter($commands, static function ($command): bool {
+            return is_string($command) && class_exists($command);
+        }));
     }
 
     /**
-     * Scan a directory for command files.
+     * @return list<class-string>
      */
     private static function scan_command_dir(string $dir): array
     {
-        $found = [];
-        foreach (glob("{$dir}/*.php") ?: [] as $file) {
-            $found[] = $file;
-        }
-        return $found;
+        return [];
     }
 
     /**

@@ -1,24 +1,34 @@
 <?php declare(strict_types=1);
+//> This file is part of Webkernel.
+//> (c) 2025 - 2027 Numerimondes, El Moumen Yassine
+//> Yassine El Moumen <yassine@numerimondes.com> | <platform@webkernelphp.com>
+//> For the full copyright and license information, please view the LICENSE
+//> file that was distributed with this source code.
 
-require __DIR__ . '/../platform/dependencies/packagist/autoload.php';
+define('START_REQUEST', hrtime(true));
 
-use Webkernel\Cache\CompilationStore;
-use Webkernel\Container\Container;
-use Webkernel\Http\RequestClassifier;
+(static function (): void {
+    $webapp_path = dirname(__DIR__);
+    $maint = $webapp_path.'/platform/maintenance.php';
+    if (is_file($maint)) {
+        require $maint;
+        return;
+    }
 
-// Fast-path: Health checks bypass all framework overhead
-$uri = $_SERVER['REQUEST_URI'] ?? '/';
-if ($uri === '/healthz' || $uri === '/ready') {
-    http_response_code(200);
-    header('Content-Type: text/plain');
-    exit('OK');
-}
+    $uri = $_SERVER['REQUEST_URI'] ?? '/';
+    $path = parse_url($uri, PHP_URL_PATH);
+    $path = is_string($path) && $path !== '' ? $path : '/';
+    if ($path === '/healthz' || $path === '/ready') {
+        http_response_code(200);
+        header('Content-Type: text/plain');
+        echo 'OK';
 
-$container = Container::get_instance();
-$method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
-$handler = (new RequestClassifier())->classify($uri, $method);
+        return;
+    }
 
-// Compilation check — single call, same path for everything
-$route_map = CompilationStore::get('webkernel.global.routes', $container);
-
-$handler->handle($route_map, $container)->emit();
+    /** @var \Webkernel\WebApp $webapp */
+    $webapp = require $webapp_path.'/platform/bootstrap/app.php';
+    $method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
+    $handler = (new \Webkernel\Http\RequestClassifier())->classify($path, $method);
+    $handler->handle([], $webapp->container())->emit();
+})();

@@ -6,6 +6,6 @@ final class AuthorizationException extends \RuntimeException
 {
     public static function denied(string $permission): self
     {
-        return new self('Unauthorized: '.$permission);
+        return new self('Unauthorized: '. $permission);
     }
 }

@@ -2,14 +2,21 @@
 
 namespace Webkernel\View;
 
-use Webkernel\PlatformProvider;
+use Webkernel\Container\Container;
+use Webkernel\Provider\PlatformProvider;
 use Webkernel\WebApp;
 
 final class ViewProvider extends PlatformProvider
 {
-    public function register(WebApp $app): void
+    public function views(): array
     {
-        $views = dirname(__DIR__).'/views';
+        return [__DIR__.'/views'];
+    }
+
+    public function register(Container $container): void
+    {
+        $app = WebApp::get();
+        $views = __DIR__.'/views';
         $app->declare_view('', $views);
         $app->declare_view('webkernel', $views);
         $app->declare_component('webkernel', $views.'/components');

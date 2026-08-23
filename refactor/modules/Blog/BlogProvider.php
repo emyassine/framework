@@ -14,7 +14,7 @@ final class BlogProvider extends PlatformProvider
     // Static declarations — resolved at compile time, zero method overhead
     public const ROUTES      = [__DIR__ . '/routes.php'];
     public const VIEWS       = [__DIR__ . '/resources/views'];
-    public const COMMANDS    = [__DIR__ . '/Console'];
+    public const COMMANDS    = [\Modules\Blog\Console\GenerateSitemapCommand::class];
     public const CONFIG      = [
         'blog.posts_per_page' => 20,
         'blog.cache_ttl' => 300,
