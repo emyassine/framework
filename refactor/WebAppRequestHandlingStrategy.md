@@ -1,105 +1,113 @@
-# Web Application Request Handling Strategy
+# Web Application & Webkernel Request Handling Strategy
 
 ## Overview
 
-A high-performance web application must serve distinct request contexts with predictable, sub-millisecond execution target efficiency. The system categorizes incoming traffic into four primary execution paths:
+A high-performance enterprise application must handle diverse request contexts with predictable, sub-millisecond execution target efficiency (< 1 ms CPU budget for kernel execution). Traffic is categorized into distinct paths:
 
-* **HTTP Requests** (Server-rendered HTML pages)
-* **API Requests** (Stateless, programmatic endpoints)
-* **Real-Time Protocols** (Persistent connections via WebSockets or Server-Sent Events)
-* **CLI Commands** (Local asynchronous scripts and background workers)
+* **HTTP Web Requests** (Server-rendered HTML pages)
+* **API Requests** (Stateless, programmatic JSON endpoints)
+* **Machine & AI Endpoints** (`/llm.txt`, `/md` or `.md` variants for LLM crawlers and headless clients)
+* **Syndication Endpoints** (`/rss`, `/atom` XML feeds)
+* **Real-Time Protocols** (Persistent connections via WebSockets / SSE)
+* **CLI Commands** (Local execution, cron tasks, queue workers)
 
-Each path enforces dedicated routing, memory allocation, and security pipelines.
+Each category enforces dedicated routing, lazy memory allocation, and tailored security pipelines.
 
 ---
 
-## Request Segmentation & Routing Architecture
+## Request Segmentation & Early-Exit Architecture
 
-To eliminate routing overhead, request classification occurs at the web server layer (e.g., Nginx) prior to framework boot:
+To prevent loading unused classes (e.g., avoiding 48 file inclusions on lightweight or non-matched requests), request classification and early-exits occur at the front-controller / web server layer:
 
-* **Static Assets (`/static/`):** Served directly by the reverse proxy/web server without invoking the application runtime.
-* **API Endpoints (`/api/`):** Immediately dispatched to a lean API kernel that bypasses session state and template rendering engine initialization.
-* **Dynamic Web Routes:** Sent to the web kernel for session resolution, CSRF validation, and HTML rendering.
-* **Real-Time Connections (`/ws/` or `/events/`):** Handled by non-blocking event loops (WebSockets/SSE) designed for long-lived, concurrent I/O.
+* **Static Assets (`/static/`):** Served directly by Nginx/Apache without invoking PHP.
+* **Machine Context (`/llm.txt`, `/*.md`):** Dispatched directly to a raw text/markdown renderer. Bypasses sessions, CSRF, and template engine boots.
+* **Syndication (`/rss`, `/atom`):** Dispatched to a lightweight XML serializer kernel with aggressive APCu edge caching.
+* **API Endpoints (`/api/`):** Handled by a stateless kernel. Bypasses session storage, CSRF middleware, and HTML view provider initialization.
+* **Dynamic Web Routes:** Dispatched to the full web kernel for session resolution, CSRF validation, and view rendering.
+
+### Fixing the Hot-Path File Leak (Lazy Boot Principles)
+
+1. **Zero Runtime Route Compilation:** `Route\Compile\Generator.php` must **never** run on the HTTP request path. Routes must be pre-compiled at build/deployment time into a flat array in APCu or OPcache (`Cache.php`).
+2. **Deferred PSR-7 Instantiation:** Route matching should execute against raw `$_SERVER['REQUEST_URI']` strings. Instantiation of heavy PSR-7 objects (`ServerRequest`, `Uri`, `Stream`) must only occur *after* a route matches.
+3. **Lazy Composable / Provider Boot:** `ViewProvider` or `PlatformProvider` must not register or load unless the matched controller explicitly requests a view rendering pipeline.
 
 ---
 
 ## Pipeline & Middleware Lifecycle
 
-Requests move through a strictly ordered, low-overhead middleware pipeline:
+Requests move through a strictly ordered pipeline:
 
-1. **Request Identification:** Injection of a unique `X-Request-ID` header across HTTP, API, and worker logs for end-to-end tracing.
-2. **Payload & Input Filtering:**
-* Global size restrictions to prevent buffer exhaustion DoS.
-* `Content-Type` validation (rejecting malformed JSON/Form payloads).
+1. **Request Identification:** Injection of a unique `X-Request-ID` header across HTTP, API, Machine, and worker logs for end-to-end tracing.
+2. **Early Route Match (Flat Array):** Instant lookup via APCu pre-compiled route map. If non-matched, exit immediately with a lightweight 404 response (< 0.1 ms execution, ~5 files loaded).
+3. **Payload & Input Filtering:**
+* Global payload size restrictions to prevent memory exhaustion DoS.
+* `Content-Type` validation (`application/json`, `text/plain`, etc.).
 
 
-3. **Rate Limiting:** In-memory check (via Redis) before route matching or database interaction.
-4. **Router Execution:** Route dispatch via pre-compiled static lookup maps.
+4. **Context-Specific Middleware:**
+* *Web:* Session start, CSRF verification.
+* *API / Machine:* Token auth, CORS, strict rate-limiting.
+
+
 
 ---
 
-## Sub-Millisecond Caching & Performance Strategy
+## Sub-Millisecond Caching & Memory Strategy
 
-Delivering consistent response times in the microsecond-to-millisecond range requires a multi-tier caching strategy:
+To guarantee sub-millisecond execution, network-bound caches (Redis/Memcached) are restricted to full I/O operations (< 10 ms budget). The kernel path operates exclusively on local shared memory.
 
-| Tier | Technology | Purpose |
-| --- | --- | --- |
-| **Edge / CDN** | Cloudflare / Fastly | Caches static assets and publicly cacheable API outputs close to the user. |
-| **HTTP Headers** | `Cache-Control`, `ETag` | Instructs browsers and proxies to reuse client-side cached data. |
-| **In-Memory Cache** | Redis / Memcached / APCu | Bypasses database queries for frequent application data lookups. |
-| **Opcode Cache** | OPcache / JIT | Stores compiled bytecode in shared memory to eliminate runtime file parsing. |
-
-### Framework Optimization Rules
-
-* **Lazy Class Loading:** Classes, services, and database connections are instantiated strictly on-demand.
-* **Pre-Compiled Metadata:** Routes, configurations, and Dependency Injection containers are compiled into optimized, single-file array structures during deployment.
+| Caching Tier | Technology | Target Data | Memory Overhead |
+| --- | --- | --- | --- |
+| **OPcache Bytecode** | Shared Memory | Compiled PHP scripts, config arrays | Zero file read overhead |
+| **APCu (Local RAM)** | Shared Memory | Flattened route maps, ACL trees, compiled config | Zero network/serialization cost |
+| **HTTP / CDN** | Cloudflare / Nginx | Static assets, `/rss`, `/llm.txt`, public API responses | Zero application boot |
 
 ---
 
 ## Security Strategy & Threat Mitigation
 
-Security checks are embedded directly into the request pipeline to catch threats before invoking application logic:
+Security checks are embedded directly into the request pipeline before invoking business logic:
 
-### 1. CSRF & Session Security
+### 1. CSRF & Session Isolation
 
-* **Web Context (Stateful):** Requires a cryptographically secure token passed via `<meta name="csrf-token">` and sent in the `X-CSRF-TOKEN` header for mutative AJAX requests (`POST`, `PUT`, `DELETE`). Session cookies enforce `SameSite=Lax` or `Strict` and `HttpOnly; Secure` flags.
-* **API Context (Stateless):** Operates without cookies. Authentication relies exclusively on HTTP Authorization headers (`Bearer <token>`), eliminating CSRF exposure.
+* **Web Context (Stateful):** Requires a cryptographically secure token passed via `<meta name="csrf-token">` and sent in the `X-CSRF-TOKEN` header for mutative AJAX requests (`POST`, `PUT`, `DELETE`). Cookies enforce `SameSite=Lax/Strict` and `HttpOnly; Secure`.
+* **API / Machine / RSS Contexts (Stateless):** Cookie authentication is completely disabled. Requests utilize HTTP `Authorization: Bearer <token>` or public access, eliminating CSRF vulnerabilities by design.
 
-### 2. Injection Prevention (SQLi, XSS, Command Injection)
+### 2. Injection Prevention (SQLi, XSS, Shell)
 
-* **SQL Injection:** Mandatory use of prepared statements and parameterized queries. Dynamic identifiers are restricted via strict white-listing.
-* **Cross-Site Scripting (XSS):** Input data remains raw; contextual HTML escaping is enforced automatically at the view template layer. API outputs strictly enforce `Content-Type: application/json`.
-* **Shell Injections:** System execution calls (`exec`, `system`) are forbidden on raw user inputs. Command arguments must be passed as escaped array parameters.
+* **SQL Injection:** Mandatory use of prepared statements and parameterized queries via PDO/Query Builder.
+* **XSS Protection:** Input data remains raw in the database. HTML escaping is performed strictly at render time. API and machine endpoints enforce explicit content types (`application/json`, `text/markdown`, `text/plain`).
+* **Shell Injections:** Direct execution functions (`exec`, `system`) are prohibited on user input. Arguments are strictly passed via array escaping primitives.
 
-### 3. API CORS & Rate Limiting
+### 3. API & AI Endpoint Rate Limiting
 
-* **CORS:** Wildcard origins (`*`) are disallowed in production environments. Explicit origin, header, and method white-lists are enforced.
-* **Rate Limiting:** Enforces a token bucket algorithm per IP or API key, returning standard HTTP `429 Too Many Requests` when limits are exceeded.
+* Enforces a Token Bucket algorithm stored in APCu/Redis per IP or API token.
+* Strict limits applied to AI crawlers scraping `/llm.txt` or `/md` to prevent resource harvesting attacks.
+* Standard `429 Too Many Requests` responses with `Retry-After` headers.
 
 ---
 
 ## Asynchronous Processing & Task Offloading
 
-To maintain low latency on HTTP endpoints, time-heavy processing must never block the main execution thread:
+Endpoints requiring heavy I/O or computations must never hold the HTTP response thread:
 
-* **Background Queues:** Offloads email generation, file processing, third-party API integration, and heavy calculations to asynchronous workers (e.g., RabbitMQ, Redis Queues).
-* **Immediate Response Acknowledgment:** Endpoints dispatch job payloads to the queue and instantly return a `202 Accepted` response containing a job ID for status polling.
+* **Background Queues:** Offload email delivery, RSS feed generation, vector indexing, and PDF rendering to asynchronous background processes.
+* **Immediate Response:** HTTP controllers dispatch job payloads to the queue and instantly respond with `202 Accepted`.
 
 ---
 
-## Observability, Resilience & Error Standards
+## Observability & Error Standards
 
-* **Health Probes:** Exposes lightweight `/healthz` (liveness) and `/ready` (readiness) endpoints for load balancers and orchestrators.
-* **Standardized Error Formatting:** API errors strictly follow the **RFC 7807 Problem Details** standard:
+* **Health Probes:** Exposes ultra-fast `/healthz` (liveness) and `/ready` (readiness) endpoints that bypass framework overhead.
+* **Standardized Errors:** APIs return RFC 7807 *Problem Details* JSON. Machine endpoints return structured plain text errors.
 
 ```json
 {
-  "type": "https://api.example.com/errors/invalid-input",
-  "title": "Invalid Request Payload",
-  "status": 400,
-  "detail": "The 'email' field must be a valid email address.",
-  "instance": "/api/v1/users"
+  "type": "https://webkernelphp.com/errors/route-not-found",
+  "title": "Not Found",
+  "status": 404,
+  "detail": "The requested endpoint '/api/v1/missing' does not exist.",
+  "instance": "/api/v1/missing"
 }
 
 ```
@@ -108,4 +116,4 @@ To maintain low latency on HTTP endpoints, time-heavy processing must never bloc
 
 ## CLI Execution
 
-Command-line operations (cron jobs, queue consumers, CLI commands) execute via a dedicated CLI kernel. By bypassing HTTP parsing, web middleware, and network interface overhead, CLI scripts execute with minimal memory overhead and zero latency penalties.
+Command-line execution runs via the dedicated host CLI binary (`webkernel`), bypassing HTTP parsing, web server interfaces, and middleware stacks entirely for minimal overhead.
