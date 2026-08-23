@@ -7,9 +7,9 @@
 define('START_REQUEST', hrtime(true));
 (static function () {
     $webapp_path = dirname(__DIR__);
-    $maint = "$webapp_path/platform/storage/maintenance.php";
+    $maint = "$webapp_path/platform/maintenance.php";
     /** Send Maintenance page if set */
-    if (is_file($maint)) { require $maint; }
+    if (is_file($maint)) { require $maint; return; }
     /** @var \Webkernel\WebApp $webapp is launched */
     (require $webapp = "$webapp_path/platform/bootstrap/app.php")
         ->handle_request(\Webkernel\Http\Request::capture());
