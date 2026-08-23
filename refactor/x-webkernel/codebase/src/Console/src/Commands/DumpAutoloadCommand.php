@@ -214,12 +214,18 @@ final readonly class DumpAutoloadCommand
             if (! is_string($rel) || $rel === '') {
                 continue;
             }
-            $install_path = str_replace('\\', '/', $vendor_dir.'/composer/'.$rel);
-            $real = realpath($install_path);
-            $install_path = $real !== false ? str_replace('\\', '/', $real) : rtrim($install_path, '/');
+            // The install-path is relative to the vendor directory. For packages installed
+            // via path repositories with symlinks, the install-path may point outside the
+            // vendor directory (e.g., "../webkernel/codebase"). However, the actual symlink
+            // is in the vendor directory (e.g., "packagist/webkernel/codebase"). We need to
+            // use the symlink path directly, which is in the packagist subdirectory.
+            // So we replace the leading "../" with "packagist/" to get the correct path.
+            $symlink_rel = ltrim($rel, '.');
+            $install_path = str_replace('\\', '/', $vendor_dir.$symlink_rel);
             if (! is_dir($install_path)) {
                 continue;
             }
+            $install_path = rtrim($install_path, '/');
             $out[] = ['path' => $install_path, 'package' => $package];
         }
 
