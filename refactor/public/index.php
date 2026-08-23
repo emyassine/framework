@@ -27,5 +27,4 @@ if ($path === '/healthz' || $path === '/ready') {
 }
 
 require $webapp_path.'/platform/bootstrap/fast-boot.php';
-
 \Webkernel\Index::start_http();

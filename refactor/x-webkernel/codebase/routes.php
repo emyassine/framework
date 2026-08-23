@@ -3,22 +3,20 @@
 use Webkernel\Route\Route;
 
 Route::get('/', static function (): string {
-    $elapsed = number_format((hrtime(true) - START_REQUEST) / 1e6, 2);
-
-    return sprintf(<<<HTML
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <title>Webkernel</title>
-</head>
-<body>
-    <h1>Bienvenue sur Webkernel</h1>
-    <p>Ceci est une page HTML servie directement par ta closure.</p>
-    <p>Temps de réponse: %s ms</p>
-</body>
-</html>
-HTML, $elapsed);
+    $elapsed = number_format((hrtime(true) - START_REQUEST) / 1e6, 2) . ' ms';
+    return
+        '<!DOCTYPE html>' .
+        '<html lang="fr">' .
+        '<head>' .
+        '    <meta charset="UTF-8">' .
+        '    <title>Webkernel</title>' .
+        '</head>' .
+        '<body>' .
+        '    <h1>Bienvenue sur Webkernel</h1>' .
+        '    <p>Ceci est une page HTML servie directement par ta closure.</p>' .
+        '    <p>Temps de réponse: ' . $elapsed . '</p>' .
+        '</body>' .
+        '</html>';
 });
 
 

@@ -1,32 +1,38 @@
 <?php declare(strict_types=1);
 
-return ['compiled_at' => 1787508968, 'host' => 'localhost', 'files' => ['/home/yassine/Projects/framework/refactor/x-webkernel/codebase/src/Provider/ProviderRegistry.php' => 1787497841, '/home/yassine/Projects/framework/refactor/modules/Blog/BlogProvider.php' => 1787498446, '/home/yassine/Projects/framework/refactor/modules/Blog/routes.php' => 1787502062, '/home/yassine/Projects/framework/refactor/x-webkernel/codebase/routes.php' => 1787508966, '/home/yassine/Projects/framework/refactor/config/app.php' => 1787495249, '/home/yassine/Projects/framework/refactor/config/app.dev.php' => 1787495255, '/home/yassine/Projects/framework/refactor/config/app.prod.php' => 1787495261], 'data' => [['GET' => ['/' => [static function (): string {
+return ['compiled_at' => 1787509081, 'host' => 'localhost', 'files' => ['/home/yassine/Projects/framework/refactor/x-webkernel/codebase/src/Provider/ProviderRegistry.php' => 1787497841, '/home/yassine/Projects/framework/refactor/modules/Blog/BlogProvider.php' => 1787498446, '/home/yassine/Projects/framework/refactor/modules/Blog/routes.php' => 1787502062, '/home/yassine/Projects/framework/refactor/x-webkernel/codebase/routes.php' => 1787509080, '/home/yassine/Projects/framework/refactor/config/app.php' => 1787495249, '/home/yassine/Projects/framework/refactor/config/app.dev.php' => 1787495255, '/home/yassine/Projects/framework/refactor/config/app.prod.php' => 1787495261], 'data' => [['GET' => ['/' => [static function (): string {
     $elapsed = number_format((hrtime(true) - START_REQUEST) / 1e6, 2) . ' ms';
 
-    return <<<HTML
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <title>Webkernel</title>
-</head>
-<body>
-    <h1>Bienvenue sur Webkernel</h1>
-    <p>Ceci est une page HTML servie directement par ta closure.</p>
-    <p>Temps de réponse: {$elapsed}, ['_route' => '/']], '/healthz' => [static fn (): string => 'OK', ['_route' => '/healthz']], '/ready' => [static fn (): string => 'OK', ['_route' => '/ready']], '/api' => [static fn (): string => json_encode(['status' => 'ok', 'version' => '1.0']), ['_route' => '/api']], '/api/v1' => [static fn (): string => json_encode(['version' => '1.0']), ['_route' => '/api/v1']], '/api/posts' => [static fn (): string => json_encode(['posts' => []]), ['_route' => '/api/posts']], '/rss' => [static fn (): string => 'RSS Feed', ['_route' => '/rss']], '/atom' => [static fn (): string => 'Atom Feed', ['_route' => '/atom']], '/llm.txt' => [static fn (): string => 'LLM Content', ['_route' => '/llm.txt']], '/blog' => [static fn (): string => 'Blog index', ['_route' => '/blog']], '/blog/posts' => [static fn (): string => 'Blog posts list', ['_route' => '/blog/posts', '_name' => 'blog.posts.index']]], 'HEAD' => ['/' => [static function (): string {
+    return
+        '<!DOCTYPE html>' .
+        '<html lang="fr">' .
+        '<head>' .
+        '    <meta charset="UTF-8">' .
+        '    <title>Webkernel</title>' .
+        '</head>' .
+        '<body>' .
+        '    <h1>Bienvenue sur Webkernel</h1>' .
+        '    <p>Ceci est une page HTML servie directement par ta closure.</p>' .
+        '    <p>Temps de réponse: ' . $elapsed . '</p>' .
+        '</body>' .
+        '</html>';
+}, ['_route' => '/']], '/healthz' => [static fn (): string => 'OK', ['_route' => '/healthz']], '/ready' => [static fn (): string => 'OK', ['_route' => '/ready']], '/api' => [static fn (): string => json_encode(['status' => 'ok', 'version' => '1.0']), ['_route' => '/api']], '/api/v1' => [static fn (): string => json_encode(['version' => '1.0']), ['_route' => '/api/v1']], '/api/posts' => [static fn (): string => json_encode(['posts' => []]), ['_route' => '/api/posts']], '/rss' => [static fn (): string => 'RSS Feed', ['_route' => '/rss']], '/atom' => [static fn (): string => 'Atom Feed', ['_route' => '/atom']], '/llm.txt' => [static fn (): string => 'LLM Content', ['_route' => '/llm.txt']], '/blog' => [static fn (): string => 'Blog index', ['_route' => '/blog']], '/blog/posts' => [static fn (): string => 'Blog posts list', ['_route' => '/blog/posts', '_name' => 'blog.posts.index']]], 'HEAD' => ['/' => [static function (): string {
     $elapsed = number_format((hrtime(true) - START_REQUEST) / 1e6, 2) . ' ms';
 
-    return <<<HTML
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <title>Webkernel</title>
-</head>
-<body>
-    <h1>Bienvenue sur Webkernel</h1>
-    <p>Ceci est une page HTML servie directement par ta closure.</p>
-    <p>Temps de réponse: {$elapsed}, ['_route' => '/']], '/healthz' => [static fn (): string => 'OK', ['_route' => '/healthz']], '/ready' => [static fn (): string => 'OK', ['_route' => '/ready']], '/api' => [static fn (): string => json_encode(['status' => 'ok', 'version' => '1.0']), ['_route' => '/api']], '/api/v1' => [static fn (): string => json_encode(['version' => '1.0']), ['_route' => '/api/v1']], '/api/posts' => [static fn (): string => json_encode(['posts' => []]), ['_route' => '/api/posts']], '/rss' => [static fn (): string => 'RSS Feed', ['_route' => '/rss']], '/atom' => [static fn (): string => 'Atom Feed', ['_route' => '/atom']], '/llm.txt' => [static fn (): string => 'LLM Content', ['_route' => '/llm.txt']], '/blog' => [static fn (): string => 'Blog index', ['_route' => '/blog']], '/blog/posts' => [static fn (): string => 'Blog posts list', ['_route' => '/blog/posts', '_name' => 'blog.posts.index']]]], ['GET' => [['regex' => '~^(?|/blog/posts/([^/]+)(*MARK:a))$~', 'routeMap' => ['a' => [static fn (string $id): string =>
+    return
+        '<!DOCTYPE html>' .
+        '<html lang="fr">' .
+        '<head>' .
+        '    <meta charset="UTF-8">' .
+        '    <title>Webkernel</title>' .
+        '</head>' .
+        '<body>' .
+        '    <h1>Bienvenue sur Webkernel</h1>' .
+        '    <p>Ceci est une page HTML servie directement par ta closure.</p>' .
+        '    <p>Temps de réponse: ' . $elapsed . '</p>' .
+        '</body>' .
+        '</html>';
+}, ['_route' => '/']], '/healthz' => [static fn (): string => 'OK', ['_route' => '/healthz']], '/ready' => [static fn (): string => 'OK', ['_route' => '/ready']], '/api' => [static fn (): string => json_encode(['status' => 'ok', 'version' => '1.0']), ['_route' => '/api']], '/api/v1' => [static fn (): string => json_encode(['version' => '1.0']), ['_route' => '/api/v1']], '/api/posts' => [static fn (): string => json_encode(['posts' => []]), ['_route' => '/api/posts']], '/rss' => [static fn (): string => 'RSS Feed', ['_route' => '/rss']], '/atom' => [static fn (): string => 'Atom Feed', ['_route' => '/atom']], '/llm.txt' => [static fn (): string => 'LLM Content', ['_route' => '/llm.txt']], '/blog' => [static fn (): string => 'Blog index', ['_route' => '/blog']], '/blog/posts' => [static fn (): string => 'Blog posts list', ['_route' => '/blog/posts', '_name' => 'blog.posts.index']]]], ['GET' => [['regex' => '~^(?|/blog/posts/([^/]+)(*MARK:a))$~', 'routeMap' => ['a' => [static fn (string $id): string =>
         'Blog post ' . $id . ' detail in ' .
         number_format((hrtime(true) - START_REQUEST) / 1e6, 2) . ' ms', ['id' => 'id'], ['_route' => '/blog/posts/{id}', '_name' => 'blog.posts.show']]]]], 'HEAD' => [['regex' => '~^(?|/blog/posts/([^/]+)(*MARK:a))$~', 'routeMap' => ['a' => [static fn (string $id): string =>
         'Blog post ' . $id . ' detail in ' .
