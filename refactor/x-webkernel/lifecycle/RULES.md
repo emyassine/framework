@@ -21,11 +21,14 @@ Packages declare themselves in `extra.webkernel`:
 
 - `prefix` — package alias for `webkernel_package_root()`.
 - `provider` — one FQCN per package, dumped into `webkernel_providers.php`.
-- `views` — dir or list. Default: `views/`, `resources/views/` when they exist. Runtime source of truth is `declare_view` from providers; dump is fallback.
-- `routes` — file or list. Default: `routes/web.php`, `routes.php` when those files exist. Runtime source of truth is `declare('routes', …)`; dump is fallback.
+- `package_repo` — used by webkernel/x-monorepo to split the dev tree.
 
-ComposableContract implementors already in the classmap are mapped `api_name => class` into `webkernel_composables.php`. No glob on the request path.
+ComposableContract implementors already in the classmap are mapped `api_name => class` into `webkernel_composables.php`.
+Avoiding glob's on the request path.
 
-Path/instance function files stay dumped. Packages with `provider` do not dump `functions/*.php` (those load with the composable).
+Path/instance function files stay dumped.
+Packages with `provider` do not dump `functions/*.php` (those load with the composable).
 
 Scan Composer install paths (including `modules/` via the installer). Do not walk `modules/` at request time.
+
+> QueryModules coming soon as a composable as well `webapp()->query(list: 'modules')->...`

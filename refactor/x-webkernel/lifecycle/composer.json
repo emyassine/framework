@@ -24,11 +24,8 @@
     },
     "autoload": {
         "psr-4": {
-            "Webkernel\\Lifecycle\\": "src/Lifecycle"
-        },
-        "files": [
-            "load.lifecycle.package-function.php"
-        ]
+            "Webkernel\\Lifecycle\\": "Lifecycle"
+        }
     },
     "extra": {
         "class": "Webkernel\\Lifecycle\\LCInstaller",
