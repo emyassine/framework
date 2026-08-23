@@ -13,6 +13,6 @@ final class ApiHandler implements HandlerInterface
 
     public function handle(array $route_map, Container $container): ResponseInterface
     {
-        return RouteResponse::dispatch(strtoupper($this->method), 'application/json');
+        return RouteResponse::from_map($route_map, strtoupper($this->method), 'application/json');
     }
 }

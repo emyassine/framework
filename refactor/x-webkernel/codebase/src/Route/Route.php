@@ -199,6 +199,18 @@ final class Route implements ComposableContract
         return self::app()->uri_generator()->for_name($name, $parameters);
     }
 
+    /**
+     * Build FastRoute data from declared route files. Cold path only.
+     *
+     * @return RouteData
+     */
+    public static function compile_for_cache(string $host = ''): array
+    {
+        $route = self::app();
+
+        return $route->build_data($host);
+    }
+
     public static function dispatch(\Psr\Http\Message\ServerRequestInterface|string|null $method = null, ?string $uri = null, ?string $host = null): mixed
     {
         if ($method instanceof \Psr\Http\Message\ServerRequestInterface) {
@@ -218,7 +230,9 @@ final class Route implements ComposableContract
         $uri = rawurldecode($uri);
         $host = self::normalize_host($host ?? (string) ($_SERVER['HTTP_HOST'] ?? ''));
 
-        $data = webapp()->route()->compiled_data($host);
+        $route = webapp()->route();
+        $data = $route->bindings === [] ? Cache::read() : null;
+        $data = is_array($data) ? $data : $route->compiled_data($host);
         $result = self::match_static($data, $method, $uri)
             ?? (new Dispatcher($data))->dispatch($method, $uri);
 
@@ -342,18 +356,18 @@ final class Route implements ComposableContract
         if ($this->bindings !== []) {
             return $this->build_data($host);
         }
-        $path = Cache::path($this->files_hash($host));
-        $cached = Cache::read($path);
+        $cached = Cache::read();
         if (is_array($cached) && (($cached[0] ?? []) !== [] || ($cached[1] ?? []) !== [])) {
             return $cached;
         }
         $this->ensure_declared();
-        if ($this->has_closure_handler()) {
-            return $this->build_data($host);
-        }
         $data = $this->build_data($host);
         if (($data[0] ?? []) !== [] || ($data[1] ?? []) !== []) {
-            Cache::write($path, $data);
+            Cache::write(Cache::path(), $data, [
+                'compiled_at' => time(),
+                'host' => $host,
+                'files' => \Webkernel\Cache\CompilationManifest::fingerprints(),
+            ]);
         }
 
         return $data;
@@ -390,28 +404,6 @@ final class Route implements ComposableContract
         }
 
         return $generator->get_data();
-    }
-
-    private function files_hash(string $host): string
-    {
-        $parts = [$host];
-        foreach (webapp()->route_files() as $file) {
-            $parts[] = $file;
-            $parts[] = (string) (@filemtime($file) ?: 0);
-        }
-
-        return sha1(implode("\n", $parts));
-    }
-
-    private function has_closure_handler(): bool
-    {
-        foreach ($this->bindings as $binding) {
-            if ($binding->is_closure()) {
-                return true;
-            }
-        }
-
-        return false;
     }
 
     private function uri_generator(): Uri

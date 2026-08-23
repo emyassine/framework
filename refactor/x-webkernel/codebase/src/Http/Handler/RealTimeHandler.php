@@ -8,6 +8,6 @@ final class RealTimeHandler implements HandlerInterface
 {
     public function handle(array $route_map, Container $container): ResponseInterface
     {
-        return RouteResponse::dispatch($_SERVER['REQUEST_METHOD'] ?? 'GET', 'text/plain');
+        return RouteResponse::from_map($route_map, $_SERVER['REQUEST_METHOD'] ?? 'GET', 'text/plain');
     }
 }

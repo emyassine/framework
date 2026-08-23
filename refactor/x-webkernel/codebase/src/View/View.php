@@ -120,16 +120,17 @@ final class View implements ComposableContract, \Stringable
         if (self::$engine instanceof Engine) {
             return self::$engine;
         }
+        $compiled = self::compiled_views();
         $rel = 'platform/storage/framework/views';
-        $configured = webapp()->config('platform.storage_path');
-        if (is_string($configured) && $configured !== '') {
-            $rel = $configured.'/framework/views';
-        }
-        $engine = new Engine(self::template_paths(), webapp_path($rel), Engine::MODE_AUTO);
+        $engine = new Engine(
+            $compiled['dirs'] !== [] ? $compiled['dirs'] : self::template_paths(),
+            webapp_path($rel),
+            Engine::MODE_AUTO,
+        );
         $engine->set_echo_format('\\'.self::class.'::echo(%s)');
         $engine->add_alias_classes('Js', Js::class);
         $engine->add_alias_classes('View', self::class);
-        self::apply_namespaces($engine);
+        self::apply_namespaces($engine, $compiled);
 
         return self::$engine = $engine;
     }
@@ -144,6 +145,10 @@ final class View implements ComposableContract, \Stringable
      */
     public static function template_paths(): array
     {
+        $compiled = self::compiled_views();
+        if ($compiled['dirs'] !== []) {
+            return $compiled['dirs'];
+        }
         $dirs = webapp()->view_dirs();
         if ($dirs !== []) {
             return $dirs;
@@ -208,9 +213,30 @@ final class View implements ComposableContract, \Stringable
         return $this->render();
     }
 
-    private static function apply_namespaces(Engine $engine): void
+    /**
+     * @return array{dirs: list<string>, namespaces: array<string, list<string>>, components: array<string, list<string>>}
+     */
+    private static function compiled_views(): array
     {
-        foreach (webapp()->view_namespaces() as $namespace => $dirs) {
+        $loaded = \Webkernel\Cache\CompilationStore::fetch('webkernel.global.views');
+        $dirs = is_array($loaded) && isset($loaded['dirs']) && is_array($loaded['dirs']) ? $loaded['dirs'] : [];
+        $namespaces = is_array($loaded) && isset($loaded['namespaces']) && is_array($loaded['namespaces']) ? $loaded['namespaces'] : [];
+        $components = is_array($loaded) && isset($loaded['components']) && is_array($loaded['components']) ? $loaded['components'] : [];
+
+        return [
+            'dirs' => array_values(array_filter($dirs, is_string(...))),
+            'namespaces' => $namespaces,
+            'components' => $components,
+        ];
+    }
+
+    /**
+     * @param array{dirs: list<string>, namespaces: array<string, list<string>>, components: array<string, list<string>>} $compiled
+     */
+    private static function apply_namespaces(Engine $engine, array $compiled): void
+    {
+        $namespaces = $compiled['namespaces'] !== [] ? $compiled['namespaces'] : webapp()->view_namespaces();
+        foreach ($namespaces as $namespace => $dirs) {
             if ($namespace === '') {
                 continue;
             }
@@ -218,7 +244,8 @@ final class View implements ComposableContract, \Stringable
                 $engine->add_view_namespace($namespace, $dir);
             }
         }
-        foreach (webapp()->component_namespaces() as $namespace => $dirs) {
+        $components = $compiled['components'] !== [] ? $compiled['components'] : webapp()->component_namespaces();
+        foreach ($components as $namespace => $dirs) {
             foreach ($dirs as $dir) {
                 $engine->add_component_namespace($namespace, $dir);
             }

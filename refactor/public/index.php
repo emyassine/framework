@@ -26,9 +26,11 @@ define('START_REQUEST', hrtime(true));
         return;
     }
 
-    /** @var \Webkernel\WebApp $webapp */
-    $webapp = require $webapp_path.'/platform/bootstrap/app.php';
+    require $webapp_path.'/platform/bootstrap/fast-boot.php';
+
+    $container = \Webkernel\Container\Container::get_instance();
     $method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
+    $route_map = \Webkernel\Cache\CompilationStore::get('webkernel.global.routes', $container);
     $handler = (new \Webkernel\Http\RequestClassifier())->classify($path, $method);
-    $handler->handle([], $webapp->container())->emit();
+    $handler->handle(is_array($route_map) ? $route_map : [], $container)->emit();
 })();

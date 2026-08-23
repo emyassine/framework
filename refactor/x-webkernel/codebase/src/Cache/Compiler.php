@@ -4,7 +4,6 @@ namespace Webkernel\Cache;
 
 use Webkernel\Container\Container;
 use Webkernel\Provider\ProviderRegistry;
-use Webkernel\Provider\ProviderFingerprint;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -33,8 +32,7 @@ final class Compiler
 
         $artifacts = [];
 
-        // Pass 1: routes (merged global map + per-fingerprint entries)
-        $artifacts['webkernel.global.routes'] = self::compile_routes($providers, $container);
+        self::compile_routes($providers, $container);
 
         // Pass 2: config (dot-accessible, merged across providers + env files)
         $artifacts['webkernel.global.config'] = self::compile_config($providers);
@@ -147,7 +145,9 @@ final class Compiler
     // -------------------------------------------------------------------------
 
     /**
-     * Compile routes from all providers.
+     * Compile routes from all providers into an OPcache-friendly PHP file.
+     *
+     * @return array{0: mixed, 1: mixed}
      */
     private static function compile_routes(array $providers, Container $container): array
     {
@@ -160,9 +160,38 @@ final class Compiler
                 }
             }
         }
-        \Webkernel\Route\Route::app();
+        $host = self::request_host();
+        $data = \Webkernel\Route\Route::compile_for_cache($host);
+        \Webkernel\Route\Compile\Cache::write(
+            \Webkernel\Route\Compile\Cache::path(),
+            $data,
+            [
+                'compiled_at' => time(),
+                'host' => $host,
+                'files' => CompilationManifest::fingerprints(),
+            ],
+        );
 
-        return \Webkernel\Route\Route::list();
+        return $data;
+    }
+
+    private static function request_host(): string
+    {
+        $host = strtolower((string) ($_SERVER['HTTP_HOST'] ?? ''));
+        if ($host === '') {
+            return '';
+        }
+        if (str_starts_with($host, '[')) {
+            $end = strpos($host, ']');
+
+            return $end === false ? $host : substr($host, 0, $end + 1);
+        }
+        $colon = strrpos($host, ':');
+        if ($colon === false) {
+            return $host;
+        }
+
+        return substr($host, 0, $colon);
     }
 
     /**
@@ -227,25 +256,30 @@ final class Compiler
 
     /**
      * Compile views from all providers.
+     *
+     * @return array{dirs: list<string>, namespaces: array<string, list<string>>, components: array<string, list<string>>}
      */
     private static function compile_views(array $providers): array
     {
-        $map = [];
-
+        $app = \Webkernel\WebApp::get()->boot();
         foreach ($providers as $provider) {
             try {
                 $entries = self::resolve_declaration($provider, 'VIEWS', 'views');
-                $fingerprint = ProviderFingerprint::for(get_class($provider));
-
                 foreach ($entries as $entry) {
-                    $map[$fingerprint][] = $entry;
+                    if (is_string($entry) && is_dir($entry)) {
+                        $app->declare_view('', $entry);
+                    }
                 }
             } catch (\Throwable $e) {
-                self::log_error("Views compilation failed for " . get_class($provider) . ": " . $e->getMessage());
+                self::log_error('Views compilation failed for '.get_class($provider).': '.$e->getMessage());
             }
         }
 
-        return $map;
+        return [
+            'dirs' => $app->view_dirs(),
+            'namespaces' => $app->view_namespaces(),
+            'components' => $app->component_namespaces(),
+        ];
     }
 
     /**

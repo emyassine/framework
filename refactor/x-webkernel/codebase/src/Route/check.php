@@ -1,13 +1,6 @@
 <?php declare(strict_types=1);
 
-$__wk_autoload = dirname(__DIR__, 5).'/refactor/platform/dependencies/autoload.php';
-if (! is_file($__wk_autoload)) {
-    $__wk_autoload = dirname(__DIR__, 4).'/platform/dependencies/autoload.php';
-}
-if (! is_file($__wk_autoload)) {
-    $__wk_autoload = dirname(__DIR__, 4).'/third_party/autoload.php';
-}
-require $__wk_autoload;
+require dirname(__DIR__, 4).'/platform/bootstrap/fast-boot.php';
 
 function expect(mixed $ok, string $msg): void
 {
