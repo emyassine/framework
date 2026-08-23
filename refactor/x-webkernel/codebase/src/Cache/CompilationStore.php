@@ -145,7 +145,7 @@ final class CompilationStore
             return;
         }
         PhpFileBuilder::make()
-            ->with_header(['Compiled artifact. Do not edit.'], 'CompilationStore')
+            ->with_header(['Compiled artifact. Do not edit.', 'See ' . __FILE__], 'Webkernel\Cache\CompilationStore')
             ->with_return_array($value)
             ->save_to_atomic($file);
         if (function_exists('opcache_invalidate')) {
