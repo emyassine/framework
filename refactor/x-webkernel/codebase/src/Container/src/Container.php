@@ -10,6 +10,9 @@ use Psr\Container\ContainerInterface;
  */
 final class Container implements ContainerInterface
 {
+    /** @var self|null Singleton instance */
+    private static ?self $instance = null;
+
     /**
      * @var array<string, array{lifetime: 'singleton'|'bind'|'scoped', factory: callable|null}>
      */
@@ -20,6 +23,22 @@ final class Container implements ContainerInterface
 
     /** @var array<string, object> */
     private array $scoped_instances = [];
+
+    /**
+     * Get singleton container instance
+     */
+    public static function get_instance(): self
+    {
+        return self::$instance ??= new self();
+    }
+
+    /**
+     * Set the singleton instance (for testing)
+     */
+    public static function set_instance(self $instance): void
+    {
+        self::$instance = $instance;
+    }
 
     public function singleton(string $abstract, ?callable $factory = null): void
     {
