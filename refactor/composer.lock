@@ -630,7 +630,7 @@
             "dist": {
                 "type": "path",
                 "url": "x-webkernel/lifecycle",
-                "reference": "3efccf4239d11474d3e37fd70d730eaa9a05c600"
+                "reference": "b5d1272c06d175e97b49705d9a6e857aa367b99e"
             },
             "require": {
                 "composer-plugin-api": "^2.0",
@@ -653,11 +653,8 @@
             },
             "autoload": {
                 "psr-4": {
-                    "Webkernel\\Lifecycle\\": "src/Lifecycle"
-                },
-                "files": [
-                    "load.lifecycle.package-function.php"
-                ]
+                    "Webkernel\\Lifecycle\\": "Lifecycle"
+                }
             },
             "license": [
                 "proprietary"
