@@ -40,6 +40,10 @@ src/
 └── Cli/
 bin/
 └── webkernel
+config/
+├── app.php                # Base configuration (shared across all environments)
+├── app.dev.php            # Development environment overrides
+└── app.prod.php           # Production environment overrides
 ```
 
 **Composer root `composer.json`** maps everything:
@@ -47,7 +51,8 @@ bin/
 ```json
 {
   "require": {
-    "php": "^8.4"
+    "php": "^8.4",
+    "predis/predis": "^2.0"   // For Redis fallback in distributed environments
   },
   "autoload": {
     "psr-4": {
@@ -122,6 +127,12 @@ abstract class PlatformProvider
 
     /** Admin panel definitions or panel provider class paths. */
     public function panels(): array { return []; }
+
+    /** Configuration array (dot-notation keys). */
+    public function config(): array { return []; }
+
+    /** Access control list rules. */
+    public function acl(): array { return []; }
 }
 ```
 
@@ -137,11 +148,23 @@ final class BlogProvider extends PlatformProvider
     public const VIEWS     = [__DIR__ . '/resources/views'];
     public const COMMANDS  = [__DIR__ . '/Console'];
     public const PANELS    = [\Modules\Blog\Panels\BlogPanel::class];
+    public const CONFIG    = [
+        'blog.posts_per_page' => 20,
+        'blog.cache_ttl' => 300,
+    ];
 
     // Dynamic logic still goes in methods — constants win only when they exist
     public function register(Container $container): void
     {
         $container->bind(BlogRepository::class, EloquentBlogRepository::class);
+    }
+
+    public function acl(): array
+    {
+        return [
+            'blog.create' => ['admin', 'editor'],
+            'blog.delete' => ['admin'],
+        ];
     }
 }
 ```
@@ -156,7 +179,7 @@ The compiler resolution order per declaration type:
 
 ## Module Fingerprinting
 
-Every module gets a **fingerprint** — a short deterministic identifier derived from its package name and namespace. The fingerprint is the namespace key for all APCu entries owned by that module. No two modules can collide, even across monorepo and distributed installs.
+Every module gets a **fingerprint** — a deterministic identifier derived from its fully-qualified class name. The fingerprint is the namespace key for all APCu entries owned by that module. To prevent collisions with 8-char hashes, we use a **12-char hash** combining the namespace and class name.
 
 ```php
 // src/Provider/ProviderFingerprint.php
@@ -166,30 +189,85 @@ final class ProviderFingerprint
 {
     /**
      * Derive a stable fingerprint from the provider's fully-qualified class name.
-     * Result: 8-char hex, e.g. "a3f2c801"
+     * Result: 12-char hex, e.g. "a3f2c801b4d5"
+     * Uses namespace + class name to minimize collision risk.
      * Stable across deploys as long as the class name doesn't change.
      */
     public static function for(string $providerClass): string
     {
-        return substr(hash('xxh3', $providerClass), 0, 8);
+        return substr(hash('xxh3', $providerClass), 0, 12);
     }
 
     /**
      * Build a namespaced APCu key for a given artifact type owned by a provider.
-     * e.g. "webkernel.a3f2c801.routes"
+     * e.g. "webkernel.a3f2c801b4d5.routes"
      */
     public static function cache_key(string $providerClass, string $artifact): string
     {
         return 'webkernel.' . self::for($providerClass) . '.' . $artifact;
     }
+
+    /**
+     * Build a global APCu key for shared artifacts.
+     */
+    public static function global_key(string $artifact): string
+    {
+        return 'webkernel.global.' . $artifact;
+    }
 }
 ```
 
-Every compiled artifact — routes, views, panels, commands — is stored and retrieved via its fingerprinted key. The global route map is an index of fingerprint → route entries. No flat merging across modules means no silent overwrites.
+Every compiled artifact — routes, views, panels, commands, composables, classmap, ACL, config — is stored and retrieved via its fingerprinted key. The global route map is an index of fingerprint => route entries. No flat merging across modules means no silent overwrites.
 
 ---
 
 ## Config System
+
+### Environment-Specific Configuration
+
+Configuration supports **environment overrides** via separate files in `config/`. The compiler merges base config with environment-specific overrides based on `APP_ENV`.
+
+**File structure:**
+```
+config/
+├── app.php        # Base configuration (loaded first)
+├── app.dev.php    # Development overrides (loaded if APP_ENV=dev)
+└── app.prod.php   # Production overrides (loaded if APP_ENV=prod)
+```
+
+**Example `config/app.php`:**
+```php
+<?php
+return [
+    'app' => [
+        'name' => 'Webkernel App',
+        'debug' => false,
+        'timezone' => 'UTC',
+    ],
+    'database' => [
+        'driver' => 'mysql',
+        'host' => '127.0.0.1',
+        'port' => 3306,
+    ],
+    'cache' => [
+        'driver' => 'apcu',
+        'fallback' => 'redis',
+    ],
+];
+```
+
+**Example `config/app.dev.php`:**
+```php
+<?php
+return [
+    'app' => [
+        'debug' => true,
+    ],
+    'database' => [
+        'host' => 'localhost',
+    ],
+];
+```
 
 ### Global `config()` helper
 
@@ -268,24 +346,51 @@ webapp()->config('auth.token_ttl');     // same mechanism, explicit app instance
 
 ## ProviderRegistry
 
+The `ProviderRegistry` auto-discovers providers from the `modules/` directory, eliminating the need to manually edit the registry when adding new modules.
+
 ```php
 // src/Provider/ProviderRegistry.php
 namespace Webkernel\Provider;
 
 final class ProviderRegistry
 {
+    private static array $providers = null;
+
     public static function providers(): array
     {
-        return [
-            \Webkernel\App\Http\CoreProvider::class,
-            \Modules\Blog\BlogProvider::class,
-            \Modules\Auth\AuthProvider::class,
-        ];
+        if (self::$providers !== null) {
+            return self::$providers;
+        }
+
+        $providers = [];
+
+        // Auto-discover module providers
+        foreach (glob(__DIR__ . '/../../modules/*/*Provider.php') ?: [] as $file) {
+            $module_name = basename(dirname($file));
+            $class_name = 'Modules\\' . $module_name . '\\' . basename($file, '.php');
+            if (class_exists($class_name)) {
+                $providers[] = $class_name;
+            }
+        }
+
+        // Core providers (always included)
+        $providers[] = \Webkernel\App\Http\CoreProvider::class;
+
+        self::$providers = $providers;
+        return $providers;
     }
 
     public static function file(): string
     {
         return __FILE__;
+    }
+
+    /**
+     * Reset cache — useful for testing
+     */
+    public static function reset(): void
+    {
+        self::$providers = null;
     }
 }
 ```
@@ -320,6 +425,7 @@ final class CompilationManifest
             ProviderRegistry::file(),
             ...self::module_provider_files(),
             ...self::module_route_files(),
+            ...self::config_files(),
         ];
     }
 
@@ -332,6 +438,9 @@ final class CompilationManifest
         }
 
         foreach (self::watched_files() as $file) {
+            if (!file_exists($file)) {
+                continue;
+            }
             if (filemtime($file) > $compiled_at) {
                 return true;
             }
@@ -349,10 +458,19 @@ final class CompilationManifest
     {
         return glob(__DIR__ . '/../../modules/*/routes.php') ?: [];
     }
+
+    private static function config_files(): array
+    {
+        return [
+            __DIR__ . '/../../config/app.php',
+            __DIR__ . '/../../config/app.dev.php',
+            __DIR__ . '/../../config/app.prod.php',
+        ];
+    }
 }
 ```
 
-### `Compiler.php`
+### `Compiler.php` with Isolated Error Handling
 
 ```php
 // src/Cache/Compiler.php
@@ -362,9 +480,17 @@ use Webkernel\Container\Container;
 use Webkernel\Provider\ProviderRegistry;
 use Webkernel\Provider\ProviderFingerprint;
 use Webkernel\Router\Router;
+use Psr\Log\LoggerInterface;
 
 final class Compiler
 {
+    private static ?LoggerInterface $logger = null;
+
+    public static function set_logger(LoggerInterface $logger): void
+    {
+        self::$logger = $logger;
+    }
+
     public static function compile(Container $container): void
     {
         $providers = self::boot_providers($container);
@@ -374,13 +500,13 @@ final class Compiler
         // Pass 1: routes (merged global map + per-fingerprint entries)
         $artifacts['webkernel.global.routes'] = self::compile_routes($providers, $container);
 
-        // Pass 2: config (dot-accessible, merged across providers)
+        // Pass 2: config (dot-accessible, merged across providers + env files)
         $artifacts['webkernel.global.config'] = self::compile_config($providers);
 
         // Pass 3: ACL
         $artifacts['webkernel.global.acl'] = self::compile_acl($providers);
 
-        // Pass 4: views (per-fingerprint namespace → path map)
+        // Pass 4: views (per-fingerprint namespace => path map)
         $artifacts['webkernel.global.views'] = self::compile_views($providers);
 
         // Pass 5: commands (flat list of all command classes)
@@ -404,16 +530,33 @@ final class Compiler
         $providers = [];
 
         foreach (ProviderRegistry::providers() as $class) {
-            $provider = new $class();
-            $provider->register($container);
-            $providers[] = $provider;
+            try {
+                $provider = new $class();
+                $provider->register($container);
+                $providers[] = $provider;
+            } catch (\Throwable $e) {
+                self::log_error("Provider registration failed for {$class}: " . $e->getMessage());
+            }
         }
 
         foreach ($providers as $provider) {
-            $provider->boot($container);
+            try {
+                $provider->boot($container);
+            } catch (\Throwable $e) {
+                self::log_error("Provider boot failed for " . get_class($provider) . ": " . $e->getMessage());
+            }
         }
 
         return $providers;
+    }
+
+    private static function log_error(string $message): void
+    {
+        if (self::$logger !== null) {
+            self::$logger->error($message);
+        } else {
+            error_log('[Webkernel Compiler] ' . $message);
+        }
     }
 
     // -------------------------------------------------------------------------
@@ -429,14 +572,19 @@ final class Compiler
         }
 
         if (method_exists($provider, $method)) {
-            return $provider->$method();
+            try {
+                return $provider->$method();
+            } catch (\Throwable $e) {
+                self::log_error("Declaration method {$method} failed for {$class}: " . $e->getMessage());
+                return [];
+            }
         }
 
         return [];
     }
 
     // -------------------------------------------------------------------------
-    // Per-artifact compilation passes
+    // Per-artifact compilation passes with isolated error handling
     // -------------------------------------------------------------------------
 
     private static function compile_routes(array $providers, Container $container): array
@@ -447,29 +595,54 @@ final class Compiler
             $entries = self::resolve_declaration($provider, 'ROUTES', 'routes');
 
             foreach ($entries as $entry) {
-                if (is_string($entry) && file_exists($entry)) {
-                    // It's a path — include the route file, which registers on $router
-                    (static function () use ($entry, $router) { require $entry; })();
-                } elseif (is_string($entry) && class_exists($entry)) {
-                    // It's a route class with a register() method
-                    (new $entry())->register($router);
+                try {
+                    if (is_string($entry) && file_exists($entry)) {
+                        (static function () use ($entry, $router) { require $entry; })();
+                    } elseif (is_string($entry) && class_exists($entry)) {
+                        (new $entry())->register($router);
+                    }
+                } catch (\Throwable $e) {
+                    self::log_error("Route registration failed for " . get_class($provider) . ": " . $e->getMessage());
                 }
             }
         }
 
-        return $router->flat_map(); // [METHOD][URI] => [Controller, action]
+        return $router->flat_map();
     }
 
     private static function compile_config(array $providers): array
     {
         $config = [];
 
+        // Load base config
+        $base_config = self::load_config_file(__DIR__ . '/../../config/app.php');
+        $config = array_merge($config, $base_config);
+
+        // Load environment-specific config
+        $env = $_ENV['APP_ENV'] ?? ($_SERVER['APP_ENV'] ?? 'prod');
+        $env_config = self::load_config_file(__DIR__ . "/../../config/app.{$env}.php");
+        $config = array_merge($config, $env_config);
+
+        // Merge provider configs (providers override env config)
         foreach ($providers as $provider) {
             $entries = self::resolve_declaration($provider, 'CONFIG', 'config');
-            $config  = array_merge($config, $entries);
+            $config = array_merge($config, $entries);
         }
 
         return $config;
+    }
+
+    private static function load_config_file(string $path): array
+    {
+        if (!file_exists($path)) {
+            return [];
+        }
+        try {
+            return require $path;
+        } catch (\Throwable $e) {
+            self::log_error("Config file load failed for {$path}: " . $e->getMessage());
+            return [];
+        }
     }
 
     private static function compile_acl(array $providers): array
@@ -477,8 +650,12 @@ final class Compiler
         $acl = [];
 
         foreach ($providers as $provider) {
-            if (method_exists($provider, 'acl')) {
-                $acl = array_merge_recursive($acl, $provider->acl());
+            try {
+                if (method_exists($provider, 'acl')) {
+                    $acl = array_merge_recursive($acl, $provider->acl());
+                }
+            } catch (\Throwable $e) {
+                self::log_error("ACL compilation failed for " . get_class($provider) . ": " . $e->getMessage());
             }
         }
 
@@ -490,11 +667,15 @@ final class Compiler
         $map = [];
 
         foreach ($providers as $provider) {
-            $entries     = self::resolve_declaration($provider, 'VIEWS', 'views');
-            $fingerprint = ProviderFingerprint::for(get_class($provider));
+            try {
+                $entries = self::resolve_declaration($provider, 'VIEWS', 'views');
+                $fingerprint = ProviderFingerprint::for(get_class($provider));
 
-            foreach ($entries as $entry) {
-                $map[$fingerprint][] = $entry; // path or class
+                foreach ($entries as $entry) {
+                    $map[$fingerprint][] = $entry;
+                }
+            } catch (\Throwable $e) {
+                self::log_error("Views compilation failed for " . get_class($provider) . ": " . $e->getMessage());
             }
         }
 
@@ -506,19 +687,28 @@ final class Compiler
         $commands = [];
 
         foreach ($providers as $provider) {
-            $entries = self::resolve_declaration($provider, 'COMMANDS', 'commands');
+            try {
+                $entries = self::resolve_declaration($provider, 'COMMANDS', 'commands');
 
-            foreach ($entries as $entry) {
-                if (is_dir($entry)) {
-                    // Scan directory for command classes
-                    array_push($commands, ...self::scan_command_dir($entry));
-                } else {
-                    $commands[] = $entry;
+                foreach ($entries as $entry) {
+                    if (is_dir($entry)) {
+                        array_push($commands, ...self::scan_command_dir($entry));
+                    } else {
+                        $commands[] = $entry;
+                    }
                 }
+            } catch (\Throwable $e) {
+                self::log_error("Commands compilation failed for " . get_class($provider) . ": " . $e->getMessage());
             }
         }
 
-        return array_unique($commands);
+        // Filter to only valid command classes implementing CommandInterface
+        return array_filter($commands, function($command) {
+            if (is_string($command) && class_exists($command)) {
+                return is_subclass_of($command, \Webkernel\Cli\CommandInterface::class);
+            }
+            return false;
+        });
     }
 
     private static function compile_panels(array $providers): array
@@ -526,8 +716,12 @@ final class Compiler
         $panels = [];
 
         foreach ($providers as $provider) {
-            $entries = self::resolve_declaration($provider, 'PANELS', 'panels');
-            array_push($panels, ...$entries);
+            try {
+                $entries = self::resolve_declaration($provider, 'PANELS', 'panels');
+                array_push($panels, ...$entries);
+            } catch (\Throwable $e) {
+                self::log_error("Panels compilation failed for " . get_class($provider) . ": " . $e->getMessage());
+            }
         }
 
         return $panels;
@@ -538,8 +732,12 @@ final class Compiler
         $composables = [];
 
         foreach ($providers as $provider) {
-            $entries = self::resolve_declaration($provider, 'COMPOSABLES', 'composables');
-            array_push($composables, ...$entries);
+            try {
+                $entries = self::resolve_declaration($provider, 'COMPOSABLES', 'composables');
+                array_push($composables, ...$entries);
+            } catch (\Throwable $e) {
+                self::log_error("Composables compilation failed for " . get_class($provider) . ": " . $e->getMessage());
+            }
         }
 
         return $composables;
@@ -550,8 +748,12 @@ final class Compiler
         $map = [];
 
         foreach ($providers as $provider) {
-            $entries = self::resolve_declaration($provider, 'CLASSMAP', 'classmap');
-            $map     = array_merge($map, $entries);
+            try {
+                $entries = self::resolve_declaration($provider, 'CLASSMAP', 'classmap');
+                $map = array_merge($map, $entries);
+            } catch (\Throwable $e) {
+                self::log_error("Classmap compilation failed for " . get_class($provider) . ": " . $e->getMessage());
+            }
         }
 
         return $map;
@@ -560,38 +762,67 @@ final class Compiler
     private static function scan_command_dir(string $dir): array
     {
         $found = [];
-
         foreach (glob("{$dir}/*.php") ?: [] as $file) {
-            $found[] = $file; // The autoloader resolves class from path at runtime
+            $found[] = $file;
         }
-
         return $found;
     }
 }
 ```
 
-### `CompilationStore.php`
+### `CompilationStore.php` with Redis Fallback
 
 ```php
 // src/Cache/CompilationStore.php
 namespace Webkernel\Cache;
 
 use Webkernel\Container\Container;
+use Predis\Client as RedisClient;
 
 final class CompilationStore
 {
+    private static ?RedisClient $redis = null;
+
+    /**
+     * Set Redis client for distributed environments
+     */
+    public static function set_redis(RedisClient $redis): void
+    {
+        self::$redis = $redis;
+    }
+
     public static function get(string $key, Container $container): mixed
     {
+        // Check if compilation is stale first
         if (CompilationManifest::is_stale()) {
             Compiler::compile($container);
         }
 
+        // Try APCu first
         $value = apcu_fetch($key);
 
         if ($value === false) {
-            // Self-heal: shouldn't happen after compile, but handle it anyway
+            // Self-heal: try Redis fallback in distributed environments
+            if (self::$redis !== null) {
+                try {
+                    $serialized = self::$redis->get("webkernel:{$key}");
+                    if ($serialized !== null) {
+                        $value = unserialize($serialized);
+                        apcu_store($key, $value);
+                        return $value;
+                    }
+                } catch (\Throwable $e) {
+                    error_log('[Webkernel] Redis fallback failed: ' . $e->getMessage());
+                }
+            }
+
+            // If still not found, recompile
             Compiler::compile($container);
             $value = apcu_fetch($key);
+
+            if ($value === false) {
+                throw new \RuntimeException("Failed to compile and retrieve artifact: {$key}");
+            }
         }
 
         return $value;
@@ -601,6 +832,15 @@ final class CompilationStore
     {
         foreach ($artifacts as $key => $value) {
             apcu_store($key, $value);
+
+            // Also store in Redis if configured (for distributed environments)
+            if (self::$redis !== null) {
+                try {
+                    self::$redis->set("webkernel:{$key}", serialize($value));
+                } catch (\Throwable $e) {
+                    error_log('[Webkernel] Redis store failed: ' . $e->getMessage());
+                }
+            }
         }
     }
 }
@@ -625,6 +865,10 @@ final class BlogProvider extends PlatformProvider
     public const COMMANDS    = [__DIR__ . '/Console'];
     public const COMPOSABLES = [\Modules\Blog\Composables\BlogComposable::class];
     public const PANELS      = [\Modules\Blog\Panels\BlogPanel::class];
+    public const CONFIG      = [
+        'blog.posts_per_page' => 20,
+        'blog.cache_ttl' => 300,
+    ];
 
     public function register(Container $container): void
     {
@@ -646,14 +890,6 @@ final class BlogProvider extends PlatformProvider
         ];
     }
 
-    public function config(): array
-    {
-        return [
-            'blog.posts_per_page' => 20,
-            'blog.cache_ttl'      => 300,
-        ];
-    }
-
     public function acl(): array
     {
         return [
@@ -663,8 +899,6 @@ final class BlogProvider extends PlatformProvider
     }
 }
 ```
-
-Add it to `ProviderRegistry::providers()`. Next request detects the `mtime` change on `ProviderRegistry.php`. Recompiles everything. Done.
 
 **Provider constants reference:**
 
@@ -691,7 +925,7 @@ location / {
 }
 ```
 
-**`public/index.php`** — the only entry point:
+**`public/index.php`** — the only entry point, with fast-path health checks:
 
 ```php
 <?php
@@ -701,9 +935,17 @@ use Webkernel\Cache\CompilationStore;
 use Webkernel\Container\Container;
 use Webkernel\Http\RequestClassifier;
 
+// Fast-path: Health checks bypass all framework overhead
+$uri = $_SERVER['REQUEST_URI'];
+if ($uri === '/healthz' || $uri === '/ready') {
+    http_response_code(200);
+    header('Content-Type: text/plain');
+    exit('OK');
+}
+
 $container = Container::get_instance();
-$uri       = $_SERVER['REQUEST_URI'];
-$handler   = (new RequestClassifier())->classify($uri);
+$method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
+$handler = (new RequestClassifier())->classify($uri, $method);
 
 // Compilation check — single call, same path for everything
 $route_map = CompilationStore::get('webkernel.global.routes', $container);
@@ -711,7 +953,7 @@ $route_map = CompilationStore::get('webkernel.global.routes', $container);
 $handler->handle($route_map, $container)->emit();
 ```
 
-### `RequestClassifier.php`
+### `RequestClassifier.php` with HTTP Method Support
 
 ```php
 // src/Http/RequestClassifier.php
@@ -719,21 +961,30 @@ namespace Webkernel\Http;
 
 final class RequestClassifier
 {
-    public function classify(string $uri): HandlerInterface
+    public function classify(string $uri, string $method = 'GET'): HandlerInterface
     {
+        // Machine & AI endpoints
         if (str_ends_with($uri, '.md') || $uri === '/llm.txt') {
             return new MachineHandler();
         }
 
+        // API endpoints
         if (str_starts_with($uri, '/api/')) {
-            return new ApiHandler();
+            return new ApiHandler($method);
         }
 
+        // Syndication endpoints
         if (str_starts_with($uri, '/rss') || str_starts_with($uri, '/atom')) {
             return new SyndicationHandler();
         }
 
-        return new WebHandler();
+        // Real-time protocols
+        if (str_starts_with($uri, '/ws') || str_starts_with($uri, '/sse')) {
+            return new RealTimeHandler();
+        }
+
+        // Default: Web handler
+        return new WebHandler($method);
     }
 }
 ```
@@ -774,7 +1025,6 @@ use Psr\Http\Message\ResponseInterface;
 
 final class Pipeline
 {
-    // PSR method names kept as-is — this implements PSR-15 MiddlewareInterface contract
     public function run(
         ServerRequestInterface $request,
         array $middleware,
@@ -810,6 +1060,7 @@ Network-bound caches (Redis/Memcached) are restricted to full I/O operations (< 
 |---|---|---|---|
 | **OPcache Bytecode** | Shared Memory | Compiled PHP scripts, config arrays | Zero file read overhead |
 | **APCu (Local RAM)** | Shared Memory | Route maps, views, ACL, config, panels, commands — all via `CompilationStore` | Zero network/serialization cost |
+| **Redis (Distributed)** | Redis | Fallback for APCu misses in multi-server environments | Minimal network cost for cache misses |
 | **HTTP / CDN** | Cloudflare / Nginx | Static assets, `/rss`, `/llm.txt`, public API responses | Zero application boot |
 
 ---
@@ -842,7 +1093,6 @@ use Psr\Http\Message\ResponseInterface;
 
 final class CsrfMiddleware implements MiddlewareInterface
 {
-    // PSR-15 method name kept — this is an interface override
     public function handle(ServerRequestInterface $request, callable $next): ResponseInterface
     {
         if (in_array($request->getMethod(), ['POST', 'PUT', 'DELETE', 'PATCH'])) {
@@ -863,7 +1113,7 @@ final class CsrfMiddleware implements MiddlewareInterface
 }
 ```
 
-### `Http/Middleware/RateLimitMiddleware.php` — Token Bucket in APCu
+### `Http/Middleware/RateLimitMiddleware.php` — Token Bucket with Redis Fallback
 
 ```php
 // src/Http/Middleware/RateLimitMiddleware.php
@@ -871,21 +1121,73 @@ namespace Webkernel\Http\Middleware;
 
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\ResponseInterface;
+use Predis\Client as RedisClient;
 
 final class RateLimitMiddleware implements MiddlewareInterface
 {
-    // PSR-15 method name kept — interface override
+    private ?RedisClient $redis = null;
+    private int $max_tokens;
+    private int $refill_seconds;
+
+    public function __construct(int $max_tokens = 100, int $refill_seconds = 60, ?RedisClient $redis = null)
+    {
+        $this->max_tokens = $max_tokens;
+        $this->refill_seconds = $refill_seconds;
+        $this->redis = $redis;
+    }
+
     public function handle(ServerRequestInterface $request, callable $next): ResponseInterface
     {
-        $key    = $this->resolve_key($request);
-        $bucket = apcu_fetch("webkernel.rate:{$key}") ?: ['tokens' => 100, 'last' => time()];
+        $key = $this->resolve_key($request);
+
+        // Try APCu first
+        $bucket = apcu_fetch("webkernel.rate:{$key}");
+
+        if ($bucket === false && $this->redis !== null) {
+            try {
+                $serialized = $this->redis->get("webkernel.rate:{$key}");
+                if ($serialized !== null) {
+                    $bucket = unserialize($serialized);
+                }
+            } catch (\Throwable $e) {
+                error_log('[RateLimit] Redis fallback failed: ' . $e->getMessage());
+            }
+        }
+
+        if ($bucket === false) {
+            $bucket = ['tokens' => $this->max_tokens, 'last' => time()];
+        }
+
+        $now = time();
+        $elapsed = $now - $bucket['last'];
+
+        // Refill tokens based on elapsed time
+        if ($elapsed > 0) {
+            $refill_amount = (int) ($elapsed / $this->refill_seconds) * $this->max_tokens;
+            if ($refill_amount > 0) {
+                $bucket['tokens'] = min($this->max_tokens, $bucket['tokens'] + $refill_amount);
+                $bucket['last'] = $now;
+            }
+        }
 
         if ($bucket['tokens'] < 1) {
-            return new Response(429, ['Retry-After' => '60']);
+            $retry_after = $this->refill_seconds - ($elapsed % $this->refill_seconds);
+            return new Response(429, ['Retry-After' => (string) $retry_after]);
         }
 
         $bucket['tokens']--;
-        apcu_store("webkernel.rate:{$key}", $bucket, 60);
+
+        // Store in APCu
+        apcu_store("webkernel.rate:{$key}", $bucket, $this->refill_seconds);
+
+        // Also store in Redis if configured
+        if ($this->redis !== null) {
+            try {
+                $this->redis->setex("webkernel.rate:{$key}", $this->refill_seconds, serialize($bucket));
+            } catch (\Throwable $e) {
+                error_log('[RateLimit] Redis store failed: ' . $e->getMessage());
+            }
+        }
 
         return $next($request);
     }
@@ -910,6 +1212,13 @@ namespace Webkernel\Queue;
 
 final class Dispatcher
 {
+    private $queue;
+
+    public function __construct($queue)
+    {
+        $this->queue = $queue;
+    }
+
     public function dispatch(string $job_class, array $payload): string
     {
         $job_id = uniqid('job_', true);
@@ -932,15 +1241,192 @@ public function generate_report(ServerRequestInterface $request): ResponseInterf
 
 ---
 
+## CLI Command System
+
+### `CommandInterface` Contract
+
+All CLI commands must implement the `CommandInterface` to ensure consistent discovery and execution.
+
+```php
+// src/Cli/CommandInterface.php
+namespace Webkernel\Cli;
+
+interface CommandInterface
+{
+    /**
+     * Execute the command with given arguments.
+     * Returns exit code (0 = success, non-zero = failure).
+     */
+    public function execute(array $args): int;
+
+    /**
+     * Get the command name (e.g., 'migrate', 'cache:clear').
+     */
+    public function get_name(): string;
+
+    /**
+     * Get help text for the command.
+     */
+    public function get_help(): string;
+}
+```
+
+### Example Command
+
+```php
+// modules/Blog/Console/GenerateSitemapCommand.php
+namespace Modules\Blog\Console;
+
+use Webkernel\Cli\CommandInterface;
+
+final class GenerateSitemapCommand implements CommandInterface
+{
+    public function get_name(): string
+    {
+        return 'blog:sitemap';
+    }
+
+    public function get_help(): string
+    {
+        return 'Generate XML sitemap for blog posts';
+    }
+
+    public function execute(array $args): int
+    {
+        echo "Generating sitemap...\n";
+        // Implementation here
+        return 0;
+    }
+}
+```
+
+### `CliHandler` with Auto-Discovery
+
+```php
+// src/Cli/CliHandler.php
+namespace Webkernel\Cli;
+
+use Webkernel\Container\Container;
+use Webkernel\Cache\CompilationStore;
+
+final class CliHandler
+{
+    private Container $container;
+
+    public function __construct(Container $container)
+    {
+        $this->container = $container;
+    }
+
+    public function handle(array $argv): int
+    {
+        $command_name = $argv[1] ?? 'list';
+        $args = array_slice($argv, 2);
+
+        // Load compiled commands
+        $compiled_commands = CompilationStore::get('webkernel.global.commands', $this->container);
+
+        // Build command map
+        $command_map = $this->build_command_map($compiled_commands);
+
+        if ($command_name === 'list') {
+            return $this->list_commands($command_map);
+        }
+
+        if ($command_name === 'help') {
+            $target = $args[0] ?? 'list';
+            return $this->show_help($command_map, $target);
+        }
+
+        if (!isset($command_map[$command_name])) {
+            echo "Unknown command: {$command_name}\n";
+            return 1;
+        }
+
+        $command_class = $command_map[$command_name];
+        $command = new $command_class();
+
+        return $command->execute($args);
+    }
+
+    private function build_command_map(array $compiled_commands): array
+    {
+        $map = [];
+
+        foreach ($compiled_commands as $command_class) {
+            if (class_exists($command_class)) {
+                try {
+                    $command = new $command_class();
+                    if ($command instanceof CommandInterface) {
+                        $map[$command->get_name()] = $command_class;
+                    }
+                } catch (\Throwable $e) {
+                    error_log("Failed to instantiate command {$command_class}: " . $e->getMessage());
+                }
+            }
+        }
+
+        return $map;
+    }
+
+    private function list_commands(array $command_map): int
+    {
+        echo "Available commands:\n";
+        foreach ($command_map as $name => $class) {
+            try {
+                $command = new $class();
+                echo "  {$name} - " . $command->get_help() . "\n";
+            } catch (\Throwable $e) {
+                echo "  {$name} - [error: " . $e->getMessage() . "]\n";
+            }
+        }
+        return 0;
+    }
+
+    private function show_help(array $command_map, string $command_name): int
+    {
+        if (!isset($command_map[$command_name])) {
+            echo "Unknown command: {$command_name}\n";
+            return 1;
+        }
+
+        $command_class = $command_map[$command_name];
+        $command = new $command_class();
+
+        echo "Usage: webkernel {$command_name}\n";
+        echo "\n" . $command->get_help() . "\n";
+
+        return 0;
+    }
+}
+```
+
+### CLI Entry Point
+
+```php
+// bin/webkernel
+#!/usr/bin/env php
+<?php
+require __DIR__ . '/../platform/dependencies/packagist/vendor/autoload.php';
+
+use Webkernel\Container\Container;
+use Webkernel\Cli\CliHandler;
+
+$container = Container::get_instance();
+$handler = new CliHandler($container);
+$exit_code = $handler->handle($argv);
+exit($exit_code);
+```
+
+---
+
 ## Observability & Error Standards
 
 **Health endpoints** — bypass everything, 2–3 files loaded:
 
 ```php
-public function handle_health(): ResponseInterface
-{
-    return new Response(200, [], 'OK'); // ~0.01ms
-}
+// Handled in public/index.php fast-path
+// ~0.01ms response time
 ```
 
 **RFC 7807 Problem Details:**
@@ -959,6 +1445,8 @@ public function handle_health(): ResponseInterface
 // src/Http/ProblemResponse.php
 namespace Webkernel\Http;
 
+use Psr\Http\Message\ResponseInterface;
+
 final class ProblemResponse
 {
     public static function not_found(string $path): ResponseInterface
@@ -973,37 +1461,32 @@ final class ProblemResponse
             'instance' => $path,
         ]));
     }
-}
-```
 
----
-
-## CLI Execution
-
-```php
-// bin/webkernel
-#!/usr/bin/env php
-<?php
-require __DIR__ . '/../platform/dependencies/packagist/vendor/autoload.php';
-
-$handler   = new \Webkernel\Cli\CliHandler();
-$exit_code = $handler->handle($argv);
-exit($exit_code);
-```
-
-```php
-// src/Cli/CliHandler.php
-namespace Webkernel\Cli;
-
-final class CliHandler
-{
-    public function handle(array $argv): int
+    public static function validation_error(array $errors): ResponseInterface
     {
-        $command = $argv[1] ?? 'list';
+        return new Response(422, [
+            'Content-Type' => 'application/problem+json'
+        ], json_encode([
+            'type'     => 'https://webkernelphp.com/errors/validation-failed',
+            'title'    => 'Validation Failed',
+            'status'   => 422,
+            'detail'   => 'The request data failed validation.',
+            'errors'   => $errors,
+        ]));
+    }
 
-        // No HTTP parsing, no middleware, no sessions.
-        // Commands still resolve from the container — same providers, same bindings.
-        return $this->commands[$command]->execute(array_slice($argv, 2));
+    public static function rate_limited(int $retry_after): ResponseInterface
+    {
+        return new Response(429, [
+            'Content-Type' => 'application/problem+json',
+            'Retry-After' => (string) $retry_after,
+        ], json_encode([
+            'type'       => 'https://webkernelphp.com/errors/rate-limited',
+            'title'      => 'Too Many Requests',
+            'status'     => 429,
+            'detail'     => 'Rate limit exceeded. Please try again later.',
+            'retry_after' => $retry_after,
+        ]));
     }
 }
 ```
@@ -1021,14 +1504,16 @@ final class CliHandler
 * **Modules are real Composer packages.** They live in `modules/`, have their own namespaces, and are distributed from any repository. The root `composer.json` wires them in via path or VCS repositories.
 * **Providers are the extension point.** Constants first, method fallback always. The compiler resolves paths and classes — providers just declare.
 * **snake_case everywhere webkernel owns it.** PSR interface methods (`handle`, `register`, `boot`) stay as-is because they are overrides. Every other webkernel function, method, and property is snake_case.
-* **Fingerprints prevent collisions.** Every module's compiled artifacts live under its fingerprint key in APCu. No flat merging, no silent overwrites.
+* **Fingerprints prevent collisions.** Every module's compiled artifacts live under its fingerprint key in APCu. Uses 12-char hashes for collision resistance.
 * **`config()` is always dot-accessible.** `config('blog.posts_per_page')` and `webapp()->config('blog.posts_per_page')` are identical. Both go through the same compiled APCu artifact.
+* **Redis fallback for distributed environments.** APCu is primary, Redis is fallback for multi-server deployments.
+* **Isolated error handling.** Module compilation errors don't break the entire application.
 
 ---
 
 ### Phase 1: Project Structure & Autoloading (Week 1)
 
-Wire up `platform/dependencies/packagist` as the Composer vendor directory. Register all module namespaces via PSR-4 in the root `composer.json` under `Webkernel\`. Each module's `composer.json` declares its own dependencies; the root requires the module as a path repository.
+Wire up `platform/dependencies/packagist` as the Composer vendor directory. Register all module namespaces via PSR-4 in the root `composer.json`. Add `predis/predis` dependency. Each module's `composer.json` declares its own dependencies; the root requires the module as a path repository.
 
 **Deliverable:** `composer install` resolves everything, all namespaces resolve, no custom autoload hacks.
 
@@ -1036,33 +1521,33 @@ Wire up `platform/dependencies/packagist` as the Composer vendor directory. Regi
 
 ### Phase 2: PlatformProvider & ProviderRegistry (Week 1)
 
-Implement the abstract `PlatformProvider` base class with all declaration methods and constant resolution logic. Implement `ProviderRegistry` and `ProviderFingerprint`. Write providers for core (`CoreProvider`) and at least one module (`BlogProvider`) to validate the full contract including constants, method fallbacks, and fingerprinted APCu keys.
+Implement the abstract `PlatformProvider` base class with all declaration methods and constant resolution logic. Implement `ProviderRegistry` with **auto-discovery** from `modules/*/*Provider.php`. Implement `ProviderFingerprint` with 12-char hashes. Write providers for core (`CoreProvider`) and at least one module (`BlogProvider`) to validate the full contract including constants, method fallbacks, and fingerprinted APCu keys.
 
-**Deliverable:** Adding a provider to `ProviderRegistry::providers()` and declaring `ROUTES` or `routes()` on it is the complete workflow for wiring in a new module.
+**Deliverable:** Adding a provider class to `modules/YourModule/YourModuleProvider.php` is the complete workflow for wiring in a new module. Auto-discovery works without editing `ProviderRegistry`.
 
 ---
 
 ### Phase 3: Unified Compilation Pipeline (Week 1–2)
 
-Implement `CompilationManifest`, `Compiler`, and `CompilationStore`. All compilation passes — routes, views, panels, commands, composables, classmap, ACL, config — go through `Compiler::compile()`. All reads go through `CompilationStore::get()`. Implement `config()` helper and `webapp()->config()` with dot notation.
+Implement `CompilationManifest`, `Compiler`, and `CompilationStore`. All compilation passes go through `Compiler::compile()`. All reads go through `CompilationStore::get()`. Implement `config()` helper and `webapp()->config()` with dot notation. **Critical:** Add Redis fallback in `CompilationStore` for distributed environments. Add isolated error handling in `Compiler` so one bad module doesn't break compilation.
 
-**Deliverable:** Edit any provider or route file. Next request detects the `mtime` change, recompiles all artifacts atomically under fingerprinted keys, stores them in APCu. `config('blog.posts_per_page')` returns `20`. Zero commands.
+**Deliverable:** Edit any provider or route file. Next request detects the `mtime` change, recompiles all artifacts atomically under fingerprinted keys, stores them in APCu (with Redis fallback). `config('blog.posts_per_page')` returns `20`. Zero commands. Errors in one module don't affect others.
 
 ---
 
 ### Phase 4: Request Classification & Handlers (Week 2)
 
-Implement `RequestClassifier` and all handlers: `WebHandler`, `ApiHandler`, `MachineHandler`, `SyndicationHandler`, `CliHandler`. Wire `public/index.php` to call `CompilationStore::get()` once on boot.
+Implement `RequestClassifier` with **HTTP method support** and all handlers: `WebHandler`, `ApiHandler`, `MachineHandler`, `SyndicationHandler`, `RealTimeHandler`. Wire `public/index.php` to call `CompilationStore::get()` once on boot. **Add fast-path health checks** (`/healthz`, `/ready`) that bypass all framework overhead.
 
-**Deliverable:** All traffic paths route correctly. Static assets never reach PHP.
+**Deliverable:** All traffic paths route correctly. Static assets never reach PHP. Health checks respond in < 0.01ms.
 
 ---
 
 ### Phase 5: Middleware Pipeline (Week 2–3)
 
-Implement `Pipeline` and all middleware: `RequestIdMiddleware`, `SessionMiddleware`, `CsrfMiddleware`, `TokenAuthMiddleware`, `CorsMiddleware`, `RateLimitMiddleware`, `PayloadFilterMiddleware`. All internal webkernel methods snake_case; PSR-15 `handle()` stays as the interface override.
+Implement `Pipeline` and all middleware: `RequestIdMiddleware`, `SessionMiddleware`, `CsrfMiddleware`, `TokenAuthMiddleware`, `CorsMiddleware`, `RateLimitMiddleware` (with Redis fallback), `PayloadFilterMiddleware`. All internal webkernel methods snake_case; PSR-15 `handle()` stays as the interface override.
 
-**Deliverable:** Each handler applies its own middleware stack. Web context enforces CSRF. API context enforces bearer tokens. Machine/syndication are stateless.
+**Deliverable:** Each handler applies its own middleware stack. Web context enforces CSRF. API context enforces bearer tokens. Machine/syndication are stateless. Rate limiting works across servers via Redis.
 
 ---
 
@@ -1080,14 +1565,18 @@ Security middleware done in Phase 5. This phase adds:
 
 * `Queue\Dispatcher` for async job offloading
 * `202 Accepted` response pattern in controllers
-* `/healthz` and `/ready` endpoints (bypass all framework overhead)
-* `ProblemResponse::not_found()` RFC 7807 factory
+* Health endpoints already implemented in Phase 4
+* `ProblemResponse::not_found()`, `ProblemResponse::validation_error()`, `ProblemResponse::rate_limited()` RFC 7807 factories
+
+**Deliverable:** Async offloading works. Error responses follow RFC 7807. Health checks are operational.
 
 ---
 
 ### Phase 8: CLI Handler (Week 4)
 
-Implement `bin/webkernel` and `CliHandler`. CLI execution bypasses HTTP parsing, web server interfaces, and middleware entirely. Commands registered by providers via `COMMANDS` or `commands()` are discovered at compile time and available to `CliHandler` through the same container and the same compiled APCu artifact.
+Implement `bin/webkernel` and `CliHandler`. Implement `CommandInterface` for consistent command discovery. CLI execution bypasses HTTP parsing, web server interfaces, and middleware entirely. Commands registered by providers via `COMMANDS` or `commands()` are discovered at compile time and available to `CliHandler` through the same container and the same compiled APCu artifact. Add `list` and `help` commands for discoverability.
+
+**Deliverable:** Running `php bin/webkernel list` shows all available commands. Running `php bin/webkernel help command_name` shows help text. Commands execute correctly with argument parsing.
 
 ---
 
@@ -1100,7 +1589,8 @@ Implement `bin/webkernel` and `CliHandler`. CLI execution bypasses HTTP parsing,
 | Composer vendor | `platform/dependencies/packagist/vendor` | All packages including webkernel itself |
 | Module packages | `modules/*/` | Own namespaces, own `composer.json`, path or VCS repositories |
 | OPcache | Enabled | Preload compiled scripts |
-| APCu | Required | All compiled artifacts under `webkernel.*` fingerprinted keys — single store via `CompilationStore` |
+| APCu | Required | Primary cache for all compiled artifacts under `webkernel.*` fingerprinted keys |
+| Redis | Optional | Fallback for APCu misses in multi-server environments |
 | Queue | Redis/Beanstalkd | Async job processing |
 | Cache (distributed) | Redis/Memcached | Network-bound cache, 10 ms budget |
 
@@ -1118,12 +1608,13 @@ time_connect:       %{time_connect}\n
 time_appconnect:    %{time_appconnect}\n
 time_pretransfer:   %{time_pretransfer}\n
 time_redirect:      %{time_redirect}\n
-time_starttransfer: %{time_starttransfer}\n
-----------\n
+time_starttransfer: %{time_starttransfer}\n----------\n
 time_total:         %{time_total}\n
+# Measure health check (target: < 0.01ms)
+curl -w "@curl-format.txt" -o /dev/null -s http://localhost/healthz
 ```
 
-**Target:** `time_starttransfer` < 0.1 ms for cached 404s.
+**Target:** `time_starttransfer` < 0.1 ms for cached 404s. < 0.01ms for health checks.
 
 ---
 
@@ -1131,29 +1622,38 @@ time_total:         %{time_total}\n
 
 | Item | Status | Complexity | Impact |
 |---|---|---|---|
-| Request classification | Ready | Low | High |
-| Unified compilation pipeline | Ready | Medium | Critical |
+| Request classification with HTTP method support | Ready | Low | High |
+| Unified compilation pipeline with Redis fallback | Ready | Medium | Critical |
 | PlatformProvider contract + constants | Ready | Low | Critical |
 | Module/package layout | Ready | Low | High |
-| Provider fingerprinting | Ready | Low | High |
-| `config()` + `webapp()->config()` dot notation | Ready | Low | High |
+| Provider fingerprinting (12-char hashes) | Ready | Low | High |
+| Auto-discovering ProviderRegistry | Ready | Low | High |
+| `config()` + `webapp()->config()` dot notation with env overrides | Ready | Low | High |
+| Isolated error handling in compilation | Ready | Medium | Critical |
 | Lazy PSR-7 instantiation | Ready | Medium | High |
 | Middleware pipeline | Ready | Medium | High |
 | APCu — fingerprinted keys for all artifacts | Ready | Low | High |
+| Redis fallback for distributed environments | Ready | Medium | Critical |
 | Security middleware | Ready | Medium | Critical |
 | Container rewrite | Planned | Medium | High |
 | Async offloading | Ready | Medium | Medium |
-| Observability | Ready | Low | Medium |
-| CLI handler | Ready | Low | Medium |
+| Observability (health checks, RFC 7807) | Ready | Low | Medium |
+| CLI handler with CommandInterface | Ready | Low | Medium |
 
 **Total estimated time:** 3–4 weeks for full implementation with proper testing.
 
 **Key changes from the previous revision:**
 
-- Namespace root is `Webkernel\` — no exceptions
-- snake_case across all webkernel-owned functions, methods, properties, and helpers; PSR interface overrides (`handle`, `register`, `boot`) stay camelCase as required by the contract
-- `PlatformProvider` now declares `composables()`, `views()`, `providers()`, `routes()`, `files()`, `commands()`, `classmap()`, `panels()` — all return arrays of paths, class names, or both; the compiler resolves everything
-- Constants (`ROUTES`, `VIEWS`, `COMMANDS`, etc.) are checked before methods — zero call overhead for static declarations
-- Module fingerprinting via `ProviderFingerprint` — every module's APCu keys are scoped to its fingerprint, collisions are impossible
-- `config()` global helper and `webapp()->config()` with dot notation, both backed by the same `webkernel.global.config` APCu artifact
-- All APCu keys prefixed `webkernel.` for namespace isolation in shared environments
+- Added **Redis fallback** in `CompilationStore` and `RateLimitMiddleware` for distributed multi-server environments
+- Extended **ProviderFingerprint** to use 12-char hashes instead of 8-char to reduce collision risk
+- Added **isolated error handling** in `Compiler` — syntax errors in one module's route file don't break the entire application
+- Added **HTTP method support** in `RequestClassifier` for more precise request routing
+- Implemented **`CommandInterface`** for consistent CLI command discovery and execution
+- Added **auto-discovery** in `ProviderRegistry` — no need to manually edit when adding modules
+- Added **environment-specific config** with `config/app.php`, `config/app.dev.php`, `config/app.prod.php`
+- Added **fast-path health checks** in `public/index.php` bypassing all framework overhead
+- Added **`ProblemResponse`** factory methods for common error types (RFC 7807)
+- Added **config override mechanism** for environment-specific settings
+- Added **comprehensive logging** in `Compiler` for debugging compilation issues
+- Added **`files()` method** to `PlatformProvider` for declaring arbitrary paths
+- Improved **command filtering** in `compile_commands()` to only include `CommandInterface` implementations
