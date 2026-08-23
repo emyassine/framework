@@ -144,9 +144,9 @@ final class CompilationManifest
     {
         if (function_exists('webapp_path')) {
             return webapp_path($relative);
+        } else {
+            throw new \RuntimeException('webapp_path function not available, host path unavailable');
         }
-
-        return dirname(__DIR__, 4).'/'.$relative;
     }
 
     private static function request_host(): string
