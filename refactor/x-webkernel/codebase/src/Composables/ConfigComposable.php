@@ -45,6 +45,10 @@ final class ConfigComposable implements ComposableContract
             $tree = array_replace_recursive($tree, self::require_array($overrides));
         }
 
+        // DO NOT scan all modules during load() - this is lazy loaded
+        // Module configs are loaded only when accessed via get() with a modules.* key
+        // This prevents unnecessary I/O and file loading for requests that don't need module configs
+        /*
         $modules_rel = $tree['modules']['path'] ?? 'modules';
         if (is_string($modules_rel) && $modules_rel !== '' && ! str_contains($modules_rel, '..')) {
             $modules_dir = $root.'/'.$modules_rel;
@@ -64,6 +68,7 @@ final class ConfigComposable implements ComposableContract
                 }
             }
         }
+        */
 
         return new self($tree, $platform_file);
     }
@@ -71,8 +76,29 @@ final class ConfigComposable implements ComposableContract
     public function get(string $key, mixed $default = null): mixed
     {
         $cursor = $this->tree;
-        foreach (explode('.', $key) as $part) {
+        $parts = explode('.', $key);
+
+        // Lazy load module configs when accessing modules.* keys
+        if (count($parts) >= 2 && $parts[0] === 'modules' && is_array($cursor) && ! isset($cursor['modules'])) {
+            $this->load_module_configs();
+            $cursor = $this->tree;
+        }
+
+        foreach ($parts as $part) {
             if (! is_array($cursor) || ! array_key_exists($part, $cursor)) {
+                // Try lazy loading module config if this looks like a module access
+                if (count($parts) >= 2 && $parts[0] === 'modules' && ! isset($this->tree['modules'])) {
+                    $this->load_module_configs();
+                    $cursor = $this->tree;
+                    // Retry the lookup
+                    foreach ($parts as $retry_part) {
+                        if (! is_array($cursor) || ! array_key_exists($retry_part, $cursor)) {
+                            return $default;
+                        }
+                        $cursor = $cursor[$retry_part];
+                    }
+                    return $cursor;
+                }
                 return $default;
             }
             $cursor = $cursor[$part];
@@ -92,8 +118,29 @@ final class ConfigComposable implements ComposableContract
     public function has(string $key): bool
     {
         $cursor = $this->tree;
-        foreach (explode('.', $key) as $part) {
+        $parts = explode('.', $key);
+
+        // Lazy load module configs when checking modules.* keys
+        if (count($parts) >= 2 && $parts[0] === 'modules' && is_array($cursor) && ! isset($cursor['modules'])) {
+            $this->load_module_configs();
+            $cursor = $this->tree;
+        }
+
+        foreach ($parts as $part) {
             if (! is_array($cursor) || ! array_key_exists($part, $cursor)) {
+                // Try lazy loading module config if this looks like a module access
+                if (count($parts) >= 2 && $parts[0] === 'modules' && ! isset($this->tree['modules'])) {
+                    $this->load_module_configs();
+                    $cursor = $this->tree;
+                    // Retry the lookup
+                    foreach ($parts as $retry_part) {
+                        if (! is_array($cursor) || ! array_key_exists($retry_part, $cursor)) {
+                            return false;
+                        }
+                        $cursor = $cursor[$retry_part];
+                    }
+                    return true;
+                }
                 return false;
             }
             $cursor = $cursor[$part];
@@ -162,6 +209,43 @@ final class ConfigComposable implements ComposableContract
             $writes['created'] = gmdate('c');
         }
         $this->set_many($writes);
+    }
+
+    /**
+     * Lazy load all module configs. Called only when a modules.* key is accessed.
+     */
+    private function load_module_configs(): void
+    {
+        if (isset($this->tree['modules'])) {
+            return;
+        }
+
+        $root = dirname($this->platform_file, 2);
+        $modules_rel = $this->tree['modules']['path'] ?? 'modules';
+        if (! is_string($modules_rel) || $modules_rel === '' || str_contains($modules_rel, '..')) {
+            return;
+        }
+
+        $modules_dir = $root.'/'.$modules_rel;
+        if (! is_dir($modules_dir)) {
+            return;
+        }
+
+        $entries = scandir($modules_dir);
+        if (! is_array($entries)) {
+            return;
+        }
+
+        foreach ($entries as $name) {
+            if ($name === '.' || $name === '..' || ! is_dir($modules_dir.'/'.$name)) {
+                continue;
+            }
+            $file = $modules_dir.'/'.$name.'/config/'.$name.'.php';
+            $chunk = self::require_array($file);
+            if ($chunk !== []) {
+                $this->tree = array_replace_recursive($this->tree, ['modules' => [$name => $chunk]]);
+            }
+        }
     }
 
     /**

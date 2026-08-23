@@ -123,6 +123,9 @@ function webkernel_autoload(string $class): bool
 
 spl_autoload_register('webkernel_autoload');
 
+// Load webkernel_files.php (which contains function files like paths.php)
+// This is loaded here (during namespacer.php initialization) so that functions like
+// webapp_path() are available early in the boot process.
 $webkernel_composer_dir = webkernel_composer_dir();
 if ($webkernel_composer_dir !== null) {
     $webkernel_files = $webkernel_composer_dir.'/webkernel_files.php';
