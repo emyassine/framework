@@ -8,23 +8,19 @@
 define('START_REQUEST', hrtime(true));
 
 $webapp_path = dirname(__DIR__);
-$maint = $webapp_path.'/platform/maintenance.php';
 
-if (is_file($maint)) {
-    require $maint;
-    return;
-}
+if (is_file($maint = $webapp_path.'/platform/maintenance.php'))
+	{ require $maint; return; }
 
 $uri  = $_SERVER['REQUEST_URI'] ?? '/';
-$path = parse_url($uri, PHP_URL_PATH);
-$path = is_string($path) && $path !== '' ? $path : '/';
+$route = parse_url($uri, PHP_URL_PATH);
+$route = is_string($route) && $route !== '' ? $route : '/';
 
-if ($path === '/healthz' || $path === '/ready') {
+if ($route === '/healthz' || $route === '/ready') {
     http_response_code(200);
     header('Content-Type: text/plain');
-    echo 'OK';
-    return;
+    echo '<div>Platform is Working</div>'; return;
 }
 
-require $webapp_path.'/platform/bootstrap/fast-boot.php';
+require $webapp_path.'/platform/fast-boot.php';
 \Webkernel\Index::start_http();

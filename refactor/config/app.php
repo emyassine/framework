@@ -2,9 +2,9 @@
 
 return [
     'app' => [
-        'name' => 'Webkernel App',
+        'name' => 'Webkernel',
         'debug' => false,
-        'timezone' => 'UTC',
+        'timezone' => 'Africa/Casablanca',
         'env' => 'prod',
     ],
     'database' => [
