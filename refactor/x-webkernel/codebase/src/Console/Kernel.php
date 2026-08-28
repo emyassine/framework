@@ -31,11 +31,19 @@ final class Kernel implements ComposableContract
     /** @var array<string, CommandDef>|null */
     private ?array $definitions = null;
 
+    /**
+     * @return string
+     */
     public static function api_name(): string
     {
         return 'console';
     }
 
+    /**
+     * @param ArgvInput $input
+     *
+     * @return ExitCode
+     */
     public function handle(ArgvInput $input): ExitCode
     {
         $name = $input->command();
@@ -127,6 +135,10 @@ final class Kernel implements ComposableContract
 
     /**
      * @param CommandDef $definition
+     * @param ArgvInput  $input
+     * @param object     $instance
+     *
+     * @return ExitCode
      */
     private function invoke(array $definition, ArgvInput $input, object $instance): ExitCode
     {
@@ -137,6 +149,9 @@ final class Kernel implements ComposableContract
     }
 
     /**
+     * @param \ReflectionMethod $method
+     * @param ArgvInput         $input
+     *
      * @return list<mixed>
      */
     private function bind_parameters(\ReflectionMethod $method, ArgvInput $input): array
@@ -193,7 +208,12 @@ final class Kernel implements ComposableContract
     }
 
     /**
-     * @param array<string, true> $used_options
+     * @param \ReflectionParameter $param
+     * @param ArgvInput            $input
+     * @param string               $kebab
+     * @param array<string, true>  $used_options
+     *
+     * @return string|bool|null
      */
     private function option_value(\ReflectionParameter $param, ArgvInput $input, string $kebab, array &$used_options): string|bool|null
     {
@@ -224,6 +244,8 @@ final class Kernel implements ComposableContract
 
     /**
      * @param class-string $class
+     *
+     * @return object
      */
     private function instantiate(string $class): object
     {
@@ -286,6 +308,11 @@ final class Kernel implements ComposableContract
         return $out;
     }
 
+    /**
+     * @param string|null $name
+     *
+     * @return void
+     */
     private function print_help(?string $name): void
     {
         if ($name === null) {
@@ -303,6 +330,9 @@ final class Kernel implements ComposableContract
         $this->print_command($name, $definition);
     }
 
+    /**
+     * @return void
+     */
     private function print_list(): void
     {
         echo "\n  ".Terminal::BOLD.'webkernel'.Terminal::RESET.' '.Terminal::muted('<command>')."\n\n";
@@ -320,7 +350,10 @@ final class Kernel implements ComposableContract
     }
 
     /**
+     * @param string     $name
      * @param CommandDef $definition
+     *
+     * @return void
      */
     private function print_command(string $name, array $definition): void
     {
@@ -336,6 +369,11 @@ final class Kernel implements ComposableContract
         echo "\n";
     }
 
+    /**
+     * @param \ReflectionMethod $method
+     *
+     * @return string
+     */
     private function signature_hint(\ReflectionMethod $method): string
     {
         $parts = [];
@@ -361,6 +399,13 @@ final class Kernel implements ComposableContract
         return \implode(' ', $parts);
     }
 
+    /**
+     * @param \ReflectionClass<covariant object> $class
+     * @param \ReflectionMethod                  $method
+     * @param ConsoleCommand                     $attribute
+     *
+     * @return string
+     */
     private static function command_name(\ReflectionClass $class, \ReflectionMethod $method, ConsoleCommand $attribute): string
     {
         if ($attribute->name !== null && $attribute->name !== '') {
@@ -378,6 +423,11 @@ final class Kernel implements ComposableContract
         return $class_part.':'.self::kebab($method->getName());
     }
 
+    /**
+     * @param string $name
+     *
+     * @return string
+     */
     private static function kebab(string $name): string
     {
         $kebab = \preg_replace('/([a-z0-9])([A-Z])/', '$1-$2', $name);
@@ -386,6 +436,11 @@ final class Kernel implements ComposableContract
         return \strtolower($kebab);
     }
 
+    /**
+     * @param \ReflectionParameter $param
+     *
+     * @return string
+     */
     private static function scalar_type(\ReflectionParameter $param): string
     {
         $type = $param->getType();
@@ -399,6 +454,13 @@ final class Kernel implements ComposableContract
         return 'string';
     }
 
+    /**
+     * @param string $type
+     * @param mixed  $value
+     * @param bool   $nullable
+     *
+     * @return mixed
+     */
     private static function cast(string $type, mixed $value, bool $nullable): mixed
     {
         if ($value === null || $value === true || $value === false) {
@@ -420,6 +482,11 @@ final class Kernel implements ComposableContract
         };
     }
 
+    /**
+     * @param mixed $result
+     *
+     * @return ExitCode
+     */
     private static function normalize(mixed $result): ExitCode
     {
         if ($result instanceof ExitCode) {

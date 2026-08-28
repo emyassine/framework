@@ -77,9 +77,9 @@ final class Config
         $root ??= webapp_path();
         $tree = [];
         foreach (['config/platform.php', 'config/app.php'] as $rel) {
-            $tree = \array_replace_recursive($tree, self::require_array($root.'/'.$rel));
+            $tree = array_replace_recursive($tree, self::require_array($root.'/'.$rel));
         }
-        $tree = \array_replace_recursive($tree, self::require_array($root.'/platform/platform-runtime.php'));
+        $tree = array_replace_recursive($tree, self::require_array($root.'/platform/platform-runtime.php'));
         $this->tree = $tree;
         $this->booted = true;
 
@@ -90,8 +90,8 @@ final class Config
     {
         $this->ensure_booted();
         $cursor = $this->tree;
-        foreach (\explode('.', $key) as $part) {
-            if (! \is_array($cursor) || ! \array_key_exists($part, $cursor)) {
+        foreach (explode('.', $key) as $part) {
+            if (! is_array($cursor) || ! array_key_exists($part, $cursor)) {
                 return $default;
             }
             $cursor = $cursor[$part];
@@ -105,7 +105,7 @@ final class Config
         $this->ensure_booted();
         $runtime = webapp_path('platform/platform-runtime.php');
         $current = self::require_array($runtime);
-        $next = \array_replace_recursive($current, self::dot_to_tree($key, $value));
+        $next = array_replace_recursive($current, self::dot_to_tree($key, $value));
         ConfigWriter::write($runtime, $next);
         $this->set_dot($this->tree, $key, $value);
 
@@ -124,12 +124,12 @@ final class Config
      */
     private static function require_array(string $file): array
     {
-        if (! \is_file($file)) {
+        if (! is_file($file)) {
             return [];
         }
-        $loaded = require $file;
+        $loaded = \function_exists('webkernel_include') ? \webkernel_include($file) : require $file;
 
-        return \is_array($loaded) ? $loaded : [];
+        return is_array($loaded) ? $loaded : [];
     }
 
     /**
@@ -137,16 +137,16 @@ final class Config
      */
     private function set_dot(array &$tree, string $key, mixed $value): void
     {
-        $parts = \explode('.', $key);
+        $parts = explode('.', $key);
         $cursor = &$tree;
-        $last = \array_key_last($parts);
+        $last = array_key_last($parts);
         foreach ($parts as $i => $part) {
             if ($i === $last) {
                 $cursor[$part] = $value;
 
                 return;
             }
-            if (! isset($cursor[$part]) || ! \is_array($cursor[$part])) {
+            if (! isset($cursor[$part]) || ! is_array($cursor[$part])) {
                 $cursor[$part] = [];
             }
             $cursor = &$cursor[$part];
@@ -159,7 +159,7 @@ final class Config
     private static function dot_to_tree(string $key, mixed $value): array
     {
         $tree = $value;
-        foreach (\array_reverse(\explode('.', $key)) as $part) {
+        foreach (array_reverse(explode('.', $key)) as $part) {
             $tree = [$part => $tree];
         }
 

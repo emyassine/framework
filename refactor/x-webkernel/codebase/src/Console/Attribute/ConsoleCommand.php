@@ -12,6 +12,8 @@ namespace Webkernel\Console\Attribute;
 final readonly class ConsoleCommand
 {
     /**
+     * @param string|null    $name
+     * @param string         $description
      * @param MiddlewareList $middleware
      */
     public function __construct(

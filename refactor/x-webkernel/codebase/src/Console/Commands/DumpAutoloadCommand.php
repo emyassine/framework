@@ -5,21 +5,23 @@ namespace Webkernel\Console\Commands;
 use FilesystemIterator;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
+
 use Webkernel\Composables\ComposableContract;
 use Webkernel\Config\ConfigWriter;
+
 use Webkernel\Console\Attribute\ConsoleCommand;
-use Webkernel\Console\ExitCode;
-use Webkernel\Console\Terminal;
+use Webkernel\Console\{ExitCode, Terminal};
+
 use Webkernel\DevEnv\IdeHelper;
 use Webkernel\Instance\InstanceId;
-use Webkernel\Platform\Panel;
-use Webkernel\Platform\PanelProvider;
-use Webkernel\Platform\Resources\Resource;
+
+use Webkernel\Platform\{Panel, PanelProvider, Resources\Resource};
 use Webkernel\PlatformProvider;
+
 use Webkernel\Route\Compile\Cache;
 use Webkernel\Route\Route;
-use Webkernel\View\Engine;
-use Webkernel\View\View;
+
+use Webkernel\View\{Engine,View};
 
 /**
  * Writes `{vendor}/composer/webkernel_*.php`. Composer `post-autoload-dump`
@@ -981,7 +983,8 @@ PHP;
 \$files = [{$list}];
 
 foreach (\$files as \$file) {
-    if ((@include \$file) === false) {
+    \$loaded = \\function_exists('webkernel_include') ? \\webkernel_include(\$file) : @include \$file;
+    if (\$loaded === false) {
         throw new \\RuntimeException('Unable to load required file: '.\$file);
     }
 }

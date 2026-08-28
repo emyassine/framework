@@ -20,7 +20,6 @@ final class SystemPanelProvider extends PanelProvider
             ->id('system')
             ->path('system')
             ->scope('platform')
-            ->default()
             ->pages([
                 Dashboard::class,
             ])

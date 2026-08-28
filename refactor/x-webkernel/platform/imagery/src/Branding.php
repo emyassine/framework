@@ -32,7 +32,7 @@ final class Branding
         $self = new self();
         $file = \function_exists('vendor_dir') ? \vendor_dir('composer/webkernel_branding.php') : '';
         if ($file !== '' && \is_file($file)) {
-            $loaded = require $file;
+            $loaded = \function_exists('webkernel_include') ? \webkernel_include($file) : require $file;
             if (\is_array($loaded)) {
                 foreach ($loaded as $key => $row) {
                     if (! \is_string($key) || ! \is_array($row)) {

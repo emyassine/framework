@@ -52,7 +52,7 @@ return array (
     'id' => 'system',
     'path' => 'system',
     'scope' => 'platform',
-    'default' => true,
+    'default' => false,
     'pages' => 
     array (
       0 => 'Webkernel\\Platform\\Pages\\Dashboard',

@@ -3,7 +3,7 @@
         'name' => 'webkernel/webkernel',
         'pretty_version' => 'dev-main',
         'version' => 'dev-main',
-        'reference' => '2f0c514e6f30d05e09d95eb0b5cc6f8a748404d2',
+        'reference' => '5777dba175b7fada1d6e735837722fefc55abdf1',
         'type' => 'project',
         'install_path' => __DIR__ . '/../../../../',
         'aliases' => array(),
@@ -373,7 +373,7 @@
         'webkernel/webkernel' => array(
             'pretty_version' => 'dev-main',
             'version' => 'dev-main',
-            'reference' => '2f0c514e6f30d05e09d95eb0b5cc6f8a748404d2',
+            'reference' => '5777dba175b7fada1d6e735837722fefc55abdf1',
             'type' => 'project',
             'install_path' => __DIR__ . '/../../../../',
             'aliases' => array(),

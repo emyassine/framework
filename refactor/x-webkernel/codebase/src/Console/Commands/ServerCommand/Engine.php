@@ -1,12 +1,24 @@
 <?php declare(strict_types=1);
 
-namespace Webkernel\Console\Server;
+namespace Webkernel\Console\Commands\ServerCommand;
 
 use Webkernel\Console\ExitCode;
 use Webkernel\Console\Terminal;
 use Webkernel\Performance\Performance;
 use Webkernel\Performance\Status;
 
+/**
+ * PHP built-in server process for {@see \Webkernel\Console\Commands\ServerCommand}.
+ *
+ * @phpstan-type IncludeRow array{ms: float|null, run_ms: float|null, read_ms: float|null, path: string}
+ * @phpstan-type RequestTimings array{
+ *   render_ms?: float|null,
+ *   times?: list<IncludeRow>,
+ *   classes?: list<string>,
+ *   mem?: int|string|null,
+ *   type?: string
+ * }
+ */
 final class Engine
 {
     private const int MAX_PORT_TRIES = 10;
@@ -28,12 +40,17 @@ final class Engine
     private bool $address_in_use = false;
     private bool $is_first_request = true;
 
-    /** @var array<int, array{started: int|float, request: string, status: int, render_ms: float|null, type: string, times: list<array{ms: float|null, run_ms: float|null, read_ms: float|null, path: string, inferred?: bool}>, classes: list<string>, mem: int|null}> */
+    /** @var array<int, array{started: int|float, request: string, status: int, render_ms: float|null, type: string, times: list<array{ms: float|null, run_ms: float|null, read_ms: float|null, path: string}>, classes: list<string>, mem: int|null}> */
     private array $requests_pool = [];
 
-    /** @var array<string, array{render_ms: float|null, request_ms: float, times: array<string, array{ms: float, run_ms: float, read_ms: float}>}> */
-    private array $baselines = [];
-
+    /**
+     * @param string    $host
+     * @param int       $port
+     * @param bool      $profile_lifecycle
+     * @param bool|null $jit
+     *
+     * @return ExitCode
+     */
     public function serve(string $host = '127.0.0.1', int $port = 8000, bool $profile_lifecycle = false, ?bool $jit = null): ExitCode
     {
         $this->host = $host;
@@ -60,6 +77,9 @@ final class Engine
         return ExitCode::ERROR;
     }
 
+    /**
+     * @return int|null Process exit code, or null when the listen loop is still running
+     */
     private function run_process(): ?int
     {
         $command = [PHP_BINARY];
@@ -134,6 +154,11 @@ final class Engine
         }
     }
 
+    /**
+     * @param string $chunk Raw stdout from the PHP built-in server
+     *
+     * @return void
+     */
     private function ingest(string $chunk): void
     {
         $this->output_buffer .= $chunk;
@@ -144,6 +169,11 @@ final class Engine
         }
     }
 
+    /**
+     * @param string $line One stderr/stdout line from the child server
+     *
+     * @return void
+     */
     private function handle_line(string $line): void
     {
         if ($line === '') {
@@ -173,6 +203,10 @@ final class Engine
                 'times' => [], 'classes' => [], 'mem' => null,
             ];
 
+            return;
+        }
+
+        if (\str_starts_with($line, 'webkernel-profile-json ')) {
             return;
         }
 
@@ -245,6 +279,11 @@ final class Engine
         }
     }
 
+    /**
+     * @param string $line
+     *
+     * @return int|null Client port when the line is an Accept/Close/status event
+     */
     private function request_port(string $line): ?int
     {
         if (\preg_match('/:(\d+)\s+(?:Accepted|Closing|\[\d+\])/', $line, $m) === 1) {
@@ -254,6 +293,9 @@ final class Engine
         return null;
     }
 
+    /**
+     * @return void
+     */
     private function render_banner(): void
     {
         $banner_start_message = [
@@ -287,14 +329,19 @@ final class Engine
         webterminal()->warning('This server is for local development only. Behavior differs from production (Nginx/Apache/FPM).');
         echo "\n";
         if ($this->profile_lifecycle) {
-            webterminal()->info(Terminal::muted('--profile-lifecycle').' first request is timed; later ~ is an estimate (OPcache hid the stream).');
+            webterminal()->info(Terminal::muted('--profile-lifecycle').' real include execute cost (hrtime). JSON: webkernel-profile-json');
             echo "\n";
         }
         echo '  '.Terminal::muted('Press Ctrl+C to stop the server')."\n\n";
     }
 
     /**
-     * @param array{render_ms?: float|null, times?: list<array{ms: float|null, run_ms: float|null, read_ms: float|null, path: string}>, classes?: list<string>, mem?: int|string|null, type?: string} $timings
+     * @param string         $request
+     * @param int            $status_code
+     * @param int|float      $start_time
+     * @param RequestTimings $timings
+     *
+     * @return void
      */
     private function log_request(string $request, int $status_code, float|int $start_time, array $timings = []): void
     {
@@ -337,44 +384,6 @@ final class Engine
         $mem = $timings['mem'] ?? null;
         $mem_label = \is_numeric($mem) ? \number_format(((int) $mem) / 1048576, 1).'MB' : '?';
 
-        $has_real = false;
-        foreach ($times as $row) {
-            if ($row['ms'] !== null) {
-                $has_real = true;
-                break;
-            }
-        }
-
-        $inferred_count = 0;
-        if (! $has_real && isset($this->baselines[$request])) {
-            $baseline = $this->baselines[$request];
-            $base_metric = $baseline['render_ms'] ?? $baseline['request_ms'];
-            $curr_metric = $timings['render_ms'] ?? $request_ms;
-            $ratio = ($base_metric > 0.0) ? ($curr_metric / $base_metric) : 1.0;
-            foreach ($times as &$row) {
-                if ($row['ms'] === null && isset($baseline['times'][$row['path']])) {
-                    $base_row = $baseline['times'][$row['path']];
-                    $row['ms'] = $base_row['ms'] * $ratio;
-                    $row['run_ms'] = $base_row['run_ms'] * $ratio;
-                    $row['read_ms'] = $base_row['read_ms'] * $ratio;
-                    $row['inferred'] = true;
-                    $inferred_count++;
-                }
-            }
-            unset($row);
-        } elseif ($has_real) {
-            $this->baselines[$request] = ['render_ms' => $timings['render_ms'] ?? null, 'request_ms' => $request_ms, 'times' => []];
-            foreach ($times as $row) {
-                if ($row['ms'] !== null) {
-                    $this->baselines[$request]['times'][$row['path']] = [
-                        'ms' => (float) $row['ms'],
-                        'run_ms' => (float) $row['run_ms'],
-                        'read_ms' => (float) $row['read_ms'],
-                    ];
-                }
-            }
-        }
-
         $valid_times = [];
         foreach ($times as $row) {
             if ($row['ms'] !== null) {
@@ -403,7 +412,7 @@ final class Engine
         }
         echo "\n";
 
-        $summary1 = \sprintf('%s -> %d %s | files=%d timed=%d est=%d classes=%d mem=%s', $request, $status_code, $reason, \count($times), $count_valid - $inferred_count, $inferred_count, \count($classes), $mem_label);
+        $summary1 = \sprintf('%s -> %d %s | files=%d timed=%d classes=%d mem=%s', $request, $status_code, $reason, \count($times), $count_valid, \count($classes), $mem_label);
         $summary2 = \sprintf('grades excellent=%d good=%d fair=%d slow=%d (%de %dg %df %ds) median=%.3fms', $grades['e'], $grades['g'], $grades['f'], $grades['s'], $grades['e'], $grades['g'], $grades['f'], $grades['s'], $median);
 
         echo '  '.Terminal::muted($summary1)."\n";
@@ -421,12 +430,9 @@ final class Engine
             $run = $row['run_ms'];
             $read = $row['read_ms'];
             $path = $row['path'];
-            $inferred = $row['inferred'] ?? false;
             $flag = '';
             if ($ms !== null) {
-                if ($inferred) {
-                    $flag = ' '.Terminal::GRAY.'[est]  '.Terminal::RESET;
-                } elseif ($median > 0.0) {
+                if ($median > 0.0) {
                     if ($ms > 2.0 * $median) {
                         $flag = ' '.Terminal::RED.'[SLOW] '.Terminal::RESET;
                     } elseif ($ms < 0.5 * $median) {
@@ -438,9 +444,9 @@ final class Engine
                     $flag = ' '.Terminal::GRAY.' [OK]  '.Terminal::RESET;
                 }
             }
-            $ms_str = $ms === null ? '      ??' : \sprintf($inferred ? '~%7.3f' : '%8.3f', $ms);
-            $run_str = $run === null ? '      ??' : \sprintf($inferred ? '~%7.3f' : '%8.3f', $run);
-            $read_str = $read === null ? '      ??' : \sprintf($inferred ? '~%7.3f' : '%8.3f', $read);
+            $ms_str = $ms === null ? '      ??' : \sprintf('%8.3f', $ms);
+            $run_str = $run === null ? '      ??' : \sprintf('%8.3f', $run);
+            $read_str = $read === null ? '      ??' : \sprintf('%8.3f', $read);
 
             echo \sprintf("  %s  %s  %s  %s%s\n", Terminal::muted($ms_str), Terminal::muted($run_str), Terminal::muted($read_str), $flag, Terminal::muted(' ->  ').$path);
         }
@@ -450,6 +456,12 @@ final class Engine
         }
     }
 
+    /**
+     * @param float|null $render_ms
+     * @param float      $request_ms
+     *
+     * @return string
+     */
     private function metrics_plain(?float $render_ms, float $request_ms): string
     {
         $request = 'request '.\number_format($request_ms, 2).'ms';
@@ -457,11 +469,19 @@ final class Engine
         return $render_ms === null ? $request : 'render '.\number_format($render_ms, 2).'ms  '.$request;
     }
 
+    /**
+     * @return int
+     */
     private function line_width(): int
     {
         return \max(60, (int) (Terminal::columns() * 0.95));
     }
 
+    /**
+     * @param string $text
+     *
+     * @return int Visible column count, ANSI sequences stripped
+     */
     private function visible_len(string $text): int
     {
         $plain = \preg_replace('/\033\[[0-9;]*m/', '', $text);
@@ -469,6 +489,12 @@ final class Engine
         return \strlen(\is_string($plain) ? $plain : $text);
     }
 
+    /**
+     * @param string $text
+     * @param int    $max
+     *
+     * @return string
+     */
     private function shorten(string $text, int $max): string
     {
         if ($max < 2 || \strlen($text) <= $max) {
@@ -478,6 +504,11 @@ final class Engine
         return \substr($text, 0, $max - 1).'...';
     }
 
+    /**
+     * @param int $code HTTP status code
+     *
+     * @return string
+     */
     private function status_reason(int $code): string
     {
         return match ($code) {
@@ -488,7 +519,9 @@ final class Engine
     }
 
     /**
-     * @param array{ms: float|null, run_ms: float|null, read_ms: float|null, path: string} $row
+     * @param IncludeRow $row
+     *
+     * @return void
      */
     private function trace_time(array $row): void
     {
@@ -500,6 +533,12 @@ final class Engine
         $this->requests_pool[$port]['times'][] = $row;
     }
 
+    /**
+     * @param string $kind
+     * @param string $value
+     *
+     * @return void
+     */
     private function trace_push(string $kind, string $value): void
     {
         \end($this->requests_pool);
@@ -520,6 +559,9 @@ final class Engine
         $this->requests_pool[$port][$kind][] = $value;
     }
 
+    /**
+     * @return void
+     */
     private function register_signals(): void
     {
         if (! \function_exists('pcntl_async_signals') || ! \function_exists('pcntl_signal')) {
@@ -539,6 +581,9 @@ final class Engine
         });
     }
 
+    /**
+     * @return void
+     */
     private function close_process(): void
     {
         $process = $this->process;

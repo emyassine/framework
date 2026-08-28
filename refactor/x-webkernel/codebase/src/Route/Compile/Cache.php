@@ -51,7 +51,7 @@ final class Cache
         if (! \is_file($path)) {
             return self::$memo = null;
         }
-        $value = include $path;
+        $value = \function_exists('webkernel_include') ? \webkernel_include($path) : include $path;
         if (! \is_array($value) || ! isset($value['data']) || ! \is_array($value['data'])) {
             return self::$memo = null;
         }
@@ -151,7 +151,7 @@ final class Cache
             if (! \is_file($path)) {
                 return null;
             }
-            $value = include $path;
+            $value = \function_exists('webkernel_include') ? \webkernel_include($path) : include $path;
 
             return \is_array($value) ? $value : null;
         }

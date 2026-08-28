@@ -3,17 +3,28 @@
 namespace Webkernel\Console\Commands;
 
 use Webkernel\Console\Attribute\ConsoleCommand;
+use Webkernel\Console\Commands\ServerCommand\Engine;
 use Webkernel\Console\ExitCode;
-use Webkernel\Console\Server\Engine;
 use Webkernel\Performance\Performance;
 
 final readonly class ServerCommand
 {
+    /**
+     * @param Engine $engine
+     */
     public function __construct(
         private Engine $engine,
     ) {
     }
 
+    /**
+     * @param string      $host
+     * @param int         $port
+     * @param bool        $profile_lifecycle
+     * @param bool|null   $with_jit
+     *
+     * @return ExitCode
+     */
     #[ConsoleCommand(
         name: 'server',
         description: 'Local HTTP server (--host= --port= --profile-lifecycle --with-jit)',

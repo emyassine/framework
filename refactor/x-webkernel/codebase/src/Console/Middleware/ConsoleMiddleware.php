@@ -8,7 +8,10 @@ use Webkernel\Console\Input\ArgvInput;
 interface ConsoleMiddleware
 {
     /**
+     * @param ArgvInput            $input
      * @param callable(): ExitCode $next
+     *
+     * @return ExitCode
      */
     public function handle(ArgvInput $input, callable $next): ExitCode;
 }

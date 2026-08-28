@@ -89,16 +89,16 @@ final class Engine
         $this->sections = [];
         $this->variables = $this->variables_global === []
             ? $variables
-            : \array_merge($variables, $this->variables_global);
-        \ob_start();
+            : array_merge($variables, $this->variables_global);
+        ob_start();
         try {
             $this->include_view($view);
         } catch (\Throwable $e) {
-            \ob_get_clean();
+            ob_get_clean();
             throw $e;
         }
 
-        return $this->post_run(\ltrim((string) \ob_get_clean()));
+        return $this->post_run(ltrim((string) ob_get_clean()));
     }
 
     /**
@@ -108,7 +108,7 @@ final class Engine
     {
         $backup = $this->variables;
         if ($variables !== []) {
-            $this->variables = \array_merge($this->variables, $variables);
+            $this->variables = array_merge($this->variables, $variables);
         }
         $this->include_view($view);
         $this->variables = $backup;
@@ -119,7 +119,7 @@ final class Engine
     public function start_section(string $section, string $content = ''): void
     {
         if ($content === '') {
-            \ob_start() && $this->section_stack[] = $section;
+            ob_start() && $this->section_stack[] = $section;
 
             return;
         }
@@ -128,11 +128,11 @@ final class Engine
 
     public function stop_section(bool $overwrite = false): string
     {
-        $last = \array_pop($this->section_stack);
-        if (! \is_string($last) || $last === '') {
+        $last = array_pop($this->section_stack);
+        if (! is_string($last) || $last === '') {
             throw new \RuntimeException('Cannot end a section without first starting one.');
         }
-        $chunk = (string) \ob_get_clean();
+        $chunk = (string) ob_get_clean();
         if ($overwrite) {
             $this->sections[$last] = $chunk;
         } else {
@@ -148,13 +148,13 @@ final class Engine
             return $default;
         }
 
-        return \str_replace(self::PARENT_KEY, $default, $this->sections[$section]);
+        return str_replace(self::PARENT_KEY, $default, $this->sections[$section]);
     }
 
     public function start_push(string $section, string $content = ''): void
     {
         if ($content === '') {
-            if (\ob_start()) {
+            if (ob_start()) {
                 $this->push_stack[] = $section;
             }
 
@@ -165,11 +165,11 @@ final class Engine
 
     public function stop_push(): string
     {
-        $last = \array_pop($this->push_stack);
-        if (! \is_string($last) || $last === '') {
+        $last = array_pop($this->push_stack);
+        if (! is_string($last) || $last === '') {
             throw new \RuntimeException('Cannot end a section without first starting one.');
         }
-        $this->extend_push($last, (string) \ob_get_clean());
+        $this->extend_push($last, (string) ob_get_clean());
 
         return $last;
     }
@@ -184,9 +184,9 @@ final class Engine
      */
     public function start_component(string $name, array $data = []): void
     {
-        if (\ob_start()) {
+        if (ob_start()) {
             $this->component_stack[] = $name;
-            $i = \count($this->component_stack) - 1;
+            $i = count($this->component_stack) - 1;
             $this->component_data[$i] = $data;
             $this->slots[$i] = [];
             $this->slot_stack[$i] = [];
@@ -195,16 +195,16 @@ final class Engine
 
     public function slot(string $name, mixed $content = null): void
     {
-        $i = \count($this->component_stack) - 1;
+        $i = count($this->component_stack) - 1;
         if ($i < 0) {
             return;
         }
-        if (\func_num_args() === 2) {
+        if (func_num_args() === 2) {
             $this->slots[$i][$name] = $content;
 
             return;
         }
-        if (\ob_start()) {
+        if (ob_start()) {
             $this->slots[$i][$name] = '';
             $this->slot_stack[$i][] = $name;
         }
@@ -212,29 +212,29 @@ final class Engine
 
     public function end_slot(): void
     {
-        $i = \count($this->component_stack) - 1;
+        $i = count($this->component_stack) - 1;
         if ($i < 0) {
             return;
         }
-        $name = \array_pop($this->slot_stack[$i]);
-        if (! \is_string($name) || $name === '') {
+        $name = array_pop($this->slot_stack[$i]);
+        if (! is_string($name) || $name === '') {
             throw new \RuntimeException('Cannot end a slot without first starting one.');
         }
-        $this->slots[$i][$name] = \trim((string) \ob_get_clean());
+        $this->slots[$i][$name] = trim((string) ob_get_clean());
     }
 
     public function render_component(): string
     {
-        $name = \array_pop($this->component_stack);
-        $cs = \count($this->component_stack);
-        $cd = \array_merge(
+        $name = array_pop($this->component_stack);
+        $cs = count($this->component_stack);
+        $cd = array_merge(
             $this->component_data[$cs] ?? [],
-            ['slot' => \trim((string) \ob_get_clean())],
+            ['slot' => trim((string) ob_get_clean())],
             $this->slots[$cs] ?? [],
         );
         $html = $this->run_child((string) $name, $cd);
         unset($this->component_data[$cs], $this->slots[$cs]);
-        foreach (\array_keys($cd) as $key) {
+        foreach (array_keys($cd) as $key) {
             unset($this->variables[$key]);
         }
 
@@ -246,8 +246,8 @@ final class Engine
      */
     public function share(string|array $varname, mixed $value = null): self
     {
-        if (\is_array($varname)) {
-            $this->variables_global = \array_merge($this->variables_global, $varname);
+        if (is_array($varname)) {
+            $this->variables_global = array_merge($this->variables_global, $varname);
         } else {
             $this->variables_global[$varname] = $value;
         }
@@ -257,21 +257,21 @@ final class Engine
 
     public function add_template_path(string $path): void
     {
-        $this->template_path[] = \rtrim($path, '/\\');
+        $this->template_path[] = rtrim($path, '/\\');
         $this->template_files = [];
         $this->compiled_files = [];
     }
 
     public function add_view_namespace(string $namespace, string $path): void
     {
-        $this->view_namespaces[$namespace][] = \rtrim($path, '/\\');
+        $this->view_namespaces[$namespace][] = rtrim($path, '/\\');
         $this->template_files = [];
         $this->compiled_files = [];
     }
 
     public function add_component_namespace(string $namespace, string $path): void
     {
-        $this->component_namespaces[$namespace][] = \rtrim($path, '/\\');
+        $this->component_namespaces[$namespace][] = rtrim($path, '/\\');
         $this->template_files = [];
         $this->compiled_files = [];
     }
@@ -293,14 +293,14 @@ final class Engine
         }
         $namespace = '';
         $name = $template_name;
-        $sep = \strpos($template_name, '::');
+        $sep = strpos($template_name, '::');
         if ($sep !== false) {
-            $namespace = \substr($template_name, 0, $sep);
-            $name = \substr($template_name, $sep + 2);
+            $namespace = substr($template_name, 0, $sep);
+            $name = substr($template_name, $sep + 2);
         }
-        $rel = \str_contains($name, '/')
+        $rel = str_contains($name, '/')
             ? $name
-            : \str_replace('.', '/', $name).'.view.php';
+            : str_replace('.', '/', $name).'.view.php';
 
         return $this->template_files[$template_name] = $this->locate($rel, $namespace);
     }
@@ -339,7 +339,17 @@ final class Engine
     {
         $this->ensure_compiled($view);
         $compiled = $this->compiled_file($view);
-        \extract($this->variables);
+        extract($this->variables);
+        if (\function_exists('webkernel_profile_enter')) {
+            \webkernel_profile_enter($compiled);
+            try {
+                include $compiled;
+            } finally {
+                \webkernel_profile_leave();
+            }
+
+            return;
+        }
         include $compiled;
     }
 
@@ -349,13 +359,13 @@ final class Engine
             return;
         }
         if ($this->mode === self::MODE_SLOW || $this->expired($view)) {
-            if (! \is_dir($this->compile_dpath) && ! \mkdir($this->compile_dpath, 0775, true) && ! \is_dir($this->compile_dpath)) {
+            if (! is_dir($this->compile_dpath) && ! mkdir($this->compile_dpath, 0775, true) && ! is_dir($this->compile_dpath)) {
                 throw new \RuntimeException('Unable to create '.$this->compile_dpath);
             }
             $compiler = $this->compiler();
             $module = null;
-            if (\str_contains($view, '::')) {
-                $module = \explode('::', $view, 2)[0];
+            if (str_contains($view, '::')) {
+                $module = explode('::', $view, 2)[0];
                 if ($module === 'webkernel') {
                     $module = 'platform';
                 }
@@ -370,11 +380,11 @@ final class Engine
     {
         $template = $this->template_file($view);
         $compiled = $this->compiled_file($view);
-        if ($template === '' || $compiled === '' || ! \is_file($compiled)) {
+        if ($template === '' || $compiled === '' || ! is_file($compiled)) {
             return true;
         }
 
-        return \filemtime($compiled) < \filemtime($template);
+        return filemtime($compiled) < filemtime($template);
     }
 
     private function compiled_file(string $template_name): string
@@ -387,14 +397,14 @@ final class Engine
             return $this->compiled_files[$template_name] = '';
         }
 
-        return $this->compiled_files[$template_name] = $this->compile_dpath.'/'.\basename($template_name).'_'.\sha1($full).'.view.php.compiled';
+        return $this->compiled_files[$template_name] = $this->compile_dpath.'/'.basename($template_name).'_'.sha1($full).'.view.php.compiled';
     }
 
     private function locate(string $rel, string $namespace): string
     {
         foreach ($this->template_dirs($namespace) as $dir) {
             $path = $dir.'/'.$rel;
-            if (\is_file($path)) {
+            if (is_file($path)) {
                 return $path;
             }
         }
@@ -412,7 +422,7 @@ final class Engine
         }
         $dirs = $this->view_namespaces[$namespace] ?? [];
         foreach ($this->component_namespaces[$namespace] ?? [] as $dir) {
-            if (! \in_array($dir, $dirs, true)) {
+            if (! in_array($dir, $dirs, true)) {
                 $dirs[] = $dir;
             }
         }
@@ -423,7 +433,7 @@ final class Engine
     private function extend_section(string $section, string $content): void
     {
         if (isset($this->sections[$section])) {
-            $content = \str_replace(self::PARENT_KEY, $content, $this->sections[$section]);
+            $content = str_replace(self::PARENT_KEY, $content, $this->sections[$section]);
         }
         $this->sections[$section] = $content;
     }
@@ -436,30 +446,30 @@ final class Engine
     private function yield_push_content(string $section, mixed $default = ''): string
     {
         if ($section === '') {
-            return \is_string($default) ? $default : '';
+            return is_string($default) ? $default : '';
         }
         if (! isset($this->pushes[$section])) {
-            return \is_string($default) ? $default : '';
+            return is_string($default) ? $default : '';
         }
 
-        return \implode(\array_reverse($this->pushes[$section]));
+        return implode(array_reverse($this->pushes[$section]));
     }
 
     private function post_run(string $html): string
     {
-        if (! \str_contains($html, self::ESCAPE_STACK_0)) {
+        if (! str_contains($html, self::ESCAPE_STACK_0)) {
             return $html;
         }
-        $replaced = \preg_replace_callback(
-            '/'.\preg_quote(self::ESCAPE_STACK_0, '/').'\s?([A-Za-z0-9_:() ,*.@$]+)\s?'.\preg_quote(self::ESCAPE_STACK_1, '/').'/u',
+        $replaced = preg_replace_callback(
+            '/'.preg_quote(self::ESCAPE_STACK_0, '/').'\s?([A-Za-z0-9_:() ,*.@$]+)\s?'.preg_quote(self::ESCAPE_STACK_1, '/').'/u',
             function (array $matches): string {
-                $items = \explode(',', \trim($matches[1]));
+                $items = explode(',', trim($matches[1]));
 
                 return $this->yield_push_content($items[0], $items[1] ?? '');
             },
             $html,
         );
 
-        return \is_string($replaced) ? $replaced : $html;
+        return is_string($replaced) ? $replaced : $html;
     }
 }

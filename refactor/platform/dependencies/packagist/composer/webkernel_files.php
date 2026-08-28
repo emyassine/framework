@@ -22,7 +22,8 @@ $files = [
 ];
 
 foreach ($files as $file) {
-    if ((@include $file) === false) {
+    $loaded = \function_exists('webkernel_include') ? \webkernel_include($file) : @include $file;
+    if ($loaded === false) {
         throw new \RuntimeException('Unable to load required file: '.$file);
     }
 }

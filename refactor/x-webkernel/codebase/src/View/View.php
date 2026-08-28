@@ -249,7 +249,7 @@ final class View implements ComposableContract, \Stringable
         if (! is_file($file)) {
             return [];
         }
-        $loaded = require $file;
+        $loaded = \function_exists('webkernel_include') ? \webkernel_include($file) : require $file;
 
         return is_array($loaded) ? $loaded : [];
     }

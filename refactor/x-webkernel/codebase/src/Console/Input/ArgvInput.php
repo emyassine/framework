@@ -76,6 +76,9 @@ final readonly class ArgvInput
         $this->wants_help = $wants_help;
     }
 
+    /**
+     * @return string|null
+     */
     public function command(): ?string
     {
         return $this->command;
@@ -97,16 +100,29 @@ final readonly class ArgvInput
         return $this->options;
     }
 
+    /**
+     * @param string $name
+     *
+     * @return string|bool|null
+     */
     public function option(string $name): string|bool|null
     {
         return $this->options[$name] ?? null;
     }
 
+    /**
+     * @param string $name
+     *
+     * @return bool
+     */
     public function has_option(string $name): bool
     {
         return \array_key_exists($name, $this->options);
     }
 
+    /**
+     * @return bool
+     */
     public function wants_help(): bool
     {
         return $this->wants_help;

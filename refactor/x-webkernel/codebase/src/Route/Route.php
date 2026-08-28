@@ -382,6 +382,7 @@ final class Route implements ComposableContract
         if ($cached !== null) {
             return $cached;
         }
+        self::register_dumped_panel_routes();
 
         return self::app()->build_and_cache($host);
     }

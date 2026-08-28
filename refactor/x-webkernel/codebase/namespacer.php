@@ -74,7 +74,7 @@ function webkernel_autoload(string $class): bool
         if ($composer_dir !== null) {
             $file = $composer_dir.'/webkernel_classmap.php';
             if (is_file($file)) {
-                $loaded = require $file;
+                $loaded = \function_exists('webkernel_include') ? \webkernel_include($file) : require $file;
                 if (is_array($loaded)) {
                     $map = $loaded;
                 }
@@ -85,7 +85,11 @@ function webkernel_autoload(string $class): bool
     $file = $map[$class] ?? null;
     if (is_string($file) && $file !== '' && is_file($file)) {
         $hit[$class] = $file;
-        require $file;
+        if (\function_exists('webkernel_include')) {
+            \webkernel_include($file);
+        } else {
+            require $file;
+        }
 
         return true;
     }
@@ -101,7 +105,11 @@ function webkernel_autoload(string $class): bool
 
     if (is_file($file)) {
         $hit[$class] = $file;
-        require $file;
+        if (\function_exists('webkernel_include')) {
+            \webkernel_include($file);
+        } else {
+            require $file;
+        }
 
         return true;
     }
@@ -117,6 +125,10 @@ $webkernel_composer_dir = webkernel_composer_dir();
 if ($webkernel_composer_dir !== null) {
     $webkernel_files = $webkernel_composer_dir.'/webkernel_files.php';
     if (is_file($webkernel_files)) {
-        require $webkernel_files;
+        if (\function_exists('webkernel_include')) {
+            \webkernel_include($webkernel_files);
+        } else {
+            require $webkernel_files;
+        }
     }
 }
