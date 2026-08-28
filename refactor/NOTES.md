@@ -104,16 +104,16 @@ final class SystemPanelProvider extends PanelProvider
             ->path('system')
             ->default()
             ->colors(['primary' => Color::Blue])
-            ->pages([Dashboard::class])
+            ->pages([Dashboard::class]) // panel pages only — not CRUD
             ->widgets([AccountWidget::class, InfoWidget::class])
             ->discoverResources(
                 in: __DIR__ . '/../Presentation/Resources',
                 for: 'Webkernel\Platform\System\Presentation\Resources',
-            )
+            ) // each Resource brings its own pages()
             ->discoverPages(
                 in: __DIR__ . '/../Presentation/Pages',
                 for: 'Webkernel\Platform\System\Presentation\Pages',
-            )
+            ) // extra panel pages, not resource pages
             ->discoverWidgets(
                 in: __DIR__ . '/../Presentation/Widgets',
                 for: 'Webkernel\Platform\System\Presentation\Widgets',
@@ -136,7 +136,7 @@ final class SystemPanelProvider extends PanelProvider
 }
 ```
 
-Branding (logo, favicon, dark mode, brand logo height) is not hardcoded here. It is resolved dynamically at boot from a platform-wide configuration resource that the App Owner controls. This resource is injectable, panel-scoped or global, and editable via permissions. See section 5.
+Branding (logo, favicon, dark mode, brand logo height) is not hardcoded here. It is resolved dynamically at boot from platform settings the App Owner controls. Those settings are injectable, panel-scoped or global, and editable via permissions. They are not a Resource. See section 5.
 
 ---
 
@@ -149,13 +149,17 @@ Platform
   Module (1..N)
     Feature (0..N)                [extends / injects into module]
     Admin Panel (1..N)            [module-scoped]
+      Page (0..N)                 [standalone — no Resource]
       Cluster (0..N)
+        Page (0..N)               [standalone — grouped in nav]
         Resource (1..N)
-          Page (1..N)
+          Page (1..N)             [CRUD screens owned by the Resource]
             Component (1..N)      [Table, Form, Widget, Custom View]
 
 Granular Permission Layer         [cross-cutting: panel, resource, page, component, action]
 ```
+
+A Page does not require a Resource. Dashboard, reports, wizards, and any screen that is not CRUD for a model hang directly on the Panel (or on a Cluster for navigation). A Resource is only the CRUD bundle: it exists when a model needs list/create/edit/view, and then it owns those pages.
 
 Rules:
 
@@ -163,6 +167,85 @@ Rules:
 - Features extend a module. They register additional resources and pages into existing module panels. They do not create new panels.
 - Permissions are always namespaced by module. There is no global flat permission table.
 - Permission resolution is part of the sub-millisecond boot budget.
+
+### Resource — the CRUD unit
+
+A **Resource** is a static class that builds the CRUD interface for one model. It describes how administrators interact with that model's data through tables and forms. It is not a page, not a route file, and not a bag of settings.
+
+The Resource **owns its pages**. List, create, edit, view, and any custom screen for that model are declared on the Resource and live next to it. A panel does not register those pages one by one. It registers (or discovers) the Resource; the Resource registers the pages.
+
+```php
+<?php
+declare(strict_types=1);
+
+namespace Acme\Billing\Presentation\Resources;
+
+use Webkernel\Platform\Resources\Resource;
+use Webkernel\Platform\Schemas\Schema;
+use Webkernel\Platform\Tables\Table;
+use Acme\Billing\Domain\Invoice;
+use Acme\Billing\Presentation\Resources\InvoiceResource\Pages;
+
+/**
+ * CRUD interface for the Invoice model.
+ * Pages are owned here. The panel never lists them individually.
+ */
+final class InvoiceResource extends Resource
+{
+    protected static string $model = Invoice::class;
+
+    public static function form(Schema $schema): Schema
+    {
+        return $schema->components([
+            // fields
+        ]);
+    }
+
+    public static function table(Table $table): Table
+    {
+        return $table->columns([
+            // columns
+        ]);
+    }
+
+    /**
+     * @return array<string, class-string>
+     */
+    public static function pages(): array
+    {
+        return [
+            'index'  => Pages\ListInvoices::route('/'),
+            'create' => Pages\CreateInvoice::route('/create'),
+            'edit'   => Pages\EditInvoice::route('/{record}/edit'),
+        ];
+    }
+}
+```
+
+Two kinds of page exist. Mixing them is how the old notes were unclear.
+
+| Kind | Owned by | Required Resource? | Examples | Registered how |
+|---|---|---|---|---|
+| **Panel page** | The Panel (or a Cluster) | No | `Dashboard`, reports, settings, wizards | `Panel::pages()` / `discover_pages()` |
+| **Resource page** | The Resource | Yes | `ListInvoices`, `CreateInvoice`, `EditInvoice`, custom resource screens | `Resource::pages()` |
+
+A panel page is a first-class screen. It has a route, a view, components, and permissions. It does not get a table/form from a Resource because there is no model CRUD to describe.
+
+A Resource is never a panel page. `Dashboard` is never a Resource. Branding, colors, and logos are platform **settings**, not a Resource — do not call that object a "configuration resource".
+
+On disk a Resource is a directory of pages:
+
+```
+Presentation/Resources/
+  InvoiceResource.php
+  InvoiceResource/
+    Pages/
+      ListInvoices.php
+      CreateInvoice.php
+      EditInvoice.php
+```
+
+`discover_resources()` finds `InvoiceResource`. It does not find `ListInvoices`. Those pages exist only because `InvoiceResource::pages()` said so.
 
 ---
 
@@ -217,7 +300,7 @@ The class is named `Registry`, not `Kernel`. It does one thing: map string keys 
 
 ## 5. Dynamic Configuration — No Hardcoding
 
-Branding, colors, dark mode, logos, and panel defaults are not hardcoded in `PanelProvider`. They are resolved from a configuration resource stored in the platform's config layer, managed by the App Owner via the platform panel.
+Branding, colors, dark mode, logos, and panel defaults are not hardcoded in `PanelProvider`. They are resolved from platform settings stored in the config layer, managed by the App Owner via the platform panel.
 
 ```php
 // PanelProvider base — applies platform config at boot
@@ -238,7 +321,7 @@ abstract class PanelProvider
 }
 ```
 
-A default configuration resource is injected into all panels. The App Owner decides, via a platform-wide permission, who can edit it — globally or per module. Module panels can override specific keys or inherit the global config entirely.
+Default platform settings are injected into all panels. The App Owner decides, via a platform-wide permission, who can edit them — globally or per module. Module panels can override specific keys or inherit the global config entirely.
 
 ---
 
@@ -362,21 +445,31 @@ The goal is a Retool-equivalent in PHP where the interface is described as data 
 
 ### Step 1 — Schema AST
 
-Define immutable DTOs for every UI construct. These are serialisable to JSON and form the contract between the server and the render engine.
+Define immutable DTOs for every UI construct.
+These are serialisable to JSON and form the contract between the server and the render engine.
+The tree matches the domain hierarchy:
+	- a panel owns standalone pages and resources;
+	- a resource owns its pages;
+	- a page owns components.
 
 ```
 Panel AST
-  Page AST
-    Component AST (Table | Form | Widget | Custom)
+  Panel Page AST                  (Dashboard, custom — not CRUD)
+  Cluster AST                     (optional navigation group)
+    Resource AST                  (CRUD class for one model)
+      Resource Page AST           (List, Create, Edit, View, custom)
+        Component AST             (Table | Form | Widget | Custom)
 ```
 
-### Step 2 — Dynamic Configuration Resource
+A Resource AST carries the model, the table schema, the form schema, and the page map. Rendering a list page reads the table from the Resource, not from the page. Rendering a create/edit page reads the form from the Resource. Pages decide which of those schemas to show and which actions to expose.
 
-The platform injects a built-in configuration resource into every panel. Branding, colors, and layout defaults are stored there. App Owners edit them through the System Admin Panel. Permissions control who can edit globally versus per module.
+### Step 2 — Platform settings
+
+The platform injects built-in settings into every panel. Branding, colors, and layout defaults live there. App Owners edit them through the System Admin Panel. Permissions control who can edit globally versus per module. This is not a Resource.
 
 ### Step 3 — Render Engine (`.view.php`)
 
-The existing `Webkernel\View\View` engine handles this. Component AST nodes are mapped to `.view.php` templates by a resolver. No Twig. No Blade runtime dependency. BladeOne is compiled once per template per change.
+The existing `Webkernel\View\View` engine handles this. Each component type maps to a `.view.php` template. No Twig. No Blade runtime dependency. BladeOne is compiled once per template per change.
 
 ### Step 4 — Discovery and Auto-Registration
 
@@ -396,9 +489,9 @@ Each module's `declaration_class` is invoked at boot. It declares: panels, clust
 | `Webkernel\Platform\Panel` | Panel definition and fluent builder |
 | `Webkernel\Platform\PanelProvider` | Base provider — applies platform config |
 | `Webkernel\Platform\Colors\` | Color definitions and palette |
-| `Webkernel\Platform\Pages\` | Built-in platform pages |
+| `Webkernel\Platform\Pages\` | Built-in panel pages (Dashboard). Not resource pages. |
 | `Webkernel\Platform\Widgets\` | Built-in widgets |
-| `Webkernel\Platform\Resources\` | Base resource class |
+| `Webkernel\Platform\Resources\` | Base Resource: model, table, form, owned pages |
 | `Webkernel\Platform\Tables\` | Table schema and column definitions |
 | `Webkernel\Platform\Schemas\` | Form and filter schema |
 | `Webkernel\Platform\RenderHooks\` | Named render hook registry |
