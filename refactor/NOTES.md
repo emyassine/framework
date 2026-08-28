@@ -1,0 +1,406 @@
+# Webkernel — Architecture Reference
+
+## Foreword
+
+- part of the code is under /home/yassine/Projects/framework/_workbench_one, here refered to as 'old work'
+- This is the new refactor that will maintain :
+	- View from old work and its compilation BUT it should not be fucking hardcoded and put as a fucking platform wide place
+		- views are inside modules in resources/views (to be declared in the class_declaration mentionned class) so that its really modular
+		- No fuking hardcodes
+		- Same goes for routes ! we can have a route.php platform wide for tests etc but in real production it will live inside webkernel code packages and inside modules
+	- Dont repeat thoses erros from old work
+	- When pulling code from old work : dont fucking use symlinks, copy and adapt
+	- Remember no fucking camelCase
+
+---
+
+## 1. Namespace Contract
+
+Two root namespaces. No overlap, no exceptions.
+
+### `Webkernel\` — Runtime and Lifecycle
+
+Everything that runs before a request is handled, or orthogonally to UI concerns.
+
+- Registry / Service Locator
+- JSON Canonicalisation
+- Event Dispatcher
+- Lifecycle and Composer Installer
+- View Engine (`Webkernel\View\View`)
+- Cache and Compilation Store
+- Console Commands
+- Composables / Contracts
+
+### `Webkernel\Platform\` — UI and Panel System
+
+Everything that touches the panel interface, rendering, and HTTP context.
+
+- `Webkernel\Platform\Panel`
+- `Webkernel\Platform\PanelProvider`
+- `Webkernel\Platform\Colors\Color`
+- `Webkernel\Platform\Pages\Dashboard`
+- `Webkernel\Platform\Widgets\AccountWidget`
+- `Webkernel\Platform\Widgets\InfoWidget`
+- `Webkernel\Platform\Tables\Table`
+- `Webkernel\Platform\Schemas\Schema`
+- `Webkernel\Platform\Resources\Resource`
+- `Webkernel\Platform\RenderHooks\RenderHook`
+- `Webkernel\Platform\Http\Middleware\Authenticate`
+- `Webkernel\Platform\Http\Middleware\StartSession`
+- `Webkernel\Platform\Http\Middleware\EncryptCookies`
+- `Webkernel\Platform\Http\Middleware\PreventRequestForgery`
+- `Webkernel\Platform\Http\Middleware\SubstituteBindings`
+- `Webkernel\Platform\Http\Middleware\DisableIconComponents`
+- `Webkernel\Platform\Http\Middleware\DispatchServingEvent`
+- `Webkernel\Platform\Http\Middleware\AddQueuedCookiesToResponse`
+- `Webkernel\Platform\Http\Middleware\AuthenticateSession`
+- `Webkernel\Platform\Http\Middleware\ShareErrorsFromSession`
+
+`Webkernel\Support\*` is abolished. Nothing lives there.
+
+---
+
+## 2. Panel Scoping
+
+Every panel is either `platform`-scoped or `module`-scoped. This is not a runtime tag or a convention. It is enforced at registration time as part of the panel's declaration contract.
+
+A **platform-scoped** panel manages cross-module or platform-wide concerns. The System Admin Panel is the canonical example. It administers modules but does not own their domain models.
+
+A **module-scoped** panel is declared inside a business module. Its physical location is determined by the module's Composer type (`webkernel-business-module`), which places it under `modules/`. A module-scoped panel cannot promote itself to platform scope.
+
+```php
+<?php
+declare(strict_types=1);
+
+namespace Webkernel\Platform\System;
+
+use Webkernel\Platform\Panel;
+use Webkernel\Platform\PanelProvider;
+use Webkernel\Platform\Colors\Color;
+use Webkernel\Platform\Pages\Dashboard;
+use Webkernel\Platform\Widgets\AccountWidget;
+use Webkernel\Platform\Widgets\InfoWidget;
+use Webkernel\Platform\Http\Middleware\Authenticate;
+use Webkernel\Platform\Http\Middleware\AuthenticateSession;
+use Webkernel\Platform\Http\Middleware\DisableIconComponents;
+use Webkernel\Platform\Http\Middleware\DispatchServingEvent;
+use Webkernel\Platform\Http\Middleware\EncryptCookies;
+use Webkernel\Platform\Http\Middleware\AddQueuedCookiesToResponse;
+use Webkernel\Platform\Http\Middleware\PreventRequestForgery;
+use Webkernel\Platform\Http\Middleware\SubstituteBindings;
+use Webkernel\Platform\Http\Middleware\StartSession;
+use Webkernel\Platform\Http\Middleware\ShareErrorsFromSession;
+
+/**
+ * SystemPanelProvider configures the global administration panel.
+ * Scope: platform — manages modules and platform-wide configuration.
+ */
+final class SystemPanelProvider extends PanelProvider
+{
+    public function panel(Panel $panel): Panel
+    {
+        return $panel
+            ->id('system')
+            ->path('system')
+            ->default()
+            ->colors(['primary' => Color::Blue])
+            ->pages([Dashboard::class])
+            ->widgets([AccountWidget::class, InfoWidget::class])
+            ->discoverResources(
+                in: __DIR__ . '/../Presentation/Resources',
+                for: 'Webkernel\Platform\System\Presentation\Resources',
+            )
+            ->discoverPages(
+                in: __DIR__ . '/../Presentation/Pages',
+                for: 'Webkernel\Platform\System\Presentation\Pages',
+            )
+            ->discoverWidgets(
+                in: __DIR__ . '/../Presentation/Widgets',
+                for: 'Webkernel\Platform\System\Presentation\Widgets',
+            )
+            ->middleware([
+                EncryptCookies::class,
+                AddQueuedCookiesToResponse::class,
+                StartSession::class,
+                ShareErrorsFromSession::class,
+                PreventRequestForgery::class,
+                SubstituteBindings::class,
+                DisableIconComponents::class,
+                DispatchServingEvent::class,
+            ])
+            ->authMiddleware([
+                Authenticate::class,
+                AuthenticateSession::class,
+            ]);
+    }
+}
+```
+
+Branding (logo, favicon, dark mode, brand logo height) is not hardcoded here. It is resolved dynamically at boot from a platform-wide configuration resource that the App Owner controls. This resource is injectable, panel-scoped or global, and editable via permissions. See section 5.
+
+---
+
+## 3. Domain Hierarchy
+
+```
+Platform
+  App Owner(s)
+  System Admin Panel              [platform-scoped]
+  Module (1..N)
+    Feature (0..N)                [extends / injects into module]
+    Admin Panel (1..N)            [module-scoped]
+      Cluster (0..N)
+        Resource (1..N)
+          Page (1..N)
+            Component (1..N)      [Table, Form, Widget, Custom View]
+
+Granular Permission Layer         [cross-cutting: panel, resource, page, component, action]
+```
+
+Rules:
+
+- The System Admin Panel administers modules. It does not own module domain models.
+- Features extend a module. They register additional resources and pages into existing module panels. They do not create new panels.
+- Permissions are always namespaced by module. There is no global flat permission table.
+- Permission resolution is part of the sub-millisecond boot budget.
+
+---
+
+## 4. Architecture Pattern — Global Registry without DI
+
+No dependency injection container. No reflection at runtime. No configuration parsing per request.
+
+The pattern is a static Global Registry: register factories or instances by string key, resolve on first access (lazy singleton). This is the same pattern used by SQLite's extension registry and VS Code's service registry. It is testable by swapping keys directly.
+
+```php
+<?php
+declare(strict_types=1);
+
+namespace Webkernel;
+
+/**
+ * Global service registry.
+ * Services are registered as callables (lazy) or as objects (eager).
+ */
+final class Registry
+{
+    /** @var array<string, mixed> */
+    private static array $services = [];
+
+    public static function register(string $id, callable|object $service): void
+    {
+        self::$services[$id] = $service;
+    }
+
+    public static function get(string $id): mixed
+    {
+        $service = self::$services[$id] ?? null;
+
+        if (is_callable($service)) {
+            return self::$services[$id] = $service();
+        }
+
+        return $service;
+    }
+
+    /** Replace a binding — used in tests or for platform-wide overrides. */
+    public static function swap(string $id, callable|object $service): void
+    {
+        self::$services[$id] = $service;
+    }
+}
+```
+
+The class is named `Registry`, not `Kernel`. It does one thing: map string keys to resolved instances.
+
+---
+
+## 5. Dynamic Configuration — No Hardcoding
+
+Branding, colors, dark mode, logos, and panel defaults are not hardcoded in `PanelProvider`. They are resolved from a configuration resource stored in the platform's config layer, managed by the App Owner via the platform panel.
+
+```php
+// PanelProvider base — applies platform config at boot
+abstract class PanelProvider
+{
+    final protected function applyPlatformConfig(Panel $panel): Panel
+    {
+        $config = Registry::get('platform.config');
+
+        return $panel
+            ->favicon($config->get('branding.favicon'))
+            ->brandLogo($config->get('branding.logo_light'))
+            ->darkModeBrandLogo($config->get('branding.logo_dark'))
+            ->brandLogoHeight($config->get('branding.logo_height', '2rem'))
+            ->colors($config->get('branding.colors', ['primary' => Color::Blue]))
+            ->darkMode($config->get('ui.dark_mode', true));
+    }
+}
+```
+
+A default configuration resource is injected into all panels. The App Owner decides, via a platform-wide permission, who can edit it — globally or per module. Module panels can override specific keys or inherit the global config entirely.
+
+---
+
+## 6. Package Types and Installer
+
+```php
+<?php
+declare(strict_types=1);
+
+namespace Webkernel\Lifecycle\Installer;
+
+enum LCPackageType: string
+{
+    case Assets                 = 'webkernel-assets';
+    case Component              = 'webkernel-component';
+    case DevTool                = 'webkernel-devtool';
+    case Stdlib                 = 'webkernel-stdlib';
+    case Element                = 'webkernel-element';
+    case Agent                  = 'webkernel-agent';
+    case Ffi                    = 'webkernel-ffi';
+    case BusinessModule         = 'webkernel-business-module';
+    case BusinessModuleFeature  = 'webkernel-business-module-feature';
+    case PlatformModule         = 'webkernel-platform-module';
+    case PlatformModuleFeature  = 'webkernel-platform-module-feature';
+
+    public function requires_parent_module(): bool
+    {
+        return match($this) {
+            self::BusinessModuleFeature,
+            self::PlatformModuleFeature => true,
+            default                     => false,
+        };
+    }
+}
+```
+
+Install destinations:
+
+| Type | Destination |
+|---|---|
+| `webkernel-business-module` | `modules/{vendor}/{name}` |
+| `webkernel-business-module-feature` | `modules/{parentVendor}/{parentName}/features/{vendor}-{name}` |
+| `webkernel-ffi` | `ffi/{vendor}/{name}` |
+| All others | `{vendor_dir}/{vendor}/{name}` |
+
+A module-scoped panel is, by definition, inside `modules/`. This is not a convention. It is determined by the package type declared in `composer.json`.
+
+### Module Declaration Contract
+
+Every `webkernel-business-module` must declare a `declaration_class` in its `composer.json`:
+
+```json
+{
+  "name": "acme/billing",
+  "type": "webkernel-business-module",
+  "extra": {
+    "webkernel": {
+      "declaration_class": "Acme\\Billing\\BillingModuleDeclaration"
+    }
+  }
+}
+```
+
+At boot, the platform reads the manifest generated during `composer dump-autoload` and registers each module's panels, resources, and permissions automatically. No manual registration. No service provider arrays.
+
+---
+
+## 7. View Engine
+
+Views use BladeOne (owned in this package, not a Composer dependency). Template extension is `.view.php`. Compiled output lands in `platform/storage/framework/views/`.
+
+Namespace syntax for templates: `@include('webkernel::layouts.page')` or `<webkernel::page />`.
+
+The `Webkernel\View\View` class is the single entry point. It is registered in the Registry as a singleton under the key `view`.
+
+```php
+// Render a named view with data
+View::make('dashboard.index', ['user' => $user])->render();
+
+// Share a value across all views
+View::share('appName', 'Webkernel');
+
+// Register a custom stringable
+View::stringable(fn (Money $m): string => $m->format());
+
+// Register a Blade directive
+View::directive('money', fn ($e) => "<?php echo money($e); ?>");
+```
+
+View paths are resolved from a compiled manifest (`webkernel.global.views`) produced during `dump-autoload`. Modules register their view directories and namespaces through their declaration class. No filesystem scanning at runtime.
+
+---
+
+## 8. Project Layout
+
+```
+refactor/
+├── public/                          # Web root — index.php front controller
+├── webkernel                        # Host CLI binary
+├── composer.json
+├── modules/                         # Business modules (composer packages)
+│   └── {vendor}/{name}/
+│       ├── composer.json            # type: webkernel-business-module
+│       ├── src/
+│       └── features/
+│           └── {vendor}-{name}/     # type: webkernel-business-module-feature
+└── platform/
+    ├── fast-boot.php
+    ├── dependencies/                # packagist, node_modules
+    ├── storage/
+    │   └── framework/
+    │       └── views/               # Compiled view cache
+    └── telemetry/                   # Logs, metrics, traces, profiles, buffers
+```
+
+---
+
+## 9. Server-Driven UI — Build Order
+
+The goal is a Retool-equivalent in PHP where the interface is described as data and rendered by the engine, not hardcoded per panel.
+
+### Step 1 — Schema AST
+
+Define immutable DTOs for every UI construct. These are serialisable to JSON and form the contract between the server and the render engine.
+
+```
+Panel AST
+  Page AST
+    Component AST (Table | Form | Widget | Custom)
+```
+
+### Step 2 — Dynamic Configuration Resource
+
+The platform injects a built-in configuration resource into every panel. Branding, colors, and layout defaults are stored there. App Owners edit them through the System Admin Panel. Permissions control who can edit globally versus per module.
+
+### Step 3 — Render Engine (`.view.php`)
+
+The existing `Webkernel\View\View` engine handles this. Component AST nodes are mapped to `.view.php` templates by a resolver. No Twig. No Blade runtime dependency. BladeOne is compiled once per template per change.
+
+### Step 4 — Discovery and Auto-Registration
+
+Each module's `declaration_class` is invoked at boot. It declares: panels, clusters, resources, pages, components, and permissions. The platform manifest (written during `dump-autoload`) lists every active declaration class. Boot reads the manifest sequentially. No filesystem traversal at runtime.
+
+---
+
+## 10. Namespace Summary
+
+| Namespace | Responsibility |
+|---|---|
+| `Webkernel\Registry` | Global service registry |
+| `Webkernel\View\` | View engine, compiler, Blade directives |
+| `Webkernel\Cache\` | Compilation store, manifest cache |
+| `Webkernel\Lifecycle\` | Composer installer, plugin, package types |
+| `Webkernel\Console\` | CLI commands |
+| `Webkernel\Platform\Panel` | Panel definition and fluent builder |
+| `Webkernel\Platform\PanelProvider` | Base provider — applies platform config |
+| `Webkernel\Platform\Colors\` | Color definitions and palette |
+| `Webkernel\Platform\Pages\` | Built-in platform pages |
+| `Webkernel\Platform\Widgets\` | Built-in widgets |
+| `Webkernel\Platform\Resources\` | Base resource class |
+| `Webkernel\Platform\Tables\` | Table schema and column definitions |
+| `Webkernel\Platform\Schemas\` | Form and filter schema |
+| `Webkernel\Platform\RenderHooks\` | Named render hook registry |
+| `Webkernel\Platform\Http\Middleware\` | All HTTP middleware |
+| `Webkernel\Platform\System\` | System Admin Panel provider and internals |

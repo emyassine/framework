@@ -1,11 +1,6 @@
 <?php
-// 1. Define the timezone and the user's language (locale)
-
 $timezone = new DateTimeZone('Africa/Casablanca');
-$locale = 'ar_AR'; // French
-
-// 2. Create the IntlDateFormatter
-// We use a custom pattern 'vvvv' to get the full localized timezone name
+$locale   = 'he_HE';
 
 $formatter = new IntlDateFormatter(
     $locale,
@@ -15,6 +10,8 @@ $formatter = new IntlDateFormatter(
 );
 $formatter->setPattern('vvvv');
 
-// 3. Format a date to see the translation
-echo '             ' .$formatter->format(new DateTime());
-// Outputs: "heure du Maroc" (or "Morocco Time" if locale was 'en_US')
+// Wrap with RTL markers
+$rtl_start = "\u{202B}"; // RTL embedding
+$rtl_end   = "\u{202C}"; // end embedding
+
+echo $rtl_start . $formatter->format(new DateTime()) . $rtl_end . PHP_EOL;

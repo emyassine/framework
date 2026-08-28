@@ -18,9 +18,9 @@ $route = is_string($route) && $route !== '' ? $route : '/';
 
 if ($route === '/healthz' || $route === '/ready') {
     http_response_code(200);
-    header('Content-Type: text/plain');
-    echo '<div>Platform is Working</div>'; return;
+    header('Content-Type: text/plain; charset=UTF-8');
+    echo 'Platform is Working';
+    return;
 }
 
 require $webapp_path.'/platform/fast-boot.php';
-\Webkernel\Index::start_http();

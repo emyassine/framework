@@ -8,7 +8,5 @@
 
 define('START_REQUEST', hrtime(true));
 
-/** @var \Webkernel\WebApp $webapp */
-$webapp = require_once __DIR__ . '/platform/fast-boot.php';
-
-\Webkernel\Index::start_terminal($webapp);
+echo  'Binary is             :  ' . dirname(__DIR__) . $argv[0] . PHP_EOL
+	. 'And first argument is :  ' . ($argv[1] ?? null);
