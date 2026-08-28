@@ -28,7 +28,7 @@ use Webkernel\Config\ConfigWriter;
     private const DEPS_SUBDIR         = 'platform/dependencies';
     private const AUTOLOAD_DEFAULT    = self::DEPS_SUBDIR . '/autoload.php';
     private const CONFIG_REL          = 'config/platform.php';
-    private const WRITER_REL          = self::DEPS_SUBDIR . '/webkernel/codebase/src/Config/src/ConfigWriter.php';
+    private const WRITER_REL          = self::DEPS_SUBDIR . '/packagist/webkernel/codebase/src/Config/ConfigWriter.php';
     private const TMP_DIR_REL         = 'platform/temporary';
     private const COMPOSER_PHAR_URL   = 'https://getcomposer.org/download/latest-stable/composer.phar';
     private const COMPOSER_SHA256_URL = 'https://getcomposer.org/download/latest-stable/composer.phar.sha256sum';

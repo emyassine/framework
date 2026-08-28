@@ -6,18 +6,15 @@
 //> For the full copyright and license information, please view the LICENSE
 //> file that was distributed with this source code.
 
-//> This is the Webkernel autoloader.
-//> Classmap + dumped function files from lifecycle
-//> (vendor/composer/webkernel_classmap.php, webkernel_files.php).
-//> Short names (Route, View, Js) alias on first use — class_alias at boot
-//> would load the target class on every request.
-//> Path helpers stay dumped. Route/view composables load on webapp()->{name}().
+//> Autoload + class_alias only. Functions (webapp, view, webapp_path)
+//> live in dumped webkernel_files.php, loaded after this file.
 
 const WEBKERNEL_NS = 'Webkernel\\';
 const WEBKERNEL_NS_LEN = 10;
 
 /** @var array<string, class-string> */
 const WEBKERNEL_CLASS_ALIAS = [
+    'Config' => 'Webkernel\\Config\\Config',
     'Route' => 'Webkernel\\Route\\Route',
     'View' => 'Webkernel\\View\\View',
     'Js' => 'Webkernel\\View\\Js',
@@ -88,7 +85,9 @@ function webkernel_autoload(string $class): bool
     $file = $map[$class] ?? null;
     if (is_string($file) && $file !== '' && is_file($file)) {
         $hit[$class] = $file;
-        require $file; return true;
+        require $file;
+
+        return true;
     }
 
     if (strncmp($class, WEBKERNEL_NS, WEBKERNEL_NS_LEN) !== 0) {
@@ -114,20 +113,10 @@ function webkernel_autoload(string $class): bool
 
 spl_autoload_register('webkernel_autoload');
 
-// Load webkernel_files.php (which contains function files like paths.php)
-// This is loaded here (during namespacer.php initialization) so that functions like
-// webapp_path() are available early in the boot process.
 $webkernel_composer_dir = webkernel_composer_dir();
 if ($webkernel_composer_dir !== null) {
     $webkernel_files = $webkernel_composer_dir.'/webkernel_files.php';
     if (is_file($webkernel_files)) {
         require $webkernel_files;
-    }
-}
-
-if (! function_exists('webapp')) {
-    function webapp(): \Webkernel\WebApp
-    {
-        return \Webkernel\WebApp::get();
     }
 }

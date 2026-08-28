@@ -1,0 +1,81 @@
+<?php declare(strict_types=1);
+
+//> This file is part of Webkernel.
+//> (c) 2025 - 2027 Numerimondes, El Moumen Yassine
+//> Yassine El Moumen <yassine@numerimondes.com> | <platform@webkernelphp.com>
+//> For the full copyright and license information, please view the LICENSE
+//> file that was distributed with this source code.
+//>
+//> Generated. Do not edit.
+
+$v = dirname(__DIR__); // vendor_dir
+$b = dirname($v, 3); // webapp root
+
+return array(
+    'Acme\\Billing\\BillingProvider' => $b . '/modules/acme/billing/src/BillingProvider.php',
+    'Acme\\Billing\\Domain\\Invoice' => $b . '/modules/acme/billing/src/Domain/Invoice.php',
+    'Acme\\Billing\\Infrastructure\\InvoiceStore' => $b . '/modules/acme/billing/src/Infrastructure/InvoiceStore.php',
+    'Acme\\Billing\\Presentation\\BillingPanelProvider' => $b . '/modules/acme/billing/src/Presentation/BillingPanelProvider.php',
+    'Acme\\Billing\\Presentation\\Resources\\Invoices\\InvoiceResource' => $b . '/modules/acme/billing/src/Presentation/Resources/Invoices/InvoiceResource.php',
+    'Acme\\Billing\\Presentation\\Resources\\Invoices\\Pages\\CreateInvoice' => $b . '/modules/acme/billing/src/Presentation/Resources/Invoices/Pages/CreateInvoice.php',
+    'Acme\\Billing\\Presentation\\Resources\\Invoices\\Pages\\EditInvoice' => $b . '/modules/acme/billing/src/Presentation/Resources/Invoices/Pages/EditInvoice.php',
+    'Acme\\Billing\\Presentation\\Resources\\Invoices\\Pages\\ListInvoices' => $b . '/modules/acme/billing/src/Presentation/Resources/Invoices/Pages/ListInvoices.php',
+    'Acme\\Billing\\Presentation\\Resources\\Invoices\\Schemas\\InvoiceForm' => $b . '/modules/acme/billing/src/Presentation/Resources/Invoices/Schemas/InvoiceForm.php',
+    'Acme\\Billing\\Presentation\\Resources\\Invoices\\Tables\\InvoicesTable' => $b . '/modules/acme/billing/src/Presentation/Resources/Invoices/Tables/InvoicesTable.php',
+    'Webkernel\\CodebaseProvider' => $b . '/x-webkernel/codebase/src/CodebaseProvider.php',
+    'Webkernel\\Composables\\ComposableContract' => $b . '/x-webkernel/codebase/src/Composables/ComposableContract.php',
+    'Webkernel\\Composables\\ConfigComposable' => $b . '/x-webkernel/codebase/src/Composables/ConfigComposable.php',
+    'Webkernel\\Composables\\PanelComposable' => $b . '/x-webkernel/codebase/src/Composables/PanelComposable.php',
+    'Webkernel\\Config\\Config' => $b . '/x-webkernel/codebase/src/Config/Config.php',
+    'Webkernel\\Config\\ConfigWriter' => $b . '/x-webkernel/codebase/src/Config/ConfigWriter.php',
+    'Webkernel\\Console' => $b . '/x-webkernel/codebase/src/Console.php',
+    'Webkernel\\Console\\Attribute\\ConsoleCommand' => $b . '/x-webkernel/codebase/src/Console/Attribute/ConsoleCommand.php',
+    'Webkernel\\Console\\Cancelled' => $b . '/x-webkernel/codebase/src/Console/Cancelled.php',
+    'Webkernel\\Console\\Commands\\DumpAutoloadCommand' => $b . '/x-webkernel/codebase/src/Console/Commands/DumpAutoloadCommand.php',
+    'Webkernel\\Console\\ExitCode' => $b . '/x-webkernel/codebase/src/Console/ExitCode.php',
+    'Webkernel\\Console\\Input\\ArgvInput' => $b . '/x-webkernel/codebase/src/Console/Input/ArgvInput.php',
+    'Webkernel\\Console\\Kernel' => $b . '/x-webkernel/codebase/src/Console/Kernel.php',
+    'Webkernel\\Console\\Middleware\\ConsoleMiddleware' => $b . '/x-webkernel/codebase/src/Console/Middleware/ConsoleMiddleware.php',
+    'Webkernel\\Console\\Prompt' => $b . '/x-webkernel/codebase/src/Console/Prompt.php',
+    'Webkernel\\Console\\Terminal' => $b . '/x-webkernel/codebase/src/Console/Terminal.php',
+    'Webkernel\\DevEnv\\IdeHelper' => $b . '/x-webkernel/codebase/src/DevEnv/IdeHelper.php',
+    'Webkernel\\Http' => $b . '/x-webkernel/codebase/src/Http.php',
+    'Webkernel\\Instance\\InstanceId' => $b . '/x-webkernel/codebase/src/Instance/InstanceId.php',
+    'Webkernel\\Lifecycle\\ComposerScripts' => $b . '/x-webkernel/lifecycle/Lifecycle/ComposerScripts.php',
+    'Webkernel\\Lifecycle\\Installer\\LCBaseInstaller' => $b . '/x-webkernel/lifecycle/Lifecycle/Installer/LCBaseInstaller.php',
+    'Webkernel\\Lifecycle\\Installer\\LCInstallerLocations' => $b . '/x-webkernel/lifecycle/Lifecycle/Installer/LCInstallerLocations.php',
+    'Webkernel\\Lifecycle\\Installer\\LCPackageType' => $b . '/x-webkernel/lifecycle/Lifecycle/Installer/LCPackageType.php',
+    'Webkernel\\Lifecycle\\LCInstaller' => $b . '/x-webkernel/lifecycle/Lifecycle/LCInstaller.php',
+    'Webkernel\\Paths\\Package' => $b . '/x-webkernel/codebase/src/Paths/Package.php',
+    'Webkernel\\PlatformProvider' => $b . '/x-webkernel/codebase/src/PlatformProvider.php',
+    'Webkernel\\Platform\\Colors\\Color' => $b . '/x-webkernel/codebase/src/Platform/Colors/Color.php',
+    'Webkernel\\Platform\\Http\\Middleware\\Authenticate' => $b . '/x-webkernel/codebase/src/Platform/Http/Middleware/Authenticate.php',
+    'Webkernel\\Platform\\Pages\\Dashboard' => $b . '/x-webkernel/codebase/src/Platform/Pages/Dashboard.php',
+    'Webkernel\\Platform\\Panel' => $b . '/x-webkernel/codebase/src/Platform/Panel.php',
+    'Webkernel\\Platform\\PanelProvider' => $b . '/x-webkernel/codebase/src/Platform/PanelProvider.php',
+    'Webkernel\\Platform\\Resources\\Resource' => $b . '/x-webkernel/codebase/src/Platform/Resources/Resource.php',
+    'Webkernel\\Platform\\Schemas\\Schema' => $b . '/x-webkernel/codebase/src/Platform/Schemas/Schema.php',
+    'Webkernel\\Platform\\System\\SystemPanelProvider' => $b . '/x-webkernel/codebase/src/Platform/System/SystemPanelProvider.php',
+    'Webkernel\\Platform\\Tables\\Table' => $b . '/x-webkernel/codebase/src/Platform/Tables/Table.php',
+    'Webkernel\\Route\\Action\\RedirectAction' => $b . '/x-webkernel/codebase/src/Route/Action/RedirectAction.php',
+    'Webkernel\\Route\\Action\\ViewAction' => $b . '/x-webkernel/codebase/src/Route/Action/ViewAction.php',
+    'Webkernel\\Route\\Binding' => $b . '/x-webkernel/codebase/src/Route/Binding.php',
+    'Webkernel\\Route\\Compile\\Cache' => $b . '/x-webkernel/codebase/src/Route/Compile/Cache.php',
+    'Webkernel\\Route\\Compile\\Compiled' => $b . '/x-webkernel/codebase/src/Route/Compile/Compiled.php',
+    'Webkernel\\Route\\Compile\\Generator' => $b . '/x-webkernel/codebase/src/Route/Compile/Generator.php',
+    'Webkernel\\Route\\Compile\\Pattern' => $b . '/x-webkernel/codebase/src/Route/Compile/Pattern.php',
+    'Webkernel\\Route\\Dispatch\\Dispatcher' => $b . '/x-webkernel/codebase/src/Route/Dispatch/Dispatcher.php',
+    'Webkernel\\Route\\Dispatch\\Matched' => $b . '/x-webkernel/codebase/src/Route/Dispatch/Matched.php',
+    'Webkernel\\Route\\Dispatch\\MethodNotAllowed' => $b . '/x-webkernel/codebase/src/Route/Dispatch/MethodNotAllowed.php',
+    'Webkernel\\Route\\Dispatch\\NotMatched' => $b . '/x-webkernel/codebase/src/Route/Dispatch/NotMatched.php',
+    'Webkernel\\Route\\Exception\\BadRoute' => $b . '/x-webkernel/codebase/src/Route/Exception/BadRoute.php',
+    'Webkernel\\Route\\Group\\PendingGroup' => $b . '/x-webkernel/codebase/src/Route/Group/PendingGroup.php',
+    'Webkernel\\Route\\Route' => $b . '/x-webkernel/codebase/src/Route/Route.php',
+    'Webkernel\\Route\\Uri\\Uri' => $b . '/x-webkernel/codebase/src/Route/Uri/Uri.php',
+    'Webkernel\\Route\\Uri\\UriException' => $b . '/x-webkernel/codebase/src/Route/Uri/UriException.php',
+    'Webkernel\\View\\Compiler' => $b . '/x-webkernel/codebase/src/View/Compiler.php',
+    'Webkernel\\View\\Engine' => $b . '/x-webkernel/codebase/src/View/Engine.php',
+    'Webkernel\\View\\Js' => $b . '/x-webkernel/codebase/src/View/Js.php',
+    'Webkernel\\View\\View' => $b . '/x-webkernel/codebase/src/View/View.php',
+    'Webkernel\\WebApp' => $b . '/x-webkernel/codebase/src/WebApp.php',
+);

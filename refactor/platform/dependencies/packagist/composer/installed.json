@@ -1,6 +1,38 @@
 {
     "packages": [
         {
+            "name": "acme/billing",
+            "version": "0.1.0",
+            "version_normalized": "0.1.0.0",
+            "dist": {
+                "type": "path",
+                "url": "modules/acme/billing",
+                "reference": "e69cacf73486368ac197019cd677f6a65f481007"
+            },
+            "type": "webkernel-business-module",
+            "extra": {
+                "webkernel": {
+                    "provider": "Acme\\Billing\\BillingProvider",
+                    "prefix": "billing"
+                }
+            },
+            "installation-source": "dist",
+            "autoload": {
+                "psr-4": {
+                    "Acme\\Billing\\": "src/"
+                }
+            },
+            "license": [
+                "proprietary"
+            ],
+            "description": "Billing business module",
+            "transport-options": {
+                "symlink": true,
+                "relative": true
+            },
+            "install-path": "../../../../modules/acme/billing"
+        },
+        {
             "name": "composer/installers",
             "version": "v2.3.0",
             "version_normalized": "2.3.0.0",
@@ -591,7 +623,7 @@
             "dist": {
                 "type": "path",
                 "url": "x-webkernel/codebase",
-                "reference": "28c12941311e7d3517d3553830c127e50702425e"
+                "reference": "bf46d2df3df4246cceaee720d1b22db32afad59f"
             },
             "require": {
                 "php": ">=8.4",
@@ -608,7 +640,8 @@
                 "webkernel": {
                     "package_repo": "git@github.com:webkernelphp/codebase.git",
                     "production": true,
-                    "prefix": "codebase"
+                    "provider": "Webkernel\\CodebaseProvider",
+                    "prefix": "webkernel"
                 }
             },
             "installation-source": "dist",
@@ -623,7 +656,7 @@
             "license": [
                 "proprietary"
             ],
-            "description": "Webkernel runtime: paths, instance, container, route, view. PSR-11 plus PHP 8.4+.",
+            "description": "Webkernel runtime: config, route, view, console, HTTP door.",
             "transport-options": {
                 "symlink": true,
                 "relative": true

@@ -1,0 +1,27 @@
+<?php $_shouldextend[1]=1; ?>
+
+<?php $this->start_section('content'); ?>
+ <h1><?php echo \Webkernel\View\View::echo($title); ?></h1>
+ <form method="post" action="<?php echo \Webkernel\View\View::echo($action); ?>">
+ <?php $__currentLoopData = $fields; $this->add_loop($__currentLoopData);$this->get_first_loop();
+ foreach($__currentLoopData as $field): $loop = $this->increment_loop_indices();  ?>
+ <p>
+ <label>
+ <?php echo \Webkernel\View\View::echo($field['label']); ?>
+
+ <input
+ type="<?php echo \Webkernel\View\View::echo($field['type']); ?>"
+ name="<?php echo \Webkernel\View\View::echo($field['name']); ?>"
+ value="<?php echo \Webkernel\View\View::echo($invoice?->{$field['name']} ?? ''); ?>"
+ />
+ </label>
+ </p>
+ <?php endforeach; $this->pop_loop(); $loop = $this->get_first_loop(); ?>
+ <p>
+ <button type="submit">Save</button>
+ <a href="/billing/invoices">Cancel</a>
+ </p>
+ </form>
+<?php $this->stop_section(); ?>
+
+<?php if (isset($_shouldextend[1])) { echo $this->run_child('webkernel::layouts.simple'); } ?>

@@ -1,0 +1,34 @@
+<?php $_shouldextend[1]=1; ?>
+
+<?php $this->start_section('content'); ?>
+ <h1><?php echo \Webkernel\View\View::echo($title); ?></h1>
+ <p><a href="/billing/invoices/create">Create invoice</a> · <a href="/system">System</a></p>
+ <table>
+ <thead>
+ <tr>
+ <?php $__currentLoopData = $columns; $this->add_loop($__currentLoopData);$this->get_first_loop();
+ foreach($__currentLoopData as $column): $loop = $this->increment_loop_indices();  ?>
+ <th><?php echo \Webkernel\View\View::echo($column['label']); ?></th>
+ <?php endforeach; $this->pop_loop(); $loop = $this->get_first_loop(); ?>
+ <th></th>
+ </tr>
+ </thead>
+ <tbody>
+ <?php $__empty_1 = true; foreach($invoices as $invoice): $__empty_1 = false; ?>
+ <tr>
+ <?php $__currentLoopData = $columns; $this->add_loop($__currentLoopData);$this->get_first_loop();
+ foreach($__currentLoopData as $column): $loop = $this->increment_loop_indices();  ?>
+ <td><?php echo \Webkernel\View\View::echo($invoice->{$column['key']}); ?></td>
+ <?php endforeach; $this->pop_loop(); $loop = $this->get_first_loop(); ?>
+ <td><a href="/billing/invoices/<?php echo \Webkernel\View\View::echo($invoice->id); ?>/edit">Edit</a></td>
+ </tr>
+ <?php endforeach; if ($__empty_1): ?>
+ <tr>
+ <td colspan="<?php echo \Webkernel\View\View::echo(count($columns) + 1); ?>">No invoices yet.</td>
+ </tr>
+ <?php endif; ?>
+ </tbody>
+ </table>
+<?php $this->stop_section(); ?>
+
+<?php if (isset($_shouldextend[1])) { echo $this->run_child('webkernel::layouts.simple'); } ?>

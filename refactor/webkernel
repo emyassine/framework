@@ -8,5 +8,5 @@
 
 define('START_REQUEST', hrtime(true));
 
-echo  'Binary is             :  ' . dirname(__DIR__) . $argv[0] . PHP_EOL
-	. 'And first argument is :  ' . ($argv[1] ?? null);
+require __DIR__.'/platform/fast-boot.php';
+\Webkernel\Console::run($argv);

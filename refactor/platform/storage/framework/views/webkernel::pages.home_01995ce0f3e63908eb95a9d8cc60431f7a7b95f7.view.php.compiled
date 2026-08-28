@@ -1,0 +1,13 @@
+<?php $_shouldextend[1]=1; ?>
+
+<?php $this->start_section('content'); ?>
+ <h1><?php echo \Webkernel\View\View::echo($title ?? 'Webkernel'); ?></h1>
+ <p>Platform is working.</p>
+ <p>
+ <a href="/system">System panel</a>
+ ·
+ <a href="/billing/invoices">Invoices</a>
+ </p>
+<?php $this->stop_section(); ?>
+
+<?php if (isset($_shouldextend[1])) { echo $this->run_child('webkernel::layouts.simple'); } ?>

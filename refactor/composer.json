@@ -35,10 +35,18 @@
             "options": {
                 "symlink": true
             }
+        },
+        {
+            "type": "path",
+            "url": "modules/*/*",
+            "options": {
+                "symlink": true
+            }
         }
     ],
 	"require": {
 	    "php": ">8.4",
+	    "acme/billing": "*",
 	    "ext-dom": "*",
 	    "ext-fileinfo": "*",
 	    "ext-intl": "*",

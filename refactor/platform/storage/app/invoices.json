@@ -1,0 +1,9 @@
+[
+    {
+        "id": "8c23b7c8",
+        "number": "INV-1",
+        "customer": "Acme",
+        "total": "100",
+        "status": "draft"
+    }
+]

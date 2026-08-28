@@ -17,4 +17,5 @@ return array(
     'Psr\\Cache\\' => array($vendorDir . '/psr/cache/src'),
     'Modules\\' => array($baseDir . '/modules'),
     'Composer\\Installers\\' => array($vendorDir . '/composer/installers/src/Composer/Installers'),
+    'Acme\\Billing\\' => array($baseDir . '/modules/acme/billing/src'),
 );

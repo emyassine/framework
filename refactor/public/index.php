@@ -24,3 +24,4 @@ if ($route === '/healthz' || $route === '/ready') {
 }
 
 require $webapp_path.'/platform/fast-boot.php';
+\Webkernel\Http::run();

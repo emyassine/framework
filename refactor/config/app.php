@@ -7,6 +7,18 @@ return [
         'timezone' => 'Africa/Casablanca',
         'env' => 'prod',
     ],
+    'branding' => [
+        'favicon' => '/favicon.ico',
+        'logo_light' => null,
+        'logo_dark' => null,
+        'logo_height' => '2rem',
+        'colors' => [
+            'primary' => 'blue',
+        ],
+    ],
+    'ui' => [
+        'dark_mode' => true,
+    ],
     'database' => [
         'driver' => 'mysql',
         'host' => '127.0.0.1',

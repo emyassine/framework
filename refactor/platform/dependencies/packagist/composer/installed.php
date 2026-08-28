@@ -3,13 +3,22 @@
         'name' => 'webkernel/webkernel',
         'pretty_version' => 'dev-main',
         'version' => 'dev-main',
-        'reference' => '02e27ac190e73290dffb391bd9b0068426c6b0de',
+        'reference' => '98ed67af43b5a15837e5d8f58c83bd1b096ca48f',
         'type' => 'project',
         'install_path' => __DIR__ . '/../../../../',
         'aliases' => array(),
         'dev' => true,
     ),
     'versions' => array(
+        'acme/billing' => array(
+            'pretty_version' => '0.1.0',
+            'version' => '0.1.0.0',
+            'reference' => 'e69cacf73486368ac197019cd677f6a65f481007',
+            'type' => 'webkernel-business-module',
+            'install_path' => __DIR__ . '/../../../../modules/acme/billing',
+            'aliases' => array(),
+            'dev_requirement' => false,
+        ),
         'composer/installers' => array(
             'pretty_version' => 'v2.3.0',
             'version' => '2.3.0.0',
@@ -94,7 +103,7 @@
         'webkernel/codebase' => array(
             'pretty_version' => '0.12.0',
             'version' => '0.12.0.0',
-            'reference' => '28c12941311e7d3517d3553830c127e50702425e',
+            'reference' => 'bf46d2df3df4246cceaee720d1b22db32afad59f',
             'type' => 'library',
             'install_path' => __DIR__ . '/../webkernel/codebase',
             'aliases' => array(),
@@ -112,7 +121,7 @@
         'webkernel/webkernel' => array(
             'pretty_version' => 'dev-main',
             'version' => 'dev-main',
-            'reference' => '02e27ac190e73290dffb391bd9b0068426c6b0de',
+            'reference' => '98ed67af43b5a15837e5d8f58c83bd1b096ca48f',
             'type' => 'project',
             'install_path' => __DIR__ . '/../../../../',
             'aliases' => array(),
