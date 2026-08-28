@@ -6,10 +6,11 @@ $vendorDir = dirname(__DIR__);
 $baseDir = dirname(dirname(dirname($vendorDir)));
 
 return array(
+    'Webkernel\\Tests\\' => array($baseDir . '/x-webkernel/codebase/tests'),
     'Webkernel\\Lifecycle\\' => array($vendorDir . '/webkernel/lifecycle/Lifecycle'),
+    'Webkernel\\Imagery\\Tests\\' => array($baseDir . '/x-webkernel/platform/imagery/tests'),
     'Webkernel\\Imagery\\' => array($vendorDir . '/webkernel/imagery/src'),
     'Webkernel\\' => array($vendorDir . '/webkernel/codebase/src'),
-    'Tests\\' => array($baseDir . '/tests'),
     'Psr\\SimpleCache\\' => array($vendorDir . '/psr/simple-cache/src'),
     'Psr\\Log\\' => array($vendorDir . '/psr/log/src'),
     'Psr\\Http\\Message\\' => array($vendorDir . '/psr/http-factory/src', $vendorDir . '/psr/http-message/src'),

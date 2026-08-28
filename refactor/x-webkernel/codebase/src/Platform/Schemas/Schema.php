@@ -14,7 +14,7 @@ final class Schema
     {
         $out = [];
         foreach ($fields as $field) {
-            if (is_string($field)) {
+            if (\is_string($field)) {
                 $out[] = ['name' => $field, 'label' => $field, 'type' => 'text'];
                 continue;
             }

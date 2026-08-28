@@ -4386,6 +4386,14 @@ class Compiler
         return $this->php_tag . ' $this->end_slot(); ?>';
     }
 
+    /**
+     * @param string $expression  e.g. (['title' => null, 'theme' => 'light'])
+     */
+    protected function compile_props($expression): string
+    {
+        return $this->php_tag.' foreach ('.$expression.' as $__n => $__d) { if (!isset($$__n)) { $$__n = $__d; } } unset($__n, $__d); ?>';
+    }
+
     protected function compile_asset($expression): string
     {
         return $this->php_tag_echo . "(isset(\$this->asset_dict[$expression]))?\$this->asset_dict[$expression]:\$this->base_url.'/'.$expression; ?>";

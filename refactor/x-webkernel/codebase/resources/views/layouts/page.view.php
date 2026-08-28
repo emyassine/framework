@@ -1,9 +1,28 @@
+@props([
+  'lang' => 'en',
+  'theme' => null,
+  'layout' => 'sidebar',
+  'sidebar' => 'expanded',
+  'brand' => null,
+  'favicon' => null,
+  'logo' => null,
+])
+@php
+  $brand = $brand ?? \Webkernel\Config\Config::get('app.name');
+  $theme = $theme ?? (\Webkernel\Config\Config::get('ui.dark_mode', true) ? 'dark' : 'light');
+  if ($favicon === null && \function_exists('webkernel_branding_url')) {
+    $favicon = webkernel_branding_url('webkernel-favicon');
+  }
+  if ($logo === null && \function_exists('webkernel_branding_url')) {
+    $logo = webkernel_branding_url($theme === 'dark' ? 'webkernel-logo-dark' : 'webkernel-logo-light');
+  }
+@endphp
 <!DOCTYPE html>
 <html
-  lang="{{ $lang ?? 'en' }}"
-  data-webkernel-design-theme="{{ $theme ?? 'light' }}"
-  data-webkernel-design-layout="{{ $layout ?? 'sidebar' }}"
-  data-webkernel-design-sidebar="{{ $sidebar ?? 'expanded' }}"
+  lang="{{ $lang }}"
+  data-webkernel-design-theme="{{ $theme }}"
+  data-webkernel-design-layout="{{ $layout }}"
+  data-webkernel-design-sidebar="{{ $sidebar }}"
 >
 <head>
   <meta charset="UTF-8" />
@@ -11,7 +30,7 @@
   @if (!empty($favicon))
     <link rel="icon" href="{{ $favicon }}" />
   @endif
-  <title>{{ $title ?? 'Webkernel' }}</title>
+  <title>@yield('title')</title>
   @include('webkernel::layouts.partials.tokens')
   @include('webkernel::layouts.partials.shell')
   @include('webkernel::layouts.partials.components')

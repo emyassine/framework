@@ -1,5 +1,7 @@
 <?php $_shouldextend[1]=1; ?>
 
+<?php $this->start_section('title', 'System'); ?>
+
 <?php $this->start_section('navigation'); ?>
  <?php echo $this->run_child('webkernel::panels.system.sidebar', ['current' => 'dashboard']); ?>
 <?php $this->stop_section(); ?>

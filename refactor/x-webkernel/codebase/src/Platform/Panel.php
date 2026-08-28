@@ -81,7 +81,7 @@ final class Panel
      */
     public function pages(array $pages): self
     {
-        $this->pages = array_values($pages);
+        $this->pages = \array_values($pages);
 
         return $this;
     }
@@ -91,7 +91,7 @@ final class Panel
      */
     public function widgets(array $widgets): self
     {
-        $this->widgets = array_values($widgets);
+        $this->widgets = \array_values($widgets);
 
         return $this;
     }
@@ -101,7 +101,7 @@ final class Panel
      */
     public function resources(array $resources): self
     {
-        $this->resources = array_values($resources);
+        $this->resources = \array_values($resources);
 
         return $this;
     }
@@ -111,7 +111,7 @@ final class Panel
      */
     public function middleware(array $middleware): self
     {
-        $this->middleware = array_values($middleware);
+        $this->middleware = \array_values($middleware);
 
         return $this;
     }
@@ -121,7 +121,7 @@ final class Panel
      */
     public function auth_middleware(array $middleware): self
     {
-        $this->auth_middleware = array_values($middleware);
+        $this->auth_middleware = \array_values($middleware);
 
         return $this;
     }

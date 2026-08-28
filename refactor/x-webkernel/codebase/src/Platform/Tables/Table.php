@@ -14,7 +14,7 @@ final class Table
     {
         $out = [];
         foreach ($columns as $column) {
-            if (is_string($column)) {
+            if (\is_string($column)) {
                 $out[] = ['key' => $column, 'label' => $column];
                 continue;
             }

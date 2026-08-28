@@ -13,6 +13,11 @@
             "Webkernel\\": "src/"
         }
     },
+    "autoload-dev": {
+        "psr-4": {
+            "Webkernel\\Tests\\": "tests/"
+        }
+    },
     "require": {
         "php": ">=8.4",
         "psr/cache": "^3.0",

@@ -28,17 +28,17 @@ abstract class PlatformProvider
      */
     public static function declaration(string $constant): array
     {
-        $method = strtolower($constant);
-        if (defined(static::class.'::'.$constant)) {
-            $value = constant(static::class.'::'.$constant);
-            if (is_array($value) && $value !== []) {
+        $method = \strtolower($constant);
+        if (\defined(static::class.'::'.$constant)) {
+            $value = \constant(static::class.'::'.$constant);
+            if (\is_array($value) && $value !== []) {
                 return $value;
             }
         }
-        if (is_callable([static::class, $method])) {
+        if (\is_callable([static::class, $method])) {
             $value = static::{$method}();
 
-            return is_array($value) ? $value : [];
+            return \is_array($value) ? $value : [];
         }
 
         return [];

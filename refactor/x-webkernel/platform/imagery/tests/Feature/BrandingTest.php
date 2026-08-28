@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace Tests\Feature;
+namespace Webkernel\Imagery\Tests\Feature;
 
 use PHPUnit\Framework\TestCase;
 use Webkernel\Imagery\Branding;
@@ -13,11 +13,11 @@ final class BrandingTest extends TestCase
         $this->assertStringStartsWith('/__webkernel-app/branding/webkernel/webkernel-favicon?v=', $url);
     }
 
-    public function test_show_returns_png_bytes(): void
+    public function test_payload_returns_png_bytes(): void
     {
-        $binary = Branding::get()->show('webkernel', 'webkernel-favicon');
+        $binary = Branding::get()->payload('webkernel', 'webkernel-favicon');
         $this->assertNotSame('', $binary);
-        $this->assertSame("\x89PNG", substr($binary, 0, 4));
+        $this->assertSame("\x89PNG", \substr($binary, 0, 4));
     }
 
     public function test_unknown_key_is_empty(): void

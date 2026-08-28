@@ -13,7 +13,7 @@ final class UriException extends LogicException
 
     public static function parameter_mismatch(string $route, string $parameter, string $pattern): self
     {
-        return new self(sprintf(
+        return new self(\sprintf(
             'Route "%s" expects the parameter [%s] to match the regex `%s`',
             $route,
             $parameter,
@@ -27,11 +27,11 @@ final class UriException extends LogicException
      */
     public static function insufficient(string $route, array $missing, array $given): self
     {
-        return new self(sprintf(
+        return new self(\sprintf(
             'Route "%s" expects at least parameter values for [%s], but received %s',
             $route,
-            implode(',', $missing),
-            $given === [] ? 'none' : '['.implode(',', $given).']',
+            \implode(',', $missing),
+            $given === [] ? 'none' : '['.\implode(',', $given).']',
         ));
     }
 }

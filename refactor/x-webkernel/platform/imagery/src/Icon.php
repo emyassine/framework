@@ -17,15 +17,15 @@ final class Icon
 
     public static function package_root(): string
     {
-        $root = dirname(__DIR__);
+        $root = \dirname(__DIR__);
 
-        return realpath($root) ?: $root;
+        return \realpath($root) ?: $root;
     }
 
     public static function path(string $name, string $set = 'lucide'): string
     {
-        $name = str_replace(['\\', '..'], '', $name);
-        $set = str_replace(['\\', '..'], '', $set);
+        $name = \str_replace(['\\', '..'], '', $name);
+        $set = \str_replace(['\\', '..'], '', $set);
 
         return self::package_root().'/res/icons/'.$set.'/'.$name.'.svg';
     }

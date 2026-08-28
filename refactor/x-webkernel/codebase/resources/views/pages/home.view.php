@@ -1,5 +1,7 @@
 @extends('webkernel::layouts.page')
 
+@section('title', 'Home')
+
 @section('navigation')
   @include('webkernel::panels.system.sidebar', ['current' => 'home'])
 @endsection

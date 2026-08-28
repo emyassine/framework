@@ -1,16 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<phpunit bootstrap="tests/bootstrap.php"
+<phpunit bootstrap="x-webkernel/codebase/tests/bootstrap.php"
          colors="true"
          cacheDirectory="platform/storage/framework/phpunit"
 >
     <testsuites>
-        <testsuite name="Feature">
-            <directory>tests/Feature</directory>
+        <testsuite name="codebase">
+            <directory>x-webkernel/codebase/tests</directory>
+        </testsuite>
+        <testsuite name="imagery">
+            <directory>x-webkernel/platform/imagery/tests</directory>
         </testsuite>
     </testsuites>
     <source>
         <include>
             <directory>x-webkernel/codebase/src</directory>
+            <directory>x-webkernel/platform/imagery/src</directory>
             <directory>modules</directory>
         </include>
     </source>

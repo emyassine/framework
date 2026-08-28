@@ -1,5 +1,7 @@
 @extends('webkernel::layouts.page')
 
+@section('title', 'System')
+
 @section('navigation')
   @include('webkernel::panels.system.sidebar', ['current' => 'dashboard'])
 @endsection

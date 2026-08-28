@@ -32,7 +32,7 @@ final class Prompt
                 if ($this->io->is_faking()) {
                     $fake = $this->io->next_fake($label);
 
-                    return is_scalar($fake) ? (string) $fake : $default;
+                    return \is_scalar($fake) ? (string) $fake : $default;
                 }
                 if (! $this->io->is_interactive()) {
                     return $this->fallback_line($label, $default, $hidden);
@@ -67,7 +67,7 @@ final class Prompt
                         return $default_s;
                     }
 
-                    return is_scalar($fake) ? (string) $fake : $default_s;
+                    return \is_scalar($fake) ? (string) $fake : $default_s;
                 }
                 if (! $this->io->is_interactive()) {
                     return $this->fallback_line($label, $default_s, false);
@@ -79,10 +79,10 @@ final class Prompt
                 if ($raw === '') {
                     return $this->required_message($required);
                 }
-                if (! is_numeric($raw)) {
+                if (! \is_numeric($raw)) {
                     return 'Must be a number.';
                 }
-                $n = str_contains($raw, '.') ? (float) $raw : (int) $raw;
+                $n = \str_contains($raw, '.') ? (float) $raw : (int) $raw;
                 if ($min !== null && $n < $min) {
                     return 'Must be at least '.$min.'.';
                 }
@@ -92,7 +92,7 @@ final class Prompt
                 if ($validate !== null) {
                     $err = $validate($n);
 
-                    return is_string($err) ? $err : null;
+                    return \is_string($err) ? $err : null;
                 }
 
                 return null;
@@ -102,7 +102,7 @@ final class Prompt
                     return null;
                 }
 
-                return str_contains($raw, '.') ? (float) $raw : (int) $raw;
+                return \str_contains($raw, '.') ? (float) $raw : (int) $raw;
             },
         );
     }
@@ -123,7 +123,7 @@ final class Prompt
                 if ($this->io->is_faking()) {
                     $fake = $this->io->next_fake($label);
 
-                    return is_scalar($fake) ? (string) $fake : $default;
+                    return \is_scalar($fake) ? (string) $fake : $default;
                 }
                 if (! $this->io->is_interactive()) {
                     return $this->fallback_line($label, $default, false);
@@ -151,11 +151,11 @@ final class Prompt
             function () use ($label, $default, $yes, $no, $hint): bool {
                 if ($this->io->is_faking()) {
                     $fake = $this->io->next_fake($label);
-                    if (is_bool($fake)) {
+                    if (\is_bool($fake)) {
                         return $fake;
                     }
-                    if (is_string($fake)) {
-                        return in_array(strtolower($fake), ['y', 'yes', '1', 'true'], true);
+                    if (\is_string($fake)) {
+                        return \in_array(\strtolower($fake), ['y', 'yes', '1', 'true'], true);
                     }
 
                     return (bool) $fake;
@@ -168,12 +168,12 @@ final class Prompt
             },
             function (bool $value) use ($required, $validate): ?string {
                 if ($required !== false && $value !== true) {
-                    return is_string($required) ? $required : 'Required.';
+                    return \is_string($required) ? $required : 'Required.';
                 }
                 if ($validate !== null) {
                     $err = $validate($value);
 
-                    return is_string($err) ? $err : null;
+                    return \is_string($err) ? $err : null;
                 }
 
                 return null;
@@ -215,7 +215,7 @@ final class Prompt
                 if ($validate !== null) {
                     $err = $validate($value);
 
-                    return is_string($err) ? $err : null;
+                    return \is_string($err) ? $err : null;
                 }
 
                 return null;
@@ -244,7 +244,7 @@ final class Prompt
             function () use ($label, $options, $default, $scroll, $hint, $info): array {
                 if ($this->io->is_faking()) {
                     $fake = $this->io->next_fake($label);
-                    if (! is_array($fake)) {
+                    if (! \is_array($fake)) {
                         $fake = $fake === null || $fake === '' ? [] : [$fake];
                     }
 
@@ -258,12 +258,12 @@ final class Prompt
             },
             function (array $value) use ($required, $validate): ?string {
                 if ($required !== false && $value === []) {
-                    return is_string($required) ? $required : 'Required.';
+                    return \is_string($required) ? $required : 'Required.';
                 }
                 if ($validate !== null) {
                     $err = $validate($value);
 
-                    return is_string($err) ? $err : null;
+                    return \is_string($err) ? $err : null;
                 }
 
                 return null;
@@ -307,7 +307,7 @@ final class Prompt
         if ($validate !== null) {
             $err = $validate($value);
 
-            return is_string($err) ? $err : null;
+            return \is_string($err) ? $err : null;
         }
 
         return null;
@@ -319,25 +319,25 @@ final class Prompt
             return null;
         }
 
-        return is_string($required) ? $required : 'Required.';
+        return \is_string($required) ? $required : 'Required.';
     }
 
     private function fallback_line(string $label, string $default, bool $hidden): string
     {
         $suffix = $default !== '' ? ' ['.$default.']' : '';
-        fwrite(STDOUT, '  '.$label.$suffix.': ');
+        \fwrite(STDOUT, '  '.$label.$suffix.': ');
         if ($hidden) {
             $this->stty(['-echo']);
         }
-        $line = defined('STDIN') && is_resource(STDIN) ? fgets(STDIN) : false;
+        $line = \defined('STDIN') && \is_resource(STDIN) ? \fgets(STDIN) : false;
         if ($hidden) {
             $this->stty(['echo']);
-            fwrite(STDOUT, "\n");
+            \fwrite(STDOUT, "\n");
         }
         if ($line === false) {
             throw new Cancelled('Cancelled.');
         }
-        $line = trim($line);
+        $line = \trim($line);
 
         return $line === '' ? $default : $line;
     }
@@ -367,27 +367,27 @@ final class Prompt
                 if ($key === 'enter') {
                     $this->clear_frame($prev);
                     $this->show_cursor(true);
-                    $this->write_submitted($label, $hidden ? str_repeat('*', strlen($value)) : $value);
+                    $this->write_submitted($label, $hidden ? \str_repeat('*', \strlen($value)) : $value);
 
                     return $value;
                 }
                 if ($key === 'backspace') {
-                    $value = mb_substr($value, 0, max(0, mb_strlen($value) - 1));
+                    $value = \mb_substr($value, 0, \max(0, \mb_strlen($value) - 1));
                     continue;
                 }
-                if ($key === 'up' && $numeric && is_numeric($value === '' ? '0' : $value)) {
+                if ($key === 'up' && $numeric && \is_numeric($value === '' ? '0' : $value)) {
                     $value = (string) ((int) $value + 1);
                     continue;
                 }
-                if ($key === 'down' && $numeric && is_numeric($value === '' ? '0' : $value)) {
+                if ($key === 'down' && $numeric && \is_numeric($value === '' ? '0' : $value)) {
                     $value = (string) ((int) $value - 1);
                     continue;
                 }
                 if ($key === 'tab' && $matches !== []) {
-                    $value = (string) array_values($matches)[0];
+                    $value = (string) \array_values($matches)[0];
                     continue;
                 }
-                if (strlen($key) === 1 && $key >= ' ') {
+                if (\strlen($key) === 1 && $key >= ' ') {
                     $value .= $key;
                 }
             }
@@ -417,10 +417,10 @@ final class Prompt
                     continue;
                 }
                 if ($key === 'backspace') {
-                    $value = mb_substr($value, 0, max(0, mb_strlen($value) - 1));
+                    $value = \mb_substr($value, 0, \max(0, \mb_strlen($value) - 1));
                     continue;
                 }
-                if (strlen($key) === 1 && $key >= ' ') {
+                if (\strlen($key) === 1 && $key >= ' ') {
                     $value .= $key;
                 }
             }
@@ -484,9 +484,9 @@ final class Prompt
         bool $multi,
         bool $search,
     ): mixed {
-        $assoc = ! array_is_list($options);
+        $assoc = ! \array_is_list($options);
         $query = '';
-        $keys = array_keys($options);
+        $keys = \array_keys($options);
         $index = $this->default_index($keys, $options, $default);
         $checked = [];
         if ($multi) {
@@ -503,11 +503,11 @@ final class Prompt
             ): mixed {
                 while (true) {
                     $visible = $this->filtered($options, $query, $search);
-                    $keys = array_keys($visible);
+                    $keys = \array_keys($visible);
                     if ($keys === []) {
                         $index = 0;
                     } else {
-                        $index = max(0, min($index, count($keys) - 1));
+                        $index = \max(0, \min($index, \count($keys) - 1));
                     }
                     $this->redraw($this->frame_select($label, $visible, $keys, $index, $scroll, $hint, $info, $multi, $checked, $query, $search), $prev);
                     $key = $this->read_key();
@@ -515,7 +515,7 @@ final class Prompt
                         $this->clear_frame($prev);
                         if ($multi) {
                             $picked = $this->checked_values($options, $checked, $assoc);
-                            $this->write_submitted($label, $picked === [] ? 'none' : implode(', ', array_map('strval', $picked)));
+                            $this->write_submitted($label, $picked === [] ? 'none' : \implode(', ', \array_map('strval', $picked)));
 
                             return $picked;
                         }
@@ -528,11 +528,11 @@ final class Prompt
                         return $assoc ? $picked_key : $visible[$picked_key];
                     }
                     if ($key === 'up') {
-                        $index = $index > 0 ? $index - 1 : max(0, count($keys) - 1);
+                        $index = $index > 0 ? $index - 1 : \max(0, \count($keys) - 1);
                         continue;
                     }
                     if ($key === 'down') {
-                        $index = $keys === [] ? 0 : ($index + 1) % count($keys);
+                        $index = $keys === [] ? 0 : ($index + 1) % \count($keys);
                         continue;
                     }
                     if ($key === 'space' && $multi && $keys !== []) {
@@ -545,11 +545,11 @@ final class Prompt
                         continue;
                     }
                     if ($search && $key === 'backspace') {
-                        $query = mb_substr($query, 0, max(0, mb_strlen($query) - 1));
+                        $query = \mb_substr($query, 0, \max(0, \mb_strlen($query) - 1));
                         $index = 0;
                         continue;
                     }
-                    if ($search && strlen($key) === 1 && $key >= ' ') {
+                    if ($search && \strlen($key) === 1 && $key >= ' ') {
                         $query .= $key;
                         $index = 0;
                     }
@@ -569,10 +569,10 @@ final class Prompt
         if (! $search || $query === '') {
             return $options;
         }
-        $q = mb_strtolower($query);
+        $q = \mb_strtolower($query);
         $out = [];
         foreach ($options as $key => $label) {
-            if (str_contains(mb_strtolower((string) $label), $q) || str_contains(mb_strtolower((string) $key), $q)) {
+            if (\str_contains(\mb_strtolower((string) $label), $q) || \str_contains(\mb_strtolower((string) $key), $q)) {
                 $out[$key] = $label;
             }
         }
@@ -603,7 +603,7 @@ final class Prompt
      */
     private function default_index(array $keys, array $options, mixed $default): int
     {
-        if ($default === null || is_array($default)) {
+        if ($default === null || \is_array($default)) {
             return 0;
         }
         foreach ($keys as $i => $key) {
@@ -620,12 +620,12 @@ final class Prompt
      */
     private function default_choice(array $options, mixed $default): mixed
     {
-        if ($default !== null && (array_key_exists($default, $options) || in_array($default, $options, true))) {
-            return array_is_list($options) ? (in_array($default, $options, true) ? $default : $options[$default] ?? $default) : $default;
+        if ($default !== null && (\array_key_exists($default, $options) || \in_array($default, $options, true))) {
+            return \array_is_list($options) ? (\in_array($default, $options, true) ? $default : $options[$default] ?? $default) : $default;
         }
-        $first_key = array_key_first($options);
+        $first_key = \array_key_first($options);
 
-        return array_is_list($options) ? $options[$first_key] : $first_key;
+        return \array_is_list($options) ? $options[$first_key] : $first_key;
     }
 
     /**
@@ -635,12 +635,12 @@ final class Prompt
      */
     private function default_multi(array $options, array $default): array
     {
-        $assoc = ! array_is_list($options);
+        $assoc = ! \array_is_list($options);
         $out = [];
         foreach ($default as $item) {
-            if ($assoc && array_key_exists($item, $options)) {
+            if ($assoc && \array_key_exists($item, $options)) {
                 $out[] = $item;
-            } elseif (! $assoc && in_array($item, $options, true)) {
+            } elseif (! $assoc && \in_array($item, $options, true)) {
                 $out[] = $item;
             }
         }
@@ -653,28 +653,28 @@ final class Prompt
      */
     private function fake_choice(array $options, mixed $fake, bool $multi): mixed
     {
-        $assoc = ! array_is_list($options);
+        $assoc = ! \array_is_list($options);
         if ($multi) {
             $out = [];
             foreach ((array) $fake as $item) {
-                if ($assoc && array_key_exists($item, $options)) {
+                if ($assoc && \array_key_exists($item, $options)) {
                     $out[] = $item;
-                } elseif (! $assoc && in_array($item, $options, true)) {
+                } elseif (! $assoc && \in_array($item, $options, true)) {
                     $out[] = $item;
-                } elseif ($assoc && in_array($item, $options, true)) {
-                    $out[] = array_search($item, $options, true);
+                } elseif ($assoc && \in_array($item, $options, true)) {
+                    $out[] = \array_search($item, $options, true);
                 }
             }
 
             return $out;
         }
-        if ($assoc && array_key_exists($fake, $options)) {
+        if ($assoc && \array_key_exists($fake, $options)) {
             return $fake;
         }
-        if (in_array($fake, $options, true)) {
-            return $assoc ? array_search($fake, $options, true) : $fake;
+        if (\in_array($fake, $options, true)) {
+            return $assoc ? \array_search($fake, $options, true) : $fake;
         }
-        $first = array_key_first($options);
+        $first = \array_key_first($options);
 
         return $assoc ? $first : $options[$first];
     }
@@ -685,18 +685,18 @@ final class Prompt
      */
     private function suggest_matches(string $value, array|callable $options): array
     {
-        $list = is_callable($options) ? $options($value) : $options;
-        if (! is_array($list)) {
+        $list = \is_callable($options) ? $options($value) : $options;
+        if (! \is_array($list)) {
             return [];
         }
         if ($value === '') {
-            return array_values(array_map('strval', $list));
+            return \array_values(\array_map('strval', $list));
         }
-        $q = mb_strtolower($value);
+        $q = \mb_strtolower($value);
         $out = [];
         foreach ($list as $item) {
             $s = (string) $item;
-            if (str_contains(mb_strtolower($s), $q)) {
+            if (\str_contains(\mb_strtolower($s), $q)) {
                 $out[] = $s;
             }
         }
@@ -709,12 +709,12 @@ final class Prompt
      */
     private function frame_line(string $label, string $value, string $placeholder, string $hint, bool $hidden, array $matches): string
     {
-        $shown = $value === '' ? Terminal::muted($placeholder) : ($hidden ? str_repeat('*', strlen($value)) : $value);
+        $shown = $value === '' ? Terminal::muted($placeholder) : ($hidden ? \str_repeat('*', \strlen($value)) : $value);
         $frame = '  '.$label."\n  ".$shown."\n";
         if ($hint !== '') {
             $frame .= '  '.Terminal::muted($hint)."\n";
         }
-        foreach (array_slice($matches, 0, 5) as $match) {
+        foreach (\array_slice($matches, 0, 5) as $match) {
             $frame .= '  '.Terminal::muted($match)."\n";
         }
 
@@ -740,17 +740,17 @@ final class Prompt
         string $query,
         bool $search,
     ): string {
-        $scroll = max(1, $scroll);
-        $count = count($keys);
+        $scroll = \max(1, $scroll);
+        $count = \count($keys);
         $start = 0;
         if ($count > $scroll) {
-            $start = min(max(0, $index - intdiv($scroll, 2)), $count - $scroll);
+            $start = \min(\max(0, $index - \intdiv($scroll, 2)), $count - $scroll);
         }
         $frame = '  '.$label.($search ? ' '.Terminal::muted($query === '' ? '/' : '/'.$query) : '')."\n";
         if ($hint !== '') {
             $frame .= '  '.Terminal::muted($hint)."\n";
         }
-        $slice = array_slice($keys, $start, $scroll);
+        $slice = \array_slice($keys, $start, $scroll);
         foreach ($slice as $i => $key) {
             $pos = $start + $i;
             $active = $pos === $index;
@@ -780,13 +780,13 @@ final class Prompt
         if ($info === null || $key === null) {
             return null;
         }
-        if (is_string($info)) {
+        if (\is_string($info)) {
             return $info;
         }
-        $value = array_is_list($visible) ? ($visible[$key] ?? $key) : $key;
+        $value = \array_is_list($visible) ? ($visible[$key] ?? $key) : $key;
         $text = $info($value);
 
-        return is_string($text) ? $text : null;
+        return \is_string($text) ? $text : null;
     }
 
     private function write_submitted(string $label, string $value): void
@@ -803,7 +803,7 @@ final class Prompt
             echo "\033[{$prev}A\033[J";
         }
         echo $frame;
-        $prev = substr_count($frame, "\n");
+        $prev = \substr_count($frame, "\n");
     }
 
     private function clear_frame(int $prev): void
@@ -836,24 +836,24 @@ final class Prompt
 
     private function read_key(): string
     {
-        if (! defined('STDIN') || ! is_resource(STDIN)) {
+        if (! \defined('STDIN') || ! \is_resource(STDIN)) {
             throw new Cancelled('Cancelled.');
         }
-        $c = fread(STDIN, 1);
-        if (! is_string($c) || $c === '') {
+        $c = \fread(STDIN, 1);
+        if (! \is_string($c) || $c === '') {
             throw new Cancelled('Cancelled.');
         }
         if ($c === "\033") {
-            stream_set_blocking(STDIN, false);
-            $rest = fread(STDIN, 3);
-            stream_set_blocking(STDIN, true);
-            $seq = $c.(is_string($rest) ? $rest : '');
+            \stream_set_blocking(STDIN, false);
+            $rest = \fread(STDIN, 3);
+            \stream_set_blocking(STDIN, true);
+            $seq = $c.(\is_string($rest) ? $rest : '');
 
             return match (true) {
-                str_ends_with($seq, 'A') => 'up',
-                str_ends_with($seq, 'B') => 'down',
-                str_ends_with($seq, 'C') => 'right',
-                str_ends_with($seq, 'D') => 'left',
+                \str_ends_with($seq, 'A') => 'up',
+                \str_ends_with($seq, 'B') => 'down',
+                \str_ends_with($seq, 'C') => 'right',
+                \str_ends_with($seq, 'D') => 'left',
                 default => $seq,
             };
         }
@@ -876,7 +876,7 @@ final class Prompt
         }
         $out = $this->shell('stty -g 2>/dev/null');
 
-        return trim($out);
+        return \trim($out);
     }
 
     /**
@@ -887,7 +887,7 @@ final class Prompt
         if (PHP_OS_FAMILY === 'Windows' || $args === []) {
             return;
         }
-        $this->shell('stty '.implode(' ', array_map('escapeshellarg', $args)).' 2>/dev/null');
+        $this->shell('stty '.\implode(' ', \array_map('escapeshellarg', $args)).' 2>/dev/null');
     }
 
     private function stty_restore(string $saved): void
@@ -897,14 +897,14 @@ final class Prompt
 
             return;
         }
-        $this->shell('stty '.escapeshellarg($saved).' 2>/dev/null');
+        $this->shell('stty '.\escapeshellarg($saved).' 2>/dev/null');
     }
 
     private function shell(string $command): string
     {
         $out = [];
-        exec($command, $out);
+        \exec($command, $out);
 
-        return implode("\n", $out);
+        return \implode("\n", $out);
     }
 }

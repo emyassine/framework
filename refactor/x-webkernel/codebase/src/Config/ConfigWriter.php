@@ -14,14 +14,14 @@ final class ConfigWriter
     public static function atomic_rewrite(string $path, array $keys): void
     {
         $current = [];
-        if (is_file($path)) {
+        if (\is_file($path)) {
             $loaded = require $path;
-            if (is_array($loaded)) {
+            if (\is_array($loaded)) {
                 $current = $loaded;
             }
         }
 
-        self::write($path, array_replace_recursive($current, $keys));
+        self::write($path, \array_replace_recursive($current, $keys));
     }
 
     /**
@@ -29,13 +29,13 @@ final class ConfigWriter
      */
     public static function write(string $path, array $tree): void
     {
-        $dir = dirname($path);
-        if (! is_dir($dir) && ! mkdir($dir, 0775, true) && ! is_dir($dir)) {
+        $dir = \dirname($path);
+        if (! \is_dir($dir) && ! \mkdir($dir, 0775, true) && ! \is_dir($dir)) {
             throw new \RuntimeException('Unable to create '.$dir);
         }
 
-        $exported = var_export($tree, true);
-        $end = ((int) date('Y')) + 1;
+        $exported = \var_export($tree, true);
+        $end = ((int) \date('Y')) + 1;
         $body = <<<PHP
 <?php declare(strict_types=1);
 //> This file is part of Webkernel.
@@ -52,16 +52,16 @@ return {$exported};
 
 PHP;
 
-        $tmp = $path.'.'.bin2hex(random_bytes(4)).'.tmp';
-        if (file_put_contents($tmp, $body, LOCK_EX) === false) {
+        $tmp = $path.'.'.\bin2hex(\random_bytes(4)).'.tmp';
+        if (\file_put_contents($tmp, $body, LOCK_EX) === false) {
             throw new \RuntimeException('Unable to write '.$tmp);
         }
-        if (! rename($tmp, $path)) {
-            @unlink($tmp);
+        if (! \rename($tmp, $path)) {
+            @\unlink($tmp);
             throw new \RuntimeException('Unable to rename config over '.$path);
         }
-        if (function_exists('opcache_invalidate')) {
-            opcache_invalidate($path, true);
+        if (\function_exists('opcache_invalidate')) {
+            \opcache_invalidate($path, true);
         }
     }
 }

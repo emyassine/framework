@@ -24,13 +24,13 @@ final class CreateInvoice
         if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST') {
             $invoice = new Invoice(
                 InvoiceStore::next_id(),
-                trim((string) ($_POST['number'] ?? '')),
-                trim((string) ($_POST['customer'] ?? '')),
-                trim((string) ($_POST['total'] ?? '0')),
-                trim((string) ($_POST['status'] ?? 'draft')),
+                \trim((string) ($_POST['number'] ?? '')),
+                \trim((string) ($_POST['customer'] ?? '')),
+                \trim((string) ($_POST['total'] ?? '0')),
+                \trim((string) ($_POST['status'] ?? 'draft')),
             );
             InvoiceStore::save($invoice);
-            header('Location: /billing/invoices', true, 302);
+            \header('Location: /billing/invoices', true, 302);
 
             return '';
         }

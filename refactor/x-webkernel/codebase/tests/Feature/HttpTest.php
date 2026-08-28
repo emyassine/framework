@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace Tests\Feature;
+namespace Webkernel\Tests\Feature;
 
 use PHPUnit\Framework\TestCase;
 use Webkernel\Config\Config;
@@ -25,5 +25,6 @@ final class HttpTest extends TestCase
 
         $this->assertStringContainsString('webkernel-shell-sidebar', $html);
         $this->assertStringContainsString('webkernel-shell-page', $html);
+        $this->assertStringContainsString('<title>Home</title>', $html);
     }
 }

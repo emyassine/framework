@@ -6,7 +6,7 @@
 //> For the full copyright and license information, please view the LICENSE
 //> file that was distributed with this source code.
 //> Generated. Do not edit.
-//> hash: 4f613f501ff0c788
+//> hash: ef6f068a8120dc37
 
 namespace Acme\Billing {
     if (false) {
@@ -2439,14 +2439,6 @@ namespace SebastianBergmann\Type {
 namespace SebastianBergmann {
     if (false) {
         class Version {}
-    }
-}
-namespace Tests\Feature {
-    if (false) {
-        class BrandingTest {}
-        class ConfigTest {}
-        class HttpTest {}
-        class PanelViewTest {}
     }
 }
 namespace TheSeer\Tokenizer {

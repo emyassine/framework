@@ -55,7 +55,7 @@ final class PendingGroup
     {
         $this->prefix = $this->prefix === ''
             ? $prefix
-            : rtrim($this->prefix, '/').'/'.ltrim($prefix, '/');
+            : \rtrim($this->prefix, '/').'/'.\ltrim($prefix, '/');
 
         return $this;
     }
@@ -81,7 +81,7 @@ final class PendingGroup
      */
     public function middleware(string|array $middleware): self
     {
-        $this->middleware = array_values(array_unique(array_merge(
+        $this->middleware = \array_values(\array_unique(\array_merge(
             $this->middleware,
             self::normalize_middleware($middleware),
         )));
@@ -94,7 +94,7 @@ final class PendingGroup
      */
     public function where(string|array $parameter, ?string $pattern = null): self
     {
-        if (is_array($parameter)) {
+        if (\is_array($parameter)) {
             foreach ($parameter as $name => $regex) {
                 $this->wheres[$name] = $regex;
             }
@@ -210,12 +210,12 @@ final class PendingGroup
      */
     public static function normalize_middleware(string|array $middleware): array
     {
-        if (is_string($middleware)) {
-            $middleware = explode('|', $middleware);
+        if (\is_string($middleware)) {
+            $middleware = \explode('|', $middleware);
         }
         $out = [];
         foreach ($middleware as $item) {
-            $item = trim((string) $item);
+            $item = \trim((string) $item);
             if ($item !== '') {
                 $out[] = $item;
             }
@@ -230,7 +230,7 @@ final class PendingGroup
         $this->router->push_group($this, static function () use ($register, &$out): void {
             $out = $register();
         });
-        assert($out instanceof Binding);
+        \assert($out instanceof Binding);
 
         return $out;
     }

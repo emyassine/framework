@@ -23,7 +23,7 @@ final class EditInvoice
     {
         $invoice = InvoiceStore::find($record);
         if ($invoice === null) {
-            http_response_code(404);
+            \http_response_code(404);
 
             return 'Invoice not found';
         }
@@ -31,13 +31,13 @@ final class EditInvoice
         if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST') {
             $updated = new Invoice(
                 $invoice->id,
-                trim((string) ($_POST['number'] ?? $invoice->number)),
-                trim((string) ($_POST['customer'] ?? $invoice->customer)),
-                trim((string) ($_POST['total'] ?? $invoice->total)),
-                trim((string) ($_POST['status'] ?? $invoice->status)),
+                \trim((string) ($_POST['number'] ?? $invoice->number)),
+                \trim((string) ($_POST['customer'] ?? $invoice->customer)),
+                \trim((string) ($_POST['total'] ?? $invoice->total)),
+                \trim((string) ($_POST['status'] ?? $invoice->status)),
             );
             InvoiceStore::save($updated);
-            header('Location: /billing/invoices', true, 302);
+            \header('Location: /billing/invoices', true, 302);
 
             return '';
         }

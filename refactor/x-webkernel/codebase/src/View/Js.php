@@ -14,13 +14,13 @@ final class Js implements \Stringable
 
     public static function from(mixed $data, int $flags = 0, int $depth = 512): self
     {
-        $json = json_encode(
+        $json = \json_encode(
             $data,
             $flags | JSON_THROW_ON_ERROR | JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT | JSON_UNESCAPED_UNICODE,
             $depth,
         );
 
-        return new self('JSON.parse(\''.str_replace(['\\', "'"], ['\\\\', "\\'"], $json).'\')');
+        return new self('JSON.parse(\''.\str_replace(['\\', "'"], ['\\\\', "\\'"], $json).'\')');
     }
 
     public function __toString(): string

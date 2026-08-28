@@ -20,9 +20,9 @@ final class IdeHelper
      */
     public static function generated_header(): string
     {
-        $end = ((int) date('Y')) + 1;
+        $end = ((int) \date('Y')) + 1;
 
-        return implode("\n", [
+        return \implode("\n", [
             '//> This file is part of Webkernel.',
             '//> (c) 2025 - '.$end.' Numerimondes, El Moumen Yassine',
             '//> Yassine El Moumen <yassine@numerimondes.com> | <platform@webkernelphp.com>',
@@ -36,23 +36,23 @@ final class IdeHelper
      */
     public static function generate(string $vendor_dir, ?string $output = null): array
     {
-        $vendor_dir = rtrim($vendor_dir, '/\\');
+        $vendor_dir = \rtrim($vendor_dir, '/\\');
         $output ??= self::output_path();
         $catalog = self::catalog($vendor_dir);
 
-        $ctx = hash_init('xxh3');
+        $ctx = \hash_init('xxh3');
         foreach ($catalog as $name => $kind) {
-            hash_update($ctx, $kind.' '.$name."\n");
+            \hash_update($ctx, $kind.' '.$name."\n");
         }
-        $hash = hash_final($ctx);
+        $hash = \hash_final($ctx);
 
-        if (is_file($output) && self::stored_hash($output) === $hash) {
-            return ['path' => $output, 'classes' => count($catalog), 'bytes' => (int) filesize($output), 'skipped' => true];
+        if (\is_file($output) && self::stored_hash($output) === $hash) {
+            return ['path' => $output, 'classes' => \count($catalog), 'bytes' => (int) \filesize($output), 'skipped' => true];
         }
 
         $bytes = self::write($output, $catalog, $hash);
 
-        return ['path' => $output, 'classes' => count($catalog), 'bytes' => $bytes, 'skipped' => false];
+        return ['path' => $output, 'classes' => \count($catalog), 'bytes' => $bytes, 'skipped' => false];
     }
 
     /**
@@ -65,22 +65,22 @@ final class IdeHelper
         $classmap = $vendor_dir.DIRECTORY_SEPARATOR.'composer'.DIRECTORY_SEPARATOR.'autoload_classmap.php';
         $catalog = [];
 
-        if (is_file($classmap)) {
+        if (\is_file($classmap)) {
             $map = require $classmap;
-            if (is_array($map)) {
+            if (\is_array($map)) {
                 foreach ($map as $class => $file) {
-                    if (! is_string($class) || str_starts_with($class, 'Webkernel\\') || ! self::is_class_name($class)) {
+                    if (! \is_string($class) || \str_starts_with($class, 'Webkernel\\') || ! self::is_class_name($class)) {
                         continue;
                     }
-                    $slash = strrpos($class, '\\');
-                    $short = $slash === false ? $class : substr($class, $slash + 1);
-                    $catalog[$class] = is_string($file) && is_file($file)
+                    $slash = \strrpos($class, '\\');
+                    $short = $slash === false ? $class : \substr($class, $slash + 1);
+                    $catalog[$class] = \is_string($file) && \is_file($file)
                         ? self::kind($file, $short)
                         : 'class';
                 }
             }
         }
-        ksort($catalog, SORT_STRING);
+        \ksort($catalog, SORT_STRING);
 
         return $catalog;
     }
@@ -90,20 +90,20 @@ final class IdeHelper
      */
     private static function kind(string $file, string $short): string
     {
-        $src = file_get_contents($file);
-        if (! is_string($src) || $src === '') {
+        $src = \file_get_contents($file);
+        if (! \is_string($src) || $src === '') {
             return 'class';
         }
-        if (! str_contains($src, 'interface') && ! str_contains($src, 'trait') && ! str_contains($src, 'enum')) {
+        if (! \str_contains($src, 'interface') && ! \str_contains($src, 'trait') && ! \str_contains($src, 'enum')) {
             return 'class';
         }
 
-        $tokens = token_get_all($src);
+        $tokens = \token_get_all($src);
         $prev = 0;
-        $count = count($tokens);
+        $count = \count($tokens);
         for ($i = 0; $i < $count; $i++) {
             $token = $tokens[$i];
-            if (! is_array($token)) {
+            if (! \is_array($token)) {
                 $prev = 0;
                 continue;
             }
@@ -124,10 +124,10 @@ final class IdeHelper
             }
             for ($j = $i + 1; $j < $count; $j++) {
                 $next = $tokens[$j];
-                if (is_array($next) && ($next[0] === T_WHITESPACE || $next[0] === T_COMMENT || $next[0] === T_DOC_COMMENT)) {
+                if (\is_array($next) && ($next[0] === T_WHITESPACE || $next[0] === T_COMMENT || $next[0] === T_DOC_COMMENT)) {
                     continue;
                 }
-                if (is_array($next) && $next[0] === T_STRING && $next[1] === $short) {
+                if (\is_array($next) && $next[0] === T_STRING && $next[1] === $short) {
                     return $kind;
                 }
                 break;
@@ -139,12 +139,12 @@ final class IdeHelper
 
     private static function is_class_name(string $name): bool
     {
-        if ($name === '' || str_contains($name, ' ') || str_contains($name, '$')) {
+        if ($name === '' || \str_contains($name, ' ') || \str_contains($name, '$')) {
             return false;
         }
 
-        foreach (explode('\\', $name) as $part) {
-            if ($part === '' || preg_match('/^[A-Za-z_][A-Za-z0-9_]*$/', $part) !== 1) {
+        foreach (\explode('\\', $name) as $part) {
+            if ($part === '' || \preg_match('/^[A-Za-z_][A-Za-z0-9_]*$/', $part) !== 1) {
                 return false;
             }
         }
@@ -157,76 +157,76 @@ final class IdeHelper
      */
     private static function write(string $output, array $catalog, string $hash): int
     {
-        $dir = dirname($output);
-        if (! is_dir($dir) && ! mkdir($dir, 0775, true) && ! is_dir($dir)) {
+        $dir = \dirname($output);
+        if (! \is_dir($dir) && ! \mkdir($dir, 0775, true) && ! \is_dir($dir)) {
             throw new \RuntimeException('Unable to create '.$dir);
         }
 
         $tmp = $output.'.tmp';
-        $fh = fopen($tmp, 'wb');
+        $fh = \fopen($tmp, 'wb');
         if ($fh === false) {
             throw new \RuntimeException('Unable to write '.$tmp);
         }
 
-        fwrite($fh, "<?php declare(strict_types=1);\n\n");
-        fwrite($fh, self::generated_header()."\n");
-        fwrite($fh, "//> Generated. Do not edit.\n");
-        fwrite($fh, '//> hash: '.$hash."\n\n");
+        \fwrite($fh, "<?php declare(strict_types=1);\n\n");
+        \fwrite($fh, self::generated_header()."\n");
+        \fwrite($fh, "//> Generated. Do not edit.\n");
+        \fwrite($fh, '//> hash: '.$hash."\n\n");
 
         $current_ns = null;
         $open = false;
 
         foreach ($catalog as $fqcn => $kind) {
-            $pos = strrpos($fqcn, '\\');
+            $pos = \strrpos($fqcn, '\\');
             if ($pos === false) {
                 $ns = '';
                 $short = $fqcn;
             } else {
-                $ns = substr($fqcn, 0, $pos);
-                $short = substr($fqcn, $pos + 1);
+                $ns = \substr($fqcn, 0, $pos);
+                $short = \substr($fqcn, $pos + 1);
             }
 
             if ($ns !== $current_ns) {
                 if ($open) {
-                    fwrite($fh, "    }\n}\n");
+                    \fwrite($fh, "    }\n}\n");
                 }
-                fwrite($fh, $ns === '' ? "namespace {\n    if (false) {\n" : 'namespace '.$ns." {\n    if (false) {\n");
+                \fwrite($fh, $ns === '' ? "namespace {\n    if (false) {\n" : 'namespace '.$ns." {\n    if (false) {\n");
                 $open = true;
                 $current_ns = $ns;
             }
 
-            fwrite($fh, '        '.$kind.' '.$short." {}\n");
+            \fwrite($fh, '        '.$kind.' '.$short." {}\n");
         }
 
         if ($open) {
-            fwrite($fh, "    }\n}\n");
+            \fwrite($fh, "    }\n}\n");
         }
 
-        fclose($fh);
-        rename($tmp, $output);
+        \fclose($fh);
+        \rename($tmp, $output);
 
-        return (int) filesize($output);
+        return (int) \filesize($output);
     }
 
     private static function stored_hash(string $file): ?string
     {
-        $fh = fopen($file, 'rb');
+        $fh = \fopen($file, 'rb');
         if ($fh === false) {
             return null;
         }
         $hash = null;
         for ($i = 0; $i < 16; $i++) {
-            $line = fgets($fh);
+            $line = \fgets($fh);
             if ($line === false) {
                 break;
             }
-            $line = ltrim($line);
-            if (str_starts_with($line, '//> hash: ') || str_starts_with($line, '// hash: ')) {
-                $hash = trim(substr($line, strpos($line, ':') + 1));
+            $line = \ltrim($line);
+            if (\str_starts_with($line, '//> hash: ') || \str_starts_with($line, '// hash: ')) {
+                $hash = \trim(\substr($line, \strpos($line, ':') + 1));
                 break;
             }
         }
-        fclose($fh);
+        \fclose($fh);
 
         return $hash !== '' ? $hash : null;
     }

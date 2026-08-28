@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace Tests\Feature;
+namespace Webkernel\Tests\Feature;
 
 use PHPUnit\Framework\TestCase;
 use Webkernel\Config\Config;
@@ -21,6 +21,6 @@ final class ConfigTest extends TestCase
     public function test_set_writes_runtime_and_reads_back(): void
     {
         $this->assertSame(1, Config::set('tests.probe', 1)->get('tests.probe'));
-        $this->assertFileExists(webapp_path('platform/platform-runtime.php'));
+        $this->assertFileExists(\webapp_path('platform/platform-runtime.php'));
     }
 }

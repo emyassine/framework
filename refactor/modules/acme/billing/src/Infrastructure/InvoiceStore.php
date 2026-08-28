@@ -54,7 +54,7 @@ final class InvoiceStore
 
     public static function next_id(): string
     {
-        return bin2hex(random_bytes(4));
+        return \bin2hex(\random_bytes(4));
     }
 
     /**
@@ -63,17 +63,17 @@ final class InvoiceStore
     private static function rows(): array
     {
         $file = self::path();
-        if (! is_file($file)) {
+        if (! \is_file($file)) {
             return [];
         }
-        $raw = file_get_contents($file);
-        $data = is_string($raw) ? json_decode($raw, true) : null;
-        if (! is_array($data)) {
+        $raw = \file_get_contents($file);
+        $data = \is_string($raw) ? \json_decode($raw, true) : null;
+        if (! \is_array($data)) {
             return [];
         }
         $out = [];
         foreach ($data as $row) {
-            if (! is_array($row) || ! isset($row['id'], $row['number'], $row['customer'], $row['total'], $row['status'])) {
+            if (! \is_array($row) || ! isset($row['id'], $row['number'], $row['customer'], $row['total'], $row['status'])) {
                 continue;
             }
             $out[] = [
@@ -94,17 +94,17 @@ final class InvoiceStore
     private static function write(array $rows): void
     {
         $file = self::path();
-        $dir = dirname($file);
-        if (! is_dir($dir) && ! mkdir($dir, 0775, true) && ! is_dir($dir)) {
+        $dir = \dirname($file);
+        if (! \is_dir($dir) && ! \mkdir($dir, 0775, true) && ! \is_dir($dir)) {
             throw new \RuntimeException('Unable to create '.$dir);
         }
-        $json = json_encode($rows, JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT);
-        $tmp = $file.'.'.bin2hex(random_bytes(4)).'.tmp';
-        if (file_put_contents($tmp, $json, LOCK_EX) === false) {
+        $json = \json_encode($rows, JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT);
+        $tmp = $file.'.'.\bin2hex(\random_bytes(4)).'.tmp';
+        if (\file_put_contents($tmp, $json, LOCK_EX) === false) {
             throw new \RuntimeException('Unable to write '.$tmp);
         }
-        if (! rename($tmp, $file)) {
-            @unlink($tmp);
+        if (! \rename($tmp, $file)) {
+            @\unlink($tmp);
             throw new \RuntimeException('Unable to rename over '.$file);
         }
     }

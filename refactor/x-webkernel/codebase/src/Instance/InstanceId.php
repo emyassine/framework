@@ -10,7 +10,7 @@ final class InstanceId
 {
     public static function file_path(string $webapp_root): string
     {
-        return rtrim($webapp_root, '/\\').'/platform/storage/instance/data/instance_id';
+        return \rtrim($webapp_root, '/\\').'/platform/storage/instance/data/instance_id';
     }
 
     public static function fingerprint(string $webapp_root): string
@@ -22,11 +22,11 @@ final class InstanceId
     {
         $id = self::fingerprint($webapp_root);
         $file = self::file_path($webapp_root);
-        $dir = dirname($file);
-        if (! is_dir($dir) && ! mkdir($dir, 0775, true) && ! is_dir($dir)) {
+        $dir = \dirname($file);
+        if (! \is_dir($dir) && ! \mkdir($dir, 0775, true) && ! \is_dir($dir)) {
             throw new \RuntimeException('Unable to create '.$dir);
         }
-        file_put_contents($file, $id, LOCK_EX);
+        \file_put_contents($file, $id, LOCK_EX);
 
         return $id;
     }
@@ -34,10 +34,10 @@ final class InstanceId
     public static function stored(string $webapp_root): ?string
     {
         $file = self::file_path($webapp_root);
-        if (! is_file($file)) {
+        if (! \is_file($file)) {
             return null;
         }
-        $id = trim((string) file_get_contents($file));
+        $id = \trim((string) \file_get_contents($file));
 
         return $id !== '' ? $id : null;
     }
@@ -47,9 +47,9 @@ final class InstanceId
      */
     public static function parts(string $webapp_root): array
     {
-        $path = rtrim(str_replace('\\', '/', $webapp_root), '/');
-        $host = (string) gethostname();
-        $ip = gethostbyname($host);
+        $path = \rtrim(\str_replace('\\', '/', $webapp_root), '/');
+        $host = (string) \gethostname();
+        $ip = \gethostbyname($host);
         $machine_uuid = self::machine_uuid();
         $macs = self::macs();
         $base = $path.'|'.$ip.'|'.$host.'|'.$machine_uuid.'|'.$macs;
@@ -60,38 +60,38 @@ final class InstanceId
             'host' => $host,
             'machine_uuid' => $machine_uuid,
             'macs' => $macs,
-            'fingerprint' => substr(hash('sha256', $base), 0, 32),
+            'fingerprint' => \substr(\hash('sha256', $base), 0, 32),
         ];
     }
 
     public static function macs(): string
     {
         $macs = [];
-        $files = glob('/sys/class/net/*/address');
+        $files = \glob('/sys/class/net/*/address');
         if ($files === false) {
             return '';
         }
         foreach ($files as $file) {
-            $addr = @file_get_contents($file);
+            $addr = @\file_get_contents($file);
             if ($addr !== false) {
-                $macs[] = trim($addr);
+                $macs[] = \trim($addr);
             }
         }
 
-        return implode(',', $macs);
+        return \implode(',', $macs);
     }
 
     public static function machine_uuid(): string
     {
-        $uuid = @file_get_contents('/sys/class/dmi/id/product_uuid');
-        if (is_string($uuid) && trim($uuid) !== '') {
-            return trim($uuid);
+        $uuid = @\file_get_contents('/sys/class/dmi/id/product_uuid');
+        if (\is_string($uuid) && \trim($uuid) !== '') {
+            return \trim($uuid);
         }
-        $id = @file_get_contents('/etc/machine-id');
-        if (is_string($id) && trim($id) !== '') {
-            return trim($id);
+        $id = @\file_get_contents('/etc/machine-id');
+        if (\is_string($id) && \trim($id) !== '') {
+            return \trim($id);
         }
 
-        return (string) gethostname();
+        return (string) \gethostname();
     }
 }

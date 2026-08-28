@@ -43,23 +43,23 @@ final readonly class DumpAutoloadCommand
         $vendor_dir = $this->vendor_dir($root);
         $composer_dir = $vendor_dir.DIRECTORY_SEPARATOR.'composer';
 
-        if (! is_dir($composer_dir) && ! mkdir($composer_dir, 0775, true) && ! is_dir($composer_dir)) {
+        if (! \is_dir($composer_dir) && ! \mkdir($composer_dir, 0775, true) && ! \is_dir($composer_dir)) {
             $this->terminal()->warning('cannot create '.$composer_dir);
 
             return ExitCode::ERROR;
         }
 
         $instance_id = InstanceId::record($root);
-        $vendor_rel = $this->relative($root, $vendor_dir) ?? basename($vendor_dir);
-        $this->stamp_platform_config($root, str_replace('\\', '/', $vendor_rel), $instance_id);
+        $vendor_rel = $this->relative($root, $vendor_dir) ?? \basename($vendor_dir);
+        $this->stamp_platform_config($root, \str_replace('\\', '/', $vendor_rel), $instance_id);
         $packages = $this->packages($vendor_dir);
 
         $boot = [
             'instance_id' => $instance_id,
             'webapp_root' => $root,
             'vendor_dir' => $vendor_dir,
-            'vendor_rel' => str_replace('\\', '/', $vendor_rel),
-            'generated_at' => gmdate('c'),
+            'vendor_rel' => \str_replace('\\', '/', $vendor_rel),
+            'generated_at' => \gmdate('c'),
         ];
 
         $classmap = $this->classmap($packages);
@@ -104,7 +104,7 @@ final readonly class DumpAutoloadCommand
         $this->write_webapp_ide($composables);
         $this->write_class_list(
             $composer_dir.DIRECTORY_SEPARATOR.self::PROVIDERS_BASENAME,
-            array_column($providers, 'class'),
+            \array_column($providers, 'class'),
         );
         $this->write_class_list(
             $composer_dir.DIRECTORY_SEPARATOR.self::COMMANDS_BASENAME,
@@ -120,7 +120,7 @@ final readonly class DumpAutoloadCommand
 
         try {
             $ide = IdeHelper::generate($vendor_dir);
-            $io->info(sprintf(
+            $io->info(\sprintf(
                 'ide helper %s (%d classes, %d bytes%s)',
                 $ide['path'],
                 $ide['classes'],
@@ -136,16 +136,16 @@ final readonly class DumpAutoloadCommand
 
     private function project_root(): string
     {
-        $dir = getcwd() ?: '';
-        $real = realpath($dir);
+        $dir = \getcwd() ?: '';
+        $real = \realpath($dir);
         if ($real !== false) {
             $dir = $real;
         }
         while ($dir !== '' && $dir !== '/') {
-            if (is_file($dir.DIRECTORY_SEPARATOR.'composer.json')) {
+            if (\is_file($dir.DIRECTORY_SEPARATOR.'composer.json')) {
                 return $dir;
             }
-            $parent = dirname($dir);
+            $parent = \dirname($dir);
             if ($parent === $dir) {
                 break;
             }
@@ -158,11 +158,11 @@ final readonly class DumpAutoloadCommand
     private function stamp_platform_config(string $root, string $vendor_rel, string $instance_id): void
     {
         $config_path = $root.DIRECTORY_SEPARATOR.'config'.DIRECTORY_SEPARATOR.'platform.php';
-        if (! is_file($config_path)) {
+        if (! \is_file($config_path)) {
             return;
         }
         $current = require $config_path;
-        if (! is_array($current)) {
+        if (! \is_array($current)) {
             $current = [];
         }
         $parts = InstanceId::parts($root);
@@ -175,31 +175,31 @@ final readonly class DumpAutoloadCommand
             'autoload' => $vendor_rel.'/autoload.php',
         ];
         $id = $current['id'] ?? null;
-        if (! is_string($id) || $id === '') {
+        if (! \is_string($id) || $id === '') {
             $writes['id'] = $instance_id;
         }
         $created = $current['created'] ?? null;
-        if (! is_string($created) || $created === '') {
-            $writes['created'] = gmdate('c');
+        if (! \is_string($created) || $created === '') {
+            $writes['created'] = \gmdate('c');
         }
         ConfigWriter::atomic_rewrite($config_path, $writes);
     }
 
     private function vendor_dir(string $root): string
     {
-        $raw = file_get_contents($root.DIRECTORY_SEPARATOR.'composer.json');
-        $json = is_string($raw) ? json_decode($raw, true) : null;
-        $rel = is_array($json) ? ($json['config']['vendor-dir'] ?? 'vendor') : 'vendor';
+        $raw = \file_get_contents($root.DIRECTORY_SEPARATOR.'composer.json');
+        $json = \is_string($raw) ? \json_decode($raw, true) : null;
+        $rel = \is_array($json) ? ($json['config']['vendor-dir'] ?? 'vendor') : 'vendor';
 
-        return rtrim($root.DIRECTORY_SEPARATOR.str_replace(['\\', '/'], DIRECTORY_SEPARATOR, (string) $rel), DIRECTORY_SEPARATOR);
+        return \rtrim($root.DIRECTORY_SEPARATOR.\str_replace(['\\', '/'], DIRECTORY_SEPARATOR, (string) $rel), DIRECTORY_SEPARATOR);
     }
 
     private function relative(string $from, string $to): ?string
     {
-        $from = rtrim(str_replace('\\', '/', $from), '/');
-        $to = str_replace('\\', '/', $to);
-        if (str_starts_with($to, $from.'/')) {
-            return substr($to, strlen($from) + 1);
+        $from = \rtrim(\str_replace('\\', '/', $from), '/');
+        $to = \str_replace('\\', '/', $to);
+        if (\str_starts_with($to, $from.'/')) {
+            return \substr($to, \strlen($from) + 1);
         }
 
         return null;
@@ -211,31 +211,31 @@ final readonly class DumpAutoloadCommand
     private function packages(string $vendor_dir): array
     {
         $file = $vendor_dir.'/composer/installed.json';
-        $raw = is_file($file) ? file_get_contents($file) : false;
-        $data = is_string($raw) ? json_decode($raw, true) : null;
-        if (! is_array($data)) {
+        $raw = \is_file($file) ? \file_get_contents($file) : false;
+        $data = \is_string($raw) ? \json_decode($raw, true) : null;
+        if (! \is_array($data)) {
             return [];
         }
-        $list = $data['packages'] ?? (array_is_list($data) ? $data : []);
+        $list = $data['packages'] ?? (\array_is_list($data) ? $data : []);
         $composer_dir = $vendor_dir.'/composer';
         $out = [];
         foreach ($list as $package) {
-            if (! is_array($package) || ! $this->is_webkernel_package($package)) {
+            if (! \is_array($package) || ! $this->is_webkernel_package($package)) {
                 continue;
             }
             $rel = $package['install-path'] ?? null;
             $name = $package['name'] ?? '';
             $candidates = [];
-            if (is_string($rel) && $rel !== '') {
+            if (\is_string($rel) && $rel !== '') {
                 $candidates[] = $composer_dir.'/'.$rel;
             }
-            if (is_string($name) && $name !== '') {
+            if (\is_string($name) && $name !== '') {
                 $candidates[] = $vendor_dir.'/'.$name;
             }
             $install_path = null;
             foreach ($candidates as $candidate) {
-                $real = realpath($candidate);
-                if ($real !== false && is_dir($real)) {
+                $real = \realpath($candidate);
+                if ($real !== false && \is_dir($real)) {
                     $install_path = $real;
                     break;
                 }
@@ -243,7 +243,7 @@ final readonly class DumpAutoloadCommand
             if ($install_path === null) {
                 continue;
             }
-            $out[] = ['path' => str_replace('\\', '/', $install_path), 'package' => $package];
+            $out[] = ['path' => \str_replace('\\', '/', $install_path), 'package' => $package];
         }
 
         return $out;
@@ -256,14 +256,14 @@ final readonly class DumpAutoloadCommand
     {
         $type = $package['type'] ?? '';
         $name = $package['name'] ?? '';
-        if (is_string($type) && str_starts_with($type, 'webkernel-')) {
+        if (\is_string($type) && \str_starts_with($type, 'webkernel-')) {
             return true;
         }
-        if (isset($package['extra']['webkernel']) && is_array($package['extra']['webkernel'])) {
+        if (isset($package['extra']['webkernel']) && \is_array($package['extra']['webkernel'])) {
             return true;
         }
 
-        return is_string($name) && str_starts_with($name, 'webkernel/');
+        return \is_string($name) && \str_starts_with($name, 'webkernel/');
     }
 
     /**
@@ -274,7 +274,7 @@ final readonly class DumpAutoloadCommand
     {
         $extra = $package['extra']['webkernel'] ?? null;
 
-        return is_array($extra) ? $extra : [];
+        return \is_array($extra) ? $extra : [];
     }
 
     /**
@@ -286,21 +286,21 @@ final readonly class DumpAutoloadCommand
         $map = [];
         foreach ($packages as $row) {
             $psr4 = $row['package']['autoload']['psr-4'] ?? [];
-            if (! is_array($psr4)) {
+            if (! \is_array($psr4)) {
                 continue;
             }
             foreach ($psr4 as $namespace => $dirs) {
                 foreach ((array) $dirs as $dir) {
-                    $base = rtrim($row['path'], '/\\').DIRECTORY_SEPARATOR.str_replace(['\\', '/'], DIRECTORY_SEPARATOR, (string) $dir);
-                    $base = rtrim($base, '/\\');
-                    if (! is_dir($base)) {
+                    $base = \rtrim($row['path'], '/\\').DIRECTORY_SEPARATOR.\str_replace(['\\', '/'], DIRECTORY_SEPARATOR, (string) $dir);
+                    $base = \rtrim($base, '/\\');
+                    if (! \is_dir($base)) {
                         continue;
                     }
                     $this->scan_psr4($map, (string) $namespace, $base);
                 }
             }
         }
-        ksort($map);
+        \ksort($map);
 
         return $map;
     }
@@ -316,8 +316,8 @@ final readonly class DumpAutoloadCommand
         foreach ($packages as $row) {
             $this->collect_function_files($paths, $row['path']);
         }
-        $list = array_keys($paths);
-        sort($list, SORT_STRING);
+        $list = \array_keys($paths);
+        \sort($list, SORT_STRING);
 
         return $list;
     }
@@ -328,8 +328,8 @@ final readonly class DumpAutoloadCommand
     private function collect_function_files(array &$paths, string $dir): void
     {
         foreach ($this->glob_paths($dir.'/functions/*.php') as $file) {
-            if (is_file($file)) {
-                $paths[str_replace('\\', '/', $file)] = true;
+            if (\is_file($file)) {
+                $paths[\str_replace('\\', '/', $file)] = true;
             }
         }
     }
@@ -339,13 +339,13 @@ final readonly class DumpAutoloadCommand
      */
     private function glob_paths(string $pattern): array
     {
-        $found = glob($pattern);
-        if (! is_array($found)) {
+        $found = \glob($pattern);
+        if (! \is_array($found)) {
             return [];
         }
         $out = [];
         foreach ($found as $path) {
-            if (is_string($path) && $path !== '') {
+            if (\is_string($path) && $path !== '') {
                 $out[] = $path;
             }
         }
@@ -364,18 +364,18 @@ final readonly class DumpAutoloadCommand
         foreach ($packages as $row) {
             $extra = $this->extra($row['package']);
             $provider = $extra['provider'] ?? null;
-            if (! is_string($provider) || $provider === '') {
+            if (! \is_string($provider) || $provider === '') {
                 continue;
             }
             $this->ensure_class($provider, $classmap);
-            if (! class_exists($provider) || ! is_a($provider, PlatformProvider::class, true)) {
+            if (! \class_exists($provider) || ! \is_a($provider, PlatformProvider::class, true)) {
                 continue;
             }
             $prefix = $extra['prefix'] ?? null;
-            if (! is_string($prefix) || $prefix === '') {
+            if (! \is_string($prefix) || $prefix === '') {
                 $name = $row['package']['name'] ?? 'app';
-                $prefix = is_string($name) && str_contains($name, '/')
-                    ? substr($name, strrpos($name, '/') + 1)
+                $prefix = \is_string($name) && \str_contains($name, '/')
+                    ? \substr($name, \strrpos($name, '/') + 1)
                     : (string) $name;
             }
             $out[] = [
@@ -395,18 +395,18 @@ final readonly class DumpAutoloadCommand
      */
     private function panels_dump(array $providers, array $classmap, string $root): array
     {
-        if (class_exists(\Webkernel\Config\Config::class, true)) {
+        if (\class_exists(\Webkernel\Config\Config::class, true)) {
             \Webkernel\Config\Config::boot($root);
         }
         $out = [];
         foreach ($providers as $row) {
             $provider = $row['class'];
             foreach ($provider::declaration('PANELS') as $panel_class) {
-                if (! is_string($panel_class) || $panel_class === '') {
+                if (! \is_string($panel_class) || $panel_class === '') {
                     continue;
                 }
                 $this->ensure_class($panel_class, $classmap);
-                if (! class_exists($panel_class) || ! is_a($panel_class, PanelProvider::class, true)) {
+                if (! \class_exists($panel_class) || ! \is_a($panel_class, PanelProvider::class, true)) {
                     continue;
                 }
                 /** @var PanelProvider $instance */
@@ -431,14 +431,14 @@ final readonly class DumpAutoloadCommand
         $out = [];
         foreach ($providers as $row) {
             foreach ($row['class']::declaration($constant) as $path) {
-                if (! is_string($path) || $path === '') {
+                if (! \is_string($path) || $path === '') {
                     continue;
                 }
-                $real = realpath($path) ?: $path;
-                if (! is_dir($real)) {
+                $real = \realpath($path) ?: $path;
+                if (! \is_dir($real)) {
                     continue;
                 }
-                $out[$row['prefix']][] = str_replace('\\', '/', $real);
+                $out[$row['prefix']][] = \str_replace('\\', '/', $real);
             }
         }
 
@@ -454,12 +454,12 @@ final readonly class DumpAutoloadCommand
         $out = [];
         foreach ($providers as $row) {
             foreach ($row['class']::declaration($constant) as $path) {
-                if (! is_string($path) || $path === '') {
+                if (! \is_string($path) || $path === '') {
                     continue;
                 }
-                $real = realpath($path) ?: $path;
-                if (is_file($real) && ! in_array($real, $out, true)) {
-                    $out[] = str_replace('\\', '/', $real);
+                $real = \realpath($path) ?: $path;
+                if (\is_file($real) && ! \in_array($real, $out, true)) {
+                    $out[] = \str_replace('\\', '/', $real);
                 }
             }
         }
@@ -476,12 +476,12 @@ final readonly class DumpAutoloadCommand
         $out = [];
         foreach ($providers as $row) {
             foreach ($row['class']::declaration($constant) as $class) {
-                if (is_string($class) && $class !== '' && ! in_array($class, $out, true)) {
+                if (\is_string($class) && $class !== '' && ! \in_array($class, $out, true)) {
                     $out[] = $class;
                 }
             }
         }
-        sort($out, SORT_STRING);
+        \sort($out, SORT_STRING);
 
         return $out;
     }
@@ -491,14 +491,14 @@ final readonly class DumpAutoloadCommand
      */
     private function ensure_class(string $class, array $classmap): void
     {
-        if (class_exists($class, false) || interface_exists($class, false)) {
+        if (\class_exists($class, false) || \interface_exists($class, false)) {
             return;
         }
         $file = $classmap[$class] ?? null;
-        if (is_string($file) && is_file($file)) {
+        if (\is_string($file) && \is_file($file)) {
             require_once $file;
         }
-        class_exists($class, true);
+        \class_exists($class, true);
     }
 
     /**
@@ -508,30 +508,30 @@ final readonly class DumpAutoloadCommand
     private function composables_list(array $classmap): array
     {
         $contract_file = $classmap[ComposableContract::class] ?? null;
-        if (is_string($contract_file) && is_file($contract_file)) {
+        if (\is_string($contract_file) && \is_file($contract_file)) {
             require_once $contract_file;
         }
-        if (! interface_exists(ComposableContract::class, false)) {
+        if (! \interface_exists(ComposableContract::class, false)) {
             return [];
         }
 
         /** @var array<string, class-string<ComposableContract>> $map */
         $map = [];
         foreach ($classmap as $class => $file) {
-            if (! is_string($file) || ! is_file($file)) {
+            if (! \is_string($file) || ! \is_file($file)) {
                 continue;
             }
-            $src = file_get_contents($file);
-            if ($src === false || ! str_contains($src, 'ComposableContract')) {
+            $src = \file_get_contents($file);
+            if ($src === false || ! \str_contains($src, 'ComposableContract')) {
                 continue;
             }
             require_once $file;
-            if (! class_exists($class, false) || ! is_a($class, ComposableContract::class, true)) {
+            if (! \class_exists($class, false) || ! \is_a($class, ComposableContract::class, true)) {
                 continue;
             }
             $map[$class::api_name()] = $class;
         }
-        ksort($map);
+        \ksort($map);
 
         return $map;
     }
@@ -541,7 +541,7 @@ final readonly class DumpAutoloadCommand
      */
     private function scan_psr4(array &$map, string $namespace, string $base): void
     {
-        $prefix_len = strlen($base) + 1;
+        $prefix_len = \strlen($base) + 1;
         $it = new RecursiveIteratorIterator(
             new RecursiveDirectoryIterator($base, FilesystemIterator::SKIP_DOTS),
         );
@@ -550,36 +550,36 @@ final readonly class DumpAutoloadCommand
             if (! $file->isFile() || $file->getExtension() !== 'php') {
                 continue;
             }
-            $rel = substr($file->getPathname(), $prefix_len);
+            $rel = \substr($file->getPathname(), $prefix_len);
             if ($rel === false) {
                 continue;
             }
-            $rel = str_replace('\\', '/', $rel);
-            $base_name = basename($rel);
+            $rel = \str_replace('\\', '/', $rel);
+            $base_name = \basename($rel);
             if (
-                str_contains($rel, '/functions/')
-                || str_starts_with($rel, 'functions/')
+                \str_contains($rel, '/functions/')
+                || \str_starts_with($rel, 'functions/')
                 || $base_name === 'check.php'
                 || $base_name === 'router.php'
                 || $base_name === 'config.php'
-                || str_starts_with($base_name, 'load.')
-                || str_starts_with($base_name, '_')
+                || \str_starts_with($base_name, 'load.')
+                || \str_starts_with($base_name, '_')
             ) {
                 continue;
             }
-            $src = file_get_contents($file->getPathname());
-            if (! is_string($src) || preg_match('/\b(?:class|interface|enum|trait)\s+/', $src) !== 1) {
+            $src = \file_get_contents($file->getPathname());
+            if (! \is_string($src) || \preg_match('/\b(?:class|interface|enum|trait)\s+/', $src) !== 1) {
                 continue;
             }
-            $class = $namespace.str_replace('/', '\\', substr($rel, 0, -4));
-            $map[$class] = str_replace('\\', '/', $file->getPathname());
+            $class = $namespace.\str_replace('/', '\\', \substr($rel, 0, -4));
+            $map[$class] = \str_replace('\\', '/', $file->getPathname());
         }
     }
 
     private function dump_path_prefix(string $vendor_dir, string $root): string
     {
-        $vendor_rel = str_replace('\\', '/', $this->relative($root, $vendor_dir) ?? basename($vendor_dir));
-        $up = substr_count($vendor_rel, '/') + 1;
+        $vendor_rel = \str_replace('\\', '/', $this->relative($root, $vendor_dir) ?? \basename($vendor_dir));
+        $up = \substr_count($vendor_rel, '/') + 1;
 
         return '$v = dirname(__DIR__); // vendor_dir'."\n".'$b = dirname($v, '.$up.'); // webapp root';
     }
@@ -589,14 +589,14 @@ final readonly class DumpAutoloadCommand
      */
     private function write_classmap(string $path, array $map, string $vendor_dir, string $root): void
     {
-        $vendor_dir = rtrim(str_replace('\\', '/', $vendor_dir), '/');
-        $root = rtrim(str_replace('\\', '/', $root), '/');
+        $vendor_dir = \rtrim(\str_replace('\\', '/', $vendor_dir), '/');
+        $root = \rtrim(\str_replace('\\', '/', $root), '/');
         $header = IdeHelper::generated_header();
         $lines = [];
 
         foreach ($map as $class => $file) {
-            $file = str_replace('\\', '/', $file);
-            $key = var_export($class, true);
+            $file = \str_replace('\\', '/', $file);
+            $key = \var_export($class, true);
             $lines[] = '    '.$key.' => '.$this->path_code($file, $vendor_dir, $root).',';
         }
 
@@ -611,20 +611,20 @@ final readonly class DumpAutoloadCommand
 
 return array(
 PHP;
-        $body .= ($lines === [] ? "\n" : "\n".implode("\n", $lines)."\n").");\n";
-        file_put_contents($path, $body, LOCK_EX);
+        $body .= ($lines === [] ? "\n" : "\n".\implode("\n", $lines)."\n").");\n";
+        \file_put_contents($path, $body, LOCK_EX);
     }
 
     private function path_code(string $file, string $vendor_dir, string $root): string
     {
-        if (str_starts_with($file, $vendor_dir.'/')) {
-            return '$v . '.(string) var_export(substr($file, strlen($vendor_dir)), true);
+        if (\str_starts_with($file, $vendor_dir.'/')) {
+            return '$v . '.(string) \var_export(\substr($file, \strlen($vendor_dir)), true);
         }
-        if (str_starts_with($file, $root.'/')) {
-            return '$b . '.(string) var_export(substr($file, strlen($root)), true);
+        if (\str_starts_with($file, $root.'/')) {
+            return '$b . '.(string) \var_export(\substr($file, \strlen($root)), true);
         }
 
-        return (string) var_export($file, true);
+        return (string) \var_export($file, true);
     }
 
     /**
@@ -632,15 +632,15 @@ PHP;
      */
     private function write_files(string $path, array $files, string $vendor_dir, string $root): void
     {
-        $vendor_dir = rtrim(str_replace('\\', '/', $vendor_dir), '/');
-        $root = rtrim(str_replace('\\', '/', $root), '/');
+        $vendor_dir = \rtrim(\str_replace('\\', '/', $vendor_dir), '/');
+        $root = \rtrim(\str_replace('\\', '/', $root), '/');
         $header = IdeHelper::generated_header();
         $items = [];
         foreach ($files as $file) {
-            $items[] = '    '.$this->path_code(str_replace('\\', '/', $file), $vendor_dir, $root).',';
+            $items[] = '    '.$this->path_code(\str_replace('\\', '/', $file), $vendor_dir, $root).',';
         }
 
-        $list = $items === [] ? '' : "\n".implode("\n", $items)."\n";
+        $list = $items === [] ? '' : "\n".\implode("\n", $items)."\n";
 
         $body = <<<PHP
 <?php declare(strict_types=1);
@@ -660,7 +660,7 @@ foreach (\$files as \$file) {
 }
 
 PHP;
-        file_put_contents($path, $body, LOCK_EX);
+        \file_put_contents($path, $body, LOCK_EX);
     }
 
     /**
@@ -668,14 +668,14 @@ PHP;
      */
     private function write_path_list(string $path, array $paths, string $vendor_dir, string $root): void
     {
-        $vendor_dir = rtrim(str_replace('\\', '/', $vendor_dir), '/');
-        $root = rtrim(str_replace('\\', '/', $root), '/');
+        $vendor_dir = \rtrim(\str_replace('\\', '/', $vendor_dir), '/');
+        $root = \rtrim(\str_replace('\\', '/', $root), '/');
         $header = IdeHelper::generated_header();
         $items = [];
         foreach ($paths as $item) {
-            $items[] = '    '.$this->path_code(str_replace('\\', '/', $item), $vendor_dir, $root).',';
+            $items[] = '    '.$this->path_code(\str_replace('\\', '/', $item), $vendor_dir, $root).',';
         }
-        $list = $items === [] ? '' : "\n".implode("\n", $items)."\n";
+        $list = $items === [] ? '' : "\n".\implode("\n", $items)."\n";
 
         $body = <<<PHP
 <?php declare(strict_types=1);
@@ -689,7 +689,7 @@ PHP;
 return [{$list}];
 
 PHP;
-        file_put_contents($path, $body, LOCK_EX);
+        \file_put_contents($path, $body, LOCK_EX);
     }
 
     /**
@@ -697,23 +697,23 @@ PHP;
      */
     private function write_namespaced_paths(string $path, array $namespaces, string $vendor_dir, string $root): void
     {
-        $vendor_dir = rtrim(str_replace('\\', '/', $vendor_dir), '/');
-        $root = rtrim(str_replace('\\', '/', $root), '/');
+        $vendor_dir = \rtrim(\str_replace('\\', '/', $vendor_dir), '/');
+        $root = \rtrim(\str_replace('\\', '/', $root), '/');
         $header = IdeHelper::generated_header();
         $ns_lines = [];
         $dir_lines = [];
         foreach ($namespaces as $namespace => $dirs) {
             $items = [];
             foreach ($dirs as $dir) {
-                $code = $this->path_code(str_replace('\\', '/', $dir), $vendor_dir, $root);
+                $code = $this->path_code(\str_replace('\\', '/', $dir), $vendor_dir, $root);
                 $items[] = '            '.$code.',';
                 $dir_lines[$dir] = '        '.$code.',';
             }
-            $list = $items === [] ? '' : "\n".implode("\n", $items)."\n        ";
-            $ns_lines[] = '        '.var_export($namespace, true).' => ['.$list.'],';
+            $list = $items === [] ? '' : "\n".\implode("\n", $items)."\n        ";
+            $ns_lines[] = '        '.\var_export($namespace, true).' => ['.$list.'],';
         }
-        $ns_body = $ns_lines === [] ? '' : "\n".implode("\n", $ns_lines)."\n    ";
-        $dirs_body = $dir_lines === [] ? '' : "\n".implode("\n", $dir_lines)."\n    ";
+        $ns_body = $ns_lines === [] ? '' : "\n".\implode("\n", $ns_lines)."\n    ";
+        $dirs_body = $dir_lines === [] ? '' : "\n".\implode("\n", $dir_lines)."\n    ";
 
         $body = <<<PHP
 <?php declare(strict_types=1);
@@ -730,7 +730,7 @@ return [
 ];
 
 PHP;
-        file_put_contents($path, $body, LOCK_EX);
+        \file_put_contents($path, $body, LOCK_EX);
     }
 
     /**
@@ -738,19 +738,19 @@ PHP;
      */
     private function write_webapp_ide(array $map): void
     {
-        $path = dirname(IdeHelper::output_path()).'/_ide_webapp.php';
+        $path = \dirname(IdeHelper::output_path()).'/_ide_webapp.php';
         $header = IdeHelper::generated_header();
         $methods = [
             '     * @method \Webkernel\Composables\ConfigComposable|mixed config(?string $key = null, mixed $default = null)',
         ];
-        ksort($map);
+        \ksort($map);
         foreach ($map as $name => $class) {
             if ($name === 'config') {
                 continue;
             }
             $methods[] = '     * '.$this->composable_phpdoc($name, $class);
         }
-        $block = implode("\n", $methods);
+        $block = \implode("\n", $methods);
         $body = <<<PHP
 <?php declare(strict_types=1);
 
@@ -770,7 +770,7 @@ if (false) {
 }
 
 PHP;
-        file_put_contents($path, $body, LOCK_EX);
+        \file_put_contents($path, $body, LOCK_EX);
     }
 
     /**
@@ -778,7 +778,7 @@ PHP;
      */
     private function composable_phpdoc(string $name, string $class): string
     {
-        if (method_exists($class, '__invoke')) {
+        if (\method_exists($class, '__invoke')) {
             try {
                 $ref = new \ReflectionMethod($class, '__invoke');
             } catch (\ReflectionException) {
@@ -790,7 +790,7 @@ PHP;
             }
             $return = $this->phpdoc_type($ref->getReturnType(), $class) ?? ('\\'.$class);
 
-            return '@method '.$return.' '.$name.'('.implode(', ', $params).')';
+            return '@method '.$return.' '.$name.'('.\implode(', ', $params).')';
         }
 
         return '@method \\'.$class.' '.$name.'()';
@@ -810,7 +810,7 @@ PHP;
             } elseif ($default === null) {
                 $piece .= ' = null';
             } else {
-                $piece .= ' = '.var_export($default, true);
+                $piece .= ' = '.\var_export($default, true);
             }
         } elseif ($parameter->isOptional() || $parameter->allowsNull()) {
             $piece .= ' = null';
@@ -849,9 +849,9 @@ PHP;
         $header = IdeHelper::generated_header();
         $lines = [];
         foreach ($map as $name => $class) {
-            $lines[] = '    '.var_export($name, true).' => \\'.$class.'::class,';
+            $lines[] = '    '.\var_export($name, true).' => \\'.$class.'::class,';
         }
-        $list = $lines === [] ? '' : "\n".implode("\n", $lines)."\n";
+        $list = $lines === [] ? '' : "\n".\implode("\n", $lines)."\n";
 
         $body = <<<PHP
 <?php declare(strict_types=1);
@@ -863,7 +863,7 @@ PHP;
 return [{$list}];
 
 PHP;
-        file_put_contents($path, $body, LOCK_EX);
+        \file_put_contents($path, $body, LOCK_EX);
     }
 
     /**
@@ -876,7 +876,7 @@ PHP;
         foreach ($classes as $class) {
             $lines[] = '    \\'.$class.'::class,';
         }
-        $list = $lines === [] ? '' : "\n".implode("\n", $lines)."\n";
+        $list = $lines === [] ? '' : "\n".\implode("\n", $lines)."\n";
 
         $body = <<<PHP
 <?php declare(strict_types=1);
@@ -888,12 +888,12 @@ PHP;
 return [{$list}];
 
 PHP;
-        file_put_contents($path, $body, LOCK_EX);
+        \file_put_contents($path, $body, LOCK_EX);
     }
 
     private function write_php(string $path, mixed $data): void
     {
-        $export = var_export($data, true);
+        $export = \var_export($data, true);
         $header = IdeHelper::generated_header();
         $body = <<<PHP
 <?php declare(strict_types=1);
@@ -905,7 +905,7 @@ PHP;
 return {$export};
 
 PHP;
-        file_put_contents($path, $body, LOCK_EX);
+        \file_put_contents($path, $body, LOCK_EX);
     }
 
     private function terminal(): Terminal

@@ -1,6 +1,10 @@
+<?php  foreach (([
+ 'name' => '',
+ 'set' => 'lucide',
+]) as $__n => $__d) { if (!isset($$__n)) { $$__n = $__d; } } unset($__n, $__d); ?>
 <?php 
- $markup = function_exists('webkernel_grab_icon')
- ? webkernel_grab_icon((string) ($name ?? ''), 'webkernel-shell-icon__svg', '', (string) ($set ?? 'lucide'))
+ $markup = \function_exists('icon')
+ ? icon((string) $name, 'webkernel-shell-icon__svg', '', (string) $set)
  : '';
  ?>
 <span class="webkernel-shell-icon"><?php echo $markup; ?></span>

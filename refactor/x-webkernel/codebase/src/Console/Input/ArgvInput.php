@@ -26,7 +26,7 @@ final readonly class ArgvInput
     public function __construct(?array $argv = null)
     {
         $argv ??= $_SERVER['argv'] ?? [];
-        if (! is_array($argv)) {
+        if (! \is_array($argv)) {
             $argv = [];
         }
 
@@ -35,25 +35,25 @@ final readonly class ArgvInput
         $options = [];
         $wants_help = false;
 
-        foreach (array_slice(array_values($argv), 1) as $token) {
-            if (! is_string($token) || $token === '') {
+        foreach (\array_slice(\array_values($argv), 1) as $token) {
+            if (! \is_string($token) || $token === '') {
                 continue;
             }
             if ($token === '--help' || $token === '-h') {
                 $wants_help = true;
                 continue;
             }
-            if (str_starts_with($token, '--no-') && strlen($token) > 5 && ! str_contains($token, '=')) {
-                $options[substr($token, 5)] = false;
+            if (\str_starts_with($token, '--no-') && \strlen($token) > 5 && ! \str_contains($token, '=')) {
+                $options[\substr($token, 5)] = false;
                 continue;
             }
-            if (str_starts_with($token, '--') && strlen($token) > 2) {
-                $body = substr($token, 2);
-                $eq = strpos($body, '=');
+            if (\str_starts_with($token, '--') && \strlen($token) > 2) {
+                $body = \substr($token, 2);
+                $eq = \strpos($body, '=');
                 if ($eq === false) {
                     $options[$body] = true;
                 } else {
-                    $options[substr($body, 0, $eq)] = substr($body, $eq + 1);
+                    $options[\substr($body, 0, $eq)] = \substr($body, $eq + 1);
                 }
                 continue;
             }
@@ -67,7 +67,7 @@ final readonly class ArgvInput
         if ($command === 'help') {
             $wants_help = true;
             $command = $arguments[0] ?? null;
-            $arguments = array_slice($arguments, 1);
+            $arguments = \array_slice($arguments, 1);
         }
 
         $this->command = $command;
@@ -104,7 +104,7 @@ final readonly class ArgvInput
 
     public function has_option(string $name): bool
     {
-        return array_key_exists($name, $this->options);
+        return \array_key_exists($name, $this->options);
     }
 
     public function wants_help(): bool

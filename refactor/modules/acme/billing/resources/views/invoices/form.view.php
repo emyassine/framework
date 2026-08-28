@@ -1,5 +1,7 @@
 @extends('webkernel::layouts.page')
 
+@section('title'){{ $title }}@endsection
+
 @section('navigation')
   @include('billing::sidebar', ['current' => 'invoices'])
 @endsection

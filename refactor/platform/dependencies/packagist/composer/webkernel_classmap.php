@@ -44,6 +44,7 @@ return array(
     'Webkernel\\DevEnv\\IdeHelper' => $b . '/x-webkernel/codebase/src/DevEnv/IdeHelper.php',
     'Webkernel\\Http' => $b . '/x-webkernel/codebase/src/Http.php',
     'Webkernel\\Imagery\\Branding' => $b . '/x-webkernel/platform/imagery/src/Branding.php',
+    'Webkernel\\Imagery\\Http\\Controllers\\BrandingController' => $b . '/x-webkernel/platform/imagery/src/Http/Controllers/BrandingController.php',
     'Webkernel\\Imagery\\Icon' => $b . '/x-webkernel/platform/imagery/src/Icon.php',
     'Webkernel\\Imagery\\ImageryProvider' => $b . '/x-webkernel/platform/imagery/src/ImageryProvider.php',
     'Webkernel\\Instance\\InstanceId' => $b . '/x-webkernel/codebase/src/Instance/InstanceId.php',

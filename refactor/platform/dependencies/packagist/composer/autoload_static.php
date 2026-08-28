@@ -15,13 +15,11 @@ class ComposerStaticInitcc6f492cc5d64cb7f09b9024726d6929
     public static $prefixLengthsPsr4 = array (
         'W' =>
         array (
+            'Webkernel\\Tests\\' => 16,
             'Webkernel\\Lifecycle\\' => 20,
+            'Webkernel\\Imagery\\Tests\\' => 24,
             'Webkernel\\Imagery\\' => 18,
             'Webkernel\\' => 10,
-        ),
-        'T' =>
-        array (
-            'Tests\\' => 6,
         ),
         'P' =>
         array (
@@ -53,9 +51,17 @@ class ComposerStaticInitcc6f492cc5d64cb7f09b9024726d6929
     );
 
     public static $prefixDirsPsr4 = array (
+        'Webkernel\\Tests\\' =>
+        array (
+            0 => __DIR__ . '/../../../..' . '/x-webkernel/codebase/tests',
+        ),
         'Webkernel\\Lifecycle\\' =>
         array (
             0 => __DIR__ . '/..' . '/webkernel/lifecycle/Lifecycle',
+        ),
+        'Webkernel\\Imagery\\Tests\\' =>
+        array (
+            0 => __DIR__ . '/../../../..' . '/x-webkernel/platform/imagery/tests',
         ),
         'Webkernel\\Imagery\\' =>
         array (
@@ -64,10 +70,6 @@ class ComposerStaticInitcc6f492cc5d64cb7f09b9024726d6929
         'Webkernel\\' =>
         array (
             0 => __DIR__ . '/..' . '/webkernel/codebase/src',
-        ),
-        'Tests\\' =>
-        array (
-            0 => __DIR__ . '/../../../..' . '/tests',
         ),
         'Psr\\SimpleCache\\' =>
         array (
@@ -1774,10 +1776,6 @@ class ComposerStaticInitcc6f492cc5d64cb7f09b9024726d6929
         'SebastianBergmann\\Type\\UnknownType' => __DIR__ . '/..' . '/sebastian/type/src/type/UnknownType.php',
         'SebastianBergmann\\Type\\VoidType' => __DIR__ . '/..' . '/sebastian/type/src/type/VoidType.php',
         'SebastianBergmann\\Version' => __DIR__ . '/..' . '/sebastian/version/src/Version.php',
-        'Tests\\Feature\\BrandingTest' => __DIR__ . '/../../../..' . '/tests/Feature/BrandingTest.php',
-        'Tests\\Feature\\ConfigTest' => __DIR__ . '/../../../..' . '/tests/Feature/ConfigTest.php',
-        'Tests\\Feature\\HttpTest' => __DIR__ . '/../../../..' . '/tests/Feature/HttpTest.php',
-        'Tests\\Feature\\PanelViewTest' => __DIR__ . '/../../../..' . '/tests/Feature/PanelViewTest.php',
         'TheSeer\\Tokenizer\\Exception' => __DIR__ . '/..' . '/theseer/tokenizer/src/Exception.php',
         'TheSeer\\Tokenizer\\NamespaceUri' => __DIR__ . '/..' . '/theseer/tokenizer/src/NamespaceUri.php',
         'TheSeer\\Tokenizer\\NamespaceUriException' => __DIR__ . '/..' . '/theseer/tokenizer/src/NamespaceUriException.php',
@@ -1808,8 +1806,10 @@ class ComposerStaticInitcc6f492cc5d64cb7f09b9024726d6929
         'Webkernel\\DevEnv\\IdeHelper' => __DIR__ . '/..' . '/webkernel/codebase/src/DevEnv/IdeHelper.php',
         'Webkernel\\Http' => __DIR__ . '/..' . '/webkernel/codebase/src/Http.php',
         'Webkernel\\Imagery\\Branding' => __DIR__ . '/..' . '/webkernel/imagery/src/Branding.php',
+        'Webkernel\\Imagery\\Http\\Controllers\\BrandingController' => __DIR__ . '/..' . '/webkernel/imagery/src/Http/Controllers/BrandingController.php',
         'Webkernel\\Imagery\\Icon' => __DIR__ . '/..' . '/webkernel/imagery/src/Icon.php',
         'Webkernel\\Imagery\\ImageryProvider' => __DIR__ . '/..' . '/webkernel/imagery/src/ImageryProvider.php',
+        'Webkernel\\Imagery\\Tests\\Feature\\BrandingTest' => __DIR__ . '/../../../..' . '/x-webkernel/platform/imagery/tests/Feature/BrandingTest.php',
         'Webkernel\\Instance\\InstanceId' => __DIR__ . '/..' . '/webkernel/codebase/src/Instance/InstanceId.php',
         'Webkernel\\Lifecycle\\ComposerScripts' => __DIR__ . '/..' . '/webkernel/lifecycle/Lifecycle/ComposerScripts.php',
         'Webkernel\\Lifecycle\\Installer\\LCBaseInstaller' => __DIR__ . '/..' . '/webkernel/lifecycle/Lifecycle/Installer/LCBaseInstaller.php',
@@ -1845,6 +1845,9 @@ class ComposerStaticInitcc6f492cc5d64cb7f09b9024726d6929
         'Webkernel\\Route\\Route' => __DIR__ . '/..' . '/webkernel/codebase/src/Route/Route.php',
         'Webkernel\\Route\\Uri\\Uri' => __DIR__ . '/..' . '/webkernel/codebase/src/Route/Uri/Uri.php',
         'Webkernel\\Route\\Uri\\UriException' => __DIR__ . '/..' . '/webkernel/codebase/src/Route/Uri/UriException.php',
+        'Webkernel\\Tests\\Feature\\ConfigTest' => __DIR__ . '/../../../..' . '/x-webkernel/codebase/tests/Feature/ConfigTest.php',
+        'Webkernel\\Tests\\Feature\\HttpTest' => __DIR__ . '/../../../..' . '/x-webkernel/codebase/tests/Feature/HttpTest.php',
+        'Webkernel\\Tests\\Feature\\PanelViewTest' => __DIR__ . '/../../../..' . '/x-webkernel/codebase/tests/Feature/PanelViewTest.php',
         'Webkernel\\View\\Compiler' => __DIR__ . '/..' . '/webkernel/codebase/src/View/Compiler.php',
         'Webkernel\\View\\Engine' => __DIR__ . '/..' . '/webkernel/codebase/src/View/Engine.php',
         'Webkernel\\View\\Js' => __DIR__ . '/..' . '/webkernel/codebase/src/View/Js.php',

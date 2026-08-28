@@ -26,7 +26,7 @@ final class Uri
      */
     public function for_name(string $name, array $substitutions = []): string
     {
-        if (! array_key_exists($name, $this->named)) {
+        if (! \array_key_exists($name, $this->named)) {
             throw UriException::undefined($name);
         }
 
@@ -38,9 +38,9 @@ final class Uri
             }
         }
 
-        assert($missing !== []);
+        \assert($missing !== []);
 
-        throw UriException::insufficient($name, $missing, array_keys($substitutions));
+        throw UriException::insufficient($name, $missing, \array_keys($substitutions));
     }
 
     /**
@@ -53,7 +53,7 @@ final class Uri
     {
         $missing = [];
         foreach ($parts as $part) {
-            if (is_string($part) || array_key_exists($part[0], $substitutions)) {
+            if (\is_string($part) || \array_key_exists($part[0], $substitutions)) {
                 continue;
             }
             $missing[] = $part[0];
@@ -70,19 +70,19 @@ final class Uri
     {
         $path = '';
         foreach ($parsed_route as $part) {
-            if (is_string($part)) {
+            if (\is_string($part)) {
                 $path .= $part;
                 continue;
             }
 
             [$parameter, $regex] = $part;
-            if (preg_match('~^'.$regex.'$~u', $substitutions[$parameter]) !== 1) {
+            if (\preg_match('~^'.$regex.'$~u', $substitutions[$parameter]) !== 1) {
                 throw UriException::parameter_mismatch($route, $parameter, $regex);
             }
             $path .= $substitutions[$parameter];
         }
 
-        assert($path !== '');
+        \assert($path !== '');
 
         return $path;
     }

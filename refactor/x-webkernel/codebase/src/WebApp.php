@@ -56,7 +56,7 @@ final class WebApp
         if ($arguments === []) {
             return $segment;
         }
-        if (is_callable($segment)) {
+        if (\is_callable($segment)) {
             return $segment(...$arguments);
         }
 
@@ -70,7 +70,7 @@ final class WebApp
         }
         $this->load_map();
         $class = $this->composables[$name] ?? null;
-        if (! is_string($class) || $class === '') {
+        if (! \is_string($class) || $class === '') {
             throw new \BadMethodCallException('Unknown composable ['.$name.'].');
         }
 
@@ -84,15 +84,15 @@ final class WebApp
         }
         $this->map_loaded = true;
         $file = vendor_dir('composer/webkernel_composables.php');
-        if (! is_file($file)) {
+        if (! \is_file($file)) {
             return;
         }
         $map = require $file;
-        if (! is_array($map)) {
+        if (! \is_array($map)) {
             return;
         }
         foreach ($map as $name => $class) {
-            if (is_string($name) && is_string($class) && $class !== '') {
+            if (\is_string($name) && \is_string($class) && $class !== '') {
                 $this->composables[$name] = $class;
             }
         }

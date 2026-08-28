@@ -50,7 +50,7 @@ final class Binding
      */
     public function where(string|array $parameter, ?string $pattern = null): self
     {
-        if (is_array($parameter)) {
+        if (\is_array($parameter)) {
             foreach ($parameter as $name => $regex) {
                 $this->wheres[$name] = $regex;
             }
@@ -73,7 +73,7 @@ final class Binding
     public function middleware(string|array $middleware): self
     {
         // ponytail: recorded on extra, not executed — upgrade when an auth pipeline exists
-        $this->middleware = array_values(array_unique(array_merge(
+        $this->middleware = \array_values(\array_unique(\array_merge(
             $this->middleware,
             PendingGroup::normalize_middleware($middleware),
         )));
@@ -157,16 +157,16 @@ final class Binding
 
     public function action_label(): string
     {
-        if (isset($this->attributes[Route::VIEW]) && is_string($this->attributes[Route::VIEW]) && $this->attributes[Route::VIEW] !== '') {
+        if (isset($this->attributes[Route::VIEW]) && \is_string($this->attributes[Route::VIEW]) && $this->attributes[Route::VIEW] !== '') {
             return 'view:'.$this->attributes[Route::VIEW];
         }
-        if (is_array($this->action) && isset($this->action[0], $this->action[1]) && is_string($this->action[0]) && is_string($this->action[1])) {
+        if (\is_array($this->action) && isset($this->action[0], $this->action[1]) && \is_string($this->action[0]) && \is_string($this->action[1])) {
             return $this->action[0].'@'.$this->action[1];
         }
-        if (is_string($this->action) && $this->action !== '') {
+        if (\is_string($this->action) && $this->action !== '') {
             return $this->action;
         }
-        if (is_object($this->action)) {
+        if (\is_object($this->action)) {
             return $this->action::class;
         }
 
@@ -181,11 +181,11 @@ final class Binding
         if ($host === '') {
             return false;
         }
-        if (! str_contains($this->domain, '{')) {
-            return strcasecmp($this->domain, $host) === 0;
+        if (! \str_contains($this->domain, '{')) {
+            return \strcasecmp($this->domain, $host) === 0;
         }
 
-        return preg_match(self::domain_regex($this->domain), $host) === 1;
+        return \preg_match(self::domain_regex($this->domain), $host) === 1;
     }
 
     public function compile(Generator $generator): void
@@ -210,11 +210,11 @@ final class Binding
         if ($name === '') {
             return;
         }
-        if (array_key_exists($name, $named)) {
+        if (\array_key_exists($name, $named)) {
             throw BadRoute::named_route_already_defined($name);
         }
 
-        $named[$name] = array_reverse($this->parsed());
+        $named[$name] = \array_reverse($this->parsed());
     }
 
     /**
@@ -231,7 +231,7 @@ final class Binding
             $extra[Route::DOMAIN] = $this->domain;
         }
         if ($this->middleware !== []) {
-            $extra[Route::MIDDLEWARE] = implode('|', $this->middleware);
+            $extra[Route::MIDDLEWARE] = \implode('|', $this->middleware);
         }
 
         return $extra;
@@ -248,7 +248,7 @@ final class Binding
         }
         foreach ($parsed as $i => $parts) {
             foreach ($parts as $j => $part) {
-                if (is_array($part) && isset($this->wheres[$part[0]])) {
+                if (\is_array($part) && isset($this->wheres[$part[0]])) {
                     $parsed[$i][$j][1] = $this->wheres[$part[0]];
                 }
             }
@@ -259,18 +259,18 @@ final class Binding
 
     public static function domain_regex(string $domain): string
     {
-        $pattern = preg_replace_callback(
+        $pattern = \preg_replace_callback(
             '/\{([a-zA-Z_][a-zA-Z0-9_-]*)\}|[^{]+/',
             static function (array $m): string {
                 if (isset($m[1]) && $m[1] !== '') {
                     return '(?P<'.$m[1].'>[^./]+)';
                 }
 
-                return preg_quote($m[0], '`');
+                return \preg_quote($m[0], '`');
             },
             $domain,
         );
-        assert(is_string($pattern) && $pattern !== '');
+        \assert(\is_string($pattern) && $pattern !== '');
 
         return '`^'.$pattern.'$`i';
     }
@@ -283,15 +283,15 @@ final class Binding
     public static function domain_variables(array $extra, string $host): array
     {
         $domain = $extra[Route::DOMAIN] ?? null;
-        if (! is_string($domain) || $domain === '' || $host === '' || ! str_contains($domain, '{')) {
+        if (! \is_string($domain) || $domain === '' || $host === '' || ! \str_contains($domain, '{')) {
             return [];
         }
-        if (preg_match(self::domain_regex($domain), $host, $matches) !== 1) {
+        if (\preg_match(self::domain_regex($domain), $host, $matches) !== 1) {
             return [];
         }
         $vars = [];
         foreach ($matches as $key => $value) {
-            if (is_string($key)) {
+            if (\is_string($key)) {
                 $vars[$key] = $value;
             }
         }
@@ -310,8 +310,8 @@ final class Binding
     private static function expand_optional(string $uri): string
     {
         $suffix = '';
-        while (preg_match('~(/?)\{([a-zA-Z_][a-zA-Z0-9_-]*)\?\}$~', $uri, $m) === 1) {
-            $uri = substr($uri, 0, -strlen($m[0]));
+        while (\preg_match('~(/?)\{([a-zA-Z_][a-zA-Z0-9_-]*)\?\}$~', $uri, $m) === 1) {
+            $uri = \substr($uri, 0, -\strlen($m[0]));
             $suffix = '['.$m[1].'{'.$m[2].'}'.$suffix.']';
         }
 

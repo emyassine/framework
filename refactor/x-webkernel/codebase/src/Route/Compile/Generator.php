@@ -31,7 +31,7 @@ final class Generator
      */
     public function add_route(string $http_method, array $route_data, mixed $handler, array $extra = []): void
     {
-        if (count($route_data) === 1 && is_string($route_data[0])) {
+        if (\count($route_data) === 1 && \is_string($route_data[0])) {
             $this->add_static($http_method, $route_data[0], $handler, $extra);
 
             return;
@@ -51,9 +51,9 @@ final class Generator
 
         $data = [];
         foreach ($this->method_to_regex as $method => $regex_to_routes) {
-            $chunk_size = $this->chunk_size(count($regex_to_routes));
-            $chunks = array_chunk($regex_to_routes, $chunk_size, true);
-            $data[$method] = array_map($this->process_chunk(...), $chunks);
+            $chunk_size = $this->chunk_size(\count($regex_to_routes));
+            $chunks = \array_chunk($regex_to_routes, $chunk_size, true);
+            $data[$method] = \array_map($this->process_chunk(...), $chunks);
         }
 
         return [$this->static_routes, $data];
@@ -98,9 +98,9 @@ final class Generator
     /** @return positive-int */
     private function chunk_size(int $count): int
     {
-        $num_parts = max(1, (int) round($count / 30));
-        $size = (int) ceil($count / $num_parts);
-        assert($size > 0);
+        $num_parts = \max(1, (int) \round($count / 30));
+        $size = (int) \ceil($count / $num_parts);
+        \assert($size > 0);
 
         return $size;
     }
@@ -123,7 +123,7 @@ final class Generator
         }
 
         return [
-            'regex' => '~^(?|'.implode('|', $regexes).')$~',
+            'regex' => '~^(?|'.\implode('|', $regexes).')$~',
             'routeMap' => $route_map,
         ];
     }

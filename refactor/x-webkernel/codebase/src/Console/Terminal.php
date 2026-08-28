@@ -53,16 +53,16 @@ final class Terminal implements ComposableContract
 
     public static function columns(): int
     {
-        $cols = (int) getenv('COLUMNS');
+        $cols = (int) \getenv('COLUMNS');
         if ($cols >= 40) {
             return $cols;
         }
         if (PHP_OS_FAMILY !== 'Windows') {
             $stty = [];
-            exec('stty size 2>/dev/null', $stty);
+            \exec('stty size 2>/dev/null', $stty);
             $line = $stty[0] ?? '';
-            if (preg_match('/\d+\s+(\d+)/', $line, $m) === 1) {
-                return max(40, (int) $m[1]);
+            if (\preg_match('/\d+\s+(\d+)/', $line, $m) === 1) {
+                return \max(40, (int) $m[1]);
             }
         }
 
@@ -77,7 +77,7 @@ final class Terminal implements ComposableContract
     public function fake(array $answers = []): self
     {
         $this->faking = true;
-        $this->fakes = array_values($answers);
+        $this->fakes = \array_values($answers);
 
         return $this;
     }
@@ -91,9 +91,9 @@ final class Terminal implements ComposableContract
     {
         return ! $this->faking
             && PHP_OS_FAMILY !== 'Windows'
-            && defined('STDIN')
-            && is_resource(STDIN)
-            && stream_isatty(STDIN);
+            && \defined('STDIN')
+            && \is_resource(STDIN)
+            && \stream_isatty(STDIN);
     }
 
     public function next_fake(string $prompt = ''): mixed
@@ -105,7 +105,7 @@ final class Terminal implements ComposableContract
             );
         }
 
-        return array_shift($this->fakes);
+        return \array_shift($this->fakes);
     }
 
     public function secret(string $label, bool $required = false): string
@@ -131,25 +131,25 @@ final class Terminal implements ComposableContract
     {
         $widths = [];
         foreach ($headers as $i => $header) {
-            $widths[$i] = strlen((string) $header);
+            $widths[$i] = \strlen((string) $header);
         }
         foreach ($rows as $row) {
-            foreach (array_values($row) as $i => $cell) {
-                $widths[$i] = max($widths[$i] ?? 0, strlen((string) $cell));
+            foreach (\array_values($row) as $i => $cell) {
+                $widths[$i] = \max($widths[$i] ?? 0, \strlen((string) $cell));
             }
         }
         $line = static function (array $cells) use ($widths): string {
             $out = [];
-            foreach (array_values($cells) as $i => $cell) {
-                $out[] = str_pad((string) $cell, $widths[$i] ?? 0);
+            foreach (\array_values($cells) as $i => $cell) {
+                $out[] = \str_pad((string) $cell, $widths[$i] ?? 0);
             }
 
-            return '  '.implode('  ', $out);
+            return '  '.\implode('  ', $out);
         };
         echo $line($headers).PHP_EOL;
-        echo '  '.str_repeat('-', max(1, array_sum($widths) + 2 * max(0, count($widths) - 1))).PHP_EOL;
+        echo '  '.\str_repeat('-', \max(1, \array_sum($widths) + 2 * \max(0, \count($widths) - 1))).PHP_EOL;
         foreach ($rows as $row) {
-            echo $line(array_values($row)).PHP_EOL;
+            echo $line(\array_values($row)).PHP_EOL;
         }
     }
 
@@ -331,7 +331,7 @@ final class Terminal implements ComposableContract
 
     public function note(string $message, string $type = 'NOTE'): void
     {
-        $colors = match (strtoupper($type)) {
+        $colors = match (\strtoupper($type)) {
             'INFO' => ['44', '97'],
             'WARN', 'WARNING' => ['43', '30'],
             'ERROR' => ['41', '97'],
@@ -359,7 +359,7 @@ final class Terminal implements ComposableContract
 
     public function error(string $msg): void
     {
-        fwrite(STDERR, '  '.self::badge('ERROR', '41', '97').' '.self::RED.$msg.self::RESET."\n");
+        \fwrite(STDERR, '  '.self::badge('ERROR', '41', '97').' '.self::RED.$msg.self::RESET."\n");
     }
 
     public function alert(string $msg): void

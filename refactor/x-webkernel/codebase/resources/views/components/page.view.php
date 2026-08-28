@@ -4,11 +4,17 @@
     body
   </x-webkernel::page>
 --}}
+@props([
+  'title' => null,
+  'description' => null,
+])
 <div class="webkernel-shell-page">
   <header class="webkernel-shell-page-header">
     <div>
-      <h1 class="webkernel-shell-page-title">{{ $title ?? '' }}</h1>
-      @if (!empty($description))
+      @if ($title !== null && $title !== '')
+        <h1 class="webkernel-shell-page-title">{{ $title }}</h1>
+      @endif
+      @if ($description !== null && $description !== '')
         <p class="webkernel-shell-page-desc">{{ $description }}</p>
       @endif
     </div>

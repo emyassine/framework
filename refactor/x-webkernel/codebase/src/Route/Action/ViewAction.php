@@ -22,7 +22,7 @@ final readonly class ViewAction
     public function __invoke(): View
     {
         if ($this->status !== 200) {
-            http_response_code($this->status);
+            \http_response_code($this->status);
         }
 
         return View::make($this->view, $this->data);

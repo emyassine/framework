@@ -41,8 +41,8 @@ final class Compiled
         $variables = [];
 
         foreach ($route_data as $part) {
-            if (is_string($part)) {
-                $regex .= preg_quote($part, '~');
+            if (\is_string($part)) {
+                $regex .= \preg_quote($part, '~');
                 continue;
             }
 
@@ -56,6 +56,6 @@ final class Compiled
 
     public function matches(string $str): bool
     {
-        return (bool) preg_match('~^'.$this->regex.'$~', $str);
+        return (bool) \preg_match('~^'.$this->regex.'$~', $str);
     }
 }

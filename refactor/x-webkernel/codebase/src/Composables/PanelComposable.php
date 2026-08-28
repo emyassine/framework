@@ -68,16 +68,16 @@ final class PanelComposable implements ComposableContract
             return self::$panels;
         }
         $file = vendor_dir('composer/webkernel_panels.php');
-        if (! is_file($file)) {
+        if (! \is_file($file)) {
             return self::$panels = [];
         }
         $loaded = require $file;
-        if (! is_array($loaded)) {
+        if (! \is_array($loaded)) {
             return self::$panels = [];
         }
         $out = [];
         foreach ($loaded as $panel) {
-            if (is_array($panel)) {
+            if (\is_array($panel)) {
                 $out[] = $panel;
             }
         }

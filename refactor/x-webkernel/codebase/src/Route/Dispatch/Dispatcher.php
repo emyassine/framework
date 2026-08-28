@@ -91,7 +91,7 @@ final class Dispatcher
     private function dispatch_variable(array $route_data, string $uri): ?Matched
     {
         foreach ($route_data as $data) {
-            if (preg_match($data['regex'], $uri, $matches) !== 1) {
+            if (\preg_match($data['regex'], $uri, $matches) !== 1) {
                 continue;
             }
 

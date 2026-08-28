@@ -4,11 +4,17 @@
  body
  <?php echo $this->render_component(); ?>
 */ ?>
+<?php  foreach (([
+ 'title' => null,
+ 'description' => null,
+]) as $__n => $__d) { if (!isset($$__n)) { $$__n = $__d; } } unset($__n, $__d); ?>
 <div class="webkernel-shell-page">
  <header class="webkernel-shell-page-header">
  <div>
- <h1 class="webkernel-shell-page-title"><?php echo \Webkernel\View\View::echo($title ?? ''); ?></h1>
- <?php if(!empty($description)): ?>
+ <?php if($title !== null && $title !== ''): ?>
+ <h1 class="webkernel-shell-page-title"><?php echo \Webkernel\View\View::echo($title); ?></h1>
+ <?php endif; ?>
+ <?php if($description !== null && $description !== ''): ?>
  <p class="webkernel-shell-page-desc"><?php echo \Webkernel\View\View::echo($description); ?></p>
  <?php endif; ?>
  </div>

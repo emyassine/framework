@@ -19,6 +19,11 @@
             "Webkernel\\Imagery\\": "src/"
         }
     },
+    "autoload-dev": {
+        "psr-4": {
+            "Webkernel\\Imagery\\Tests\\": "tests/"
+        }
+    },
     "extra": {
         "webkernel": {
             "package_repo": "git@github.com:webkernelphp/imagery.git",

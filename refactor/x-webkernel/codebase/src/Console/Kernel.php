@@ -63,7 +63,7 @@ final class Kernel implements ComposableContract
             $next = function () use ($definition, $input, $instance): ExitCode {
                 return $this->invoke($definition, $input, $instance);
             };
-            foreach (array_reverse($definition['middleware']) as $middleware_class) {
+            foreach (\array_reverse($definition['middleware']) as $middleware_class) {
                 $middleware = $this->instantiate($middleware_class);
                 if (! $middleware instanceof ConsoleMiddleware) {
                     throw new \RuntimeException($middleware_class.' must implement ConsoleMiddleware.');
@@ -95,7 +95,7 @@ final class Kernel implements ComposableContract
 
         $out = [];
         foreach ($this->command_classes() as $class) {
-            if (! class_exists($class)) {
+            if (! \class_exists($class)) {
                 continue;
             }
             $ref = new \ReflectionClass($class);
@@ -119,7 +119,7 @@ final class Kernel implements ComposableContract
                 ];
             }
         }
-        ksort($out);
+        \ksort($out);
         $this->definitions = $out;
 
         return $out;
@@ -148,12 +148,12 @@ final class Kernel implements ComposableContract
 
         foreach ($method->getParameters() as $param) {
             $type = self::scalar_type($param);
-            $kebab = str_replace('_', '-', $param->getName());
+            $kebab = \str_replace('_', '-', $param->getName());
             $is_bool = $type === 'bool';
             $is_argument = ! $is_bool && ! $param->isDefaultValueAvailable();
 
             if ($is_argument) {
-                if (! array_key_exists($position, $positional)) {
+                if (! \array_key_exists($position, $positional)) {
                     throw new \InvalidArgumentException('Missing argument <'.$param->getName().'>.');
                 }
                 $args[] = self::cast($type, $positional[$position], $param->allowsNull());
@@ -198,8 +198,8 @@ final class Kernel implements ComposableContract
     private function option_value(\ReflectionParameter $param, ArgvInput $input, string $kebab, array &$used_options): string|bool|null
     {
         $names = [$kebab];
-        if (str_starts_with($param->getName(), 'with_')) {
-            $names[] = str_replace('_', '-', substr($param->getName(), 5));
+        if (\str_starts_with($param->getName(), 'with_')) {
+            $names[] = \str_replace('_', '-', \substr($param->getName(), 5));
         }
 
         foreach ($names as $name) {
@@ -269,16 +269,16 @@ final class Kernel implements ComposableContract
     private function dumped_commands(): array
     {
         $file = vendor_dir('composer/webkernel_commands.php');
-        if (! is_file($file)) {
+        if (! \is_file($file)) {
             return [];
         }
         $loaded = require $file;
-        if (! is_array($loaded)) {
+        if (! \is_array($loaded)) {
             return [];
         }
         $out = [];
         foreach ($loaded as $class) {
-            if (is_string($class) && $class !== '') {
+            if (\is_string($class) && $class !== '') {
                 $out[] = $class;
             }
         }
@@ -308,11 +308,11 @@ final class Kernel implements ComposableContract
         echo "\n  ".Terminal::BOLD.'webkernel'.Terminal::RESET.' '.Terminal::muted('<command>')."\n\n";
         $definitions = $this->definitions();
         $width = 4;
-        foreach (array_keys($definitions) as $name) {
-            $width = max($width, strlen($name));
+        foreach (\array_keys($definitions) as $name) {
+            $width = \max($width, \strlen($name));
         }
         foreach ($definitions as $name => $definition) {
-            $pad = str_repeat(' ', $width - strlen($name) + 3);
+            $pad = \str_repeat(' ', $width - \strlen($name) + 3);
             $desc = $definition['description'] !== '' ? $definition['description'] : $this->signature_hint($definition['reflection']);
             echo '  '.Terminal::CYAN.$name.Terminal::RESET.$pad.Terminal::muted($desc)."\n";
         }
@@ -340,25 +340,25 @@ final class Kernel implements ComposableContract
     {
         $parts = [];
         foreach ($method->getParameters() as $param) {
-            $kebab = str_replace('_', '-', $param->getName());
+            $kebab = \str_replace('_', '-', $param->getName());
             $type = self::scalar_type($param);
             if ($type === 'bool') {
                 $parts[] = '[--'.$kebab.']';
-                if (str_starts_with($param->getName(), 'with_')) {
-                    $parts[] = '[--no-'.str_replace('_', '-', substr($param->getName(), 5)).']';
+                if (\str_starts_with($param->getName(), 'with_')) {
+                    $parts[] = '[--no-'.\str_replace('_', '-', \substr($param->getName(), 5)).']';
                 }
                 continue;
             }
             if ($param->isDefaultValueAvailable()) {
                 $default = $param->getDefaultValue();
-                $shown = is_scalar($default) ? (string) $default : '';
+                $shown = \is_scalar($default) ? (string) $default : '';
                 $parts[] = '[--'.$kebab.($shown !== '' ? '='.$shown : '').']';
                 continue;
             }
             $parts[] = '<'.$param->getName().'>';
         }
 
-        return implode(' ', $parts);
+        return \implode(' ', $parts);
     }
 
     private static function command_name(\ReflectionClass $class, \ReflectionMethod $method, ConsoleCommand $attribute): string
@@ -367,8 +367,8 @@ final class Kernel implements ComposableContract
             return $attribute->name;
         }
         $short = $class->getShortName();
-        if (str_ends_with($short, 'Command')) {
-            $short = substr($short, 0, -7);
+        if (\str_ends_with($short, 'Command')) {
+            $short = \substr($short, 0, -7);
         }
         $class_part = self::kebab($short);
         if ($method->getName() === '__invoke') {
@@ -380,10 +380,10 @@ final class Kernel implements ComposableContract
 
     private static function kebab(string $name): string
     {
-        $kebab = preg_replace('/([a-z0-9])([A-Z])/', '$1-$2', $name);
-        $kebab = str_replace('_', '-', is_string($kebab) ? $kebab : $name);
+        $kebab = \preg_replace('/([a-z0-9])([A-Z])/', '$1-$2', $name);
+        $kebab = \str_replace('_', '-', \is_string($kebab) ? $kebab : $name);
 
-        return strtolower($kebab);
+        return \strtolower($kebab);
     }
 
     private static function scalar_type(\ReflectionParameter $param): string
@@ -425,7 +425,7 @@ final class Kernel implements ComposableContract
         if ($result instanceof ExitCode) {
             return $result;
         }
-        if (is_int($result)) {
+        if (\is_int($result)) {
             return ExitCode::tryFrom($result) ?? ExitCode::ERROR;
         }
         if ($result === null) {

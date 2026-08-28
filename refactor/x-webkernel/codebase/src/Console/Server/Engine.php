@@ -53,9 +53,9 @@ final class Engine
                 continue;
             }
 
-            return ExitCode::tryFrom(is_int($exit_code) ? $exit_code : 0) ?? ExitCode::SUCCESS;
+            return ExitCode::tryFrom(\is_int($exit_code) ? $exit_code : 0) ?? ExitCode::SUCCESS;
         }
-        fwrite(STDERR, "Unable to listen on {$this->host} after ".self::MAX_PORT_TRIES." port attempts.\n");
+        \fwrite(STDERR, "Unable to listen on {$this->host} after ".self::MAX_PORT_TRIES." port attempts.\n");
 
         return ExitCode::ERROR;
     }
@@ -79,20 +79,20 @@ final class Engine
         $command[] = $this->router;
         $env = null;
         if ($this->profile_lifecycle) {
-            $env = getenv();
-            if (! is_array($env)) {
+            $env = \getenv();
+            if (! \is_array($env)) {
                 $env = [];
             }
             $env['WEBKERNEL_PROFILE_LIFECYCLE'] = '1';
         }
         $pipes = [];
-        $process = proc_open($command, [
+        $process = \proc_open($command, [
             0 => ['file', '/dev/null', 'r'],
             1 => ['pipe', 'w'],
             2 => ['redirect', 1],
         ], $pipes, $this->root, $env);
         if ($process === false) {
-            fwrite(STDERR, "Failed to start PHP development server.\n");
+            \fwrite(STDERR, "Failed to start PHP development server.\n");
 
             return 1;
         }
@@ -100,7 +100,7 @@ final class Engine
         $stdout = $pipes[1] ?? null;
         if ($stdout === null) {
             $this->close_process();
-            fwrite(STDERR, "Failed to capture server output.\n");
+            \fwrite(STDERR, "Failed to capture server output.\n");
 
             return 1;
         }
@@ -114,33 +114,33 @@ final class Engine
             $kept[(int) $fd] = $pipe;
         }
         $this->pipes = $kept;
-        stream_set_blocking($stdout, false);
+        \stream_set_blocking($stdout, false);
         while (true) {
-            $chunk = fread($stdout, 8192);
-            if (is_string($chunk) && $chunk !== '') {
+            $chunk = \fread($stdout, 8192);
+            if (\is_string($chunk) && $chunk !== '') {
                 $this->ingest($chunk);
             }
-            $status = proc_get_status($process);
+            $status = \proc_get_status($process);
             if (! $status['running']) {
-                $leftover = stream_get_contents($stdout);
-                if (is_string($leftover) && $leftover !== '') {
+                $leftover = \stream_get_contents($stdout);
+                if (\is_string($leftover) && $leftover !== '') {
                     $this->ingest($leftover);
                 }
                 $this->close_process();
 
                 return $status['exitcode'];
             }
-            usleep(50_000);
+            \usleep(50_000);
         }
     }
 
     private function ingest(string $chunk): void
     {
         $this->output_buffer .= $chunk;
-        $lines = explode("\n", $this->output_buffer);
-        $this->output_buffer = (string) array_pop($lines);
+        $lines = \explode("\n", $this->output_buffer);
+        $this->output_buffer = (string) \array_pop($lines);
         foreach ($lines as $line) {
-            $this->handle_line(trim($line));
+            $this->handle_line(\trim($line));
         }
     }
 
@@ -149,12 +149,12 @@ final class Engine
         if ($line === '') {
             return;
         }
-        if (str_contains($line, 'Failed to listen') || str_contains($line, 'Address already in use')) {
+        if (\str_contains($line, 'Failed to listen') || \str_contains($line, 'Address already in use')) {
             $this->address_in_use = true;
 
             return;
         }
-        if (str_contains($line, 'Development Server (http')) {
+        if (\str_contains($line, 'Development Server (http')) {
             if (! $this->banner_shown) {
                 $this->banner_shown = true;
                 $this->render_banner();
@@ -162,21 +162,21 @@ final class Engine
 
             return;
         }
-        if (str_contains($line, 'Closed without sending a request') || str_contains($line, 'Failed to poll event')) {
+        if (\str_contains($line, 'Closed without sending a request') || \str_contains($line, 'Failed to poll event')) {
             return;
         }
 
         $port = $this->request_port($line);
-        if (str_ends_with($line, ' Accepted') && $port !== null) {
+        if (\str_ends_with($line, ' Accepted') && $port !== null) {
             $this->requests_pool[$port] = [
-                'started' => hrtime(true), 'request' => '', 'status' => 200, 'render_ms' => null, 'type' => 'WEB',
+                'started' => \hrtime(true), 'request' => '', 'status' => 200, 'render_ms' => null, 'type' => 'WEB',
                 'times' => [], 'classes' => [], 'mem' => null,
             ];
 
             return;
         }
 
-        if (preg_match('/^webkernel-include (\S+) (\S+) (\S+) (.+)$/', $line, $tm) === 1) {
+        if (\preg_match('/^webkernel-include (\S+) (\S+) (\S+) (.+)$/', $line, $tm) === 1) {
             $this->trace_time([
                 'ms' => $tm[1] === '?' ? null : (float) $tm[1],
                 'run_ms' => $tm[2] === '?' ? null : (float) $tm[2],
@@ -186,27 +186,27 @@ final class Engine
 
             return;
         }
-        if (str_starts_with($line, 'webkernel-class ')) {
-            $this->trace_push('classes', substr($line, 16));
+        if (\str_starts_with($line, 'webkernel-class ')) {
+            $this->trace_push('classes', \substr($line, 16));
 
             return;
         }
-        if (str_starts_with($line, 'webkernel-mem ')) {
-            $this->trace_push('mem', substr($line, 14));
+        if (\str_starts_with($line, 'webkernel-mem ')) {
+            $this->trace_push('mem', \substr($line, 14));
 
             return;
         }
-        if (str_starts_with($line, 'webkernel-type ')) {
-            $this->trace_push('type', substr($line, 15));
+        if (\str_starts_with($line, 'webkernel-type ')) {
+            $this->trace_push('type', \substr($line, 15));
 
             return;
         }
 
-        if (preg_match('/\[(\d+)\]:\s+(\S+)\s+(\S+)/', $line, $m) === 1) {
+        if (\preg_match('/\[(\d+)\]:\s+(\S+)\s+(\S+)/', $line, $m) === 1) {
             $status = (int) $m[1];
             $request = $m[2].' '.$m[3];
             $render_ms = null;
-            if (preg_match('/render=([0-9.]+)/', $line, $r) === 1) {
+            if (\preg_match('/render=([0-9.]+)/', $line, $r) === 1) {
                 $render_ms = (float) $r[1];
             }
             if ($port !== null && isset($this->requests_pool[$port])) {
@@ -218,12 +218,12 @@ final class Engine
 
                 return;
             }
-            $this->log_request($request, $status, hrtime(true), ['render_ms' => $render_ms]);
+            $this->log_request($request, $status, \hrtime(true), ['render_ms' => $render_ms]);
 
             return;
         }
 
-        if (str_ends_with($line, ' Closing') && $port !== null) {
+        if (\str_ends_with($line, ' Closing') && $port !== null) {
             $entry = $this->requests_pool[$port] ?? null;
             unset($this->requests_pool[$port]);
             if ($entry === null || $entry['request'] === '') {
@@ -237,8 +237,8 @@ final class Engine
             return;
         }
 
-        if (str_starts_with($line, '[')) {
-            $line = trim((string) strstr($line, '] '));
+        if (\str_starts_with($line, '[')) {
+            $line = \trim((string) \strstr($line, '] '));
         }
         if ($line !== '') {
             echo '  '.Terminal::muted($line)."\n";
@@ -247,7 +247,7 @@ final class Engine
 
     private function request_port(string $line): ?int
     {
-        if (preg_match('/:(\d+)\s+(?:Accepted|Closing|\[\d+\])/', $line, $m) === 1) {
+        if (\preg_match('/:(\d+)\s+(?:Accepted|Closing|\[\d+\])/', $line, $m) === 1) {
             return (int) $m[1];
         }
 
@@ -258,7 +258,7 @@ final class Engine
     {
         $banner_start_message = [
             'This feature is part of Webkernel.',
-            '(c) 2025 - '.(date('Y') + 1).' Numerimondes, El Moumen Yassine',
+            '(c) 2025 - '.(\date('Y') + 1).' Numerimondes, El Moumen Yassine',
             'Yassine El Moumen <yassine@numerimondes.com> | <platform@webkernelphp.com>',
             'For the full copyright and license information, please view the LICENSE',
             'file that was distributed with the source code.',
@@ -271,7 +271,7 @@ final class Engine
 
         $url = "http://{$this->host}:{$this->port}";
         $child = Status::inspect('cli-server');
-        $ext = extension_loaded('Zend OPcache');
+        $ext = \extension_loaded('Zend OPcache');
         $opcache_active = $this->jit === true ? $ext : $child->opcache;
         $jit_active = $this->jit === true ? $ext : ($this->jit === false ? false : $child->jit);
         $opcache_status = $opcache_active ? Terminal::GREEN.'enabled'.Terminal::RESET : Terminal::GRAY.'disabled'.Terminal::RESET;
@@ -280,7 +280,7 @@ final class Engine
         webterminal()->info('Server running on '.Terminal::BOLD.'['.$url.']'.Terminal::RESET);
         echo "\n";
         echo '  '.Terminal::muted('PHP Version: '.PHP_VERSION.' | OPcache: '.$opcache_status.' | JIT: '.$jit_status)."\n\n";
-        if ($this->jit === true && ! extension_loaded('Zend OPcache')) {
+        if ($this->jit === true && ! \extension_loaded('Zend OPcache')) {
             webterminal()->warning('Zend OPcache is not loaded; --with-jit has no effect.');
             echo "\n";
         }
@@ -303,31 +303,31 @@ final class Engine
         }
         $this->is_first_request = false;
 
-        $request_ms = (hrtime(true) - $start_time) / 1e6;
-        $timestamp = date('H:i:s');
+        $request_ms = (\hrtime(true) - $start_time) / 1e6;
+        $timestamp = \date('H:i:s');
         $width = $this->line_width();
 
         $is_api = $timings['type'] ?? 'WEB';
         $type_badge = $is_api === 'API' ? Terminal::badge('API', '45', '97') : Terminal::badge('WEB', '42', '97');
         $reason = $this->status_reason($status_code);
 
-        $left = sprintf('  %s %s %s%s %s %s%s%s', $type_badge, Terminal::muted($timestamp), Terminal::status_color($status_code), $status_code, $reason, Terminal::CYAN, $request, Terminal::RESET);
+        $left = \sprintf('  %s %s %s%s %s %s%s%s', $type_badge, Terminal::muted($timestamp), Terminal::status_color($status_code), $status_code, $reason, Terminal::CYAN, $request, Terminal::RESET);
         $right_plain = $this->metrics_plain($timings['render_ms'] ?? null, $request_ms);
         $right = Terminal::muted($right_plain);
 
         $left_len = $this->visible_len($left);
-        $right_len = strlen($right_plain);
+        $right_len = \strlen($right_plain);
         $dots = $width - $left_len - $right_len - 2;
 
         if ($dots < 2) {
             $overflow = 2 - $dots;
-            $max_req = max(8, strlen($request) - $overflow);
+            $max_req = \max(8, \strlen($request) - $overflow);
             $request_short = $this->shorten($request, $max_req);
-            $left = sprintf('  %s %s %s%s %s %s%s%s', $type_badge, Terminal::muted($timestamp), Terminal::status_color($status_code), $status_code, $reason, Terminal::CYAN, $request_short, Terminal::RESET);
-            $dots = max(2, $width - $this->visible_len($left) - $right_len - 2);
+            $left = \sprintf('  %s %s %s%s %s %s%s%s', $type_badge, Terminal::muted($timestamp), Terminal::status_color($status_code), $status_code, $reason, Terminal::CYAN, $request_short, Terminal::RESET);
+            $dots = \max(2, $width - $this->visible_len($left) - $right_len - 2);
         }
 
-        echo $left.' '.Terminal::muted(str_repeat('.', $dots)).' '.$right."\n";
+        echo $left.' '.Terminal::muted(\str_repeat('.', $dots)).' '.$right."\n";
         if (! $this->profile_lifecycle) {
             return;
         }
@@ -335,7 +335,7 @@ final class Engine
         $times = $timings['times'] ?? [];
         $classes = $timings['classes'] ?? [];
         $mem = $timings['mem'] ?? null;
-        $mem_label = is_numeric($mem) ? number_format(((int) $mem) / 1048576, 1).'MB' : '?';
+        $mem_label = \is_numeric($mem) ? \number_format(((int) $mem) / 1048576, 1).'MB' : '?';
 
         $has_real = false;
         foreach ($times as $row) {
@@ -380,11 +380,11 @@ final class Engine
                 $valid_times[] = $row['ms'];
             }
         }
-        sort($valid_times);
-        $count_valid = count($valid_times);
+        \sort($valid_times);
+        $count_valid = \count($valid_times);
         $median = 0.0;
         if ($count_valid > 0) {
-            $mid = (int) floor(($count_valid - 1) / 2);
+            $mid = (int) \floor(($count_valid - 1) / 2);
             $median = ($count_valid % 2 === 0) ? ($valid_times[$mid] + $valid_times[$mid + 1]) / 2.0 : $valid_times[$mid];
         }
 
@@ -402,8 +402,8 @@ final class Engine
         }
         echo "\n";
 
-        $summary1 = sprintf('%s -> %d %s | files=%d timed=%d inferred=%d classes=%d mem=%s', $request, $status_code, $reason, count($times), $count_valid, $inferred_count, count($classes), $mem_label);
-        $summary2 = sprintf('grades excellent=%d good=%d fair=%d slow=%d (%de %dg %df %ds) median=%.3fms', $grades['e'], $grades['g'], $grades['f'], $grades['s'], $grades['e'], $grades['g'], $grades['f'], $grades['s'], $median);
+        $summary1 = \sprintf('%s -> %d %s | files=%d timed=%d inferred=%d classes=%d mem=%s', $request, $status_code, $reason, \count($times), $count_valid, $inferred_count, \count($classes), $mem_label);
+        $summary2 = \sprintf('grades excellent=%d good=%d fair=%d slow=%d (%de %dg %df %ds) median=%.3fms', $grades['e'], $grades['g'], $grades['f'], $grades['s'], $grades['e'], $grades['g'], $grades['f'], $grades['s'], $median);
 
         echo '  '.Terminal::muted($summary1)."\n";
         echo '  '.Terminal::muted($summary2)."\n";
@@ -435,11 +435,11 @@ final class Engine
                     $flag = ' '.Terminal::GRAY.' [OK]  '.Terminal::RESET;
                 }
             }
-            $ms_str = $ms === null ? '      ??' : sprintf('%c%7.3f', $inferred ? '~' : ' ', $ms);
-            $run_str = $run === null ? '      ??' : sprintf('%c%7.3f', $inferred ? '~' : ' ', $run);
-            $read_str = $read === null ? '      ??' : sprintf('%c%7.3f', $inferred ? '~' : ' ', $read);
+            $ms_str = $ms === null ? '      ??' : \sprintf('%c%7.3f', $inferred ? '~' : ' ', $ms);
+            $run_str = $run === null ? '      ??' : \sprintf('%c%7.3f', $inferred ? '~' : ' ', $run);
+            $read_str = $read === null ? '      ??' : \sprintf('%c%7.3f', $inferred ? '~' : ' ', $read);
 
-            echo sprintf("  %s  %s  %s  %s%s\n", Terminal::muted($ms_str), Terminal::muted($run_str), Terminal::muted($read_str), $flag, Terminal::muted(' ->  ').$path);
+            echo \sprintf("  %s  %s  %s  %s%s\n", Terminal::muted($ms_str), Terminal::muted($run_str), Terminal::muted($read_str), $flag, Terminal::muted(' ->  ').$path);
         }
         echo "\n";
         foreach ($classes as $class) {
@@ -449,30 +449,30 @@ final class Engine
 
     private function metrics_plain(?float $render_ms, float $request_ms): string
     {
-        $request = 'request '.number_format($request_ms, 2).'ms';
+        $request = 'request '.\number_format($request_ms, 2).'ms';
 
-        return $render_ms === null ? $request : 'render '.number_format($render_ms, 2).'ms  '.$request;
+        return $render_ms === null ? $request : 'render '.\number_format($render_ms, 2).'ms  '.$request;
     }
 
     private function line_width(): int
     {
-        return max(60, (int) (Terminal::columns() * 0.95));
+        return \max(60, (int) (Terminal::columns() * 0.95));
     }
 
     private function visible_len(string $text): int
     {
-        $plain = preg_replace('/\033\[[0-9;]*m/', '', $text);
+        $plain = \preg_replace('/\033\[[0-9;]*m/', '', $text);
 
-        return strlen(is_string($plain) ? $plain : $text);
+        return \strlen(\is_string($plain) ? $plain : $text);
     }
 
     private function shorten(string $text, int $max): string
     {
-        if ($max < 2 || strlen($text) <= $max) {
+        if ($max < 2 || \strlen($text) <= $max) {
             return $text;
         }
 
-        return substr($text, 0, $max - 1).'...';
+        return \substr($text, 0, $max - 1).'...';
     }
 
     private function status_reason(int $code): string
@@ -489,9 +489,9 @@ final class Engine
      */
     private function trace_time(array $row): void
     {
-        end($this->requests_pool);
-        $port = key($this->requests_pool);
-        if (! is_int($port)) {
+        \end($this->requests_pool);
+        $port = \key($this->requests_pool);
+        if (! \is_int($port)) {
             return;
         }
         $this->requests_pool[$port]['times'][] = $row;
@@ -499,9 +499,9 @@ final class Engine
 
     private function trace_push(string $kind, string $value): void
     {
-        end($this->requests_pool);
-        $port = key($this->requests_pool);
-        if (! is_int($port)) {
+        \end($this->requests_pool);
+        $port = \key($this->requests_pool);
+        if (! \is_int($port)) {
             return;
         }
         if ($kind === 'mem') {
@@ -519,19 +519,19 @@ final class Engine
 
     private function register_signals(): void
     {
-        if (! function_exists('pcntl_async_signals') || ! function_exists('pcntl_signal')) {
+        if (! \function_exists('pcntl_async_signals') || ! \function_exists('pcntl_signal')) {
             return;
         }
-        pcntl_async_signals(true);
+        \pcntl_async_signals(true);
         $stop = function (): void {
             $this->close_process();
             exit(0);
         };
-        pcntl_signal(SIGINT, $stop);
-        pcntl_signal(SIGTERM, $stop);
-        pcntl_signal(SIGHUP, $stop);
-        pcntl_signal(SIGQUIT, $stop);
-        register_shutdown_function(function (): void {
+        \pcntl_signal(SIGINT, $stop);
+        \pcntl_signal(SIGTERM, $stop);
+        \pcntl_signal(SIGHUP, $stop);
+        \pcntl_signal(SIGQUIT, $stop);
+        \register_shutdown_function(function (): void {
             $this->close_process();
         });
     }
@@ -544,22 +544,22 @@ final class Engine
 
             return;
         }
-        $status = proc_get_status($process);
+        $status = \proc_get_status($process);
         if ($status['running']) {
-            proc_terminate($process, SIGTERM);
-            $deadline = microtime(true) + 2;
-            while (proc_get_status($process)['running'] && microtime(true) < $deadline) {
-                usleep(50_000);
+            \proc_terminate($process, SIGTERM);
+            $deadline = \microtime(true) + 2;
+            while (\proc_get_status($process)['running'] && \microtime(true) < $deadline) {
+                \usleep(50_000);
             }
-            if (proc_get_status($process)['running']) {
-                proc_terminate($process, SIGKILL);
+            if (\proc_get_status($process)['running']) {
+                \proc_terminate($process, SIGKILL);
             }
         }
         foreach ($this->pipes as $pipe) {
-            fclose($pipe);
+            \fclose($pipe);
         }
         $this->pipes = [];
-        proc_close($process);
+        \proc_close($process);
         $this->process = null;
     }
 }

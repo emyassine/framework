@@ -66,7 +66,7 @@ final class Performance implements ComposableContract
     public function restart_required(): bool
     {
         $file = self::preference_path();
-        if (! is_file($file)) {
+        if (! \is_file($file)) {
             return false;
         }
 
@@ -86,8 +86,8 @@ final class Performance implements ComposableContract
             '-d', 'opcache.jit='.self::JIT_MODE,
             '-d', 'opcache.jit_buffer_size='.self::JIT_BUFFER,
         ];
-        if (! extension_loaded('Zend OPcache')) {
-            array_unshift($args, '-d', 'zend_extension=opcache');
+        if (! \extension_loaded('Zend OPcache')) {
+            \array_unshift($args, '-d', 'zend_extension=opcache');
         }
 
         return $args;
@@ -111,24 +111,24 @@ final class Performance implements ComposableContract
     public static function wants_jit(?string $file = null): bool
     {
         $file ??= self::preference_path();
-        if (! is_file($file)) {
+        if (! \is_file($file)) {
             return false;
         }
         $data = include $file;
 
-        return is_array($data) && ($data['jit'] ?? false) === true;
+        return \is_array($data) && ($data['jit'] ?? false) === true;
     }
 
     public static function write_preference(bool $jit, ?string $file = null): void
     {
         $file ??= self::preference_path();
-        $dir = dirname($file);
-        if (! is_dir($dir) && ! mkdir($dir, 0775, true) && ! is_dir($dir)) {
+        $dir = \dirname($file);
+        if (! \is_dir($dir) && ! \mkdir($dir, 0775, true) && ! \is_dir($dir)) {
             throw new \RuntimeException('Unable to create '.$dir);
         }
-        $ok = file_put_contents(
+        $ok = \file_put_contents(
             $file,
-            "<?php declare(strict_types=1);\n\nreturn ".var_export(['jit' => $jit], true).";\n",
+            "<?php declare(strict_types=1);\n\nreturn ".\var_export(['jit' => $jit], true).";\n",
             LOCK_EX,
         );
         if ($ok === false) {

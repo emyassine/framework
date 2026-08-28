@@ -15,8 +15,8 @@ final readonly class RedirectAction
 
     public function __invoke(): string
     {
-        http_response_code($this->status);
-        header('Location: '.$this->destination, true, $this->status);
+        \http_response_code($this->status);
+        \header('Location: '.$this->destination, true, $this->status);
 
         return '';
     }

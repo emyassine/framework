@@ -1,9 +1,28 @@
+<?php  foreach (([
+ 'lang' => 'en',
+ 'theme' => null,
+ 'layout' => 'sidebar',
+ 'sidebar' => 'expanded',
+ 'brand' => null,
+ 'favicon' => null,
+ 'logo' => null,
+]) as $__n => $__d) { if (!isset($$__n)) { $$__n = $__d; } } unset($__n, $__d); ?>
+<?php 
+ $brand = $brand ?? \Webkernel\Config\Config::get('app.name');
+ $theme = $theme ?? (\Webkernel\Config\Config::get('ui.dark_mode', true) ? 'dark' : 'light');
+ if ($favicon === null && \function_exists('webkernel_branding_url')) {
+ $favicon = webkernel_branding_url('webkernel-favicon');
+ }
+ if ($logo === null && \function_exists('webkernel_branding_url')) {
+ $logo = webkernel_branding_url($theme === 'dark' ? 'webkernel-logo-dark' : 'webkernel-logo-light');
+ }
+ ?>
 <!DOCTYPE html>
 <html
- lang="<?php echo \Webkernel\View\View::echo($lang ?? 'en'); ?>"
- data-webkernel-design-theme="<?php echo \Webkernel\View\View::echo($theme ?? 'light'); ?>"
- data-webkernel-design-layout="<?php echo \Webkernel\View\View::echo($layout ?? 'sidebar'); ?>"
- data-webkernel-design-sidebar="<?php echo \Webkernel\View\View::echo($sidebar ?? 'expanded'); ?>"
+ lang="<?php echo \Webkernel\View\View::echo($lang); ?>"
+ data-webkernel-design-theme="<?php echo \Webkernel\View\View::echo($theme); ?>"
+ data-webkernel-design-layout="<?php echo \Webkernel\View\View::echo($layout); ?>"
+ data-webkernel-design-sidebar="<?php echo \Webkernel\View\View::echo($sidebar); ?>"
 >
 <head>
  <meta charset="UTF-8" />
@@ -11,7 +30,7 @@
  <?php if(!empty($favicon)): ?>
  <link rel="icon" href="<?php echo \Webkernel\View\View::echo($favicon); ?>" />
  <?php endif; ?>
- <title><?php echo \Webkernel\View\View::echo($title ?? 'Webkernel'); ?></title>
+ <title><?php echo $this->yield_content('title'); ?></title>
  <?php echo $this->run_child('webkernel::layouts.partials.tokens'); ?>
  <?php echo $this->run_child('webkernel::layouts.partials.shell'); ?>
  <?php echo $this->run_child('webkernel::layouts.partials.components'); ?>

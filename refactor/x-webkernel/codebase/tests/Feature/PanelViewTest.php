@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace Tests\Feature;
+namespace Webkernel\Tests\Feature;
 
 use PHPUnit\Framework\TestCase;
 use Webkernel\Config\Config;
@@ -12,11 +12,6 @@ final class PanelViewTest extends TestCase
     {
         Config::boot();
         View::flush();
-        View::share([
-            'title' => 'Webkernel',
-            'brand' => 'Webkernel',
-            'theme' => 'dark',
-        ]);
     }
 
     public function test_system_dashboard_uses_page_component_and_sidebar(): void
@@ -29,6 +24,7 @@ final class PanelViewTest extends TestCase
         $this->assertStringContainsString('href="/billing/invoices"', $html);
         $this->assertStringContainsString('webkernel-shell-user-menu', $html);
         $this->assertStringContainsString('<svg', $html);
+        $this->assertStringContainsString('<title>System</title>', $html);
     }
 
     public function test_page_component_renders_slot(): void

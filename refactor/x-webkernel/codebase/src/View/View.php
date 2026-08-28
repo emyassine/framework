@@ -49,7 +49,7 @@ final class View implements ComposableContract, \Stringable
      */
     public static function make(string $view, array $data = [], array $merge_data = []): self
     {
-        return new self($view, array_merge($merge_data, $data));
+        return new self($view, \array_merge($merge_data, $data));
     }
 
     /**
@@ -146,7 +146,7 @@ final class View implements ComposableContract, \Stringable
         if ($value instanceof Js) {
             return (string) $value;
         }
-        if (is_object($value)) {
+        if (\is_object($value)) {
             foreach (self::$stringable as $class => $handler) {
                 if ($value instanceof $class) {
                     return e($handler($value), self::$double_encode);
@@ -162,8 +162,8 @@ final class View implements ComposableContract, \Stringable
      */
     public function with(string|array $key, mixed $value = null): self
     {
-        if (is_array($key)) {
-            $this->data = array_merge($this->data, $key);
+        if (\is_array($key)) {
+            $this->data = \array_merge($this->data, $key);
         } else {
             $this->data[$key] = $value;
         }
@@ -198,24 +198,24 @@ final class View implements ComposableContract, \Stringable
 
         $dirs = [];
         $namespaces = [];
-        if (array_is_list($views)) {
+        if (\array_is_list($views)) {
             foreach ($views as $dir) {
-                if (is_string($dir) && $dir !== '') {
+                if (\is_string($dir) && $dir !== '') {
                     $dirs[] = $dir;
                 }
             }
         } else {
             foreach ($views['dirs'] ?? [] as $dir) {
-                if (is_string($dir) && $dir !== '') {
+                if (\is_string($dir) && $dir !== '') {
                     $dirs[] = $dir;
                 }
             }
             foreach ($views['namespaces'] ?? [] as $namespace => $ns_dirs) {
-                if (! is_string($namespace) || ! is_array($ns_dirs)) {
+                if (! \is_string($namespace) || ! \is_array($ns_dirs)) {
                     continue;
                 }
                 foreach ($ns_dirs as $dir) {
-                    if (is_string($dir) && $dir !== '') {
+                    if (\is_string($dir) && $dir !== '') {
                         $namespaces[$namespace][] = $dir;
                     }
                 }
@@ -223,13 +223,13 @@ final class View implements ComposableContract, \Stringable
         }
 
         $component_namespaces = [];
-        $component_map = array_is_list($components) ? [] : ($components['namespaces'] ?? $components);
+        $component_map = \array_is_list($components) ? [] : ($components['namespaces'] ?? $components);
         foreach ($component_map as $namespace => $ns_dirs) {
-            if (! is_string($namespace) || ! is_array($ns_dirs)) {
+            if (! \is_string($namespace) || ! \is_array($ns_dirs)) {
                 continue;
             }
             foreach ($ns_dirs as $dir) {
-                if (is_string($dir) && $dir !== '') {
+                if (\is_string($dir) && $dir !== '') {
                     $component_namespaces[$namespace][] = $dir;
                 }
             }
@@ -248,12 +248,12 @@ final class View implements ComposableContract, \Stringable
     private static function load_dump(string $basename): array
     {
         $file = vendor_dir('composer/'.$basename);
-        if (! is_file($file)) {
+        if (! \is_file($file)) {
             return [];
         }
         $loaded = require $file;
 
-        return is_array($loaded) ? $loaded : [];
+        return \is_array($loaded) ? $loaded : [];
     }
 
     /**
@@ -265,7 +265,7 @@ final class View implements ComposableContract, \Stringable
         $dirs = [];
         foreach ($compiled['namespaces'] as $ns_dirs) {
             foreach ($ns_dirs as $dir) {
-                if (! in_array($dir, $dirs, true)) {
+                if (! \in_array($dir, $dirs, true)) {
                     $dirs[] = $dir;
                 }
             }
