@@ -64,6 +64,9 @@ final class Engine
     /** @var array<int, array<string, mixed>> */
     private array $slots = [];
 
+    /** @var array<int, list<string>> */
+    private array $slot_stack = [];
+
     private string $echo_format = '\\'.View::class.'::echo(%s)';
 
     private ?Compiler $compiler = null;
@@ -186,7 +189,38 @@ final class Engine
             $i = count($this->component_stack) - 1;
             $this->component_data[$i] = $data;
             $this->slots[$i] = [];
+            $this->slot_stack[$i] = [];
         }
+    }
+
+    public function slot(string $name, mixed $content = null): void
+    {
+        $i = count($this->component_stack) - 1;
+        if ($i < 0) {
+            return;
+        }
+        if (func_num_args() === 2) {
+            $this->slots[$i][$name] = $content;
+
+            return;
+        }
+        if (ob_start()) {
+            $this->slots[$i][$name] = '';
+            $this->slot_stack[$i][] = $name;
+        }
+    }
+
+    public function end_slot(): void
+    {
+        $i = count($this->component_stack) - 1;
+        if ($i < 0) {
+            return;
+        }
+        $name = array_pop($this->slot_stack[$i]);
+        if (! is_string($name) || $name === '') {
+            throw new \RuntimeException('Cannot end a slot without first starting one.');
+        }
+        $this->slots[$i][$name] = trim((string) ob_get_clean());
     }
 
     public function render_component(): string

@@ -1,8 +1,31 @@
 <?php $_shouldextend[1]=1; ?>
 
+<?php $this->start_section('navigation'); ?>
+ <?php echo $this->run_child('billing::sidebar', ['current' => 'invoices']); ?>
+<?php $this->stop_section(); ?>
+
+<?php $this->start_section('user'); ?>
+ <?php echo $this->run_child('webkernel::panels.system.user'); ?>
+<?php $this->stop_section(); ?>
+
+<?php $this->start_section('topnav'); ?>
+ <?php echo $this->run_child('billing::sidebar', ['current' => 'invoices']); ?>
+<?php $this->stop_section(); ?>
+
+<?php $this->start_section('horizontal'); ?>
+ <?php echo $this->run_child('billing::sidebar', ['current' => 'invoices']); ?>
+<?php $this->stop_section(); ?>
+
+<?php $this->start_section('breadcrumb'); ?>
+ Billing / Invoices
+<?php $this->stop_section(); ?>
+
 <?php $this->start_section('content'); ?>
- <h1><?php echo \Webkernel\View\View::echo($title); ?></h1>
- <p><a href="/billing/invoices/create">Create invoice</a> · <a href="/system">System</a></p>
+ <?php  $this->start_component('webkernel::page',["title"=>"Invoices"]); ?>
+ <?php  $this->slot('actions'); ?>
+ <a href="/billing/invoices/create">Create invoice</a>
+ <?php  $this->end_slot(); ?>
+
  <table>
  <thead>
  <tr>
@@ -29,6 +52,7 @@
  <?php endif; ?>
  </tbody>
  </table>
+ <?php echo $this->render_component(); ?>
 <?php $this->stop_section(); ?>
 
-<?php if (isset($_shouldextend[1])) { echo $this->run_child('webkernel::layouts.simple'); } ?>
+<?php if (isset($_shouldextend[1])) { echo $this->run_child('webkernel::layouts.page'); } ?>

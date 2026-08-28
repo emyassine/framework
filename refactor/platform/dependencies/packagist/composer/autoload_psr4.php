@@ -8,6 +8,7 @@ $baseDir = dirname(dirname(dirname($vendorDir)));
 return array(
     'Webkernel\\Lifecycle\\' => array($vendorDir . '/webkernel/lifecycle/Lifecycle'),
     'Webkernel\\' => array($vendorDir . '/webkernel/codebase/src'),
+    'Tests\\' => array($baseDir . '/tests'),
     'Psr\\SimpleCache\\' => array($vendorDir . '/psr/simple-cache/src'),
     'Psr\\Log\\' => array($vendorDir . '/psr/log/src'),
     'Psr\\Http\\Message\\' => array($vendorDir . '/psr/http-factory/src', $vendorDir . '/psr/http-message/src'),
@@ -15,7 +16,9 @@ return array(
     'Psr\\Container\\' => array($vendorDir . '/psr/container/src'),
     'Psr\\Clock\\' => array($vendorDir . '/psr/clock/src'),
     'Psr\\Cache\\' => array($vendorDir . '/psr/cache/src'),
+    'PhpParser\\' => array($vendorDir . '/nikic/php-parser/lib/PhpParser'),
     'Modules\\' => array($baseDir . '/modules'),
+    'DeepCopy\\' => array($vendorDir . '/myclabs/deep-copy/src/DeepCopy'),
     'Composer\\Installers\\' => array($vendorDir . '/composer/installers/src/Composer/Installers'),
     'Acme\\Billing\\' => array($baseDir . '/modules/acme/billing/src'),
 );

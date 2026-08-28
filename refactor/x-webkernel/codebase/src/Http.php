@@ -5,6 +5,7 @@ namespace Webkernel;
 use Webkernel\Config\Config;
 use Webkernel\Platform\Resources\Resource;
 use Webkernel\Route\Route;
+use Webkernel\View\View;
 
 /**
  * HTTP door. Autoload is already done by fast-boot.php.
@@ -14,6 +15,13 @@ final class Http
     public static function run(): void
     {
         Config::boot();
+        View::share([
+            'title' => Config::get('app.name', 'Webkernel'),
+            'brand' => Config::get('app.name', 'Webkernel'),
+            'theme' => Config::get('ui.dark_mode', true) ? 'dark' : 'light',
+            'favicon' => Config::get('branding.favicon'),
+            'logo' => Config::get('branding.logo_light'),
+        ]);
         self::register_panels();
         $out = Route::dispatch();
         if ($out instanceof \Stringable || is_scalar($out) || $out === null) {

@@ -1,0 +1,26 @@
+<?php /*
+ <?php  $this->start_component('webkernel::page',["title"=>"...","description"=>"..."]); ?>
+ <?php  $this->slot('actions'); ?> ... <?php  $this->end_slot(); ?>
+ body
+ <?php echo $this->render_component(); ?>
+*/ ?>
+<div class="wks-page">
+ <header class="wks-page-header">
+ <div>
+ <h1 class="wks-page-title"><?php echo \Webkernel\View\View::echo($title ?? ''); ?></h1>
+ <?php if(!empty($description)): ?>
+ <p class="wks-page-desc"><?php echo \Webkernel\View\View::echo($description); ?></p>
+ <?php endif; ?>
+ </div>
+ <?php if(!empty($actions)): ?>
+ <div class="wks-page-actions">
+ <?php echo $actions; ?>
+
+ </div>
+ <?php endif; ?>
+ </header>
+ <div class="wks-page-body">
+ <?php echo $slot; ?>
+
+ </div>
+</div>

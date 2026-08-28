@@ -2,7 +2,6 @@
 
 namespace Webkernel\Platform\Pages;
 
-use Webkernel\Config\Config;
 use Webkernel\View\View;
 
 final class Dashboard
@@ -17,11 +16,6 @@ final class Dashboard
 
     public function __invoke(): string
     {
-        return View::make('webkernel::pages.dashboard', [
-            'title' => Config::get('app.name', 'Webkernel'),
-            'favicon' => Config::get('branding.favicon'),
-            'logo' => Config::get('branding.logo_light'),
-            'theme' => Config::get('ui.dark_mode', true) ? 'dark' : 'light',
-        ])->render();
+        return View::make('webkernel::panels.system.dashboard')->render();
     }
 }

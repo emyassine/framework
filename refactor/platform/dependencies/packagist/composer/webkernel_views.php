@@ -14,14 +14,14 @@ $b = dirname($v, 3); // webapp root
 return [
     'dirs' => [
         $b . '/modules/acme/billing/resources/views',
-        $b . '/x-webkernel/codebase/src/View/views',
+        $b . '/x-webkernel/codebase/resources/views',
     ],
     'namespaces' => [
         'billing' => [
             $b . '/modules/acme/billing/resources/views',
         ],
         'webkernel' => [
-            $b . '/x-webkernel/codebase/src/View/views',
+            $b . '/x-webkernel/codebase/resources/views',
         ],
     ],
 ];
