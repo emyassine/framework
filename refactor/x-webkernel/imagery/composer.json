@@ -1,0 +1,75 @@
+{
+    "$schema": "https://getcomposer.org/schema.json",
+    "name": "webkernel/imagery",
+    "description": "Webkernel imagery: Filament icon picker + brand/icon/pixmap assets.",
+    "version": "0.12.0",
+    "keywords": [
+        "webkernel",
+        "laravel",
+        "filament",
+        "icons",
+        "imagery",
+        "branding",
+        "blade-icons"
+    ],
+    "homepage": "https://www.webkernelphp.com/",
+    "license": "EPL-2.0",
+    "type": "library",
+    "authors": [
+        {
+            "name": "El Moumen Yassine",
+            "email": "yassine@numerimondes.com",
+            "homepage": "https://webkernelphp.com/about"
+        }
+    ],
+    "require": {
+        "php": ">=8.4",
+        "blade-ui-kit/blade-icons": "^1.0",
+        "filament/filament": "^5.0"
+    },
+    "require-dev": {
+        "laravel/pint": "^1.26",
+        "orchestra/testbench": "^10.0",
+        "phpunit/phpunit": "^11.0"
+    },
+    "suggest": {
+        "blade-ui-kit/blade-heroicons": "Heroicons (recommended)"
+    },
+    "replace": {
+        "webkernel/icon-picker": "self.version",
+        "webkernel/standard-pix": "self.version"
+    },
+    "autoload": {
+        "files": [
+            "load.imagery.functions.php"
+        ],
+        "psr-4": {
+            "Webkernel\\Imagery\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Webkernel\\Imagery\\Tests\\": "tests/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Webkernel\\Imagery\\ImageryServiceProvider"
+            ],
+            "aliases": {
+                "Imagery": "Webkernel\\Imagery\\Facades\\Imagery"
+            }
+        },
+        "webkernel": {
+            "package_repo": "git@github.com:webkernelphp/imagery.git",
+            "production": true,
+            "prefix": "imagery"
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "config": {
+        "sort-packages": true
+    }
+}

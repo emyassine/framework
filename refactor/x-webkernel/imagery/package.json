@@ -1,0 +1,11 @@
+{
+    "name": "@webkernel/imagery",
+    "private": true,
+    "scripts": {
+        "build": "node bin/build.js",
+        "dev": "node bin/build.js --dev"
+    },
+    "devDependencies": {
+        "esbuild": "^0.20.0"
+    }
+}
