@@ -1,163 +1,37 @@
-# Webkernel refactor — build contract
+# Webkernel refactor — NOTES.md + decisions
 
-This file is the map. `NOTES.md` is the product shape (panels, resources, pages). This file is what we actually build, in what order, and why the old work felt like spaghetti.
+This file **is** `NOTES.md`, plus the decisions you added after it (no Container, no global functions, one provider per package, `Config::get` / `Config::set`, two doors).
 
-If a term is used, it is defined here. No AST. No hidden Container. No `webapp()`.
+If something is in `NOTES.md`, it is in this file. If something is **not** in `NOTES.md`, it is labelled **Decision** (you said it) or **Not specified** (do not invent it).
 
----
-
-## 0. Why you could not see the system
-
-In `_workbench_one` there are **three different boots**, and they do not do the same thing.
-
-### HTTP today (`public/index.php`)
-
-```
-public/index.php
-  → platform/bootstrap/fast-boot.php     (require autoload)
-  → Webkernel\Index::start_http()
-      → Container::get_instance()
-      → CompilationStore::get('webkernel.global.routes', $container)
-      → RequestClassifier → some Handler → emit
-```
-
-`Index` talks to `Container`. `Container` talks to a compilation store. The classifier picks a handler. `WebApp` is not in this path. Providers are not in this path. You cannot point at one file and say "this is a request."
-
-### CLI today (`./webkernel`)
-
-```
-./webkernel
-  → platform/bootstrap/app.php
-      → fast-boot.php                    (autoload, again)
-      → WebApp::configure()
-            ->with_middleware(...)
-            ->with_exceptions(...)
-            ->create()                   (= boot)
-                → ConfigComposable::load()
-                → load dumped composable map
-                → load dumped providers
-                → ProviderRegistry::providers()
-                      **globs** modules/*/*Provider.php at runtime
-                → new Provider; register($container); boot($container)
-  → Index::start_terminal($webapp)
-      → $webapp->handle_command()
-```
-
-Now you have `WebApp` **and** `Index` **and** `Container` **and** `ProviderRegistry`. The HTTP path and the CLI path do not share a brain.
-
-### Then, on top of that
-
-- `webapp()` global function → `WebApp` singleton → `__call` → composable class from a dump map → `Container::make()`
-- `view()` global, `webapp_path()` global, `vendor_dir()` global
-- `WebApp::boot()` hardcodes `resources/views` as a platform-wide view path
-- `BlogProvider::register(Container $container)` exists so the Container never dies
-- Two meanings of "provider": dump list, plus a glob of `*Provider.php`
-
-That is why it feels spaghetti. It is. The goal of this refactor is that you can **read two files** and understand a request.
+`NOTES.md` stays the product shape. This file is the same shape with the boot made visible.
 
 ---
 
-## 1. The rule you can hold in your head
+## How to read this
 
-**Three moments. Never mix them.**
-
-| Moment | When | What you do | What the machine does |
-|---|---|---|---|
-| **Author** | You type PHP | Write one `PlatformProvider` per package, with `const ROUTES`, `const VIEWS`, … | Nothing |
-| **Composer** | `composer dump-autoload` (and again when a provider changes) | Nothing | Read each provider **statically**, write PHP arrays under `platform/dependencies/packagist/composer/webkernel_*.php` |
-| **Request** | Browser or `./webkernel` | Nothing | `require` autoload, `require` those arrays, dispatch. No `new Provider`. No Container. No glob. No global functions. |
-
-Composer time may use Reflection. Request time may not.
-
-If a provider is **constants and static methods only**, dump-autoload never even instantiates it. That is the 100% static world. Rebuild on every dump. Dev can later re-dump when a provider file is newer than the dump file. Request path stays a `require`.
+| Label | Meaning |
+|---|---|
+| **Spec** | From `NOTES.md`. We build toward it. |
+| **Decision** | You said it after `NOTES.md`. It wins over `NOTES.md` where they clash. |
+| **Not specified** | No design yet. Do not put a constant or a class for it. |
 
 ---
 
-## 2. The two doors
+# Part I — What you said after NOTES.md (the clashes)
 
-There is no `Index`. There is no `WebApp`. There is no `Container`.
+## Decision: no Container
 
-### HTTP — `public/index.php`
+`NOTES.md` §4 replaces Laravel-style DI with a `Registry` (string key → instance). You then said: there will be no Container.
 
-```php
-<?php
-declare(strict_types=1);
+**What that means:** do not copy `Webkernel\Container`. Do not `register($container)` on providers.
 
-define('START_REQUEST', hrtime(true));
+**What happens to `NOTES.md` Registry:** Config, View, and Route become static class aliases (`Config::get`, `View::make`, `Route::get`). Those three do not need a Registry. The Registry class from `NOTES.md` §4 is kept as a spec for *other* services later (JSON canonicaliser, event dispatcher, compilation store) if a static class is not enough. It is not a Container. It is not built in the first cut. See Part II §4.
 
-$webapp_path = dirname(__DIR__);
+## Decision: no global functions
 
-if (is_file($maint = $webapp_path.'/platform/temporary/maintenance.php')) {
-    require $maint;
-    return;
-}
-
-require $webapp_path.'/platform/fast-boot.php';   // autoload.php only
-
-\Webkernel\Http::run();
-```
-
-`Http::run()`:
-
-1. `Config::boot()` — load `config/platform.php` + `platform/platform-runtime.php` into memory
-2. `require` dumped routes (`webkernel_routes.php`)
-3. Match URI + method
-4. Run the page (panel page or resource page)
-5. Render `.view.php`
-6. Emit
-
-### CLI — `./webkernel`
-
-```php
-#!/usr/bin/env php
-<?php
-declare(strict_types=1);
-
-define('START_REQUEST', hrtime(true));
-
-require dirname(__DIR__).'/platform/fast-boot.php';
-
-exit(\Webkernel\Console::run($argv));
-```
-
-`Console::run()`:
-
-1. `Config::boot()`
-2. `require` dumped commands (`webkernel_commands.php`)
-3. Dispatch argv
-4. Return exit code
-
-Two doors. Two classes. Same autoload. Same config. Same dumps.
-
-`fast-boot.php` does **one job**: make sure `platform/dependencies/packagist/autoload.php` is required. It does not start HTTP. It does not start CLI. It does not touch Container.
-
----
-
-## 3. What is abolished
-
-| Old | Why it dies | Replaced by |
-|---|---|---|
-| `Webkernel\Container\Container` | Hidden graph. You cannot see who creates what. | Nothing. Static classes + dumped arrays. Tests call `Config::flush()` / `View::flush()`. |
-| `Webkernel\Registry` as a general service locator | Same smell as Container under another name | Do not build it. |
-| `webapp()` | Global + god object | Class aliases: `Config`, `View`, `Route` |
-| `view()`, `webapp_path()`, `vendor_dir()` | Global functions | `View::make()`, `Config::get('paths.webapp')`, dump file `webkernel.php` |
-| `WebApp` | Boot + declare + `__call` + emit + CLI + HTTP in one class | `Http` and `Console` |
-| `Index` | Third boot, talks to Container | Deleted |
-| `ComposableContract` as the public API | `webapp()->foo()` requires a map, a container lifetime, and magic | Direct static API on the class that owns the job |
-| `ProviderRegistry` glob `modules/*/*Provider.php` | Filesystem scan on the request path | Dump-autoload list from `extra.webkernel.provider` |
-| `register(Container)` / `boot(Container)` | Keeps the Container alive | Providers are dump-time data. They do not run on a request. |
-| `Webkernel\Support\*` | NOTES.md | Does not exist |
-| Host `resources/views` hardcoded in boot | Breaks modularity | Views come from provider `VIEWS` only |
-| `discover_resources()` / `discover_pages()` at request time | Filesystem scan | Listed in the dump from the provider |
-| camelCase on Webkernel surfaces | Project law | `snake_case` methods, `PascalCase` classes |
-
-`NOTES.md` copied a Filament-shaped `PanelProvider` with `discoverResources`, `brandLogo`, eleven middleware. That is the **shape of the UI**, not the PHP API. The PHP API is snake_case. Discovery is dump-autoload, not a boot-time glob.
-
----
-
-## 4. Config — class alias, not a composable
-
-`namespacer.php` registers the autoloader **and** class aliases. It does not define helper functions.
+But we maintaine the composables with `webapp()`, `view()` and `webapp_path()`.
+`namespacer.php` is autoload + `class_alias` only.
 
 ```php
 class_alias(\Webkernel\Config\Config::class, 'Config');
@@ -165,199 +39,297 @@ class_alias(\Webkernel\View\View::class, 'View');
 class_alias(\Webkernel\Route\Route::class, 'Route');
 ```
 
-Usage:
+## Decision: one provider per Composer package
+
+`NOTES.md` §6 called it `extra.webkernel.declaration_class`. **One name now:** `extra.webkernel.provider`. Exactly one FQCN. The class extends `Webkernel\PlatformProvider`. It is a **declaration** (paths and class lists). It is not a service. It does not run on a request.
+
+Dump-autoload reads it and writes PHP arrays. The request `require`s those arrays.
+
+## Decision: Config is a class, not a composable
 
 ```php
 Config::get('branding.logo', 'default.svg');
 Config::set('branding.logo', $path)->get('branding.logo');
 ```
 
-### Files
+`set` writes `platform/platform-runtime.php` (atomic tmp → rename). It does **not** write `config/platform.php` (that file is identity + autoload, stamped by dump-autoload).
 
-| File | Who writes it | Purpose |
-|---|---|---|
-| `config/platform.php` | dump-autoload (identity, `autoload` path) | Platform-managed. Do not `Config::set` into this file. |
-| `config/app.php` | You | App defaults. Read-only at request time. |
-| `platform/platform-runtime.php` | `Config::set` | Runtime writes. Atomic tmp → rename (already exists as `ConfigWriter`). |
+This **is** `NOTES.md` §5 (branding not hardcoded). The access path changes from `Registry::get('platform.config')` to `Config::get('branding.favicon')`.
 
-`Config::boot()` merges, in order: `config/platform.php`, `config/app.php`, then `platform/platform-runtime.php`. Runtime wins. In-memory tree after that. `get` is an array walk on dot notation. No file I/O on `get`.
+## Decision: two doors, no Index, no WebApp
 
-`Config::set('a.b', $value)`:
+Old work (`_workbench_one`) has three boots that do not do the same thing. That is the spaghetti.
 
-1. Updates the in-memory tree
-2. Writes `platform/platform-runtime.php` atomically
-3. Returns `Config` so you can chain `->get('a.b')` as a read-back check
-4. If the write fails, the in-memory tree is **not** left half-updated (write tmp, rename, then commit memory — or roll memory back). `ConfigWriter` already does tmp + rename + `opcache_invalidate`
+**HTTP today:**
 
-Dump-autoload still stamps identity keys into `config/platform.php` (`id`, `hostname`, `autoload`, …). That is Composer time, not `Config::set`.
+```
+public/index.php
+  → fast-boot.php          (autoload)
+  → Index::start_http()
+      → Container::get_instance()
+      → CompilationStore::get('webkernel.global.routes', $container)
+      → RequestClassifier → Handler → emit
+```
+
+`WebApp` is not in this path. Providers are not in this path.
+
+**CLI today:**
+
+```
+./webkernel
+  → bootstrap/app.php
+      → fast-boot.php
+      → WebApp::configure()->create()
+          → Container
+          → glob modules/*/*Provider.php
+          → new Provider; register($container); boot($container)
+  → Index::start_terminal($webapp)
+```
+
+**HTTP after this file:**
+
+```
+public/index.php
+  → platform/fast-boot.php     // autoload only
+  → Webkernel\Http::run()
+```
+
+**CLI after this file:**
+
+```
+./webkernel
+  → platform/fast-boot.php
+  → Webkernel\Console::run($argv)
+```
+
+`fast-boot.php` does not start HTTP or CLI. It requires `autoload.php`. That is the whole job.
 
 ---
 
-## 5. One provider per package
+# Part II — NOTES.md specs (complete)
 
-Every Webkernel package (codebase sub-area, business module, feature) declares **exactly one** class:
+Foreword from `NOTES.md`:
 
-```json
-{
-  "name": "acme/billing",
-  "type": "webkernel-business-module",
-  "extra": {
-    "webkernel": {
-      "provider": "Acme\\Billing\\BillingProvider",
-      "prefix": "billing"
-    }
-  }
-}
-```
+- Old work is `_workbench_one`. Copy and adapt. Do not symlink that tree into refactor.
+- Views from old work and their compilation stay. They are **not** hardcoded as a platform-wide bag. Views live in each module's `resources/views`, declared on that package's provider.
+- Same for routes. A host `routes.php` is allowed for tests. Production routes live in packages and modules.
+- No camelCase on Webkernel surfaces (`snake_case` methods, `PascalCase` classes).
+- Composer path-repo `"symlink": true` for `x-webkernel/*` is Composer linking the package you edit. That is allowed. `ln -s _workbench_one` is not.
 
-- Key is `extra.webkernel.provider`
-- Value is **one** FQCN, not an array
-- That class extends `Webkernel\PlatformProvider`
-- `declaration_class` from `NOTES.md` is this. One name, not two.
+---
 
-### What a provider is
+## 1. Namespace contract — Spec (`NOTES.md` §1)
 
-A provider is a **declaration**. It is not a service. It is not constructed on a request.
+Two root namespaces. No overlap. `Webkernel\Support\*` does not exist.
+
+### `Webkernel\` — runtime and lifecycle
+
+Everything that runs before a request is a page, or orthogonally to UI.
+
+From `NOTES.md`:
+
+- Registry (see §4 — not first cut)
+- JSON Canonicalisation
+- Event Dispatcher
+- Lifecycle and Composer Installer
+- View Engine (`Webkernel\View\View`)
+- Cache and Compilation Store
+- Console Commands
+
+**Decision (added):**
+
+- `Webkernel\Config\Config` — `get` / `set` / `boot` / `flush`
+- `Webkernel\Http` — HTTP door
+- `Webkernel\Console` — CLI door
+- `Webkernel\PlatformProvider` — package declaration (dump-time). This is `declaration_class` from `NOTES.md` §6.
+
+**Decision (removed from public API):** Composables / `webapp()`. The jobs they wrapped become the static classes above.
+
+### `Webkernel\Platform\` — UI and panel system
+
+Everything that touches the panel interface, rendering, and HTTP context.
+
+From `NOTES.md`, all of these remain:
+
+- `Webkernel\Platform\Panel`
+- `Webkernel\Platform\PanelProvider`
+- `Webkernel\Platform\Colors\Color`
+- `Webkernel\Platform\Pages\Dashboard`
+- `Webkernel\Platform\Widgets\AccountWidget`
+- `Webkernel\Platform\Widgets\InfoWidget`
+- `Webkernel\Platform\Tables\Table`
+- `Webkernel\Platform\Schemas\Schema`
+- `Webkernel\Platform\Resources\Resource`
+- `Webkernel\Platform\RenderHooks\RenderHook`
+- `Webkernel\Platform\Http\Middleware\Authenticate`
+- `Webkernel\Platform\Http\Middleware\StartSession`
+- `Webkernel\Platform\Http\Middleware\EncryptCookies`
+- `Webkernel\Platform\Http\Middleware\PreventRequestForgery`
+- `Webkernel\Platform\Http\Middleware\SubstituteBindings`
+- `Webkernel\Platform\Http\Middleware\DisableIconComponents`
+- `Webkernel\Platform\Http\Middleware\DispatchServingEvent`
+- `Webkernel\Platform\Http\Middleware\AddQueuedCookiesToResponse`
+- `Webkernel\Platform\Http\Middleware\AuthenticateSession`
+- `Webkernel\Platform\Http\Middleware\ShareErrorsFromSession`
+
+The eleven middleware are **spec**. They are not the first cut (one auth class is enough to render a panel). They are not deleted from the spec.
+
+**Do not mix these two classes:**
+
+| Class | From | Job | When it runs |
+|---|---|---|---|
+| `Webkernel\PlatformProvider` | Decision (was `declaration_class`) | Tells dump-autoload which route files, view dirs, panel classes this **package** has | Composer dump only |
+| `Webkernel\Platform\PanelProvider` | `NOTES.md` §2 | Configures **one admin UI** (id, path, scope, pages, resources) | Dump reads `panel()`; request uses the dumped panel |
+
+---
+
+## 2. Panel scoping — Spec (`NOTES.md` §2)
+
+Every panel is either `platform`-scoped or `module`-scoped. This is not a runtime tag. It is enforced when the panel is registered (dump-autoload), as part of the panel's declaration.
+
+A **platform-scoped** panel manages cross-module or platform-wide concerns. The System Admin Panel is the canonical example. It administers modules. It does not own their domain models.
+
+A **module-scoped** panel is declared inside a business module. Its disk location is determined by Composer type `webkernel-business-module` → `modules/{vendor}/{name}`. A module-scoped panel cannot promote itself to platform scope.
+
+`NOTES.md` example, with **Decision** applied: snake_case, no request-time `discover_*`, branding from `Config` not hardcoded.
 
 ```php
 <?php
 declare(strict_types=1);
 
-namespace Acme\Billing;
+namespace Webkernel\Platform\System;
 
-use Webkernel\PlatformProvider;
+use Webkernel\Platform\Panel;
+use Webkernel\Platform\PanelProvider;
+use Webkernel\Platform\Pages\Dashboard;
+use Webkernel\Platform\Widgets\AccountWidget;
+use Webkernel\Platform\Widgets\InfoWidget;
+use Webkernel\Platform\Http\Middleware\Authenticate;
+use Webkernel\Platform\Http\Middleware\AuthenticateSession;
+use Webkernel\Platform\Http\Middleware\DisableIconComponents;
+use Webkernel\Platform\Http\Middleware\DispatchServingEvent;
+use Webkernel\Platform\Http\Middleware\EncryptCookies;
+use Webkernel\Platform\Http\Middleware\AddQueuedCookiesToResponse;
+use Webkernel\Platform\Http\Middleware\PreventRequestForgery;
+use Webkernel\Platform\Http\Middleware\SubstituteBindings;
+use Webkernel\Platform\Http\Middleware\StartSession;
+use Webkernel\Platform\Http\Middleware\ShareErrorsFromSession;
 
-final class BillingProvider extends PlatformProvider
+/**
+ * System Admin Panel.
+ * Scope: platform — manages modules and platform-wide configuration.
+ * Branding is not in this method. See §5.
+ */
+final class SystemPanelProvider extends PanelProvider
 {
-    public const ROUTES      = [__DIR__.'/routes.php'];
-    public const VIEWS       = [__DIR__.'/resources/views'];
-    public const COMPONENTS  = [__DIR__.'/resources/views/components'];
-    public const COMMANDS    = [\Acme\Billing\Console\GenerateSitemapCommand::class];
-    public const PANELS      = [\Acme\Billing\Presentation\BillingPanelProvider::class];
-    public const CONFIG      = [
-        'billing.vat_rate' => 0.20,
-    ];
-    public const ACL         = [
-        'billing.invoice.view'   => ['admin', 'accountant'],
-        'billing.invoice.delete' => ['admin'],
-    ];
+    public function panel(Panel $panel): Panel
+    {
+        return $panel
+            ->id('system')
+            ->path('system')
+            ->scope('platform')
+            ->default()
+            ->pages([
+                Dashboard::class, // standalone panel page — not CRUD, not a Resource
+            ])
+            ->widgets([
+                AccountWidget::class,
+                InfoWidget::class,
+            ])
+            ->resources([
+                // listed explicitly, or listed on the package PlatformProvider
+                // and dumped. Not globbed on the request.
+            ])
+            ->middleware([
+                EncryptCookies::class,
+                AddQueuedCookiesToResponse::class,
+                StartSession::class,
+                PreventRequestForgery::class,
+                SubstituteBindings::class,
+                DisableIconComponents::class,
+                DispatchServingEvent::class,
+            ])
+            ->auth_middleware([
+                Authenticate::class,
+                AuthenticateSession::class,
+            ]);
+    }
 }
 ```
 
-Constants are the default. If a path cannot be a constant, a **static** method with the same name is allowed (`public static function views(): array`). Dump-autoload calls the static method. Still no instance.
+**Decision vs `NOTES.md` `discoverResources(in:, for:)`:** that API is a filesystem scan. `NOTES.md` §9 step 4 also says no filesystem traversal at runtime. Those two lines in `NOTES.md` contradict. **Resolution:** dump-autoload lists resources from the package provider / panel provider. The request does not scan `Presentation/Resources`. The word `discover_*` is not a request-time method.
 
-`register()` and `boot()` do not exist.
-
-### Dump-autoload (Composer plugin, already the right hook)
-
-`webkernel/lifecycle` on `post-autoload-dump`:
-
-1. Read `installed.json`
-2. For each package with `extra.webkernel.provider`, load that class
-3. Read constants (and static methods if present) **without** `new` if possible
-4. Write:
-
-```
-platform/dependencies/packagist/composer/
-  webkernel.php              # instance_id, webapp_root, vendor_dir
-  webkernel_providers.php    # list of FQCNs (debug / IDE, not executed at request)
-  webkernel_routes.php       # list of route files
-  webkernel_views.php        # list of view dirs + namespaces
-  webkernel_components.php   # component dirs
-  webkernel_commands.php     # command classes
-  webkernel_panels.php       # panel provider classes
-  webkernel_acl.php          # merged ACL map
-  webkernel_config.php       # merged provider CONFIG defaults
-```
-
-Request code only `require`s these files. It never looks at `extra.webkernel`. It never instantiates `BillingProvider`.
-
-The codebase package itself has **one** provider too (`Webkernel\CodebaseProvider`) that declares kernel views (`layouts.page`, …), kernel routes if any, kernel commands (`dump-autoload`). Not four providers (`ViewProvider`, `CoreProvider`, …). One.
+Branding (logo, favicon, dark mode, brand logo height) is not hardcoded here. Spec §5.
 
 ---
 
-## 6. Namespaces
-
-Two roots. No overlap. `Webkernel\Support` does not exist.
-
-### `Webkernel\` — runtime (before a request is a page)
-
-| Class | Job |
-|---|---|
-| `Webkernel\Config\Config` | `get` / `set` / `boot` / `flush` |
-| `Webkernel\Config\ConfigWriter` | Atomic PHP array file write (already exists, copy it) |
-| `Webkernel\View\View` | `make` / `share` / `directive` / `render` |
-| `Webkernel\View\Compiler` | BladeOne, owned in-tree |
-| `Webkernel\Route\Route` | Declare + dispatch |
-| `Webkernel\Http` | HTTP door |
-| `Webkernel\Console` | CLI door |
-| `Webkernel\PlatformProvider` | Base declaration class (dump-time) |
-| `Webkernel\Lifecycle\` | Composer plugin, package types, install paths |
-| `Webkernel\Cache\CompilationStore` | Compiled views / compiled routes on disk |
-
-### `Webkernel\Platform\` — UI (a request that is a panel)
-
-| Class | Job |
-|---|---|
-| `Webkernel\Platform\Panel` | Panel definition (id, path, scope, pages, resources) |
-| `Webkernel\Platform\PanelProvider` | Declares one panel (system or module). Distinct from `PlatformProvider`. |
-| `Webkernel\Platform\Pages\Page` | Base page (standalone **or** resource-owned) |
-| `Webkernel\Platform\Pages\Dashboard` | Built-in standalone panel page |
-| `Webkernel\Platform\Resources\Resource` | CRUD class: model, `form()`, `table()`, `pages()` |
-| `Webkernel\Platform\Tables\Table` | Table schema |
-| `Webkernel\Platform\Schemas\Schema` | Form / filter schema |
-| `Webkernel\Platform\Widgets\` | Widgets |
-| `Webkernel\Platform\Colors\Color` | Palette |
-| `Webkernel\Platform\System\SystemPanelProvider` | Platform-scoped System Admin Panel |
-
-**Two provider types — do not mix the names:**
-
-- `Webkernel\PlatformProvider` — package declaration (routes, views, which panels). One per Composer package. Dump-time only.
-- `Webkernel\Platform\PanelProvider` — one admin UI (system panel, billing panel). Listed in the package provider's `PANELS` constant.
-
----
-
-## 7. Domain tree (from NOTES.md, corrected)
+## 3. Domain hierarchy — Spec (`NOTES.md` §3)
 
 ```
 Platform
   App Owner(s)
   System Admin Panel              [platform-scoped]
   Module (1..N)
-    Feature (0..N)                [injects into the module, does not create a panel]
+    Feature (0..N)                [extends / injects into module]
     Admin Panel (1..N)            [module-scoped]
       Page (0..N)                 [standalone — no Resource]
       Cluster (0..N)
-        Page (0..N)               [standalone, grouped in nav]
-        Resource (1..N)           [CRUD for one model]
-          Page (1..N)             [List / Create / Edit / View / custom]
+        Page (0..N)               [standalone — grouped in nav]
+        Resource (1..N)
+          Page (1..N)             [CRUD screens owned by the Resource]
             Component (1..N)      [Table, Form, Widget, Custom View]
+
+Granular Permission Layer         [cross-cutting: panel, resource, page, component, action]
 ```
 
-### Page without Resource
+A Page does not require a Resource. Dashboard, reports, wizards, and any screen that is not CRUD for a model hang directly on the Panel (or on a Cluster for navigation). A Resource is only the CRUD bundle: it exists when a model needs list/create/edit/view, and then it owns those pages.
 
-A page does not need a Resource. Dashboard, reports, wizards, settings: standalone pages on the Panel (or on a Cluster for navigation). They have a route, a view, permissions. They do not get a table/form from a Resource because there is no model CRUD.
+Rules from `NOTES.md`:
 
-### Resource
+- The System Admin Panel administers modules. It does not own module domain models.
+- Features extend a module. They register additional resources and pages into existing module panels. They do not create new panels.
+- Permissions are always namespaced by module. There is no global flat permission table.
+- Permission resolution is part of the sub-millisecond boot budget.
 
-A Resource is a static class that builds the CRUD interface for **one model**. It describes how administrators interact with that data through a table and a form. It **owns its pages**. The panel registers the Resource. The Resource registers List/Create/Edit.
+### 3.1 Resource — Spec (`NOTES.md` §3)
+
+A **Resource** is a static class that builds the CRUD interface for one model. It describes how administrators interact with that model's data through tables and forms. It is not a page, not a route file, and not a bag of settings.
+
+The Resource **owns its pages**. List, create, edit, view, and any custom screen for that model are declared on the Resource and live next to it. A panel does not register those pages one by one. It registers the Resource; the Resource registers the pages.
 
 ```php
+<?php
+declare(strict_types=1);
+
+namespace Acme\Billing\Presentation\Resources;
+
+use Webkernel\Platform\Resources\Resource;
+use Webkernel\Platform\Schemas\Schema;
+use Webkernel\Platform\Tables\Table;
+use Acme\Billing\Domain\Invoice;
+use Acme\Billing\Presentation\Resources\InvoiceResource\Pages;
+
 final class InvoiceResource extends Resource
 {
     protected static string $model = Invoice::class;
 
     public static function form(Schema $schema): Schema
     {
-        return $schema->components([ /* fields */ ]);
+        return $schema->components([
+            // fields
+        ]);
     }
 
     public static function table(Table $table): Table
     {
-        return $table->columns([ /* columns */ ]);
+        return $table->columns([
+            // columns
+        ]);
     }
 
-    /** @return array<string, class-string> */
+    /**
+     * @return array<string, class-string>
+     */
     public static function pages(): array
     {
         return [
@@ -368,6 +340,15 @@ final class InvoiceResource extends Resource
     }
 }
 ```
+
+| Kind | Owned by | Required Resource? | Examples | Registered how |
+|---|---|---|---|---|
+| **Panel page** | The Panel (or a Cluster) | No | `Dashboard`, reports, settings, wizards | `Panel::pages()` |
+| **Resource page** | The Resource | Yes | `ListInvoices`, `CreateInvoice`, `EditInvoice` | `Resource::pages()` |
+
+A panel page is a first-class screen. It has a route, a view, components, and permissions. It does not get a table/form from a Resource because there is no model CRUD to describe.
+
+A Resource is never a panel page. `Dashboard` is never a Resource. Branding, colors, and logos are platform **settings** (`Config`), not a Resource.
 
 On disk:
 
@@ -383,242 +364,474 @@ Presentation/Resources/
 
 Dump-autoload records `InvoiceResource`. It does not scan `Pages/`. Those pages exist because `pages()` said so.
 
-| Kind | Owner | Needs a Resource? | Registered how |
-|---|---|---|---|
-| Panel page | Panel or Cluster | No | `Panel::pages()` listed on the PanelProvider, dumped |
-| Resource page | Resource | Yes | `Resource::pages()`, dumped with the Resource |
+### 3.2 Permissions — Spec (`NOTES.md` §3) and what is **Not specified**
 
-`Dashboard` is never a Resource. Branding is never a Resource. Branding is `Config`.
+`NOTES.md` says:
 
-### Panel scope
+- There is a permission layer across panel, resource, page, component, action.
+- Namespaced by module. No global flat table.
+- Must resolve inside the boot budget.
 
-Every panel is `platform` or `module`. Enforced when the panel is dumped, not as a runtime tag.
+Old-work fluent docs name a permission like `{module}.{resource}.{action}` (`billing.invoice.delete`) and check it with `can('delete')` inside the module (module inferred) or `acl('billing')->can('delete')` from the System Admin Panel.
 
-- Platform-scoped: System Admin Panel. Administers modules. Does not own module models.
-- Module-scoped: lives under `modules/{vendor}/{name}` because the Composer type is `webkernel-business-module`. Cannot promote itself to platform.
+**Not specified (do not invent):**
 
-### UI schema (not an AST)
+- A `const ACL = ['billing.invoice.view' => ['admin', 'accountant']]` on the package provider.
+- That array was copied from old `BlogProvider`. `NOTES.md` does not have it.
+- It mixes two different things: (1) the **name** of a permission, (2) **which roles** hold it. Role assignment is data (users, App Owner). It is not a class constant dumped at Composer time.
+- Which object is a "role". How a user gets a permission. The ACL class API without `webapp()`.
 
-An AST is what a **parser** emits from source text. Webkernel already uses that word for languages (`Lexer → Parser → AST → Validator`). There is no UI language here.
-
-The PHP classes **are** the schema: Panel, Resource, Page, Table, Schema. Walk them and render `.view.php`. JSON serialisation is optional later for a visual builder. Do not build a parser. Do not call this an AST.
-
----
-
-## 8. Views and routes — modular, not hardcoded
-
-Templates are `*.view.php`. Compiler is BladeOne **owned in this package**, not a Composer library. Compiled files: `platform/storage/framework/views/`.
-
-A module declares:
-
-```php
-public const VIEWS  = [__DIR__.'/resources/views'];
-public const ROUTES = [__DIR__.'/routes.php'];
-```
-
-Dump-autoload writes those paths into `webkernel_views.php` / `webkernel_routes.php` with a namespace derived from `extra.webkernel.prefix` (example: `billing`).
-
-```
-@include('billing::invoices.index')
-@include('webkernel::layouts.page')
-```
-
-Kernel layouts stay in the codebase package provider (`webkernel` namespace). Host `platform/resources/views` is **not** a secret global bag. If the host needs a view, the host has a provider too — or it does not.
-
-A platform-wide `routes.php` is allowed for tests only. Production routes live in packages and modules, dumped.
+Until that is specified, a Resource/Page may **name** a permission (`invoice.delete`). The platform prefixes the module. Nobody assigns `'admin'` in a provider constant.
 
 ---
 
-## 9. Package types (already in lifecycle — keep)
+## 4. Registry — Spec (`NOTES.md` §4)
+
+No dependency injection container. No reflection at runtime. No configuration parsing per request.
+
+`NOTES.md` pattern: a static map, string key → factory or instance, resolve on first access, `swap` for tests.
 
 ```php
-enum LCPackageType: string
+<?php
+declare(strict_types=1);
+
+namespace Webkernel;
+
+final class Registry
 {
-    case Assets                = 'webkernel-assets';
-    case Component             = 'webkernel-component';
-    case DevTool               = 'webkernel-devtool';
-    case Stdlib                = 'webkernel-stdlib';
-    case Element               = 'webkernel-element';
-    case Agent                 = 'webkernel-agent';
-    case Ffi                   = 'webkernel-ffi';
-    case BusinessModule        = 'webkernel-business-module';
-    case BusinessModuleFeature = 'webkernel-business-module-feature';
-    case PlatformModule        = 'webkernel-platform-module';
-    case PlatformModuleFeature = 'webkernel-platform-module-feature';
+    /** @var array<string, mixed> */
+    private static array $services = [];
+
+    public static function register(string $id, callable|object $service): void
+    {
+        self::$services[$id] = $service;
+    }
+
+    public static function get(string $id): mixed
+    {
+        $service = self::$services[$id] ?? null;
+
+        if (is_callable($service)) {
+            return self::$services[$id] = $service();
+        }
+
+        return $service;
+    }
+
+    public static function swap(string $id, callable|object $service): void
+    {
+        self::$services[$id] = $service;
+    }
 }
 ```
 
-| Type | Installs to |
+Named `Registry`, not `Kernel`. One job: map keys to resolved instances.
+
+**Decision:** View is `View::…`. Config is `Config::…`. Route is `Route::…`. They do not go through Registry. Registry is not built until a fourth runtime service needs a swap and a static class is the wrong shape. It is still spec. It is not a Container.
+
+---
+
+## 5. Dynamic configuration — Spec (`NOTES.md` §5) + Decision (`Config`)
+
+Branding, colors, dark mode, logos, and panel defaults are not hardcoded in `PanelProvider`. They live in the config layer. The App Owner edits them via the System Admin Panel. Permissions decide who can edit globally vs per module. Module panels override keys or inherit. This is **not** a Resource.
+
+`NOTES.md` accessed it as `Registry::get('platform.config')`. **Decision:** `Config::get`.
+
+```php
+abstract class PanelProvider
+{
+    final protected function apply_platform_config(Panel $panel): Panel
+    {
+        return $panel
+            ->favicon(Config::get('branding.favicon'))
+            ->brand_logo(Config::get('branding.logo_light'))
+            ->dark_mode_brand_logo(Config::get('branding.logo_dark'))
+            ->brand_logo_height(Config::get('branding.logo_height', '2rem'))
+            ->colors(Config::get('branding.colors', ['primary' => \Webkernel\Platform\Colors\Color::Blue]))
+            ->dark_mode(Config::get('ui.dark_mode', true));
+    }
+}
+```
+
+### Config files — Decision
+
+| File | Who writes it | Purpose |
+|---|---|---|
+| `config/platform.php` | dump-autoload | Identity, `autoload` path. Platform-managed. Not `Config::set`. |
+| `config/app.php` | You | App defaults (including branding defaults). Read at boot. |
+| `platform/platform-runtime.php` | `Config::set` | Runtime writes. Atomic tmp → rename (`ConfigWriter`, copy from old work). |
+
+`Config::boot()` merges in that order. Runtime wins. After boot, `get('a.b.c')` is an in-memory walk on dots. No file I/O on `get`.
+
+`Config::set('a.b', $value)`:
+
+1. Write `platform/platform-runtime.php` atomically
+2. Then update memory
+3. Return `Config` so `->get('a.b')` is a read-back
+4. If the write fails, memory is unchanged
+
+### What is **not** config
+
+A package provider does **not** have:
+
+```php
+public const CONFIG = [
+    'billing.vat_rate' => 0.20,
+];
+```
+
+That was copied from old `BlogProvider`. `NOTES.md` does not have it.
+
+- `vat_rate` is **module data / module config**, not a Composer dump of the package declaration.
+- If a module needs default keys, it is a PHP file (for example `modules/acme/billing/config.php`) that `Config::boot` can merge **when we specify that**. We have not specified it. Do not put business numbers in `const CONFIG`.
+
+Dump-autoload needs **paths and class lists** from the provider (see §6.1). It does not need vat rates.
+
+---
+
+## 6. Package types and installer — Spec (`NOTES.md` §6)
+
+Already implemented in `x-webkernel/lifecycle`. Keep.
+
+```php
+<?php
+declare(strict_types=1);
+
+namespace Webkernel\Lifecycle\Installer;
+
+enum LCPackageType: string
+{
+    case Assets                 = 'webkernel-assets';
+    case Component              = 'webkernel-component';
+    case DevTool                = 'webkernel-devtool';
+    case Stdlib                 = 'webkernel-stdlib';
+    case Element                = 'webkernel-element';
+    case Agent                  = 'webkernel-agent';
+    case Ffi                    = 'webkernel-ffi';
+    case BusinessModule         = 'webkernel-business-module';
+    case BusinessModuleFeature  = 'webkernel-business-module-feature';
+    case PlatformModule         = 'webkernel-platform-module';
+    case PlatformModuleFeature  = 'webkernel-platform-module-feature';
+
+    public function requires_parent_module(): bool
+    {
+        return match ($this) {
+            self::BusinessModuleFeature,
+            self::PlatformModuleFeature => true,
+            default                     => false,
+        };
+    }
+}
+```
+
+| Type | Destination |
 |---|---|
 | `webkernel-business-module` | `modules/{vendor}/{name}` |
 | `webkernel-business-module-feature` | `modules/{parentVendor}/{parentName}/features/{vendor}-{name}` |
 | `webkernel-ffi` | `ffi/{vendor}/{name}` |
 | All others | `{vendor_dir}/{vendor}/{name}` |
 
-Features inject resources and pages into an **existing** module panel. They do not create panels. They still have exactly one `extra.webkernel.provider`.
+A module-scoped panel is inside `modules/` because of the package type, not because of a comment.
 
-Composer path repos for `x-webkernel/*` with `"symlink": true` are **fine** — that is Composer linking the package you are editing. Forbidden: `ln -s _workbench_one/...` into `refactor/`. Copy and adapt.
+### 6.1 Package declaration — Spec (`NOTES.md` §6) + Decision (one `provider`)
+
+`NOTES.md`:
+
+```json
+{
+  "name": "acme/billing",
+  "type": "webkernel-business-module",
+  "extra": {
+    "webkernel": {
+      "declaration_class": "Acme\\Billing\\BillingModuleDeclaration"
+    }
+  }
+}
+```
+
+**Decision:** the key is `provider`. Same class. One FQCN.
+
+```json
+{
+  "name": "acme/billing",
+  "type": "webkernel-business-module",
+  "extra": {
+    "webkernel": {
+      "provider": "Acme\\Billing\\BillingProvider",
+      "prefix": "billing"
+    }
+  }
+}
+```
+
+`prefix` is the view/route namespace (`@include('billing::invoices.index')`).
+
+At dump-autoload the plugin reads every installed package's `extra.webkernel.provider`, reads the constants below, writes manifests. At request, boot `require`s the manifests. No manual service-provider arrays. No glob.
+
+### 6.2 What the package provider may declare — and why
+
+Dump-autoload has to write **lists of files and classes** so the request does not walk the disk.
+
+Those lists are constants on `Webkernel\PlatformProvider`. Each constant is one dump file.
+
+| Constant | Type | Why it exists | Dump file |
+|---|---|---|---|
+| `ROUTES` | `list<string>` of PHP files | `NOTES.md` foreword + §7: routes live in the package. The router needs the file paths. | `webkernel_routes.php` |
+| `VIEWS` | `list<string>` of directories | `NOTES.md` foreword + §7: views live in the package. The view engine needs the dirs. | `webkernel_views.php` |
+| `COMPONENTS` | `list<string>` of directories | `NOTES.md` §7: `<webkernel::page />` component dirs | `webkernel_components.php` |
+| `COMMANDS` | `list<class-string>` | `NOTES.md` §1: console commands | `webkernel_commands.php` |
+| `PANELS` | `list<class-string>` of `PanelProvider` | `NOTES.md` §2 / §9: which admin UIs this package owns | `webkernel_panels.php` |
+
+```php
+<?php
+declare(strict_types=1);
+
+namespace Acme\Billing;
+
+use Webkernel\PlatformProvider;
+use Acme\Billing\Presentation\BillingPanelProvider;
+use Acme\Billing\Console\GenerateSitemapCommand;
+
+final class BillingProvider extends PlatformProvider
+{
+    public const ROUTES     = [__DIR__.'/routes.php'];
+    public const VIEWS      = [__DIR__.'/resources/views'];
+    public const COMPONENTS = [__DIR__.'/resources/views/components'];
+    public const COMMANDS   = [GenerateSitemapCommand::class];
+    public const PANELS     = [BillingPanelProvider::class];
+}
+```
+
+That is the whole class. `register()` / `boot()` do not exist.
+
+If a path cannot be a constant, a **static** method of the same name is allowed (`public static function views(): array`). Dump-autoload calls the static method. Still no instance on the request.
+
+**Not on this class:** `CONFIG`, `ACL`. See §3.2 and §5.
+
+The codebase package also has **exactly one** provider (`Webkernel\CodebaseProvider`) for kernel layouts, kernel commands (`dump-autoload`), System Admin Panel. Not `ViewProvider` + `CoreProvider` + …
 
 ---
 
-## 10. Layout (host)
+## 7. View engine — Spec (`NOTES.md` §7)
+
+Views use BladeOne **owned in this package**, not a Composer library. Extension: `.view.php`. Compiled output: `platform/storage/framework/views/`.
+
+Namespace syntax: `@include('webkernel::layouts.page')` or `<webkernel::page />`.
+
+`Webkernel\View\View` is the single entry point.
+
+`NOTES.md` registered it in Registry as `view`. **Decision:** `View::make` (class alias). Same class.
+
+```php
+View::make('dashboard.index', ['user' => $user])->render();
+View::share('app_name', 'Webkernel');
+View::stringable(fn (Money $m): string => $m->format());
+View::directive('money', fn ($e) => "<?php echo money($e); ?>");
+```
+
+View paths come from dumped `webkernel_views.php` (from `const VIEWS`). No filesystem scanning at runtime.
+
+---
+
+## 8. Project layout — Spec (`NOTES.md` §8) + Decision (config files)
 
 ```
 refactor/
-├── public/index.php                 # HTTP door
-├── webkernel                        # CLI door
+├── public/                          # Web root — index.php front controller
+├── webkernel                        # Host CLI binary
 ├── composer.json
-├── NOTES.md                         # product shape
-├── NOTES_TODO.md                    # this file
+├── NOTES.md
+├── NOTES_TODO.md
 ├── config/
 │   ├── platform.php                 # identity + autoload (dump stamps)
-│   └── app.php                      # app defaults
-├── modules/{vendor}/{name}/         # business modules
-├── platform/
-│   ├── fast-boot.php                # autoload only
-│   ├── platform-runtime.php         # Config::set target
-│   ├── dependencies/                # packagist + node_modules
-│   ├── storage/framework/views/     # compiled templates
-│   ├── storage/framework/cache/     # compiled routes
-│   ├── temporary/
-│   └── telemetry/
-└── x-webkernel/
-    ├── codebase/                    # runtime + platform UI
-    └── lifecycle/                   # Composer plugin
+│   └── app.php                      # app defaults, including branding defaults
+├── modules/                         # Business modules (composer packages)
+│   └── {vendor}/{name}/
+│       ├── composer.json            # type: webkernel-business-module
+│       │                            # extra.webkernel.provider = one class
+│       ├── src/
+│       └── features/
+│           └── {vendor}-{name}/     # type: webkernel-business-module-feature
+└── platform/
+    ├── fast-boot.php                # autoload only
+    ├── platform-runtime.php         # Config::set target
+    ├── dependencies/                # packagist, node_modules
+    ├── storage/
+    │   └── framework/
+    │       └── views/               # Compiled view cache
+    └── telemetry/                   # Logs, metrics, traces, profiles, buffers
 ```
 
 ---
 
-## 11. What we copy from old work vs what we leave
+## 9. Server-driven UI — Spec (`NOTES.md` §9)
 
-Copy (adapt to snake_case, strip Container):
+The goal is a Retool-equivalent in PHP: the interface is described as data and rendered by the engine, not hardcoded per panel.
 
-- `View/View.php`, `View/Compiler.php`, `View/Engine.php`, `View/Js.php`, kernel `views/layouts/*`
-- `Route/*` (MarkBased dispatcher, Binding, compile)
+### Step 1 — UI schema (not an AST)
+
+An **AST** (Abstract Syntax Tree) is what a **parser** emits from source text. Webkernel already uses that word for languages (`Lexer → Parser → AST → Validator`). There is no UI language here.
+
+The PHP classes **are** the schema: `Panel`, `Resource`, `Page`, `Table`, `Schema`. Immutable, walkable, optionally serialisable to JSON later if a visual builder needs a dump. Serialisation is not required to render.
+
+```
+Panel
+  Page                            (standalone — no Resource)
+  Cluster                         (optional navigation group)
+    Page                          (standalone, grouped)
+    Resource                      (CRUD class for one model)
+      Page                        (List, Create, Edit, View, custom)
+        Component                 (Table | Form | Widget | Custom)
+```
+
+A Resource schema carries the model, the table, the form, and the page map. A list page reads the table from the Resource. A create/edit page reads the form from the Resource. Pages decide which of those to show and which actions to expose.
+
+### Step 2 — Platform settings
+
+Spec §5. Built-in settings on every panel. App Owners edit them in the System Admin Panel. Not a Resource.
+
+### Step 3 — Render engine (`.view.php`)
+
+Spec §7. Each component type maps to a `.view.php` template. No Twig. BladeOne compiled once per template per change.
+
+### Step 4 — Discovery and auto-registration
+
+`NOTES.md`: each module's declaration class is invoked at boot; the dump-autoload manifest lists them; boot reads the manifest; no filesystem traversal at runtime.
+
+**Decision:** "invoked at boot" does **not** mean `new BillingProvider` on every request. Dump-autoload already invoked it (constants / static methods). Boot `require`s `webkernel_panels.php`, `webkernel_routes.php`, `webkernel_views.php`.
+
+---
+
+## 10. Namespace summary — Spec (`NOTES.md` §10) + Decision
+
+| Namespace | Responsibility |
+|---|---|
+| `Webkernel\Config\Config` | `get` / `set` / `boot` (Decision) |
+| `Webkernel\Registry` | Spec §4. Not first cut. Not a Container. |
+| `Webkernel\View\` | View engine, compiler, Blade directives |
+| `Webkernel\Cache\` | Compilation store, manifest cache |
+| `Webkernel\Lifecycle\` | Composer installer, plugin, package types |
+| `Webkernel\Console` | CLI door + commands |
+| `Webkernel\Http` | HTTP door (Decision) |
+| `Webkernel\PlatformProvider` | Package declaration, dump-time (Decision) |
+| `Webkernel\Platform\Panel` | Panel definition and fluent builder |
+| `Webkernel\Platform\PanelProvider` | One admin UI; applies platform config (§5) |
+| `Webkernel\Platform\Colors\` | Color definitions and palette |
+| `Webkernel\Platform\Pages\` | Built-in panel pages (`Dashboard`). Not resource pages. |
+| `Webkernel\Platform\Widgets\` | Built-in widgets |
+| `Webkernel\Platform\Resources\` | Base Resource: model, table, form, owned pages |
+| `Webkernel\Platform\Tables\` | Table schema and column definitions |
+| `Webkernel\Platform\Schemas\` | Form and filter schema |
+| `Webkernel\Platform\RenderHooks\` | Named render hook registry |
+| `Webkernel\Platform\Http\Middleware\` | All HTTP middleware (spec; first cut is one auth class) |
+| `Webkernel\Platform\System\` | System Admin Panel provider and internals |
+
+JSON Canonicalisation and Event Dispatcher stay on the `Webkernel\` list from §1. Not first cut.
+
+---
+
+# Part III — Three moments (so the boot is visible)
+
+| Moment | When | What you do | What the machine does |
+|---|---|---|---|
+| **Author** | You type PHP | Write one `PlatformProvider` per package (`const ROUTES`, `const VIEWS`, …) and Panel/Resource/Page classes | Nothing |
+| **Composer** | `composer dump-autoload` | Nothing | Read each provider statically. Write `platform/dependencies/packagist/composer/webkernel_*.php` |
+| **Request** | Browser or `./webkernel` | Nothing | `require` autoload, `require` those arrays, `Config::boot()`, dispatch. No `new Provider`. No Container. No glob. No global functions. |
+
+Composer time may use Reflection. Request time may not.
+
+If the provider is constants (and static methods) only, dump-autoload never instantiates it.
+
+---
+
+# Part IV — What we copy from old work
+
+Copy and adapt (strip Container, strip `webapp()`):
+
+- `View/View.php`, `Compiler.php`, `Engine.php`, `Js.php`, kernel `views/layouts/*`
+- `Route/*`
 - `Config/ConfigWriter.php`
-- `Lifecycle/*` (installer + package types) — already in refactor
-- `namespacer.php` — strip `webapp()`, keep autoload + add class aliases
-- Console attribute + argv parsing (not Symfony Console)
+- `Lifecycle/*` (already in refactor)
+- `namespacer.php` (aliases, no functions)
+- Console attribute + argv parsing
 
 Do not copy:
 
 - `Container/`
 - `WebApp.php`
-- `Index.php` as it exists (HTTP+CLI+Container)
+- `Index.php`
 - `Composables/*` as the public API
 - `Provider/ProviderRegistry.php` (the glob)
-- `Http/CoreProvider.php` + `View/ViewProvider.php` as two providers (fold into one `CodebaseProvider`)
+- `ViewProvider` + `CoreProvider` as two providers
 - Host `resources/views` hardcoded in boot
-- `webapp()` / `view()` / `webapp_path()` function files
+- `BlogProvider::CONFIG` and `BlogProvider::ACL`
 
 ---
 
-## 12. What this implies (honest)
+# Part V — Build order
 
-Applying `NOTES.md` as a Filament clone plus a kernel rewrite is **weeks**, not two days.
+Each step leaves the previous door working. Spec items not in A–G stay spec; they are not deleted.
 
-Applying **this file** means:
+### A — Doors
 
-1. The boot becomes readable. You can follow a request without an agent.
-2. Every package has one declaration class. Composer turns it into arrays. The request reads arrays.
-3. Config is `Config::get` / `Config::set`. No composable, no container.
-4. You still need the View compiler and the router — those are real code, copied from old work, not reinvented.
-5. Panel / Resource / Page is **new** code, small if we only render: one dashboard page + one Resource with List/Create/Edit.
-6. We do **not** build: Retool JSON builder, eleven Filament middleware, boot-time `discover_*`, a general Registry, granular ACL UI, feature packages, branding editor.
+- [ ] `public/index.php` → `fast-boot.php` → `Webkernel\Http::run()`
+- [ ] `./webkernel` → `fast-boot.php` → `Webkernel\Console::run($argv)`
 
-Container removal is not a rename. Old work is soaked in `Container`. The way to win is: **do not copy those files**. Copy View and Route. Write Http and Console as twenty-line doors.
+### B — Config
 
-Performance contract stays: no directory walk on the request path, no reflection on the request path, dumped PHP `require`, OPcache.
-
----
-
-## 13. Build order (do in this order, stop when the app runs)
-
-Each step must leave the previous door working.
-
-### Step A — Doors
-
-- [ ] `public/index.php` → `fast-boot.php` → `Webkernel\Http::run()` (can print a plain string)
-- [ ] `./webkernel` → `fast-boot.php` → `Webkernel\Console::run($argv)` (can print help)
-- [ ] Delete any use of `Index`, `WebApp`, `Container` in refactor (refactor barely has them; do not copy them in)
-
-### Step B — Config + namespacer
-
-- [ ] `namespacer.php`: autoload + `class_alias` for `Config`, `View`, `Route`. No functions.
-- [ ] `Webkernel\Config\Config`: `boot`, `get`, `set` (writes `platform/platform-runtime.php`), `flush`
+- [ ] `namespacer.php`: aliases only
+- [ ] `Config::boot` / `get` / `set` / `flush`
 - [ ] Copy `ConfigWriter`
-- [ ] One check: `Config::set('x.y', 1)->get('x.y') === 1` and the runtime file exists
+- [ ] `Config::set('x.y', 1)->get('x.y') === 1` writes `platform/platform-runtime.php`
 
-### Step C — One provider, dump-autoload
+### C — One provider, dump-autoload
 
-- [ ] `Webkernel\PlatformProvider` base (constants only)
-- [ ] `Webkernel\CodebaseProvider` — the single codebase provider (`VIEWS` = kernel layouts)
-- [ ] `extra.webkernel.provider` on `x-webkernel/codebase/composer.json`
-- [ ] Lifecycle dump writes `webkernel_views.php`, `webkernel_providers.php`, `webkernel.php`
-- [ ] Request reads the dump. Dump does not instantiate the provider if constants suffice
+- [ ] `Webkernel\PlatformProvider` with `ROUTES`, `VIEWS`, `COMPONENTS`, `COMMANDS`, `PANELS` only
+- [ ] `Webkernel\CodebaseProvider` (kernel layouts)
+- [ ] `extra.webkernel.provider` on codebase `composer.json`
+- [ ] Lifecycle writes `webkernel_views.php`, `webkernel_providers.php`, `webkernel.php`
 
-### Step D — View engine (copy)
+### D — View engine (copy) — `NOTES.md` §7
 
-- [ ] Copy View / Compiler / Engine / kernel layouts from old work
-- [ ] Strip Container from them
-- [ ] `Http::run()` renders `webkernel::layouts.simple` with a hello string
-- [ ] Compiled files land in `platform/storage/framework/views/`
+- [ ] Copy View / Compiler / Engine / layouts
+- [ ] `Http::run()` renders `webkernel::layouts.simple`
 
-### Step E — Router (copy)
+### E — Router (copy)
 
-- [ ] Copy Route engine
-- [ ] Kernel or test `routes.php` dumped via the codebase provider
-- [ ] `Http::run()` matches `/` and renders the view
+- [ ] Copy Route
+- [ ] Match `/` and render
 
-### Step F — Panel page (no Resource)
+### F — Panel page — `NOTES.md` §2–§3
 
 - [ ] `Panel`, `PanelProvider`, `Page`
-- [ ] `SystemPanelProvider` (platform scope) with `Dashboard` as a standalone page
-- [ ] Dumped via `CodebaseProvider::PANELS`
-- [ ] `/system` (or `/`) shows Dashboard through the view engine
+- [ ] `SystemPanelProvider` (`scope('platform')`) + standalone `Dashboard`
+- [ ] Branding from `Config` (§5), even if the keys are still defaults
 
-### Step G — Resource (CRUD unit)
+### G — Resource — `NOTES.md` §3
 
 - [ ] `Resource`, `Table`, `Schema`
-- [ ] One demo module (`modules/...`) with **one** `PlatformProvider`
-- [ ] That provider declares `VIEWS`, `ROUTES`, `PANELS`
-- [ ] One `InvoiceResource` (or whatever the app's first model is) with List / Create / Edit pages
-- [ ] Panel registers the Resource; Resource owns the pages
-- [ ] Persistence: the smallest thing that works (array / sqlite). Not an ORM.
+- [ ] One business module, one `PlatformProvider`, one panel, one Resource, List/Create/Edit
+- [ ] Persistence: smallest thing that works. Not an ORM.
 
-### Step H — Only if the app needs it after G
+### H — Spec, after the app runs
 
-- [ ] Auth middleware (one class, not eleven)
-- [ ] Module-scoped ACL from dumped `webkernel_acl.php`
-- [ ] Branding keys in Config, read by the panel layout (no settings Resource)
-- [ ] Feature packages
-- [ ] JSON dump of the UI schema for a visual builder
+- [ ] Middleware list from §1 / §2
+- [ ] Permission names, module-namespaced (`NOTES.md` §3). Not a `const ACL` role map
+- [ ] Features inject into existing panels (`NOTES.md` §3)
+- [ ] Render hooks, widgets
+- [ ] Registry if a fourth service needs it (`NOTES.md` §4)
+- [ ] JSON dump of the UI schema (`NOTES.md` §9)
+- [ ] JSON Canonicalisation, Event Dispatcher (`NOTES.md` §1)
 
 ---
 
-## 14. Naming law
+# Part VI — Naming
 
 | Kind | Rule | Example |
 |---|---|---|
-| Methods, functions, parameters, config keys | `snake_case` | `Config::get()`, `pages()`, `vat_rate` |
+| Methods, parameters, config keys | `snake_case` | `Config::get()`, `pages()`, `brand_logo()` |
 | Classes, namespaces | `PascalCase` | `PlatformProvider`, `InvoiceResource` |
 | Constants | `UPPER_SNAKE` | `ROUTES`, `VIEWS` |
 | Composer extra keys | `snake_case` | `extra.webkernel.provider` |
 
 PSR / Composer plugin methods we do not own stay as the interface wrote them (`activate`, `getSubscribedEvents`).
-
----
-
-## 15. How to know you understand it
-
-You should be able to answer, without opening an agent:
-
-1. A request arrives. Which file runs first? (`public/index.php`)
-2. Who loads classes? (`fast-boot.php` → Composer autoload → `namespacer.php`)
-3. Who knows the view directories? (dumped `webkernel_views.php`, written at dump-autoload from `const VIEWS`)
-4. Who knows branding? (`Config::get`, files in section 4)
-5. Where is a new CRUD screen declared? (a `Resource` class, `pages()`)
-6. Where is a Dashboard declared? (a `PanelProvider`, standalone page, no Resource)
-7. When does a Provider run? (**Never** on a request. At dump-autoload only, and only if a static method must be called.)
-
-If you cannot answer one of those, this file is still missing a sentence. Add it. Do not add a Container to hide the answer.
