@@ -10,4 +10,5 @@
 
 return [
     \Webkernel\Console\Commands\DumpAutoloadCommand::class,
+    \Webkernel\Console\Commands\ServerCommand::class,
 ];

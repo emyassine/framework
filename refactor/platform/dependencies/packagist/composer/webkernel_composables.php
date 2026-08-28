@@ -12,6 +12,7 @@ return [
     'config' => \Webkernel\Composables\ConfigComposable::class,
     'console' => \Webkernel\Console\Kernel::class,
     'panel' => \Webkernel\Composables\PanelComposable::class,
+    'performance' => \Webkernel\Performance\Performance::class,
     'route' => \Webkernel\Route\Route::class,
     'terminal' => \Webkernel\Console\Terminal::class,
     'view' => \Webkernel\View\View::class,
