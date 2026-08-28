@@ -23,12 +23,16 @@
   {{-- Location: sidebar brand --}}
   <aside class="webkernel-shell-sidebar" id="sidebar" role="navigation" aria-label="Main navigation">
     <div class="webkernel-shell-sidebar__brand">
-      <div class="webkernel-shell-brand-icon">
-        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="8" cy="8" r="6"/>
-          <path d="M8 2v6l3 3"/>
-        </svg>
-      </div>
+      @if (!empty($logo))
+        <img class="webkernel-shell-brand-mark" src="{{ $logo }}" alt="{{ $brand ?? 'Webkernel' }}" />
+      @else
+        <div class="webkernel-shell-brand-icon">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="8" cy="8" r="6"/>
+            <path d="M8 2v6l3 3"/>
+          </svg>
+        </div>
+      @endif
       <span class="webkernel-shell-brand-name">{{ $brand ?? 'Webkernel' }}</span>
     </div>
 
@@ -49,11 +53,15 @@
         <svg viewBox="0 0 16 16"><line x1="1" y1="4" x2="15" y2="4"/><line x1="1" y1="8" x2="15" y2="8"/><line x1="1" y1="12" x2="15" y2="12"/></svg>
       </button>
       <div class="webkernel-shell-topbar-brand">
-        <div class="webkernel-shell-brand-icon" style="width:24px;height:24px;">
-          <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="8" cy="8" r="6"/><path d="M8 2v6l3 3"/>
-          </svg>
-        </div>
+        @if (!empty($logo))
+          <img class="webkernel-shell-brand-mark" src="{{ $logo }}" alt="{{ $brand ?? 'Webkernel' }}" />
+        @else
+          <div class="webkernel-shell-brand-icon" style="width:24px;height:24px;">
+            <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="8" cy="8" r="6"/><path d="M8 2v6l3 3"/>
+            </svg>
+          </div>
+        @endif
         <span style="font-size:var(--webkernel-design-font-size-base);font-weight:600;letter-spacing:-0.01em;">{{ $brand ?? 'Webkernel' }}</span>
       </div>
 

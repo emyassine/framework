@@ -11,4 +11,5 @@
 return [
     \Acme\Billing\BillingProvider::class,
     \Webkernel\CodebaseProvider::class,
+    \Webkernel\Imagery\ImageryProvider::class,
 ];

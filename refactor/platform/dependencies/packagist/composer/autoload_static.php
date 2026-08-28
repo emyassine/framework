@@ -16,6 +16,7 @@ class ComposerStaticInitcc6f492cc5d64cb7f09b9024726d6929
         'W' =>
         array (
             'Webkernel\\Lifecycle\\' => 20,
+            'Webkernel\\Imagery\\' => 18,
             'Webkernel\\' => 10,
         ),
         'T' =>
@@ -55,6 +56,10 @@ class ComposerStaticInitcc6f492cc5d64cb7f09b9024726d6929
         'Webkernel\\Lifecycle\\' =>
         array (
             0 => __DIR__ . '/..' . '/webkernel/lifecycle/Lifecycle',
+        ),
+        'Webkernel\\Imagery\\' =>
+        array (
+            0 => __DIR__ . '/..' . '/webkernel/imagery/src',
         ),
         'Webkernel\\' =>
         array (
@@ -1769,6 +1774,7 @@ class ComposerStaticInitcc6f492cc5d64cb7f09b9024726d6929
         'SebastianBergmann\\Type\\UnknownType' => __DIR__ . '/..' . '/sebastian/type/src/type/UnknownType.php',
         'SebastianBergmann\\Type\\VoidType' => __DIR__ . '/..' . '/sebastian/type/src/type/VoidType.php',
         'SebastianBergmann\\Version' => __DIR__ . '/..' . '/sebastian/version/src/Version.php',
+        'Tests\\Feature\\BrandingTest' => __DIR__ . '/../../../..' . '/tests/Feature/BrandingTest.php',
         'Tests\\Feature\\ConfigTest' => __DIR__ . '/../../../..' . '/tests/Feature/ConfigTest.php',
         'Tests\\Feature\\HttpTest' => __DIR__ . '/../../../..' . '/tests/Feature/HttpTest.php',
         'Tests\\Feature\\PanelViewTest' => __DIR__ . '/../../../..' . '/tests/Feature/PanelViewTest.php',
@@ -1801,6 +1807,9 @@ class ComposerStaticInitcc6f492cc5d64cb7f09b9024726d6929
         'Webkernel\\Console\\Terminal' => __DIR__ . '/..' . '/webkernel/codebase/src/Console/Terminal.php',
         'Webkernel\\DevEnv\\IdeHelper' => __DIR__ . '/..' . '/webkernel/codebase/src/DevEnv/IdeHelper.php',
         'Webkernel\\Http' => __DIR__ . '/..' . '/webkernel/codebase/src/Http.php',
+        'Webkernel\\Imagery\\Branding' => __DIR__ . '/..' . '/webkernel/imagery/src/Branding.php',
+        'Webkernel\\Imagery\\Icon' => __DIR__ . '/..' . '/webkernel/imagery/src/Icon.php',
+        'Webkernel\\Imagery\\ImageryProvider' => __DIR__ . '/..' . '/webkernel/imagery/src/ImageryProvider.php',
         'Webkernel\\Instance\\InstanceId' => __DIR__ . '/..' . '/webkernel/codebase/src/Instance/InstanceId.php',
         'Webkernel\\Lifecycle\\ComposerScripts' => __DIR__ . '/..' . '/webkernel/lifecycle/Lifecycle/ComposerScripts.php',
         'Webkernel\\Lifecycle\\Installer\\LCBaseInstaller' => __DIR__ . '/..' . '/webkernel/lifecycle/Lifecycle/Installer/LCBaseInstaller.php',

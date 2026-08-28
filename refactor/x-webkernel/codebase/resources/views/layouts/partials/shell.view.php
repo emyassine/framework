@@ -547,4 +547,16 @@
       color: var(--webkernel-design-text);
     }
 
+
+    .webkernel-shell-brand-mark {
+      width: 28px;
+      height: 28px;
+      object-fit: contain;
+      flex-shrink: 0;
+      border-radius: var(--webkernel-design-radius);
+    }
+    .webkernel-shell-topbar-brand .webkernel-shell-brand-mark {
+      width: 24px;
+      height: 24px;
+    }
 </style>

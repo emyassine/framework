@@ -33,20 +33,20 @@ final class Icon
     public static function svg(string $name, string $set = 'lucide'): string
     {
         $file = self::path($name, $set);
-        if (is_file($file)) {
-            $svg = file_get_contents($file);
+        if (\is_file($file)) {
+            $svg = \file_get_contents($file);
 
-            return is_string($svg) ? $svg : '';
+            return \is_string($svg) ? $svg : '';
         }
         foreach (self::sets() as $fallback) {
             if ($fallback === $set) {
                 continue;
             }
             $file = self::path($name, $fallback);
-            if (is_file($file)) {
-                $svg = file_get_contents($file);
+            if (\is_file($file)) {
+                $svg = \file_get_contents($file);
 
-                return is_string($svg) ? $svg : '';
+                return \is_string($svg) ? $svg : '';
             }
         }
 

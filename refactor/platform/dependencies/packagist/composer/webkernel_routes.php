@@ -13,4 +13,5 @@ $b = dirname($v, 3); // webapp root
 
 return [
     $b . '/x-webkernel/codebase/routes.php',
+    $b . '/x-webkernel/platform/imagery/routes.php',
 ];

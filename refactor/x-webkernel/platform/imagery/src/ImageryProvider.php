@@ -6,4 +6,5 @@ use Webkernel\PlatformProvider;
 
 final class ImageryProvider extends PlatformProvider
 {
+    public const ROUTES = [__DIR__.'/../routes.php'];
 }

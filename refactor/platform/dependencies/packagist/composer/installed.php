@@ -3,7 +3,7 @@
         'name' => 'webkernel/webkernel',
         'pretty_version' => 'dev-main',
         'version' => 'dev-main',
-        'reference' => '7a813ff0e0bf85e73ffe5e3adc207124dbe25267',
+        'reference' => '2f0c514e6f30d05e09d95eb0b5cc6f8a748404d2',
         'type' => 'project',
         'install_path' => __DIR__ . '/../../../../',
         'aliases' => array(),
@@ -352,6 +352,15 @@
             'aliases' => array(),
             'dev_requirement' => false,
         ),
+        'webkernel/imagery' => array(
+            'pretty_version' => '0.12.0',
+            'version' => '0.12.0.0',
+            'reference' => 'c1ded06a3189166942cd2a61ee86709f0a957fb1',
+            'type' => 'webkernel-stdlib',
+            'install_path' => __DIR__ . '/../webkernel/imagery',
+            'aliases' => array(),
+            'dev_requirement' => false,
+        ),
         'webkernel/lifecycle' => array(
             'pretty_version' => '0.12.0',
             'version' => '0.12.0.0',
@@ -364,7 +373,7 @@
         'webkernel/webkernel' => array(
             'pretty_version' => 'dev-main',
             'version' => 'dev-main',
-            'reference' => '7a813ff0e0bf85e73ffe5e3adc207124dbe25267',
+            'reference' => '2f0c514e6f30d05e09d95eb0b5cc6f8a748404d2',
             'type' => 'project',
             'install_path' => __DIR__ . '/../../../../',
             'aliases' => array(),

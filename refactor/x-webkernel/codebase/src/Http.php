@@ -3,6 +3,7 @@
 namespace Webkernel;
 
 use Webkernel\Config\Config;
+use Webkernel\Imagery\Branding;
 use Webkernel\Platform\Resources\Resource;
 use Webkernel\Route\Route;
 use Webkernel\View\View;
@@ -15,12 +16,15 @@ final class Http
     public static function run(): void
     {
         Config::boot();
+        $theme = Config::get('ui.dark_mode', true) ? 'dark' : 'light';
+        $branding = class_exists(Branding::class) ? Branding::get() : null;
+        $logo_key = $theme === 'dark' ? 'webkernel-logo-dark' : 'webkernel-logo-light';
         View::share([
             'title' => Config::get('app.name', 'Webkernel'),
             'brand' => Config::get('app.name', 'Webkernel'),
-            'theme' => Config::get('ui.dark_mode', true) ? 'dark' : 'light',
-            'favicon' => Config::get('branding.favicon'),
-            'logo' => Config::get('branding.logo_light'),
+            'theme' => $theme,
+            'favicon' => $branding?->url('webkernel-favicon') ?: Config::get('branding.favicon'),
+            'logo' => $branding?->url($logo_key) ?: Config::get('branding.logo_light'),
         ]);
         self::register_panels();
         $out = Route::dispatch();

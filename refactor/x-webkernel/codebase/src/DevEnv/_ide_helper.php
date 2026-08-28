@@ -6,7 +6,7 @@
 //> For the full copyright and license information, please view the LICENSE
 //> file that was distributed with this source code.
 //> Generated. Do not edit.
-//> hash: a8735064eb62bcf0
+//> hash: 4f613f501ff0c788
 
 namespace Acme\Billing {
     if (false) {
@@ -2443,6 +2443,7 @@ namespace SebastianBergmann {
 }
 namespace Tests\Feature {
     if (false) {
+        class BrandingTest {}
         class ConfigTest {}
         class HttpTest {}
         class PanelViewTest {}

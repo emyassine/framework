@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "3af95fb4c12c7e108c4d9ffd1d6f765e",
+    "content-hash": "0fe172edbf759595e61b76d87ae80693",
     "packages": [
         {
             "name": "acme/billing",
@@ -631,6 +631,46 @@
                 "proprietary"
             ],
             "description": "Webkernel runtime: config, route, view, console, HTTP door.",
+            "transport-options": {
+                "symlink": true,
+                "relative": true
+            }
+        },
+        {
+            "name": "webkernel/imagery",
+            "version": "0.12.0",
+            "dist": {
+                "type": "path",
+                "url": "x-webkernel/platform/imagery",
+                "reference": "c1ded06a3189166942cd2a61ee86709f0a957fb1"
+            },
+            "require": {
+                "php": ">=8.4"
+            },
+            "type": "webkernel-stdlib",
+            "extra": {
+                "webkernel": {
+                    "package_repo": "git@github.com:webkernelphp/imagery.git",
+                    "production": true,
+                    "provider": "Webkernel\\Imagery\\ImageryProvider",
+                    "prefix": "imagery"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Webkernel\\Imagery\\": "src/"
+                }
+            },
+            "license": [
+                "EPL-2.0"
+            ],
+            "authors": [
+                {
+                    "name": "El Moumen Yassine",
+                    "email": "yassine@numerimondes.com"
+                }
+            ],
+            "description": "Webkernel imagery: icons, brands, pixmaps.",
             "transport-options": {
                 "symlink": true,
                 "relative": true

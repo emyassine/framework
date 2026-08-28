@@ -7,6 +7,7 @@ $baseDir = dirname(dirname(dirname($vendorDir)));
 
 return array(
     'Webkernel\\Lifecycle\\' => array($vendorDir . '/webkernel/lifecycle/Lifecycle'),
+    'Webkernel\\Imagery\\' => array($vendorDir . '/webkernel/imagery/src'),
     'Webkernel\\' => array($vendorDir . '/webkernel/codebase/src'),
     'Tests\\' => array($baseDir . '/tests'),
     'Psr\\SimpleCache\\' => array($vendorDir . '/psr/simple-cache/src'),
