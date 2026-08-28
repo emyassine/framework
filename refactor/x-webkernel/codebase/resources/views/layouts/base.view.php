@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html
   lang="{{ $lang ?? 'en' }}"
-  data-wds-theme="{{ $theme ?? 'light' }}"
-  data-wds-layout="{{ $wds_layout ?? 'base' }}"
+  data-webkernel-design-theme="{{ $theme ?? 'light' }}"
+  data-webkernel-design-layout="{{ $layout ?? 'base' }}"
 >
 <head>
   <meta charset="UTF-8" />

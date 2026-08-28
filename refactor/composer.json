@@ -43,6 +43,13 @@
         },
         {
             "type": "path",
+            "url": "x-webkernel/platform/*",
+            "options": {
+                "symlink": true
+            }
+        },
+        {
+            "type": "path",
             "url": "modules/*/*",
             "options": {
                 "symlink": true
@@ -68,7 +75,8 @@
 	    "psr/http-message": "^1.0 || ^2.0",
 	    "psr/log": "^3.0",
 	    "psr/simple-cache": "^3.0",
-	    "webkernel/codebase": "^0.12.0"
+	    "webkernel/codebase": "^0.12.0",
+	    "webkernel/imagery": "^0.12.0"
 	},
 	"require-dev": {
 	    "phpunit/phpunit": "^11.5"

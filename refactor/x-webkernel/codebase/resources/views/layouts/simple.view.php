@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html
   lang="{{ $lang ?? 'en' }}"
-  data-wds-theme="{{ $theme ?? 'light' }}"
-  data-wds-layout="simple"
+  data-webkernel-design-theme="{{ $theme ?? 'light' }}"
+  data-webkernel-design-layout="simple"
 >
 <head>
   <meta charset="UTF-8" />
@@ -13,8 +13,8 @@
   @stack('styles')
 </head>
 <body>
-  <main class="wks-simple">
-    <div class="wks-simple__card">
+  <main class="webkernel-shell-simple">
+    <div class="webkernel-shell-simple__card">
       @yield('content')
     </div>
   </main>

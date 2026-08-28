@@ -4,22 +4,22 @@
  body
  <?php echo $this->render_component(); ?>
 */ ?>
-<div class="wks-page">
- <header class="wks-page-header">
+<div class="webkernel-shell-page">
+ <header class="webkernel-shell-page-header">
  <div>
- <h1 class="wks-page-title"><?php echo \Webkernel\View\View::echo($title ?? ''); ?></h1>
+ <h1 class="webkernel-shell-page-title"><?php echo \Webkernel\View\View::echo($title ?? ''); ?></h1>
  <?php if(!empty($description)): ?>
- <p class="wks-page-desc"><?php echo \Webkernel\View\View::echo($description); ?></p>
+ <p class="webkernel-shell-page-desc"><?php echo \Webkernel\View\View::echo($description); ?></p>
  <?php endif; ?>
  </div>
  <?php if(!empty($actions)): ?>
- <div class="wks-page-actions">
+ <div class="webkernel-shell-page-actions">
  <?php echo $actions; ?>
 
  </div>
  <?php endif; ?>
  </header>
- <div class="wks-page-body">
+ <div class="webkernel-shell-page-body">
  <?php echo $slot; ?>
 
  </div>

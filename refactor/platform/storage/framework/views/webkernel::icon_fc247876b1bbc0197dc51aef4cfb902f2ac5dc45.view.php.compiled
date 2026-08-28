@@ -1,0 +1,6 @@
+<?php 
+ $markup = function_exists('webkernel_grab_icon')
+ ? webkernel_grab_icon((string) ($name ?? ''), 'webkernel-shell-icon__svg', '', (string) ($set ?? 'lucide'))
+ : '';
+ ?>
+<span class="webkernel-shell-icon"><?php echo $markup; ?></span>

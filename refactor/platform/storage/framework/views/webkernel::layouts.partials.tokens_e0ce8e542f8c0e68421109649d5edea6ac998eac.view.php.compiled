@@ -1,94 +1,94 @@
 <style>
  /* ============================================================
- WEBKERNEL DESIGN SYSTEM (wds-)
- WEBKERNEL COLOR SYSTEM  (wcs-)
+ WEBKERNEL DESIGN SYSTEM (webkernel-design-)
+ WEBKERNEL COLOR SYSTEM  (webkernel-color-)
  Naming convention:
- wds- = design tokens (spacing, radius, shadow, typography)
- wcs- = color tokens (semantic + palette)
- wks- = component / shell tokens
+ webkernel-design- = design tokens (spacing, radius, shadow, typography)
+ webkernel-color- = color tokens (semantic + palette)
+ webkernel-shell- = component / shell tokens
  ============================================================ */
 
  /* ----------------------------------------------------------
- WCS — COLOR PALETTE (Filament-style OKLCH)
+ Webkernel Color — COLOR PALETTE (OKLCH palette)
  ---------------------------------------------------------- */
  :root {
 
  /* — Danger — */
- --wcs-danger-50:  oklch(0.971 0.013 17.38);
- --wcs-danger-100: oklch(0.936 0.032 17.717);
- --wcs-danger-200: oklch(0.885 0.062 18.334);
- --wcs-danger-300: oklch(0.808 0.114 19.571);
- --wcs-danger-400: oklch(0.704 0.191 22.216);
- --wcs-danger-500: oklch(0.637 0.237 25.331);
- --wcs-danger-600: oklch(0.577 0.245 27.325);
- --wcs-danger-700: oklch(0.505 0.213 27.518);
- --wcs-danger-800: oklch(0.444 0.177 26.899);
- --wcs-danger-900: oklch(0.396 0.141 25.723);
- --wcs-danger-950: oklch(0.258 0.092 26.042);
+ --webkernel-color-danger-50:  oklch(0.971 0.013 17.38);
+ --webkernel-color-danger-100: oklch(0.936 0.032 17.717);
+ --webkernel-color-danger-200: oklch(0.885 0.062 18.334);
+ --webkernel-color-danger-300: oklch(0.808 0.114 19.571);
+ --webkernel-color-danger-400: oklch(0.704 0.191 22.216);
+ --webkernel-color-danger-500: oklch(0.637 0.237 25.331);
+ --webkernel-color-danger-600: oklch(0.577 0.245 27.325);
+ --webkernel-color-danger-700: oklch(0.505 0.213 27.518);
+ --webkernel-color-danger-800: oklch(0.444 0.177 26.899);
+ --webkernel-color-danger-900: oklch(0.396 0.141 25.723);
+ --webkernel-color-danger-950: oklch(0.258 0.092 26.042);
 
  /* — Gray — */
- --wcs-gray-50:  oklch(0.985 0 0);
- --wcs-gray-100: oklch(0.967 0.001 286.375);
- --wcs-gray-200: oklch(0.92  0.004 286.32);
- --wcs-gray-300: oklch(0.871 0.006 286.286);
- --wcs-gray-400: oklch(0.705 0.015 286.067);
- --wcs-gray-500: oklch(0.552 0.016 285.938);
- --wcs-gray-600: oklch(0.442 0.017 285.786);
- --wcs-gray-700: oklch(0.37  0.013 285.805);
- --wcs-gray-800: oklch(0.274 0.006 286.033);
- --wcs-gray-900: oklch(0.21  0.006 285.885);
- --wcs-gray-950: oklch(0.141 0.005 285.823);
+ --webkernel-color-gray-50:  oklch(0.985 0 0);
+ --webkernel-color-gray-100: oklch(0.967 0.001 286.375);
+ --webkernel-color-gray-200: oklch(0.92  0.004 286.32);
+ --webkernel-color-gray-300: oklch(0.871 0.006 286.286);
+ --webkernel-color-gray-400: oklch(0.705 0.015 286.067);
+ --webkernel-color-gray-500: oklch(0.552 0.016 285.938);
+ --webkernel-color-gray-600: oklch(0.442 0.017 285.786);
+ --webkernel-color-gray-700: oklch(0.37  0.013 285.805);
+ --webkernel-color-gray-800: oklch(0.274 0.006 286.033);
+ --webkernel-color-gray-900: oklch(0.21  0.006 285.885);
+ --webkernel-color-gray-950: oklch(0.141 0.005 285.823);
 
  /* — Info / Primary — */
- --wcs-info-50:  oklch(0.97  0.014 254.604);
- --wcs-info-100: oklch(0.932 0.032 255.585);
- --wcs-info-200: oklch(0.882 0.059 254.128);
- --wcs-info-300: oklch(0.809 0.105 251.813);
- --wcs-info-400: oklch(0.707 0.165 254.624);
- --wcs-info-500: oklch(0.623 0.214 259.815);
- --wcs-info-600: oklch(0.546 0.245 262.881);
- --wcs-info-700: oklch(0.488 0.243 264.376);
- --wcs-info-800: oklch(0.424 0.199 265.638);
- --wcs-info-900: oklch(0.379 0.146 265.522);
- --wcs-info-950: oklch(0.282 0.091 267.935);
+ --webkernel-color-info-50:  oklch(0.97  0.014 254.604);
+ --webkernel-color-info-100: oklch(0.932 0.032 255.585);
+ --webkernel-color-info-200: oklch(0.882 0.059 254.128);
+ --webkernel-color-info-300: oklch(0.809 0.105 251.813);
+ --webkernel-color-info-400: oklch(0.707 0.165 254.624);
+ --webkernel-color-info-500: oklch(0.623 0.214 259.815);
+ --webkernel-color-info-600: oklch(0.546 0.245 262.881);
+ --webkernel-color-info-700: oklch(0.488 0.243 264.376);
+ --webkernel-color-info-800: oklch(0.424 0.199 265.638);
+ --webkernel-color-info-900: oklch(0.379 0.146 265.522);
+ --webkernel-color-info-950: oklch(0.282 0.091 267.935);
 
- --wcs-primary-50:  var(--wcs-info-50);
- --wcs-primary-100: var(--wcs-info-100);
- --wcs-primary-200: var(--wcs-info-200);
- --wcs-primary-300: var(--wcs-info-300);
- --wcs-primary-400: var(--wcs-info-400);
- --wcs-primary-500: var(--wcs-info-500);
- --wcs-primary-600: var(--wcs-info-600);
- --wcs-primary-700: var(--wcs-info-700);
- --wcs-primary-800: var(--wcs-info-800);
- --wcs-primary-900: var(--wcs-info-900);
- --wcs-primary-950: var(--wcs-info-950);
+ --webkernel-color-primary-50:  var(--webkernel-color-info-50);
+ --webkernel-color-primary-100: var(--webkernel-color-info-100);
+ --webkernel-color-primary-200: var(--webkernel-color-info-200);
+ --webkernel-color-primary-300: var(--webkernel-color-info-300);
+ --webkernel-color-primary-400: var(--webkernel-color-info-400);
+ --webkernel-color-primary-500: var(--webkernel-color-info-500);
+ --webkernel-color-primary-600: var(--webkernel-color-info-600);
+ --webkernel-color-primary-700: var(--webkernel-color-info-700);
+ --webkernel-color-primary-800: var(--webkernel-color-info-800);
+ --webkernel-color-primary-900: var(--webkernel-color-info-900);
+ --webkernel-color-primary-950: var(--webkernel-color-info-950);
 
  /* — Success — */
- --wcs-success-50:  oklch(0.982 0.018 155.826);
- --wcs-success-100: oklch(0.962 0.044 156.743);
- --wcs-success-200: oklch(0.925 0.084 155.995);
- --wcs-success-300: oklch(0.871 0.15  154.449);
- --wcs-success-400: oklch(0.792 0.209 151.711);
- --wcs-success-500: oklch(0.723 0.219 149.579);
- --wcs-success-600: oklch(0.627 0.194 149.214);
- --wcs-success-700: oklch(0.527 0.154 150.069);
- --wcs-success-800: oklch(0.448 0.119 151.328);
- --wcs-success-900: oklch(0.393 0.095 152.535);
- --wcs-success-950: oklch(0.266 0.065 152.934);
+ --webkernel-color-success-50:  oklch(0.982 0.018 155.826);
+ --webkernel-color-success-100: oklch(0.962 0.044 156.743);
+ --webkernel-color-success-200: oklch(0.925 0.084 155.995);
+ --webkernel-color-success-300: oklch(0.871 0.15  154.449);
+ --webkernel-color-success-400: oklch(0.792 0.209 151.711);
+ --webkernel-color-success-500: oklch(0.723 0.219 149.579);
+ --webkernel-color-success-600: oklch(0.627 0.194 149.214);
+ --webkernel-color-success-700: oklch(0.527 0.154 150.069);
+ --webkernel-color-success-800: oklch(0.448 0.119 151.328);
+ --webkernel-color-success-900: oklch(0.393 0.095 152.535);
+ --webkernel-color-success-950: oklch(0.266 0.065 152.934);
 
  /* — Warning — */
- --wcs-warning-50:  oklch(0.987 0.022 95.277);
- --wcs-warning-100: oklch(0.962 0.059 95.617);
- --wcs-warning-200: oklch(0.924 0.12  95.746);
- --wcs-warning-300: oklch(0.879 0.169 91.605);
- --wcs-warning-400: oklch(0.828 0.189 84.429);
- --wcs-warning-500: oklch(0.769 0.188 70.08);
- --wcs-warning-600: oklch(0.666 0.179 58.318);
- --wcs-warning-700: oklch(0.555 0.163 48.998);
- --wcs-warning-800: oklch(0.473 0.137 46.201);
- --wcs-warning-900: oklch(0.414 0.112 45.904);
- --wcs-warning-950: oklch(0.279 0.077 45.635);
+ --webkernel-color-warning-50:  oklch(0.987 0.022 95.277);
+ --webkernel-color-warning-100: oklch(0.962 0.059 95.617);
+ --webkernel-color-warning-200: oklch(0.924 0.12  95.746);
+ --webkernel-color-warning-300: oklch(0.879 0.169 91.605);
+ --webkernel-color-warning-400: oklch(0.828 0.189 84.429);
+ --webkernel-color-warning-500: oklch(0.769 0.188 70.08);
+ --webkernel-color-warning-600: oklch(0.666 0.179 58.318);
+ --webkernel-color-warning-700: oklch(0.555 0.163 48.998);
+ --webkernel-color-warning-800: oklch(0.473 0.137 46.201);
+ --webkernel-color-warning-900: oklch(0.414 0.112 45.904);
+ --webkernel-color-warning-950: oklch(0.279 0.077 45.635);
 
  /* — Extended Palette (TailwindCSS v4 / color-*) — */
  --color-red-50: oklch(97.1% 0.013 17.38);
@@ -381,100 +381,100 @@
  --color-white: #fff;
 
  /* ----------------------------------------------------------
- WDS — DESIGN TOKENS (light theme defaults)
+ Webkernel Design — DESIGN TOKENS (light theme defaults)
  ---------------------------------------------------------- */
 
  /* Semantic surface tokens */
- --wds-bg:            var(--wcs-gray-50);
- --wds-bg-subtle:     var(--wcs-gray-100);
- --wds-surface:       #ffffff;
- --wds-surface-raise: #ffffff;
- --wds-border:        var(--wcs-gray-200);
- --wds-border-strong: var(--wcs-gray-300);
+ --webkernel-design-bg:            var(--webkernel-color-gray-50);
+ --webkernel-design-bg-subtle:     var(--webkernel-color-gray-100);
+ --webkernel-design-surface:       #ffffff;
+ --webkernel-design-surface-raise: #ffffff;
+ --webkernel-design-border:        var(--webkernel-color-gray-200);
+ --webkernel-design-border-strong: var(--webkernel-color-gray-300);
 
  /* Semantic text tokens */
- --wds-text:          var(--wcs-gray-900);
- --wds-text-muted:    var(--wcs-gray-500);
- --wds-text-faint:    var(--wcs-gray-400);
- --wds-text-on-dark:  var(--wcs-gray-50);
+ --webkernel-design-text:          var(--webkernel-color-gray-900);
+ --webkernel-design-text-muted:    var(--webkernel-color-gray-500);
+ --webkernel-design-text-faint:    var(--webkernel-color-gray-400);
+ --webkernel-design-text-on-dark:  var(--webkernel-color-gray-50);
 
  /* Semantic action tokens */
- --wds-accent:        var(--wcs-primary-600);
- --wds-accent-hover:  var(--wcs-primary-700);
- --wds-accent-subtle: var(--wcs-primary-50);
- --wds-accent-text:   var(--wcs-primary-700);
+ --webkernel-design-accent:        var(--webkernel-color-primary-600);
+ --webkernel-design-accent-hover:  var(--webkernel-color-primary-700);
+ --webkernel-design-accent-subtle: var(--webkernel-color-primary-50);
+ --webkernel-design-accent-text:   var(--webkernel-color-primary-700);
 
  /* Status tokens */
- --wds-success-bg:    var(--wcs-success-50);
- --wds-success-text:  var(--wcs-success-700);
- --wds-success-border:var(--wcs-success-200);
- --wds-warning-bg:    var(--wcs-warning-50);
- --wds-warning-text:  var(--wcs-warning-700);
- --wds-danger-bg:     var(--wcs-danger-50);
- --wds-danger-text:   var(--wcs-danger-700);
- --wds-info-bg:       var(--wcs-info-50);
- --wds-info-text:     var(--wcs-info-700);
+ --webkernel-design-success-bg:    var(--webkernel-color-success-50);
+ --webkernel-design-success-text:  var(--webkernel-color-success-700);
+ --webkernel-design-success-border:var(--webkernel-color-success-200);
+ --webkernel-design-warning-bg:    var(--webkernel-color-warning-50);
+ --webkernel-design-warning-text:  var(--webkernel-color-warning-700);
+ --webkernel-design-danger-bg:     var(--webkernel-color-danger-50);
+ --webkernel-design-danger-text:   var(--webkernel-color-danger-700);
+ --webkernel-design-info-bg:       var(--webkernel-color-info-50);
+ --webkernel-design-info-text:     var(--webkernel-color-info-700);
 
  /* Sizing & spacing */
- --wds-radius-sm:  0.25rem;
- --wds-radius:     0.5rem;
- --wds-radius-lg:  0.75rem;
- --wds-radius-xl:  1rem;
- --wds-radius-full: 9999px;
+ --webkernel-design-radius-sm:  0.25rem;
+ --webkernel-design-radius:     0.5rem;
+ --webkernel-design-radius-lg:  0.75rem;
+ --webkernel-design-radius-xl:  1rem;
+ --webkernel-design-radius-full: 9999px;
 
  /* Shadow */
- --wds-shadow-sm:  0 1px 2px 0 oklch(0 0 0 / 0.05);
- --wds-shadow:     0 1px 3px 0 oklch(0 0 0 / 0.1), 0 1px 2px -1px oklch(0 0 0 / 0.1);
- --wds-shadow-md:  0 4px 6px -1px oklch(0 0 0 / 0.08), 0 2px 4px -2px oklch(0 0 0 / 0.08);
+ --webkernel-design-shadow-sm:  0 1px 2px 0 oklch(0 0 0 / 0.05);
+ --webkernel-design-shadow:     0 1px 3px 0 oklch(0 0 0 / 0.1), 0 1px 2px -1px oklch(0 0 0 / 0.1);
+ --webkernel-design-shadow-md:  0 4px 6px -1px oklch(0 0 0 / 0.08), 0 2px 4px -2px oklch(0 0 0 / 0.08);
 
  /* Typography */
- --wds-font-sans:  system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
- --wds-font-mono:  "JetBrains Mono", "Fira Code", "Cascadia Code", Consolas, monospace;
- --wds-font-size-xs:   0.6875rem;
- --wds-font-size-sm:   0.8125rem;
- --wds-font-size-base: 0.875rem;
- --wds-font-size-md:   1rem;
- --wds-font-size-lg:   1.125rem;
- --wds-font-size-xl:   1.375rem;
- --wds-font-size-2xl:  1.75rem;
- --wds-font-size-3xl:  2.25rem;
+ --webkernel-design-font-sans:  system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+ --webkernel-design-font-mono:  "JetBrains Mono", "Fira Code", "Cascadia Code", Consolas, monospace;
+ --webkernel-design-font-size-xs:   0.6875rem;
+ --webkernel-design-font-size-sm:   0.8125rem;
+ --webkernel-design-font-size-base: 0.875rem;
+ --webkernel-design-font-size-md:   1rem;
+ --webkernel-design-font-size-lg:   1.125rem;
+ --webkernel-design-font-size-xl:   1.375rem;
+ --webkernel-design-font-size-2xl:  1.75rem;
+ --webkernel-design-font-size-3xl:  2.25rem;
 
  /* Layout / Shell */
- --wks-sidebar-width:         240px;
- --wks-sidebar-collapsed-width: 56px;
- --wks-topbar-height:         52px;
- --wks-transition:            220ms cubic-bezier(0.4, 0, 0.2, 1);
+ --webkernel-shell-sidebar-width:         240px;
+ --webkernel-shell-sidebar-collapsed-width: 56px;
+ --webkernel-shell-topbar-height:         52px;
+ --webkernel-shell-transition:            220ms cubic-bezier(0.4, 0, 0.2, 1);
  }
 
  /* ----------------------------------------------------------
- WDS DARK THEME
- Applied via: <html data-wds-theme="dark">
+ Webkernel Design DARK THEME
+ Applied via: <html data-webkernel-design-theme="dark">
  ---------------------------------------------------------- */
- [data-wds-theme="dark"] {
- --wds-bg:            var(--wcs-gray-950);
- --wds-bg-subtle:     var(--wcs-gray-900);
- --wds-surface:       var(--wcs-gray-900);
- --wds-surface-raise: var(--wcs-gray-800);
- --wds-border:        var(--wcs-gray-800);
- --wds-border-strong: var(--wcs-gray-700);
+ [data-webkernel-design-theme="dark"] {
+ --webkernel-design-bg:            var(--webkernel-color-gray-950);
+ --webkernel-design-bg-subtle:     var(--webkernel-color-gray-900);
+ --webkernel-design-surface:       var(--webkernel-color-gray-900);
+ --webkernel-design-surface-raise: var(--webkernel-color-gray-800);
+ --webkernel-design-border:        var(--webkernel-color-gray-800);
+ --webkernel-design-border-strong: var(--webkernel-color-gray-700);
 
- --wds-text:          var(--wcs-gray-50);
- --wds-text-muted:    var(--wcs-gray-400);
- --wds-text-faint:    var(--wcs-gray-600);
+ --webkernel-design-text:          var(--webkernel-color-gray-50);
+ --webkernel-design-text-muted:    var(--webkernel-color-gray-400);
+ --webkernel-design-text-faint:    var(--webkernel-color-gray-600);
 
- --wds-accent:        var(--wcs-primary-500);
- --wds-accent-hover:  var(--wcs-primary-400);
- --wds-accent-subtle: oklch(0.282 0.091 267.935 / 0.15);
- --wds-accent-text:   var(--wcs-primary-300);
+ --webkernel-design-accent:        var(--webkernel-color-primary-500);
+ --webkernel-design-accent-hover:  var(--webkernel-color-primary-400);
+ --webkernel-design-accent-subtle: oklch(0.282 0.091 267.935 / 0.15);
+ --webkernel-design-accent-text:   var(--webkernel-color-primary-300);
 
- --wds-success-bg:    oklch(0.266 0.065 152.934 / 0.2);
- --wds-success-text:  var(--wcs-success-400);
- --wds-warning-bg:    oklch(0.279 0.077 45.635 / 0.2);
- --wds-warning-text:  var(--wcs-warning-400);
- --wds-danger-bg:     oklch(0.258 0.092 26.042 / 0.2);
- --wds-danger-text:   var(--wcs-danger-400);
- --wds-info-bg:       oklch(0.282 0.091 267.935 / 0.2);
- --wds-info-text:     var(--wcs-info-400);
+ --webkernel-design-success-bg:    oklch(0.266 0.065 152.934 / 0.2);
+ --webkernel-design-success-text:  var(--webkernel-color-success-400);
+ --webkernel-design-warning-bg:    oklch(0.279 0.077 45.635 / 0.2);
+ --webkernel-design-warning-text:  var(--webkernel-color-warning-400);
+ --webkernel-design-danger-bg:     oklch(0.258 0.092 26.042 / 0.2);
+ --webkernel-design-danger-text:   var(--webkernel-color-danger-400);
+ --webkernel-design-info-bg:       oklch(0.282 0.091 267.935 / 0.2);
+ --webkernel-design-info-text:     var(--webkernel-color-info-400);
  }
 
  /* ----------------------------------------------------------
@@ -489,10 +489,10 @@
  html { font-size: 16px; }
 
  body {
- font-family: var(--wds-font-sans);
- font-size: var(--wds-font-size-base);
- background: var(--wds-bg);
- color: var(--wds-text);
+ font-family: var(--webkernel-design-font-sans);
+ font-size: var(--webkernel-design-font-size-base);
+ background: var(--webkernel-design-bg);
+ color: var(--webkernel-design-text);
  line-height: 1.5;
  -webkit-font-smoothing: antialiased;
  text-rendering: optimizeLegibility;

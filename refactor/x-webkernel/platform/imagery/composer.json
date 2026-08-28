@@ -1,0 +1,33 @@
+{
+    "$schema": "https://getcomposer.org/schema.json",
+    "name": "webkernel/imagery",
+    "description": "Webkernel imagery: icons, brands, pixmaps.",
+    "version": "0.12.0",
+    "type": "webkernel-stdlib",
+    "license": "EPL-2.0",
+    "authors": [
+        {
+            "name": "El Moumen Yassine",
+            "email": "yassine@numerimondes.com"
+        }
+    ],
+    "require": {
+        "php": ">=8.4"
+    },
+    "autoload": {
+        "psr-4": {
+            "Webkernel\\Imagery\\": "src/"
+        }
+    },
+    "extra": {
+        "webkernel": {
+            "package_repo": "git@github.com:webkernelphp/imagery.git",
+            "production": true,
+            "provider": "Webkernel\\Imagery\\ImageryProvider",
+            "prefix": "imagery"
+        }
+    },
+    "config": {
+        "sort-packages": true
+    }
+}

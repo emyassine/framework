@@ -4,21 +4,21 @@
     body
   </x-webkernel::page>
 --}}
-<div class="wks-page">
-  <header class="wks-page-header">
+<div class="webkernel-shell-page">
+  <header class="webkernel-shell-page-header">
     <div>
-      <h1 class="wks-page-title">{{ $title ?? '' }}</h1>
+      <h1 class="webkernel-shell-page-title">{{ $title ?? '' }}</h1>
       @if (!empty($description))
-        <p class="wks-page-desc">{{ $description }}</p>
+        <p class="webkernel-shell-page-desc">{{ $description }}</p>
       @endif
     </div>
     @if (!empty($actions))
-      <div class="wks-page-actions">
+      <div class="webkernel-shell-page-actions">
         {!! $actions !!}
       </div>
     @endif
   </header>
-  <div class="wks-page-body">
+  <div class="webkernel-shell-page-body">
     {!! $slot !!}
   </div>
 </div>

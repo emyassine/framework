@@ -1,4 +1,26 @@
-<div class="wks-sidebar-footer__text">
- <div class="wks-sidebar-footer__name"><?php echo \Webkernel\View\View::echo($brand ?? 'Webkernel'); ?></div>
- <div class="wks-sidebar-footer__role">System</div>
+<div class="webkernel-shell-user-menu" id="webkernel-shell-user-menu">
+ <button type="button" class="webkernel-shell-user-menu__trigger" onclick="toggleUserMenu()" aria-haspopup="menu" aria-expanded="false">
+ <span class="webkernel-shell-avatar"><?php echo \Webkernel\View\View::echo(strtoupper(substr((string) ($brand ?? 'W'), 0, 1))); ?></span>
+ <span class="webkernel-shell-sidebar-footer__text">
+ <span class="webkernel-shell-sidebar-footer__name"><?php echo \Webkernel\View\View::echo($brand ?? 'Webkernel'); ?></span>
+ <span class="webkernel-shell-sidebar-footer__role">Signed in</span>
+ </span>
+ <span class="webkernel-shell-user-menu__chevron">
+ <?php  $this->start_component('webkernel::icon',["name"=>"chevron-up"]); ?><?php echo $this->render_component(); ?>
+ </span>
+ </button>
+ <div class="webkernel-shell-user-menu__panel" role="menu">
+ <a href="/system" role="menuitem">
+ <?php  $this->start_component('webkernel::icon',["name"=>"circle-user"]); ?><?php echo $this->render_component(); ?>
+ Profile
+ </a>
+ <a href="/system" role="menuitem">
+ <?php  $this->start_component('webkernel::icon',["name"=>"settings"]); ?><?php echo $this->render_component(); ?>
+ Settings
+ </a>
+ <a href="/" role="menuitem">
+ <?php  $this->start_component('webkernel::icon',["name"=>"log-out"]); ?><?php echo $this->render_component(); ?>
+ Sign out
+ </a>
+ </div>
 </div>

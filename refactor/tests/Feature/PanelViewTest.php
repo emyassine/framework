@@ -23,17 +23,19 @@ final class PanelViewTest extends TestCase
     {
         $html = View::make('webkernel::panels.system.dashboard')->render();
 
-        $this->assertStringContainsString('wks-sidebar', $html);
-        $this->assertStringContainsString('wks-page-title', $html);
+        $this->assertStringContainsString('webkernel-shell-sidebar', $html);
+        $this->assertStringContainsString('webkernel-shell-page-title', $html);
         $this->assertStringContainsString('System Admin Panel', $html);
         $this->assertStringContainsString('href="/billing/invoices"', $html);
+        $this->assertStringContainsString('webkernel-shell-user-menu', $html);
+        $this->assertStringContainsString('<svg', $html);
     }
 
     public function test_page_component_renders_slot(): void
     {
         $html = View::make('webkernel::pages.home')->render();
 
-        $this->assertStringContainsString('wks-page', $html);
+        $this->assertStringContainsString('webkernel-shell-page', $html);
         $this->assertStringContainsString('Platform is working', $html);
     }
 }
