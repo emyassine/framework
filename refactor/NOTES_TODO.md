@@ -1,6 +1,6 @@
 # Webkernel refactor — NOTES.md + decisions
 
-This file **is** `NOTES.md`, plus the decisions you added after it (no Container, no global functions, one provider per package, `Config::get` / `Config::set`, two doors).
+This file **is** `NOTES.md`, plus the decisions you added after it (no Container, keep `webapp()` / `view()` / `webapp_path()`, one provider per package, `Config::get` / `Config::set`, two doors, Filament-shaped resource folders, `<x-webkernel::…>` only).
 
 If something is in `NOTES.md`, it is in this file. If something is **not** in `NOTES.md`, it is labelled **Decision** (you said it) or **Not specified** (do not invent it).
 
@@ -28,10 +28,18 @@ If something is in `NOTES.md`, it is in this file. If something is **not** in `N
 
 **What happens to `NOTES.md` Registry:** Config, View, and Route become static class aliases (`Config::get`, `View::make`, `Route::get`). Those three do not need a Registry. The Registry class from `NOTES.md` §4 is kept as a spec for *other* services later (JSON canonicaliser, event dispatcher, compilation store) if a static class is not enough. It is not a Container. It is not built in the first cut. See Part II §4.
 
-## Decision: no global functions
+## Decision: keep `webapp()`, `view()`, `webapp_path()` — namespacer stays aliases only
 
-But we maintaine the composables with `webapp()`, `view()` and `webapp_path()`.
-`namespacer.php` is autoload + `class_alias` only.
+The fluent composables stay. That is the public API a developer types.
+
+```php
+webapp()->config()->get('branding.logo');
+webapp()->acl()->can('do_something_new');
+view('billing::invoices.index', $data);
+webapp_path('modules');
+```
+
+`namespacer.php` does **not** define those functions. It is autoload + `class_alias` only:
 
 ```php
 class_alias(\Webkernel\Config\Config::class, 'Config');
@@ -39,17 +47,33 @@ class_alias(\Webkernel\View\View::class, 'View');
 class_alias(\Webkernel\Route\Route::class, 'Route');
 ```
 
+The functions live in dumped function files (`webkernel_files.php` / `functions/*.php`), loaded after autoload. Same as old work intended; the leak was defining `webapp()` inside `namespacer.php`.
+
+`webapp()` is **not** the old `WebApp` god object (boot + container + `__call` + HTTP + CLI). It is a small fluent host. Segments (`config`, `acl`, `panel`, `view`, `route`) are composables resolved from the dump map. No Container. `view()` is a thin wrapper around `View::make`. `Config::get` and `webapp()->config()->get` are the same store.
+
+## Decision: components are Laravel `x-` only
+
+One convention. Not two.
+
+```
+<x-webkernel::page />
+<x-billing::invoice-card />
+```
+
+Not `<webkernel::page />`. Not a second custom tag syntax. Namespace prefix after `x-`, then `::`, then the component name. `@include('webkernel::layouts.page')` stays for layouts (that is a view include, not a component tag).
+
 ## Decision: one provider per Composer package
 
 `NOTES.md` §6 called it `extra.webkernel.declaration_class`. **One name now:** `extra.webkernel.provider`. Exactly one FQCN. The class extends `Webkernel\PlatformProvider`. It is a **declaration** (paths and class lists). It is not a service. It does not run on a request.
 
 Dump-autoload reads it and writes PHP arrays. The request `require`s those arrays.
 
-## Decision: Config is a class, not a composable
+## Decision: Config is a class (and a composable that wraps it)
 
 ```php
 Config::get('branding.logo', 'default.svg');
 Config::set('branding.logo', $path)->get('branding.logo');
+webapp()->config()->get('branding.logo'); // same store
 ```
 
 `set` writes `platform/platform-runtime.php` (atomic tmp → rename). It does **not** write `config/platform.php` (that file is identity + autoload, stamped by dump-autoload).
@@ -138,12 +162,12 @@ From `NOTES.md`:
 
 **Decision (added):**
 
-- `Webkernel\Config\Config` — `get` / `set` / `boot` / `flush`
+- `Webkernel\Config\Config` — `get` / `set` / `boot` / `flush` (also `webapp()->config()`)
 - `Webkernel\Http` — HTTP door
 - `Webkernel\Console` — CLI door
 - `Webkernel\PlatformProvider` — package declaration (dump-time). This is `declaration_class` from `NOTES.md` §6.
 
-**Decision (removed from public API):** Composables / `webapp()`. The jobs they wrapped become the static classes above.
+**Decision (kept):** Composables as the fluent public API (`webapp()`, `view()`, `webapp_path()`). They do not go through Container. Functions are not defined in `namespacer.php`.
 
 ### `Webkernel\Platform\` — UI and panel system
 
@@ -301,13 +325,18 @@ The Resource **owns its pages**. List, create, edit, view, and any custom screen
 <?php
 declare(strict_types=1);
 
-namespace Acme\Billing\Presentation\Resources;
+namespace Acme\Billing\Presentation\Resources\Invoices;
 
 use Webkernel\Platform\Resources\Resource;
 use Webkernel\Platform\Schemas\Schema;
 use Webkernel\Platform\Tables\Table;
 use Acme\Billing\Domain\Invoice;
-use Acme\Billing\Presentation\Resources\InvoiceResource\Pages;
+use Acme\Billing\Presentation\Resources\Invoices\Pages\ListInvoices;
+use Acme\Billing\Presentation\Resources\Invoices\Pages\CreateInvoice;
+use Acme\Billing\Presentation\Resources\Invoices\Pages\EditInvoice;
+use Acme\Billing\Presentation\Resources\Invoices\Schemas\InvoiceForm;
+use Acme\Billing\Presentation\Resources\Invoices\Tables\InvoicesTable;
+use Acme\Billing\Presentation\Resources\Invoices\RelationManagers\PaymentsRelationManager;
 
 final class InvoiceResource extends Resource
 {
@@ -315,16 +344,20 @@ final class InvoiceResource extends Resource
 
     public static function form(Schema $schema): Schema
     {
-        return $schema->components([
-            // fields
-        ]);
+        return InvoiceForm::configure($schema);
     }
 
     public static function table(Table $table): Table
     {
-        return $table->columns([
-            // columns
-        ]);
+        return InvoicesTable::configure($table);
+    }
+
+    /** @return list<class-string> */
+    public static function relations(): array
+    {
+        return [
+            PaymentsRelationManager::class,
+        ];
     }
 
     /**
@@ -333,9 +366,9 @@ final class InvoiceResource extends Resource
     public static function pages(): array
     {
         return [
-            'index'  => Pages\ListInvoices::route('/'),
-            'create' => Pages\CreateInvoice::route('/create'),
-            'edit'   => Pages\EditInvoice::route('/{record}/edit'),
+            'index'  => ListInvoices::route('/'),
+            'create' => CreateInvoice::route('/create'),
+            'edit'   => EditInvoice::route('/{record}/edit'),
         ];
     }
 }
@@ -350,38 +383,90 @@ A panel page is a first-class screen. It has a route, a view, components, and pe
 
 A Resource is never a panel page. `Dashboard` is never a Resource. Branding, colors, and logos are platform **settings** (`Config`), not a Resource.
 
-On disk:
+On disk the Resource **is a folder**. The class lives **inside** that folder, not next to a sibling directory with the same name. Form, table, pages, and relation managers are sibling folders. This is the Filament resource tree, without the name Filament.
 
 ```
 Presentation/Resources/
-  InvoiceResource.php
-  InvoiceResource/
+  Invoices/
+    InvoiceResource.php
     Pages/
       ListInvoices.php
       CreateInvoice.php
       EditInvoice.php
+    Schemas/
+      InvoiceForm.php
+    Tables/
+      InvoicesTable.php
+    RelationManagers/
+      PaymentsRelationManager.php
 ```
 
-Dump-autoload records `InvoiceResource`. It does not scan `Pages/`. Those pages exist because `pages()` said so.
+| Path | Job |
+|---|---|
+| `{Name}/{Name}Resource.php` | CRUD class: model, `pages()`, `form()` / `table()` delegate |
+| `Pages/` | List / Create / Edit / View / custom screens owned by the Resource |
+| `Schemas/` | Form schema (`InvoiceForm::configure($schema)`) |
+| `Tables/` | Table schema (`InvoicesTable::configure($table)`) |
+| `RelationManagers/` | Related-model tables on the edit/view page (optional) |
 
-### 3.2 Permissions — Spec (`NOTES.md` §3) and what is **Not specified**
+Namespace follows the folder: `…\Resources\Invoices\InvoiceResource`, `…\Resources\Invoices\Pages\ListInvoices`, `…\Resources\Invoices\Schemas\InvoiceForm`.
+
+Dump-autoload records `InvoiceResource`. It does not scan `Pages/`. Those pages exist because `pages()` said so. Same for relations.
+
+### 3.2 Permissions — Spec (`NOTES.md` §3) + Decision (on-the-fly + predetermined)
 
 `NOTES.md` says:
 
-- There is a permission layer across panel, resource, page, component, action.
+- Permission layer across panel, resource, page, component, action.
 - Namespaced by module. No global flat table.
 - Must resolve inside the boot budget.
 
-Old-work fluent docs name a permission like `{module}.{resource}.{action}` (`billing.invoice.delete`) and check it with `can('delete')` inside the module (module inferred) or `acl('billing')->can('delete')` from the System Admin Panel.
+This ACL is for **two audiences**:
 
-**Not specified (do not invent):**
+| Who | What they do |
+|---|---|
+| **Developer** | Write `can('do_something_new')`. That is the whole declaration. |
+| **App Owner** (or a manager they delegate) | Create **roles**, assign permissions to roles, assign roles to users. |
 
-- A `const ACL = ['billing.invoice.view' => ['admin', 'accountant']]` on the package provider.
-- That array was copied from old `BlogProvider`. `NOTES.md` does not have it.
-- It mixes two different things: (1) the **name** of a permission, (2) **which roles** hold it. Role assignment is data (users, App Owner). It is not a class constant dumped at Composer time.
-- Which object is a "role". How a user gets a permission. The ACL class API without `webapp()`.
+Two modes. Both are real. The same store.
 
-Until that is specified, a Resource/Page may **name** a permission (`invoice.delete`). The platform prefixes the module. Nobody assigns `'admin'` in a provider constant.
+**Prototype / on the fly.** The developer writes `can('export_csv')` in a page, a resource action, or `@can('export_csv')` in a view. The permission now exists. The App Owner sees it in the module's permission list and attaches it to a role they created. No PHP array of roles in the module. No dump-autoload required to *invent* the name.
+
+**Predetermined.** The module ships default roles (for example “Accountant can view and edit invoices”). The App Owner can still change those assignments. Defaults are data the owner inherits, not a lock.
+
+Developer API — short name, module inferred from the current panel/module:
+
+```php
+can('do_something_new');
+webapp()->acl()->can('do_something_new');
+webapp()->acl()->can('edit', $invoice);
+```
+
+From the System Admin Panel (no module context):
+
+```php
+webapp()->acl('billing')->can('do_something_new');
+```
+
+In views:
+
+```
+@can('do_something_new')
+    …
+@endcan
+```
+
+The platform prefixes the module. Inside billing, `can('do_something_new')` is `billing.do_something_new`. There is no global `do_something_new`.
+
+**`module-acl.php` — both autogenerated and owned.**
+
+Each module has `module-acl.php` (next to the module `composer.json`, or dumped under `platform/` with a per-module key). It is the **catalogue of permission names** this module is known to use. It is **not** who has them.
+
+- Dump-autoload regenerates the known-name list from `can('…')` / `@can('…')` found in the module (and from any predetermined role file).
+- In prototype, the first `can('do_something_new')` that is not in the catalogue **appends** it (dev-mode write). Production does not invent files on the hot path; unknown names still check (deny unless assigned) and show up for the App Owner to assign.
+- Predetermined roles are an optional second list in that file (role name → permission names). The App Owner's live assignments live in runtime data (`platform-runtime` or an ACL store), and **win** over the predetermined defaults.
+
+Still forbidden: `const ACL = ['billing.invoice.view' => ['admin', 'accountant']]` on the package provider. That mixed catalogue with assignment and invented “admin” as a role in PHP. Roles are the App Owner's job.
 
 ---
 
@@ -578,7 +663,7 @@ Those lists are constants on `Webkernel\PlatformProvider`. Each constant is one 
 |---|---|---|---|
 | `ROUTES` | `list<string>` of PHP files | `NOTES.md` foreword + §7: routes live in the package. The router needs the file paths. | `webkernel_routes.php` |
 | `VIEWS` | `list<string>` of directories | `NOTES.md` foreword + §7: views live in the package. The view engine needs the dirs. | `webkernel_views.php` |
-| `COMPONENTS` | `list<string>` of directories | `NOTES.md` §7: `<webkernel::page />` component dirs | `webkernel_components.php` |
+| `COMPONENTS` | `list<string>` of directories | dirs for `<x-webkernel::…>` / `<x-{prefix}::…>` | `webkernel_components.php` |
 | `COMMANDS` | `list<class-string>` | `NOTES.md` §1: console commands | `webkernel_commands.php` |
 | `PANELS` | `list<class-string>` of `PanelProvider` | `NOTES.md` §2 / §9: which admin UIs this package owns | `webkernel_panels.php` |
 
@@ -616,7 +701,7 @@ The codebase package also has **exactly one** provider (`Webkernel\CodebaseProvi
 
 Views use BladeOne **owned in this package**, not a Composer library. Extension: `.view.php`. Compiled output: `platform/storage/framework/views/`.
 
-Namespace syntax: `@include('webkernel::layouts.page')` or `<webkernel::page />`.
+Namespace syntax: `@include('webkernel::layouts.page')` for layouts. Components are Laravel `x-` only: `<x-webkernel::page />`, `<x-billing::invoice-card />`. Not `<webkernel::page />`.
 
 `Webkernel\View\View` is the single entry point.
 
@@ -736,7 +821,7 @@ JSON Canonicalisation and Event Dispatcher stay on the `Webkernel\` list from §
 |---|---|---|---|
 | **Author** | You type PHP | Write one `PlatformProvider` per package (`const ROUTES`, `const VIEWS`, …) and Panel/Resource/Page classes | Nothing |
 | **Composer** | `composer dump-autoload` | Nothing | Read each provider statically. Write `platform/dependencies/packagist/composer/webkernel_*.php` |
-| **Request** | Browser or `./webkernel` | Nothing | `require` autoload, `require` those arrays, `Config::boot()`, dispatch. No `new Provider`. No Container. No glob. No global functions. |
+| **Request** | Browser or `./webkernel` | Nothing | `require` autoload, load dumped functions (`webapp`, `view`, `webapp_path`), `require` dumped arrays, `Config::boot()`, dispatch. No `new Provider`. No Container. No glob. |
 
 Composer time may use Reflection. Request time may not.
 
@@ -746,21 +831,22 @@ If the provider is constants (and static methods) only, dump-autoload never inst
 
 # Part IV — What we copy from old work
 
-Copy and adapt (strip Container, strip `webapp()`):
+Copy and adapt (strip Container; keep `webapp()` / `view()` / `webapp_path()` as dumped functions, not as `WebApp` + Container):
 
 - `View/View.php`, `Compiler.php`, `Engine.php`, `Js.php`, kernel `views/layouts/*`
 - `Route/*`
 - `Config/ConfigWriter.php`
 - `Lifecycle/*` (already in refactor)
-- `namespacer.php` (aliases, no functions)
+- `namespacer.php` — autoload + `class_alias` only; move `webapp()` out of it
+- Composables as fluent segments (no `container_lifetime` against a Container)
+- `functions/view.php`, path helpers — dumped via `webkernel_files.php`
 - Console attribute + argv parsing
 
 Do not copy:
 
 - `Container/`
-- `WebApp.php`
+- `WebApp.php` as the god object (HTTP + CLI + boot + `__call`)
 - `Index.php`
-- `Composables/*` as the public API
 - `Provider/ProviderRegistry.php` (the glob)
 - `ViewProvider` + `CoreProvider` as two providers
 - Host `resources/views` hardcoded in boot
@@ -779,7 +865,8 @@ Each step leaves the previous door working. Spec items not in A–G stay spec; t
 
 ### B — Config
 
-- [ ] `namespacer.php`: aliases only
+- [ ] `namespacer.php`: autoload + aliases only
+- [ ] dumped functions: `webapp()`, `view()`, `webapp_path()`
 - [ ] `Config::boot` / `get` / `set` / `flush`
 - [ ] Copy `ConfigWriter`
 - [ ] `Config::set('x.y', 1)->get('x.y') === 1` writes `platform/platform-runtime.php`
@@ -810,13 +897,13 @@ Each step leaves the previous door working. Spec items not in A–G stay spec; t
 ### G — Resource — `NOTES.md` §3
 
 - [ ] `Resource`, `Table`, `Schema`
-- [ ] One business module, one `PlatformProvider`, one panel, one Resource, List/Create/Edit
+- [ ] One business module, one `PlatformProvider`, one panel, one Resource folder (`Invoices/InvoiceResource.php` + `Pages/` + `Schemas/` + `Tables/`)
 - [ ] Persistence: smallest thing that works. Not an ORM.
 
 ### H — Spec, after the app runs
 
 - [ ] Middleware list from §1 / §2
-- [ ] Permission names, module-namespaced (`NOTES.md` §3). Not a `const ACL` role map
+- [ ] `can('do_something_new')` + `module-acl.php` catalogue (autogenerated and/or on the fly). App Owner roles. Optional predetermined roles. Not `const ACL` on the provider
 - [ ] Features inject into existing panels (`NOTES.md` §3)
 - [ ] Render hooks, widgets
 - [ ] Registry if a fourth service needs it (`NOTES.md` §4)

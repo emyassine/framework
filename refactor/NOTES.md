@@ -178,13 +178,15 @@ The Resource **owns its pages**. List, create, edit, view, and any custom screen
 <?php
 declare(strict_types=1);
 
-namespace Acme\Billing\Presentation\Resources;
+namespace Acme\Billing\Presentation\Resources\Invoices;
 
 use Webkernel\Platform\Resources\Resource;
 use Webkernel\Platform\Schemas\Schema;
 use Webkernel\Platform\Tables\Table;
 use Acme\Billing\Domain\Invoice;
-use Acme\Billing\Presentation\Resources\InvoiceResource\Pages;
+use Acme\Billing\Presentation\Resources\Invoices\Pages;
+use Acme\Billing\Presentation\Resources\Invoices\Schemas\InvoiceForm;
+use Acme\Billing\Presentation\Resources\Invoices\Tables\InvoicesTable;
 
 /**
  * CRUD interface for the Invoice model.
@@ -196,16 +198,12 @@ final class InvoiceResource extends Resource
 
     public static function form(Schema $schema): Schema
     {
-        return $schema->components([
-            // fields
-        ]);
+        return InvoiceForm::configure($schema);
     }
 
     public static function table(Table $table): Table
     {
-        return $table->columns([
-            // columns
-        ]);
+        return InvoicesTable::configure($table);
     }
 
     /**
@@ -233,16 +231,22 @@ A panel page is a first-class screen. It has a route, a view, components, and pe
 
 A Resource is never a panel page. `Dashboard` is never a Resource. Branding, colors, and logos are platform **settings**, not a Resource — do not call that object a "configuration resource".
 
-On disk a Resource is a directory of pages:
+On disk the Resource is a folder. The class lives inside it. Pages, form schema, table, and relation managers are sibling folders (Filament-shaped, not named Filament):
 
 ```
 Presentation/Resources/
-  InvoiceResource.php
-  InvoiceResource/
+  Invoices/
+    InvoiceResource.php
     Pages/
       ListInvoices.php
       CreateInvoice.php
       EditInvoice.php
+    Schemas/
+      InvoiceForm.php
+    Tables/
+      InvoicesTable.php
+    RelationManagers/
+      PaymentsRelationManager.php
 ```
 
 `discover_resources()` finds `InvoiceResource`. It does not find `ListInvoices`. Those pages exist only because `InvoiceResource::pages()` said so.
@@ -393,7 +397,7 @@ At boot, the platform reads the manifest generated during `composer dump-autoloa
 
 Views use BladeOne (owned in this package, not a Composer dependency). Template extension is `.view.php`. Compiled output lands in `platform/storage/framework/views/`.
 
-Namespace syntax for templates: `@include('webkernel::layouts.page')` or `<webkernel::page />`.
+Namespace syntax for templates: `@include('webkernel::layouts.page')`. Components are Laravel `x-` only: `<x-webkernel::page />`.
 
 The `Webkernel\View\View` class is the single entry point. It is registered in the Registry as a singleton under the key `view`.
 
