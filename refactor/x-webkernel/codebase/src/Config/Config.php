@@ -56,6 +56,7 @@ final class Config
         return self::instance()->tree;
     }
 
+    /** @param $arguments */
     public function __call(string $name, array $arguments): mixed
     {
         if ($name === 'get') {
