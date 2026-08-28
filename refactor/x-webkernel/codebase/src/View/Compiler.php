@@ -3076,6 +3076,10 @@ class Compiler
             if (isset($match[5])) {
                 $match[5] = $this->compile_components($match[5]);
             }
+            $folded = $this->fold_static_icon($match[1], $match[2], $match[3] ?? '');
+            if ($folded !== null) {
+                return $folded . ($match[5] ?? '');
+            }
             $params_compiled = $this->parse_params($match[3] ?? '');
             $str = "('" . $match[1] . '::' . $match[2] . "'," . $params_compiled . ")";
             return self::compile_component($str) . ($match[5] ?? '') . self::compile_endcomponent();
@@ -3094,6 +3098,38 @@ class Compiler
             return self::compile_component($str) . ($match[4] ?? '') . self::compile_endcomponent();
         };
         return preg_replace_callback('/<x-([a-z0-9.-]+)(\s[^>]*)?(>((?:(?!<\/x-\1>).)*)<\/x-\1>|\/>)/ms', $callback, $value);
+    }
+
+    /**
+     * Blaze-style fold: literal <x-webkernel::icon name="..."> becomes HTML.
+     * Dynamic :name stays a component. SVG edits require dump-autoload or a
+     * view mtime bump — icons are not the request-time invalidation signal.
+     */
+    protected function fold_static_icon(string $namespace, string $name, string $params): ?string
+    {
+        if ($namespace !== 'webkernel' || $name !== 'icon') {
+            return null;
+        }
+        if (preg_match('/(?:^|\s):[a-zA-Z]/', $params) === 1) {
+            return null;
+        }
+        $icon = '';
+        $set = 'lucide';
+        if (preg_match('/\bname="([^"]+)"/', $params, $m) === 1) {
+            $icon = $m[1];
+        }
+        if (preg_match('/\bset="([^"]+)"/', $params, $m) === 1) {
+            $set = $m[1];
+        }
+        if ($icon === '' || ! function_exists('icon')) {
+            return null;
+        }
+        $markup = icon($icon, 'webkernel-shell-icon__svg', '', $set);
+        if ($markup === '') {
+            return null;
+        }
+
+        return '<span class="webkernel-shell-icon">'.$markup.'</span>';
     }
 
     protected function parse_params($params): string

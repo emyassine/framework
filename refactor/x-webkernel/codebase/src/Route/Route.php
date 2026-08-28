@@ -5,6 +5,7 @@ namespace Webkernel\Route;
 use Webkernel\Composables\ComposableContract;
 use Webkernel\Route\Action\RedirectAction;
 use Webkernel\Route\Action\ViewAction;
+use Webkernel\Route\Compile\Cache;
 use Webkernel\Route\Compile\Generator;
 use Webkernel\Route\Dispatch\Dispatcher;
 use Webkernel\Route\Dispatch\Matched;
@@ -75,6 +76,7 @@ final class Route implements ComposableContract
     {
         self::$declared_loaded = false;
         self::$instance = null;
+        Cache::reset();
     }
 
     public static function get(string $uri, mixed $action): Binding
@@ -122,7 +124,7 @@ final class Route implements ComposableContract
      */
     public static function match(array $methods, string $uri, mixed $action): Binding
     {
-        return self::app()->add(\array_map(\strtoupper(...), $methods), $uri, $action);
+        return self::app()->add(array_map(strtoupper(...), $methods), $uri, $action);
     }
 
     /**
@@ -176,7 +178,7 @@ final class Route implements ComposableContract
      */
     public static function group(array|callable $attributes, ?callable $routes = null): void
     {
-        if (\is_callable($attributes)) {
+        if (is_callable($attributes)) {
             $attributes();
 
             return;
@@ -207,6 +209,35 @@ final class Route implements ComposableContract
         return $route->build_data($host);
     }
 
+    /**
+     * Bind dumped panel class-string routes. Cold path only — skip when
+     * compiled_routes.php fingerprints still match.
+     */
+    public static function register_dumped_panel_routes(): void
+    {
+        $file = \vendor_dir('composer/webkernel_panel_routes.php');
+        if (! \is_file($file)) {
+            return;
+        }
+        $routes = require $file;
+        if (! \is_array($routes)) {
+            return;
+        }
+        foreach ($routes as $row) {
+            if (! \is_array($row) || ! isset($row[0], $row[1], $row[2])) {
+                continue;
+            }
+            $methods = $row[0];
+            $uri = $row[1];
+            $action = $row[2];
+            if (! \is_array($methods) || ! \is_string($uri) || ! \is_string($action) || $action === '') {
+                continue;
+            }
+            /** @var list<string> $methods */
+            self::match(\array_values(\array_map(\strval(...), $methods)), $uri, $action);
+        }
+    }
+
     public static function dispatch(\Psr\Http\Message\ServerRequestInterface|string|null $method = null, ?string $uri = null, ?string $host = null): mixed
     {
         if ($method instanceof \Psr\Http\Message\ServerRequestInterface) {
@@ -216,32 +247,31 @@ final class Route implements ComposableContract
         }
         $method ??= $_SERVER['REQUEST_METHOD'] ?? 'GET';
         $uri ??= $_SERVER['REQUEST_URI'] ?? '/';
-        if (false !== $q = \strpos($uri, '?')) {
-            $uri = \substr($uri, 0, $q);
+        if (false !== $q = strpos($uri, '?')) {
+            $uri = substr($uri, 0, $q);
         }
-        $uri = \rawurldecode($uri);
+        $uri = rawurldecode($uri);
         $host = self::normalize_host($host ?? (string) ($_SERVER['HTTP_HOST'] ?? ''));
 
-        $route = self::app();
-        $data = $route->compiled_data($host);
+        $data = self::dispatch_data($host);
         $result = self::match_static($data, $method, $uri)
             ?? (new Dispatcher($data))->dispatch($method, $uri);
 
         if ($result instanceof NotMatched) {
-            \http_response_code(404);
+            http_response_code(404);
 
             return '';
         }
         if ($result instanceof MethodNotAllowed) {
-            \http_response_code(405);
-            \header('Allow: '.\implode(', ', $result->allowed));
+            http_response_code(405);
+            header('Allow: '.implode(', ', $result->allowed));
 
             return '';
         }
 
         $vars = $result->variables;
         $domain = $result->extra[self::DOMAIN] ?? null;
-        if (\is_string($domain) && $domain !== '' && \str_contains($domain, '{')) {
+        if (is_string($domain) && $domain !== '' && str_contains($domain, '{')) {
             $vars = Binding::domain_variables($result->extra, $host) + $vars;
         }
         $out = self::invoke($result->handler, $vars);
@@ -272,6 +302,7 @@ final class Route implements ComposableContract
         $this->uris = null;
     }
 
+    /** @param $routes */
     public function push_group(PendingGroup $group, callable $routes): void
     {
         $previous_prefix = $this->group_prefix;
@@ -285,7 +316,7 @@ final class Route implements ComposableContract
             : $this->join_uri($previous_prefix, $group->prefix_value());
         $this->group_name = $previous_name.$group->name_value();
         $this->group_domain = $group->domain_value() !== '' ? $group->domain_value() : $previous_domain;
-        $this->group_middleware = \array_values(\array_unique(\array_merge($previous_middleware, $group->middleware_value())));
+        $this->group_middleware = array_values(array_unique(array_merge($previous_middleware, $group->middleware_value())));
         $this->group_wheres = $group->wheres_value() + $previous_wheres;
         $routes();
         $this->group_prefix = $previous_prefix;
@@ -300,7 +331,7 @@ final class Route implements ComposableContract
      */
     private function add(string|array $http_method, string $route, mixed $handler): Binding
     {
-        $methods = \array_values(\array_map(\strtoupper(...), (array) $http_method));
+        $methods = array_values(array_map(strtoupper(...), (array) $http_method));
         $binding = new Binding(
             $this,
             $methods,
@@ -324,16 +355,16 @@ final class Route implements ComposableContract
     {
         $static = $data[0] ?? [];
         foreach ([$method, $method === 'HEAD' ? 'GET' : null, '*'] as $try) {
-            if (! \is_string($try)) {
+            if (! is_string($try)) {
                 continue;
             }
             $row = $static[$try][$uri] ?? null;
-            if (! \is_array($row) || ! \array_key_exists(0, $row)) {
+            if (! is_array($row) || ! array_key_exists(0, $row)) {
                 continue;
             }
             $extra = $row[1] ?? [];
 
-            return new Matched($row[0], [], \is_array($extra) ? $extra : []);
+            return new Matched($row[0], [], is_array($extra) ? $extra : []);
         }
 
         return null;
@@ -342,13 +373,48 @@ final class Route implements ComposableContract
     /**
      * @return RouteData
      */
+    private static function dispatch_data(string $host): array
+    {
+        if (self::$instance !== null && self::$instance->bindings !== []) {
+            return self::$instance->build_and_cache($host);
+        }
+        $cached = Cache::fresh_data();
+        if ($cached !== null) {
+            return $cached;
+        }
+
+        return self::app()->build_and_cache($host);
+    }
+
+    /**
+     * @return RouteData
+     */
     private function compiled_data(string $host): array
     {
         if ($this->bindings === []) {
+            $cached = Cache::fresh_data();
+            if ($cached !== null) {
+                return $cached;
+            }
             $this->ensure_declared();
         }
 
-        return $this->build_data($host);
+        return $this->build_and_cache($host);
+    }
+
+    /**
+     * @return RouteData
+     */
+    private function build_and_cache(string $host): array
+    {
+        $data = $this->build_data($host);
+        Cache::write(Cache::path(), $data, [
+            'compiled_at' => \time(),
+            'host' => $host,
+            'files' => Cache::fingerprints(),
+        ]);
+
+        return $data;
     }
 
     /**
@@ -402,21 +468,21 @@ final class Route implements ComposableContract
      */
     private static function invoke(mixed $handler, array $vars): mixed
     {
-        if (\is_callable($handler)) {
+        if (is_callable($handler)) {
             return $handler(...$vars);
         }
-        if (\is_array($handler) && isset($handler[0], $handler[1]) && \is_string($handler[0]) && \is_string($handler[1]) && \class_exists($handler[0])) {
+        if (is_array($handler) && isset($handler[0], $handler[1]) && is_string($handler[0]) && is_string($handler[1]) && class_exists($handler[0])) {
             $controller = new $handler[0]();
             $method = $handler[1];
-            if (! \is_callable([$controller, $method])) {
+            if (! is_callable([$controller, $method])) {
                 throw new \RuntimeException('Invalid route action.');
             }
 
             return $controller->{$method}(...$vars);
         }
-        if (\is_string($handler) && \class_exists($handler)) {
+        if (is_string($handler) && class_exists($handler)) {
             $page = new $handler();
-            if (\is_callable($page)) {
+            if (is_callable($page)) {
                 return $page(...$vars);
             }
         }
@@ -433,7 +499,7 @@ final class Route implements ComposableContract
         foreach ($this->bindings as $binding) {
             $methods = $binding->methods();
             $order = ['GET' => 0, 'HEAD' => 1, 'QUERY' => 2, 'POST' => 3, 'PUT' => 4, 'PATCH' => 5, 'DELETE' => 6, 'OPTIONS' => 7];
-            \usort($methods, static fn (string $a, string $b): int => ($order[$a] ?? 99) <=> ($order[$b] ?? 99));
+            usort($methods, static fn (string $a, string $b): int => ($order[$a] ?? 99) <=> ($order[$b] ?? 99));
             $rows[] = [
                 'methods' => $methods,
                 'uri' => $binding->uri(),
@@ -441,7 +507,7 @@ final class Route implements ComposableContract
                 'action' => $binding->action_label(),
             ];
         }
-        \usort($rows, static function (array $a, array $b): int {
+        usort($rows, static function (array $a, array $b): int {
             return [$a['uri'], $a['name']] <=> [$b['uri'], $b['name']];
         });
 
@@ -450,8 +516,8 @@ final class Route implements ComposableContract
 
     private function join_uri(string $left, string $right): string
     {
-        $left = \trim($left, '/');
-        $right = \trim($right, '/');
+        $left = trim($left, '/');
+        $right = trim($right, '/');
         if ($left === '' && $right === '') {
             return '/';
         }
@@ -467,21 +533,21 @@ final class Route implements ComposableContract
 
     private static function normalize_host(string $host): string
     {
-        $host = \strtolower($host);
+        $host = strtolower($host);
         if ($host === '') {
             return '';
         }
-        if (\str_starts_with($host, '[')) {
-            $end = \strpos($host, ']');
+        if (str_starts_with($host, '[')) {
+            $end = strpos($host, ']');
 
-            return $end === false ? $host : \substr($host, 0, $end + 1);
+            return $end === false ? $host : substr($host, 0, $end + 1);
         }
-        $colon = \strrpos($host, ':');
+        $colon = strrpos($host, ':');
         if ($colon === false) {
             return $host;
         }
 
-        return \substr($host, 0, $colon);
+        return substr($host, 0, $colon);
     }
 
     /**
@@ -494,15 +560,15 @@ final class Route implements ComposableContract
         }
         self::$declared_loaded = true;
         $file = vendor_dir('composer/webkernel_routes.php');
-        if (! \is_file($file)) {
+        if (! is_file($file)) {
             return;
         }
         $routes = require $file;
-        if (! \is_array($routes)) {
+        if (! is_array($routes)) {
             return;
         }
         foreach ($routes as $path) {
-            if (\is_string($path) && \is_file($path)) {
+            if (is_string($path) && is_file($path)) {
                 require $path;
             }
         }

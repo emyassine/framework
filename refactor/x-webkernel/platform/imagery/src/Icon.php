@@ -7,6 +7,12 @@ namespace Webkernel\Imagery;
  */
 final class Icon
 {
+    /** @var array<string, string>|null */
+    private static ?array $dumped = null;
+
+    /** @var array<string, string> */
+    private static array $loaded = [];
+
     /**
      * @return list<string>
      */
@@ -32,11 +38,19 @@ final class Icon
 
     public static function svg(string $name, string $set = 'lucide'): string
     {
+        $key = $set.'/'.$name;
+        if (isset(self::$loaded[$key])) {
+            return self::$loaded[$key];
+        }
+        $dumped = self::dumped();
+        if (isset($dumped[$key]) && \is_string($dumped[$key]) && $dumped[$key] !== '') {
+            return self::$loaded[$key] = $dumped[$key];
+        }
         $file = self::path($name, $set);
         if (\is_file($file)) {
             $svg = \file_get_contents($file);
 
-            return \is_string($svg) ? $svg : '';
+            return self::$loaded[$key] = \is_string($svg) ? $svg : '';
         }
         foreach (self::sets() as $fallback) {
             if ($fallback === $set) {
@@ -46,10 +60,33 @@ final class Icon
             if (\is_file($file)) {
                 $svg = \file_get_contents($file);
 
-                return \is_string($svg) ? $svg : '';
+                return self::$loaded[$key] = \is_string($svg) ? $svg : '';
             }
         }
 
-        return '';
+        return self::$loaded[$key] = '';
+    }
+
+    public static function flush(): void
+    {
+        self::$dumped = null;
+        self::$loaded = [];
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    private static function dumped(): array
+    {
+        if (self::$dumped !== null) {
+            return self::$dumped;
+        }
+        $file = \function_exists('vendor_dir') ? \vendor_dir('composer/webkernel_icons.php') : '';
+        if ($file === '' || ! \is_file($file)) {
+            return self::$dumped = [];
+        }
+        $data = require $file;
+
+        return self::$dumped = \is_array($data) ? $data : [];
     }
 }

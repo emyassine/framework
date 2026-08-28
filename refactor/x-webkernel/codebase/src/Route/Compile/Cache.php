@@ -17,9 +17,17 @@ final class Cache
 
     private const FILE_PERMISSIONS = 0664;
 
+    /** @var Payload|null|false */
+    private static array|null|false $memo = false;
+
     public static function path(): string
     {
         return self::directory().'/compiled_routes.php';
+    }
+
+    public static function reset(): void
+    {
+        self::$memo = false;
     }
 
     public static function directory(): string
@@ -36,16 +44,102 @@ final class Cache
      */
     public static function payload(): ?array
     {
+        if (self::$memo !== false) {
+            return self::$memo;
+        }
         $path = self::path();
         if (! \is_file($path)) {
-            return null;
+            return self::$memo = null;
         }
         $value = include $path;
         if (! \is_array($value) || ! isset($value['data']) || ! \is_array($value['data'])) {
-            return null;
+            return self::$memo = null;
         }
         /** @var Payload $value */
-        return $value;
+        return self::$memo = $value;
+    }
+
+    /**
+     * Dump files plus the route PHP they list. SVG/view mtimes are not
+     * route fingerprints — views have their own compiled mtime check.
+     *
+     * @return array<string, int>
+     */
+    public static function fingerprints(): array
+    {
+        $out = [];
+        foreach (self::source_files() as $file) {
+            $mtime = @\filemtime($file);
+            if (\is_int($mtime)) {
+                $out[$file] = $mtime;
+            }
+        }
+        \ksort($out);
+
+        return $out;
+    }
+
+    /**
+     * @return list<string>
+     */
+    public static function source_files(): array
+    {
+        $files = [];
+        $routes_dump = \function_exists('vendor_dir') ? \vendor_dir('composer/webkernel_routes.php') : '';
+        $panel_dump = \function_exists('vendor_dir') ? \vendor_dir('composer/webkernel_panel_routes.php') : '';
+        foreach ([$routes_dump, $panel_dump] as $dump) {
+            if ($dump !== '' && \is_file($dump)) {
+                $files[] = $dump;
+            }
+        }
+        if ($routes_dump !== '' && \is_file($routes_dump)) {
+            $listed = include $routes_dump;
+            if (\is_array($listed)) {
+                foreach ($listed as $path) {
+                    if (\is_string($path) && $path !== '' && \is_file($path)) {
+                        $files[] = $path;
+                    }
+                }
+            }
+        }
+
+        return \array_values(\array_unique($files));
+    }
+
+    public static function is_fresh(): bool
+    {
+        $payload = self::payload();
+        if ($payload === null) {
+            return false;
+        }
+        $stored = $payload['files'] ?? [];
+        if (! \is_array($stored) || $stored === []) {
+            return false;
+        }
+        foreach ($stored as $file => $mtime) {
+            if (! \is_string($file) || ! \is_int($mtime)) {
+                return false;
+            }
+            if (@\filemtime($file) !== $mtime) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * @return RouteData|null
+     */
+    public static function fresh_data(): ?array
+    {
+        if (! self::is_fresh()) {
+            return null;
+        }
+        $payload = self::payload();
+        $data = $payload['data'] ?? null;
+
+        return \is_array($data) ? $data : null;
     }
 
     /**
@@ -100,6 +194,7 @@ final class Cache
         if (\function_exists('opcache_invalidate')) {
             \opcache_invalidate($path, true);
         }
+        self::$memo = $payload;
     }
 
     private static function export(mixed $value): string
@@ -137,6 +232,7 @@ final class Cache
         return '\\'.$value::class.'::__set_state('.self::export($vars).')';
     }
 
+    /** @param $closure */
     private static function export_closure(\Closure $closure): string
     {
         $ref = new \ReflectionFunction($closure);

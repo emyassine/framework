@@ -1,4 +1,4 @@
-<?php $_shouldextend[1]=1; ?>
+<?php $_shouldextend[3]=1; ?>
 
 <?php $this->start_section('title', 'Home'); ?>
 
@@ -29,4 +29,4 @@
  <?php echo $this->render_component(); ?>
 <?php $this->stop_section(); ?>
 
-<?php if (isset($_shouldextend[1])) { echo $this->run_child('webkernel::layouts.page'); } ?>
+<?php if (isset($_shouldextend[3])) { echo $this->run_child('webkernel::layouts.page'); } ?>

@@ -2,17 +2,15 @@
 
 namespace Webkernel\Route\Dispatch;
 
-use Webkernel\Route\Compile\Generator;
-
 /**
  * MarkBased dispatcher (FastRoute). One strategy only.
  *
  * @internal
  *
- * @phpstan-import-type StaticRoutes from Generator
- * @phpstan-import-type DynamicRouteChunks from Generator
- * @phpstan-import-type DynamicRoutes from Generator
- * @phpstan-import-type RouteData from Generator
+ * @phpstan-import-type StaticRoutes from \Webkernel\Route\Compile\Generator
+ * @phpstan-import-type DynamicRouteChunks from \Webkernel\Route\Compile\Generator
+ * @phpstan-import-type DynamicRoutes from \Webkernel\Route\Compile\Generator
+ * @phpstan-import-type RouteData from \Webkernel\Route\Compile\Generator
  */
 final class Dispatcher
 {

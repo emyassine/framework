@@ -3,6 +3,7 @@
 namespace Webkernel;
 
 use Webkernel\Config\Config;
+use Webkernel\Route\Compile\Cache;
 use Webkernel\Route\Route;
 
 /**
@@ -13,7 +14,10 @@ final class Http
     public static function run(): void
     {
         Config::boot();
-        self::register_panel_routes();
+        self::maybe_compress();
+        if (! Cache::is_fresh()) {
+            Route::register_dumped_panel_routes();
+        }
         $out = Route::dispatch();
         if ($out instanceof \Stringable || \is_scalar($out) || $out === null) {
             echo (string) $out;
@@ -24,28 +28,20 @@ final class Http
         echo '';
     }
 
-    private static function register_panel_routes(): void
+    /**
+     * gzip/deflate is what browsers and phones already decode. Blaze-style
+     * folding happens at compile time (routes + static icons); this is the
+     * wire format for the HTML that comes out.
+     */
+    private static function maybe_compress(): void
     {
-        $file = \vendor_dir('composer/webkernel_panel_routes.php');
-        if (! \is_file($file)) {
+        if (\headers_sent() || \ini_get('zlib.output_compression')) {
             return;
         }
-        $routes = require $file;
-        if (! \is_array($routes)) {
+        $accept = (string) ($_SERVER['HTTP_ACCEPT_ENCODING'] ?? '');
+        if ($accept === '' || ! \str_contains($accept, 'gzip') || ! \function_exists('ob_gzhandler')) {
             return;
         }
-        foreach ($routes as $row) {
-            if (! \is_array($row) || ! isset($row[0], $row[1], $row[2])) {
-                continue;
-            }
-            $methods = $row[0];
-            $uri = $row[1];
-            $action = $row[2];
-            if (! \is_array($methods) || ! \is_string($uri) || ! \is_string($action) || $action === '') {
-                continue;
-            }
-            /** @var list<string> $methods */
-            Route::match(\array_values(\array_map(\strval(...), $methods)), $uri, $action);
-        }
+        \ob_start('ob_gzhandler');
     }
 }

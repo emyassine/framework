@@ -16,6 +16,10 @@ use Webkernel\Platform\Panel;
 use Webkernel\Platform\PanelProvider;
 use Webkernel\Platform\Resources\Resource;
 use Webkernel\PlatformProvider;
+use Webkernel\Route\Compile\Cache;
+use Webkernel\Route\Route;
+use Webkernel\View\Engine;
+use Webkernel\View\View;
 
 /**
  * Writes `{vendor}/composer/webkernel_*.php`. Composer `post-autoload-dump`
@@ -35,6 +39,7 @@ final readonly class DumpAutoloadCommand
     public const PANELS_BASENAME = 'webkernel_panels.php';
     public const PANEL_ROUTES_BASENAME = 'webkernel_panel_routes.php';
     public const BRANDING_BASENAME = 'webkernel_branding.php';
+    public const ICONS_BASENAME = 'webkernel_icons.php';
 
     #[ConsoleCommand(
         name: 'dump-autoload',
@@ -126,7 +131,13 @@ final readonly class DumpAutoloadCommand
             $composer_dir.DIRECTORY_SEPARATOR.self::BRANDING_BASENAME,
             $this->branding_dump($packages, $root),
         );
+        $this->write_php(
+            $composer_dir.DIRECTORY_SEPARATOR.self::ICONS_BASENAME,
+            $this->icons_dump($providers),
+        );
         $this->strip_dev_autoload_files($composer_dir);
+        $this->rebuild_compiled_routes();
+        $this->compile_views($providers, $root);
 
         $io = $this->terminal();
         $io->success('wrote composer/'.self::BOOT_BASENAME.' (instance '.$instance_id.')');
@@ -536,6 +547,154 @@ final readonly class DumpAutoloadCommand
         }
 
         return $out;
+    }
+
+    /**
+     * @param list<array{class: class-string, prefix: string, path: string}> $providers
+     * @return array<string, string>
+     */
+    private function icons_dump(array $providers): array
+    {
+        /** @var array<string, true> $names */
+        $names = [];
+        foreach (['VIEWS', 'COMPONENTS'] as $constant) {
+            foreach ($this->collect_provider_paths($providers, $constant) as $dirs) {
+                foreach ($dirs as $dir) {
+                    $this->collect_icon_names($names, $dir);
+                }
+            }
+        }
+        $out = [];
+        foreach (\array_keys($names) as $key) {
+            $slash = \strpos($key, '/');
+            if ($slash === false) {
+                continue;
+            }
+            $set = \substr($key, 0, $slash);
+            $name = \substr($key, $slash + 1);
+            $file = \class_exists(\Webkernel\Imagery\Icon::class, true)
+                ? \Webkernel\Imagery\Icon::path($name, $set)
+                : '';
+            if ($file === '' || ! \is_file($file)) {
+                continue;
+            }
+            $svg = \file_get_contents($file);
+            if (\is_string($svg) && $svg !== '') {
+                $out[$key] = $svg;
+            }
+        }
+        \ksort($out);
+
+        return $out;
+    }
+
+    /**
+     * @param array<string, true> $names
+     */
+    private function collect_icon_names(array &$names, string $dir): void
+    {
+        $dir = \rtrim(\str_replace('\\', '/', $dir), '/');
+        if (! \is_dir($dir)) {
+            return;
+        }
+        $it = new RecursiveIteratorIterator(
+            new RecursiveDirectoryIterator($dir, FilesystemIterator::SKIP_DOTS),
+        );
+        foreach ($it as $file) {
+            if (! $file->isFile() || ! \str_ends_with($file->getFilename(), '.view.php')) {
+                continue;
+            }
+            $src = \file_get_contents($file->getPathname());
+            if (! \is_string($src) || $src === '') {
+                continue;
+            }
+            if (\preg_match_all('/<x-webkernel::icon\b([^>]*)>/', $src, $tags) === false) {
+                continue;
+            }
+            foreach ($tags[1] as $attrs) {
+                if (! \is_string($attrs) || \preg_match('/(?:^|\s):name\b/', $attrs) === 1) {
+                    continue;
+                }
+                $name = '';
+                $set = 'lucide';
+                if (\preg_match('/\bname="([^"]+)"/', $attrs, $m) === 1) {
+                    $name = $m[1];
+                }
+                if (\preg_match('/\bset="([^"]+)"/', $attrs, $m) === 1) {
+                    $set = $m[1];
+                }
+                if ($name !== '') {
+                    $names[$set.'/'.$name] = true;
+                }
+            }
+        }
+    }
+
+    private function rebuild_compiled_routes(): void
+    {
+        Route::flush();
+        Route::register_dumped_panel_routes();
+        $data = Route::compile_for_cache('');
+        Cache::write(Cache::path(), $data, [
+            'compiled_at' => \time(),
+            'host' => '',
+            'files' => Cache::fingerprints(),
+        ]);
+        Route::flush();
+    }
+
+    /**
+     * @param list<array{class: class-string, prefix: string, path: string}> $providers
+     */
+    private function compile_views(array $providers, string $root): void
+    {
+        $dir = $root.'/platform/storage/framework/views';
+        if (\is_dir($dir)) {
+            $compiled = \glob($dir.'/*.compiled');
+            if (\is_array($compiled)) {
+                foreach ($compiled as $file) {
+                    if (\is_string($file) && \is_file($file)) {
+                        @\unlink($file);
+                    }
+                }
+            }
+        }
+        View::flush();
+        $engine = View::engine();
+        foreach (['VIEWS', 'COMPONENTS'] as $constant) {
+            foreach ($this->collect_provider_paths($providers, $constant) as $namespace => $dirs) {
+                foreach ($dirs as $base) {
+                    $this->compile_tree($engine, $base, $namespace);
+                }
+            }
+        }
+    }
+
+    private function compile_tree(Engine $engine, string $base, string $namespace): void
+    {
+        $base = \rtrim(\str_replace('\\', '/', $base), '/');
+        if (! \is_dir($base)) {
+            return;
+        }
+        $it = new RecursiveIteratorIterator(
+            new RecursiveDirectoryIterator($base, FilesystemIterator::SKIP_DOTS),
+        );
+        foreach ($it as $file) {
+            if (! $file->isFile() || ! \str_ends_with($file->getFilename(), '.view.php')) {
+                continue;
+            }
+            $rel = \substr(\str_replace('\\', '/', $file->getPathname()), \strlen($base) + 1);
+            if (! \is_string($rel) || ! \str_ends_with($rel, '.view.php')) {
+                continue;
+            }
+            $name = \str_replace('/', '.', \substr($rel, 0, -9));
+            $view = $namespace.'::'.$name;
+            try {
+                $engine->compiler()->compile($view, true);
+            } catch (\Throwable $e) {
+                $this->terminal()->warning('view compile '.$view.': '.$e->getMessage());
+            }
+        }
     }
 
     private function strip_dev_autoload_files(string $composer_dir): void
