@@ -443,25 +443,28 @@ refactor/
 
 The goal is a Retool-equivalent in PHP where the interface is described as data and rendered by the engine, not hardcoded per panel.
 
-### Step 1 — Schema AST
+### Step 1 — UI schema (not an AST)
 
-Define immutable DTOs for every UI construct.
-These are serialisable to JSON and form the contract between the server and the render engine.
+Do not call this an AST. An **AST** (Abstract Syntax Tree) is what a **parser** emits from source text: tokens in, tree out. Webkernel already uses that word correctly for languages (`Lexer → Parser → AST → Validator` in `Languages.md`). There is no UI language here, no tokens, no parser.
+
+The UI is described by the PHP classes themselves: `Panel`, `Resource`, `Page`, `Table`, `Schema`. That object tree **is** the schema. Immutable, walkable, optionally serialisable to JSON later if a visual builder needs a dump. Serialisation is not required to render.
+
 The tree matches the domain hierarchy:
 	- a panel owns standalone pages and resources;
 	- a resource owns its pages;
 	- a page owns components.
 
 ```
-Panel AST
-  Panel Page AST                  (Dashboard, custom — not CRUD)
-  Cluster AST                     (optional navigation group)
-    Resource AST                  (CRUD class for one model)
-      Resource Page AST           (List, Create, Edit, View, custom)
-        Component AST             (Table | Form | Widget | Custom)
+Panel
+  Page                            (standalone — no Resource)
+  Cluster                         (optional navigation group)
+    Page                          (standalone, grouped)
+    Resource                      (CRUD class for one model)
+      Page                        (List, Create, Edit, View, custom)
+        Component                 (Table | Form | Widget | Custom)
 ```
 
-A Resource AST carries the model, the table schema, the form schema, and the page map. Rendering a list page reads the table from the Resource, not from the page. Rendering a create/edit page reads the form from the Resource. Pages decide which of those schemas to show and which actions to expose.
+A Resource schema carries the model, the table, the form, and the page map. Rendering a list page reads the table from the Resource, not from the page. Rendering a create/edit page reads the form from the Resource. Pages decide which of those schemas to show and which actions to expose.
 
 ### Step 2 — Platform settings
 
