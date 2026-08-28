@@ -12,6 +12,9 @@ use Webkernel\Console\Middleware\ConsoleMiddleware;
 /**
  * Discovers `#[ConsoleCommand]` methods and maps PHP parameters to argv.
  *
+ * `webapp()->console()` is this object. `Webkernel\Console::run()` is the
+ * process door: construct, handle(), exit.
+ *
  * @phpstan-type CommandDef array{
  *   class: class-string,
  *   method: string,
@@ -19,8 +22,10 @@ use Webkernel\Console\Middleware\ConsoleMiddleware;
  *   middleware: list<class-string>,
  *   reflection: \ReflectionMethod
  * }
+ *
+ * //> Command methods take scalars only. Inject collaborators in the constructor.
  */
-final class Kernel implements ComposableContract
+final class Dispatcher implements ComposableContract
 {
     /** @var list<class-string> */
     private const BUILTIN = [

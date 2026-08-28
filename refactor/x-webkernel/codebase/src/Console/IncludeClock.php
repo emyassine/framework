@@ -3,11 +3,13 @@
 namespace Webkernel\Console;
 
 /**
- * Times include/require execute cost with hrtime. Loaded only when
- * WEBKERNEL_PROFILE_LIFECYCLE=1 (webkernel server --profile-lifecycle).
+ * Times include/require execute cost with hrtime. Exclusive nested time:
+ * a parent file is charged for its own code, not for children it includes.
+ * Works with OPcache (no file stream).
  *
- * Exclusive nested time: a parent file is charged for its own code, not
- * for children it includes. Works with OPcache (no file stream).
+ * Reusable. Any caller may start()/enter()/leave()/stop() or run_file().
+ * One in-tree consumer is the PHP built-in server router, gated on
+ * WEBKERNEL_PROFILE_LIFECYCLE=1 (`webkernel server --profile-lifecycle`).
  *
  * @phpstan-type FileStat array{ms: float, run_ms: float, read_ms: float, bytes: int}
  * @phpstan-type Report array{
@@ -20,6 +22,17 @@ namespace Webkernel\Console;
  */
 final class IncludeClock
 {
+    /**
+     * Versioned machine id written as report()['schema'].
+     *
+     * Format: `webkernel.profile.include/vN`. The PHP built-in server router
+     * emits `webkernel-profile-json {report}` on stderr. Consumers dispatch
+     * on this string, then read files, classes, mem, render_ms.
+     *
+     * //> Do not change the report shape under an existing /vN.
+     * //> Bump the suffix (v2, v3, ...) when files/classes/mem/render_ms change.
+     * //> Reusing a version for a different payload is a silent break.
+     */
     public const SCHEMA = 'webkernel.profile.include/v1';
 
     /** @var array<string, array{run_ns: int, bytes: int}> */
@@ -159,7 +172,7 @@ final class IncludeClock
     }
 
     /**
-     * Machine payload for a future panel / agent. Paths may be relative.
+     * JSON payload stamped with SCHEMA. Paths may be relative.
      *
      * @param array<string, FileStat> $files
      * @param list<string>            $classes

@@ -13,7 +13,7 @@ namespace Webkernel;
 if (false) {
     /**
      * @method \Webkernel\Composables\ConfigComposable|mixed config(?string $key = null, mixed $default = null)
-     * @method \Webkernel\Console\Kernel console()
+     * @method \Webkernel\Console\Dispatcher console()
      * @method \Webkernel\Composables\PanelComposable panel(?string $id = null)
      * @method \Webkernel\Performance\Performance performance()
      * @method \Webkernel\Route\Route route()

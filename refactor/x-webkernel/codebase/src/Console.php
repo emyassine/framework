@@ -4,7 +4,7 @@ namespace Webkernel;
 
 use Webkernel\Config\Config;
 use Webkernel\Console\Input\ArgvInput;
-use Webkernel\Console\Kernel;
+use Webkernel\Console\Dispatcher;
 
 /**
  * CLI door. Autoload is already done by fast-boot.php.
@@ -20,6 +20,6 @@ final class Console
     {
         Config::boot();
 
-        exit((new Kernel())->handle(new ArgvInput($argv))->value);
+        exit((new Dispatcher())->handle(new ArgvInput($argv))->value);
     }
 }

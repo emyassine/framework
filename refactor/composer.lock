@@ -598,7 +598,7 @@
             "dist": {
                 "type": "path",
                 "url": "x-webkernel/codebase",
-                "reference": "bf46d2df3df4246cceaee720d1b22db32afad59f"
+                "reference": "af1761bd9fb13995192260330858dde32c04a860"
             },
             "require": {
                 "php": ">=8.4",
@@ -627,6 +627,11 @@
                     "Webkernel\\": "src/"
                 }
             },
+            "autoload-dev": {
+                "psr-4": {
+                    "Webkernel\\Tests\\": "tests/"
+                }
+            },
             "license": [
                 "proprietary"
             ],
@@ -642,7 +647,7 @@
             "dist": {
                 "type": "path",
                 "url": "x-webkernel/platform/imagery",
-                "reference": "c1ded06a3189166942cd2a61ee86709f0a957fb1"
+                "reference": "d2445bf9f9dba090eea07a77a4d142ca47462b44"
             },
             "require": {
                 "php": ">=8.4"
@@ -659,6 +664,11 @@
             "autoload": {
                 "psr-4": {
                     "Webkernel\\Imagery\\": "src/"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "Webkernel\\Imagery\\Tests\\": "tests/"
                 }
             },
             "license": [

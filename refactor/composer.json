@@ -80,8 +80,8 @@
 	    "webkernel/imagery": "^0.12.0"
 	},
 	"require-dev": {
-	    "phpunit/phpunit": "^11.5"
-	},
+        "phpunit/phpunit": "^11.5"
+    },
 	"scripts": {
 		"dump-autoload" : "composer dump-autoload -o",
 		"test": "phpunit"

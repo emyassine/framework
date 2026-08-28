@@ -13,7 +13,7 @@ use Webkernel\Config\Config;
  * @method \Webkernel\Route\Route route()
  * @method \Webkernel\Composables\PanelComposable panel()
  * @method \Webkernel\Console\Terminal terminal()
- * @method \Webkernel\Console\Kernel console()
+ * @method \Webkernel\Console\Dispatcher console()
  */
 final class WebApp
 {
