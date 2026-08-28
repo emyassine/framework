@@ -1,0 +1,38 @@
+{
+    "$schema": "https://getcomposer.org/schema.json",
+    "name": "webkernel/codebase",
+    "description": "Webkernel runtime: paths, instance, container, route, view. PSR-11 plus PHP 8.4+.",
+    "type": "library",
+    "license": "proprietary",
+    "version": "0.12.0",
+    "autoload": {
+        "files": [
+            "namespacer.php"
+        ],
+        "psr-4": {
+            "Webkernel\\": "src/"
+        }
+    },
+    "require": {
+        "php": ">=8.4",
+        "psr/cache": "^3.0",
+        "psr/clock": "^1.0",
+        "psr/container": "^2.0",
+        "psr/http-message": "^2.0",
+        "psr/log": "^3.0",
+        "psr/simple-cache": "^3.0",
+        "webkernel/lifecycle": "^0.12.0"
+    },
+    "extra": {
+        "webkernel": {
+            "package_repo": "git@github.com:webkernelphp/codebase.git",
+            "production": true,
+            "prefix": "codebase"
+        }
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}

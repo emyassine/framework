@@ -2,10 +2,8 @@
     "$schema": "https://www.schemastore.org/package.json",
     "private": true,
     "type": "module",
-    "description": "Host app. workspaces globs = Composer install path (config.vendor-dir)/*/* + modules/*/* — kept in sync when vite.webapp.ts is generated.",
+    "description": "Host app with workspaces glob.",
     "workspaces": [
-        "third_party/webkernel/*",
-        "modules/*/*"
     ],
     "scripts": {
         "dev": "vite",

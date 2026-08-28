@@ -142,32 +142,38 @@ graph TD
             SAP["System Admin Panel<br/>platform-wide management"]
         end
         subgraph Contained ["Contained domains"]
-            MOD["Modules (1..N)"]
+            MOD["Module (1..N)<br/><i>BusinessModule</i>"]
+            FEAT["Feature (0..N)<br/><i>BusinessModuleFeature</i>"]
         end
     end
-    subgraph Module ["Module Domain"]
+    subgraph Panel ["Panel Domain"]
         AP["Admin Panels — module-scoped (1..N)"]
     end
-    subgraph Panel ["Panel Domain"]
+    subgraph Cluster ["Cluster Domain"]
         CL["Clusters"]
     end
-    subgraph Cluster ["Cluster Domain"]
+    subgraph Resource ["Resource Domain"]
         RES["Resources"]
     end
-    subgraph Resource ["Resource Domain"]
+    subgraph Page ["Page Domain"]
         PG["Pages"]
     end
-    subgraph Page ["Page Domain"]
+    subgraph Component ["Component Domain"]
         CMP["Components (Tables, Forms, Widgets, Custom Views)"]
     end
+
     AO --> SAP
     AO --> MOD
     SAP -.->|administers| MOD
+    MOD --> FEAT
     MOD --> AP
+    FEAT -.->|extends / injects| MOD
+    FEAT -.->|registers| AP
     AP --> CL
     CL --> RES
     RES --> PG
     PG --> CMP
+
     AUTH["Granular Permission & Authorization Layer"] -.- AP
     AUTH -.- RES
     AUTH -.- PG
@@ -196,6 +202,7 @@ refactor/
 ├── public/                      # Web root (index.php front controller)
 ├── webkernel                    # Host CLI binary
 ├── composer.json                # Install + dependency graph
+├── modules/                     # Modules ([custom repo's]composer packages)
 ├── platform/
 │   ├── bootstrap/               # fast-boot + WebApp configuration
 │   ├── modules/                 # Installed business modules
