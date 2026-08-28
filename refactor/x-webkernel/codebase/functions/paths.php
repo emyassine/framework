@@ -47,14 +47,36 @@ if (! function_exists('webkernel_vendor_dir')) {
             return $dir;
         }
 
+        $from_class = static function (string $class, int $up): ?string {
+            if (! class_exists($class, false)) {
+                return null;
+            }
+            $file = (new \ReflectionClass($class))->getFileName();
+            if (! is_string($file) || $file === '' || str_starts_with($file, 'phar://')) {
+                return null;
+            }
+            $vendor = dirname($file, $up);
+            $real = realpath($vendor);
+
+            return $real !== false ? $real : $vendor;
+        };
+
+        $installed = $from_class(\Composer\InstalledVersions::class, 2);
+        if ($installed !== null) {
+            return $dir = $installed;
+        }
         if (function_exists('webkernel_composer_dir')) {
             $composer_dir = webkernel_composer_dir();
-            if (is_string($composer_dir) && $composer_dir !== '') {
+            if (is_string($composer_dir) && $composer_dir !== '' && ! str_starts_with($composer_dir, 'phar://')) {
                 $vendor = dirname($composer_dir);
                 $real = realpath($vendor);
 
                 return $dir = $real !== false ? $real : $vendor;
             }
+        }
+        $loader = $from_class(\Composer\Autoload\ClassLoader::class, 2);
+        if ($loader !== null) {
+            return $dir = $loader;
         }
 
         return $dir = 'vendor';

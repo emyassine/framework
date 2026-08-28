@@ -1,6 +1,0 @@
-<a href="<?php echo \Webkernel\View\View::echo($href); ?>" class="webkernel-shell-nav-item<?php echo \Webkernel\View\View::echo(!empty($active) ? ' active' : ''); ?>">
- <?php if(!empty($icon)): ?>
- <?php  $this->start_component('webkernel::icon',["name"=>$icon]); ?><?php echo $this->render_component(); ?>
- <?php endif; ?>
- <span class="webkernel-shell-nav-label"><?php echo $slot; ?></span>
-</a>

@@ -212,10 +212,19 @@ final class Route implements ComposableContract
     /**
      * Bind dumped panel class-string routes. Cold path only — skip when
      * compiled_routes.php fingerprints still match.
+     *
+     * @param string|null $file Absolute path to webkernel_panel_routes.php
+     *
+     * @return void
      */
-    public static function register_dumped_panel_routes(): void
+    public static function register_dumped_panel_routes(?string $file = null): void
     {
-        $file = \vendor_dir('composer/webkernel_panel_routes.php');
+        if ($file === null || $file === '') {
+            if (! \function_exists('vendor_dir')) {
+                return;
+            }
+            $file = \vendor_dir('composer/webkernel_panel_routes.php');
+        }
         if (! \is_file($file)) {
             return;
         }
@@ -560,6 +569,9 @@ final class Route implements ComposableContract
             return;
         }
         self::$declared_loaded = true;
+        if (! \function_exists('vendor_dir')) {
+            return;
+        }
         $file = vendor_dir('composer/webkernel_routes.php');
         if (! is_file($file)) {
             return;

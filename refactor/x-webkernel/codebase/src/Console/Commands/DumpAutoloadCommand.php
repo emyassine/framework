@@ -138,7 +138,8 @@ final readonly class DumpAutoloadCommand
             $this->icons_dump($providers),
         );
         $this->strip_dev_autoload_files($composer_dir);
-        $this->rebuild_compiled_routes();
+        $this->ensure_path_helpers();
+        $this->rebuild_compiled_routes($composer_dir);
         $this->compile_views($providers, $root);
 
         $io = $this->terminal();
@@ -632,10 +633,32 @@ final readonly class DumpAutoloadCommand
         }
     }
 
-    private function rebuild_compiled_routes(): void
+    /**
+     * Composer post-autoload-dump runs inside the phar ClassLoader, so
+     * namespacer never required functions/paths.php. Load it from this package.
+     *
+     * @return void
+     */
+    private function ensure_path_helpers(): void
+    {
+        $file = \dirname(__DIR__, 3).'/functions/paths.php';
+        if (\is_file($file)) {
+            require_once $file;
+        }
+        if (\function_exists('webkernel_boot_flush')) {
+            \webkernel_boot_flush();
+        }
+    }
+
+    /**
+     * @param string $composer_dir
+     *
+     * @return void
+     */
+    private function rebuild_compiled_routes(string $composer_dir): void
     {
         Route::flush();
-        Route::register_dumped_panel_routes();
+        Route::register_dumped_panel_routes($composer_dir.DIRECTORY_SEPARATOR.self::PANEL_ROUTES_BASENAME);
         $data = Route::compile_for_cache('');
         Cache::write(Cache::path(), $data, [
             'compiled_at' => \time(),

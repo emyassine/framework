@@ -30,7 +30,7 @@ function webkernel_composer_dir(): ?string
         return $dir = null;
     }
     $file = (new \ReflectionClass(\Composer\Autoload\ClassLoader::class))->getFileName();
-    if (! is_string($file) || $file === '') {
+    if (! is_string($file) || $file === '' || str_starts_with($file, 'phar://')) {
         return $dir = null;
     }
 
