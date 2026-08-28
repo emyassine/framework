@@ -7,9 +7,7 @@ namespace Composer\Autoload;
 class ComposerStaticInitcc6f492cc5d64cb7f09b9024726d6929
 {
     public static $files = array (
-        '6124b4c8570aa390c21fafd04a26c69f' => __DIR__ . '/..' . '/myclabs/deep-copy/src/DeepCopy/deep_copy.php',
         'b3937b7fa35431fe0895577483870c74' => __DIR__ . '/..' . '/webkernel/codebase/namespacer.php',
-        'ec07570ca5a812141189b1fa81503674' => __DIR__ . '/..' . '/phpunit/phpunit/src/Framework/Assert/Functions.php',
     );
 
     public static $prefixLengthsPsr4 = array (
