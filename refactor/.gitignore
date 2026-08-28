@@ -1,0 +1,4 @@
+platform/dependencies/packagist
+platform/dependencies/node_modules
+platform/dependencies/package-lock.json
+composer.lock
