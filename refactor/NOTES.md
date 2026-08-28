@@ -395,7 +395,7 @@ At boot, the platform reads the manifest generated during `composer dump-autoloa
 
 ## 7. View Engine
 
-Views use BladeOne (owned in this package, not a Composer dependency). Template extension is `.view.php`. Compiled output lands in `platform/storage/framework/views/`.
+Views use `Webkernel\View`. Template extension is `.view.php`. Compiled output lands in `platform/storage/framework/views/`.
 
 Namespace syntax for templates: `@include('webkernel::layouts.page')`. Components are Laravel `x-` only: `<x-webkernel::page />`.
 
@@ -476,7 +476,7 @@ The platform injects built-in settings into every panel. Branding, colors, and l
 
 ### Step 3 — Render Engine (`.view.php`)
 
-The existing `Webkernel\View\View` engine handles this. Each component type maps to a `.view.php` template. No Twig. No Blade runtime dependency. BladeOne is compiled once per template per change.
+The existing `Webkernel\View\View` engine handles this. Each component type maps to a `.view.php` template. No Twig. Templates compile once per change.
 
 ### Step 4 — Discovery and Auto-Registration
 

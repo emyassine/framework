@@ -1,5 +1,5 @@
 <?php
-// ponytail: BladeOne engine is not strict_types — add it when the compiler is specialized.
+// ponytail: compiler is not strict_types — add it when the compiler is specialized.
 /**
  * @noinspection PhpUnusedParameterInspection
  * @noinspection SyntaxError
@@ -29,21 +29,14 @@ use Exception;
 use InvalidArgumentException;
 
 /**
- * Compiler — BladeOne (EFTEC) owned by Webkernel. Do not require eftec/bladeone.
- * Templates: .view.php. Compiled: .view.php.compiled.
+ * View compiler. Templates: .view.php. Compiled: .view.php.compiled.
  *
- * @package   Compiler
- * @author    Jorge Patricio Castro Castillo <jcastro arroba eftec dot cl>
  * @copyright Copyright (c) 2016-2025 Jorge Patricio Castro Castillo MIT License.
- *            Don't delete this comment, its part of the license.
  *            Part of this code is based on the work of Laravel PHP Components.
- * @version   4.19.1
- * @link      https://github.com/EFTEC/BladeOne
  */
 class Compiler
 {
     //<editor-fold desc="fields">
-    public const VERSION = '4.19.1';
     /** @var int Compiler reads if the compiled file has changed. If it has changed, then the file is replaced. */
     public const MODE_AUTO = 0;
     /** @var int The compiled file is always replaced. It's slow and it's useful for development. */
@@ -4753,13 +4746,7 @@ class Compiler
         $clearcompile = self::get_parameter_cli('clearcompile');
         $createfolder = self::get_parameter_cli('createfolder');
         $check = self::get_parameter_cli('check');
-        echo '  ____  _           _       ____             ' . "\n";
-        echo ' |  _ \| |         | |     / __ \            ' . "\n";
-        echo ' | |_) | | __ _  __| | ___| |  | |_ __   ___ ' . "\n";
-        echo ' |  _ <| |/ _` |/ _` |/ _ \ |  | | \'_ \ / _ \\' . "\n";
-        echo ' | |_) | | (_| | (_| |  __/ |__| | | | |  __/' . "\n";
-        echo ' |____/|_|\__,_|\__,_|\___|\____/|_| |_|\___|' . " V." . self::VERSION . "\n\n";
-        echo "\n";
+        echo "Webkernel view compiler\n\n";
         $done = false;
         if ($check) {
             $done = true;
@@ -4777,14 +4764,10 @@ class Compiler
             echo " Syntax:\n";
             echo " " . self::color_log("-templatepath", "b") . " <templatepath> (optional) the template-path (view path).\n";
             echo "    Default value: 'views'\n";
-            echo "    Example: 'php /vendor/bin/bladeonecli /folder/views' (absolute)\n";
-            echo "    Example: 'php /vendor/bin/bladeonecli folder/view1' (relative)\n";
+            echo "    Example: php webkernel dump-autoload (writes compiled views)\n";
             echo " " . self::color_log("-compilepath", "b") . " <compilepath>  (optional) the compile-path.\n";
             echo "    Default value: 'compiles'\n";
-            echo "    Example: 'php /vendor/bin/bladeonecli /folder/compiles' (absolute)\n";
-            echo "    Example: 'php /vendor/bin/bladeonecli compiles' (relative)\n";
             echo " " . self::color_log("-createfolder", "b") . " it creates the folders if they don't exist.\n";
-            echo "    Example: php ./vendor/bin/bladeonecli -createfolder\n";
             echo " " . self::color_log("-clearcompile", "b") . " It deletes the content of the compile path\n";
             echo " " . self::color_log("-check", "b") . " It checks the folders and permissions\n";
         }

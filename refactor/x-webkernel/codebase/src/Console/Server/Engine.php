@@ -287,7 +287,7 @@ final class Engine
         webterminal()->warning('This server is for local development only. Behavior differs from production (Nginx/Apache/FPM).');
         echo "\n";
         if ($this->profile_lifecycle) {
-            webterminal()->info(Terminal::muted('--profile-lifecycle').' include cost (run/read); ?? when OPcache hid the file stream.');
+            webterminal()->info(Terminal::muted('--profile-lifecycle').' first request is timed; later ~ is an estimate (OPcache hid the stream).');
             echo "\n";
         }
         echo '  '.Terminal::muted('Press Ctrl+C to stop the server')."\n\n";
@@ -351,7 +351,6 @@ final class Engine
             $base_metric = $baseline['render_ms'] ?? $baseline['request_ms'];
             $curr_metric = $timings['render_ms'] ?? $request_ms;
             $ratio = ($base_metric > 0.0) ? ($curr_metric / $base_metric) : 1.0;
-
             foreach ($times as &$row) {
                 if ($row['ms'] === null && isset($baseline['times'][$row['path']])) {
                     $base_row = $baseline['times'][$row['path']];
@@ -368,7 +367,9 @@ final class Engine
             foreach ($times as $row) {
                 if ($row['ms'] !== null) {
                     $this->baselines[$request]['times'][$row['path']] = [
-                        'ms' => (float) $row['ms'], 'run_ms' => (float) $row['run_ms'], 'read_ms' => (float) $row['read_ms'],
+                        'ms' => (float) $row['ms'],
+                        'run_ms' => (float) $row['run_ms'],
+                        'read_ms' => (float) $row['read_ms'],
                     ];
                 }
             }
@@ -402,7 +403,7 @@ final class Engine
         }
         echo "\n";
 
-        $summary1 = \sprintf('%s -> %d %s | files=%d timed=%d inferred=%d classes=%d mem=%s', $request, $status_code, $reason, \count($times), $count_valid, $inferred_count, \count($classes), $mem_label);
+        $summary1 = \sprintf('%s -> %d %s | files=%d timed=%d est=%d classes=%d mem=%s', $request, $status_code, $reason, \count($times), $count_valid - $inferred_count, $inferred_count, \count($classes), $mem_label);
         $summary2 = \sprintf('grades excellent=%d good=%d fair=%d slow=%d (%de %dg %df %ds) median=%.3fms', $grades['e'], $grades['g'], $grades['f'], $grades['s'], $grades['e'], $grades['g'], $grades['f'], $grades['s'], $median);
 
         echo '  '.Terminal::muted($summary1)."\n";
@@ -423,7 +424,9 @@ final class Engine
             $inferred = $row['inferred'] ?? false;
             $flag = '';
             if ($ms !== null) {
-                if ($median > 0.0) {
+                if ($inferred) {
+                    $flag = ' '.Terminal::GRAY.'[est]  '.Terminal::RESET;
+                } elseif ($median > 0.0) {
                     if ($ms > 2.0 * $median) {
                         $flag = ' '.Terminal::RED.'[SLOW] '.Terminal::RESET;
                     } elseif ($ms < 0.5 * $median) {
@@ -435,9 +438,9 @@ final class Engine
                     $flag = ' '.Terminal::GRAY.' [OK]  '.Terminal::RESET;
                 }
             }
-            $ms_str = $ms === null ? '      ??' : \sprintf('%c%7.3f', $inferred ? '~' : ' ', $ms);
-            $run_str = $run === null ? '      ??' : \sprintf('%c%7.3f', $inferred ? '~' : ' ', $run);
-            $read_str = $read === null ? '      ??' : \sprintf('%c%7.3f', $inferred ? '~' : ' ', $read);
+            $ms_str = $ms === null ? '      ??' : \sprintf($inferred ? '~%7.3f' : '%8.3f', $ms);
+            $run_str = $run === null ? '      ??' : \sprintf($inferred ? '~%7.3f' : '%8.3f', $run);
+            $read_str = $read === null ? '      ??' : \sprintf($inferred ? '~%7.3f' : '%8.3f', $read);
 
             echo \sprintf("  %s  %s  %s  %s%s\n", Terminal::muted($ms_str), Terminal::muted($run_str), Terminal::muted($read_str), $flag, Terminal::muted(' ->  ').$path);
         }

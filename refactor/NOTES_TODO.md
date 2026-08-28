@@ -699,7 +699,7 @@ The codebase package also has **exactly one** provider (`Webkernel\CodebaseProvi
 
 ## 7. View engine — Spec (`NOTES.md` §7)
 
-Views use BladeOne **owned in this package**, not a Composer library. Extension: `.view.php`. Compiled output: `platform/storage/framework/views/`.
+Views use `Webkernel\View`. Extension: `.view.php`. Compiled output: `platform/storage/framework/views/`.
 
 Namespace syntax: `@include('webkernel::layouts.page')` for layouts. Components are Laravel `x-` only: `<x-webkernel::page />`, `<x-billing::invoice-card />`. Not `<webkernel::page />`.
 
@@ -777,7 +777,7 @@ Spec §5. Built-in settings on every panel. App Owners edit them in the System A
 
 ### Step 3 — Render engine (`.view.php`)
 
-Spec §7. Each component type maps to a `.view.php` template. No Twig. BladeOne compiled once per template per change.
+Spec §7. Each component type maps to a `.view.php` template. No Twig. Templates compile once per template per change.
 
 ### Step 4 — Discovery and auto-registration
 
