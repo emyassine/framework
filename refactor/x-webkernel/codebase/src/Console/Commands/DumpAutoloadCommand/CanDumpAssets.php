@@ -178,7 +178,28 @@ trait CanDumpAssets
             ."//> Generated. Do not edit.\n"
             ."//> WDS chrome. Source: resources/views/wds/*.view.php\n"
             ."*/\n\n";
-        \file_put_contents($dest, $header.\implode("\n", $parts)."\n", \LOCK_EX);
+        $body = [];
+        foreach ($parts as $part) {
+            $min = $this->minify_css($part);
+            if ($min !== '') {
+                $body[] = $min;
+            }
+        }
+        \file_put_contents($dest, $header.\implode('', $body)."\n", \LOCK_EX);
+    }
+
+    /**
+     * @param $css string
+     *
+     * @return string
+     */
+    private function minify_css(string $css): string
+    {
+        $css = \preg_replace('/\/\*.*?\*\//s', '', $css) ?? $css;
+        $css = \preg_replace('/\s+/', ' ', $css) ?? $css;
+        $css = \preg_replace('/\s*([{}:;,])\s*/', '$1', $css) ?? $css;
+
+        return \trim($css);
     }
 
     /**

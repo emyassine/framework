@@ -28,22 +28,18 @@
     localStorage.setItem('wds-layout', layout);
   }
 
-  (function restoreState() {
-    const savedTheme = localStorage.getItem('wds-theme');
-    const savedLayout = localStorage.getItem('wds-layout');
-    const savedSidebar = localStorage.getItem('wds-sidebar');
-
-    if (savedTheme) {
-      document.documentElement.dataset.wdsTheme = savedTheme;
-      if (savedTheme === 'dark') {
-        const sun = document.getElementById('icon-sun');
-        const moon = document.getElementById('icon-moon');
-        if (sun) sun.style.display = 'none';
-        if (moon) moon.style.display = 'block';
-      }
+  (function syncChrome() {
+    const layout = document.documentElement.dataset.wdsLayout;
+    ['sidebar', 'topnav', 'horizontal'].forEach(function (id) {
+      const btn = document.getElementById('btn-layout-' + id);
+      if (btn) btn.classList.toggle('wds-active', id === layout);
+    });
+    if (document.documentElement.dataset.wdsTheme === 'dark') {
+      const sun = document.getElementById('icon-sun');
+      const moon = document.getElementById('icon-moon');
+      if (sun) sun.style.display = 'none';
+      if (moon) moon.style.display = 'block';
     }
-    if (savedLayout) setLayout(savedLayout);
-    if (savedSidebar) document.documentElement.dataset.wdsSidebar = savedSidebar;
   })();
 
   function toggleUserMenu() {

@@ -57,6 +57,9 @@ final class PanelViewTest extends TestCase
         $this->assertStringContainsString('wds-user-menu', $html);
         $this->assertStringContainsString('<svg', $html);
         $this->assertStringContainsString('<title>System</title>', $html);
+        $this->assertStringContainsString('name="description"', $html);
+        $this->assertStringContainsString('<nav class="wds-sidebar"', $html);
+        $this->assertStringNotContainsString('role="navigation"', $html);
     }
 
     public function test_page_component_renders_slot(): void

@@ -6,16 +6,18 @@
   'brand' => null,
   'favicon' => null,
   'logo' => null,
+  'description' => null,
   'csrf' => true,
 ])
 @php
   $brand = $brand ?? \Webkernel\Config\Config::get('app.name');
   $theme = $theme ?? (\Webkernel\Config\Config::get('ui.dark_mode', true) ? 'dark' : 'light');
+  $description = $description ?? ($brand.' control panel');
   if ($favicon === null && \function_exists('webkernel_branding_url')) {
     $favicon = webkernel_branding_url('webkernel-favicon');
   }
   if ($logo === null && \function_exists('webkernel_branding_url')) {
-    $logo = webkernel_branding_url($theme === 'dark' ? 'webkernel-logo-dark' : 'webkernel-logo-light');
+    $logo = webkernel_branding_url('webkernel-favicon');
   }
 @endphp
 <!DOCTYPE html>
@@ -28,6 +30,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script>(function(d){var t=localStorage.getItem('wds-theme');var l=localStorage.getItem('wds-layout');var s=localStorage.getItem('wds-sidebar');if(t)d.dataset.wdsTheme=t;if(l)d.dataset.wdsLayout=l;if(s&&(!l||l==='sidebar'))d.dataset.wdsSidebar=s;})(document.documentElement);</script>
   @if ($csrf)
     {!! \Webkernel\Csrf::meta() !!}
   @endif
@@ -35,6 +38,7 @@
     <link rel="icon" href="{{ $favicon }}" />
   @endif
   <title>@yield('title')</title>
+  <meta name="description" content="{{ $description }}" />
   @include('webkernel::layouts.partials.typography')
   <link rel="stylesheet" href="{{ \Webkernel\Platform\Wds::css_href() }}">
   @stack('styles')
@@ -43,10 +47,10 @@
 <body>
 <div class="wds-layout">
 
-  <aside class="wds-sidebar" id="sidebar" role="navigation" aria-label="Main navigation">
+  <nav class="wds-sidebar" id="sidebar" aria-label="Main navigation">
     <div class="wds-sidebar-header">
       @if (!empty($logo))
-        <img class="wds-logo-img" src="{{ $logo }}" alt="{{ $brand ?? 'Webkernel' }}" />
+        <img class="wds-logo-img" src="{{ $logo }}" alt="{{ $brand ?? 'Webkernel' }}" width="28" height="28" />
       @else
         <div class="wds-logo-icon">
           <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -65,7 +69,7 @@
     <div class="wds-sidebar-footer">
       @yield('user')
     </div>
-  </aside>
+  </nav>
 
   <div class="wds-main-ctn">
     <header class="wds-topbar">
@@ -74,7 +78,7 @@
       </button>
       <div class="wds-topbar-logo">
         @if (!empty($logo))
-          <img class="wds-logo-img" src="{{ $logo }}" alt="{{ $brand ?? 'Webkernel' }}" />
+          <img class="wds-logo-img" src="{{ $logo }}" alt="{{ $brand ?? 'Webkernel' }}" width="24" height="24" />
         @else
           <div class="wds-logo-icon" style="width:24px;height:24px;">
             <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">

@@ -31,5 +31,6 @@ final class HttpTest extends TestCase
         $this->assertStringContainsString('wds-sidebar', $html);
         $this->assertStringContainsString('wds-page', $html);
         $this->assertStringContainsString('<title>Home</title>', $html);
+        $this->assertStringContainsString('name="description"', $html);
     }
 }

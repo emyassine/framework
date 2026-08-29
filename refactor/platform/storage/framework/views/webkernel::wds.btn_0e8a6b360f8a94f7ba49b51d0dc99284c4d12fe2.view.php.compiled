@@ -41,6 +41,8 @@
 .wds-btn.wds-outlined:hover { background: var(--wds-bg-subtle); border-color: var(--wds-border-strong); }
 .wds-btn.wds-outlined.wds-color-primary { background: transparent; color: var(--primary-700); border-color: var(--primary-600); }
 .wds-btn.wds-outlined.wds-color-danger { background: transparent; color: var(--danger-700); border-color: var(--danger-600); }
+[data-wds-theme="dark"] .wds-btn.wds-outlined.wds-color-primary { color: var(--primary-300); border-color: var(--primary-400); }
+[data-wds-theme="dark"] .wds-btn.wds-outlined.wds-color-danger { color: var(--danger-300); border-color: var(--danger-400); }
 .wds-btn.wds-ghost { background: transparent; color: var(--wds-text-muted); }
 .wds-btn.wds-ghost:hover { background: var(--wds-bg-subtle); color: var(--wds-text); }
 .wds-btn.wds-size-xs { padding: 0.125rem 0.5rem; font-size: var(--wds-text-xs); gap: 0.25rem; }

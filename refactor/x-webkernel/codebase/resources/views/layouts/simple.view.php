@@ -17,6 +17,7 @@
     {!! \Webkernel\Csrf::meta() !!}
   @endif
   <title>{{ $title }}</title>
+  <meta name="description" content="{{ $title }}" />
   @include('webkernel::layouts.partials.typography')
   <link rel="stylesheet" href="{{ \Webkernel\Platform\Wds::css_href() }}">
   @stack('styles')

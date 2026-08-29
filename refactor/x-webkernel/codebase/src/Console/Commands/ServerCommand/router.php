@@ -17,6 +17,29 @@ $docroot = $_SERVER['DOCUMENT_ROOT'] ?? getcwd().'/public';
 $file = $docroot.$uri;
 
 if ($uri !== '/' && is_file($file)) {
+    $ext = strtolower(pathinfo($file, PATHINFO_EXTENSION));
+    $static = [
+        'css' => 'text/css; charset=UTF-8',
+        'js' => 'text/javascript; charset=UTF-8',
+        'woff2' => 'font/woff2',
+        'woff' => 'font/woff',
+        'png' => 'image/png',
+        'jpg' => 'image/jpeg',
+        'jpeg' => 'image/jpeg',
+        'gif' => 'image/gif',
+        'webp' => 'image/webp',
+        'svg' => 'image/svg+xml',
+        'ico' => 'image/x-icon',
+    ];
+    if (isset($static[$ext])) {
+        header('Content-Type: '.$static[$ext]);
+        header('Content-Length: '.(string) filesize($file));
+        header('Cache-Control: public, max-age=31536000, immutable');
+        readfile($file);
+
+        return true;
+    }
+
     return false;
 }
 
