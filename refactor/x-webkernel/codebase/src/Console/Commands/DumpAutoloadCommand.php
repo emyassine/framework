@@ -52,6 +52,7 @@ final readonly class DumpAutoloadCommand
     public const PANEL_ROUTES_BASENAME = 'webkernel_panel_routes.php';
     public const BRANDING_BASENAME = 'webkernel_branding.php';
     public const ICONS_BASENAME = 'webkernel_icons.php';
+    public const LANG_BASENAME = 'webkernel_lang.php';
 
     #[ConsoleCommand(
         name: 'dump-autoload',
@@ -115,6 +116,12 @@ final readonly class DumpAutoloadCommand
         $this->write_path_list(
             $composer_dir.DIRECTORY_SEPARATOR.self::ROUTES_BASENAME,
             $this->collect_provider_files($providers, 'ROUTES'),
+            $vendor_dir,
+            $root,
+        );
+        $this->write_path_list(
+            $composer_dir.DIRECTORY_SEPARATOR.self::LANG_BASENAME,
+            $this->collect_lang_paths($providers),
             $vendor_dir,
             $root,
         );
@@ -807,18 +814,52 @@ final readonly class DumpAutoloadCommand
     {
         $out = [];
         foreach ($providers as $row) {
-            $namespace = $row['class']::view_namespace($row['prefix']);
-            foreach ($row['class']::declaration($constant) as $path) {
-                if (! is_string($path) || $path === '') {
+            foreach ($row['class']::declaration($constant) as $namespace => $path) {
+                if (! is_string($namespace) || $namespace === '') {
                     continue;
                 }
-                $real = realpath($path) ?: $path;
-                if (! is_dir($real)) {
-                    continue;
+                $dirs = is_array($path) ? $path : [$path];
+                foreach ($dirs as $dir) {
+                    if (! is_string($dir) || $dir === '') {
+                        continue;
+                    }
+                    $real = realpath($dir) ?: $dir;
+                    if (! is_dir($real)) {
+                        continue;
+                    }
+                    $norm = str_replace('\\', '/', $real);
+                    if (! isset($out[$namespace]) || ! in_array($norm, $out[$namespace], true)) {
+                        $out[$namespace][] = $norm;
+                    }
                 }
-                $dir = str_replace('\\', '/', $real);
-                if (! isset($out[$namespace]) || ! in_array($dir, $out[$namespace], true)) {
-                    $out[$namespace][] = $dir;
+            }
+        }
+
+        return $out;
+    }
+
+    /**
+     * @param list<array{class: class-string, prefix: string, path: string}> $providers
+     * @return list<string>
+     */
+    private function collect_lang_paths(array $providers): array
+    {
+        $out = [];
+        foreach ($providers as $row) {
+            foreach ($row['class']::declaration('LANG_PATH') as $path) {
+                $dirs = is_array($path) ? $path : [$path];
+                foreach ($dirs as $dir) {
+                    if (! is_string($dir) || $dir === '') {
+                        continue;
+                    }
+                    $real = realpath($dir) ?: $dir;
+                    if (! is_dir($real)) {
+                        continue;
+                    }
+                    $norm = str_replace('\\', '/', $real);
+                    if (! in_array($norm, $out, true)) {
+                        $out[] = $norm;
+                    }
                 }
             }
         }

@@ -5,17 +5,11 @@
 //> For the full copyright and license information, please view the LICENSE
 //> file that was distributed with this source code.
 
-namespace Webkernel\Platform\Components;
+namespace Webkernel\I18n;
 
 use Webkernel\PlatformProvider;
 
-final class ComponentsProvider extends PlatformProvider
+final class I18nProvider extends PlatformProvider
 {
-    public const VIEWS = [
-        'webkernel' => __DIR__.'/../resources/views',
-    ];
-
-    public const COMPONENTS = [
-        'webkernel' => __DIR__.'/../resources/views',
-    ];
+    public const LANG_PATH = [__DIR__.'/../lang'];
 }

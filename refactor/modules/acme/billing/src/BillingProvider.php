@@ -12,11 +12,15 @@ use Webkernel\PlatformProvider;
 
 final class BillingProvider extends PlatformProvider
 {
-    public const VIEW_NAMESPACE = 'billing';
+    public const VIEWS = [
+        'billing' => __DIR__.'/../resources/views',
+    ];
 
-    public const VIEWS = [__DIR__.'/../resources/views'];
+    public const COMPONENTS = [
+        'billing' => __DIR__.'/../resources/views/components',
+    ];
 
-    public const COMPONENTS = [__DIR__.'/../resources/views/components'];
+    public const LANG_PATH = [__DIR__.'/../lang'];
 
     public const PANELS = [BillingPanelProvider::class];
 }

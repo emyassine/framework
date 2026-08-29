@@ -19,6 +19,9 @@ final class Http
     public static function run(): void
     {
         Config::boot();
+        if (\class_exists(\Webkernel\I18n\I18nContext::class, false)) {
+            \Webkernel\I18n\I18nContext::flush();
+        }
         self::maybe_compress();
         if (! Cache::is_fresh()) {
             Route::register_dumped_panel_routes();

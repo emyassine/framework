@@ -16,27 +16,36 @@ abstract class PlatformProvider
     /** @var list<string> */
     public const ROUTES = [];
 
-    /** @var list<string> */
+    /**
+     * View directories keyed by namespace (`billing::invoices.index`).
+     *
+     * //> Several packages may share one namespace. Dump concatenates their dirs.
+     *
+     * @var array<string, string|list<string>>
+     */
     public const VIEWS = [];
 
-    /** @var list<string> */
+    /**
+     * Component directories keyed by namespace (`<x-billing::card />`).
+     *
+     * //> Same merge rule as VIEWS.
+     *
+     * @var array<string, string|list<string>>
+     */
     public const COMPONENTS = [];
+
+    /**
+     * Translation directories (`{dir}/{locale}/translations.php`).
+     *
+     * @var list<string>
+     */
+    public const LANG_PATH = [];
 
     /** @var list<class-string> */
     public const COMMANDS = [];
 
     /** @var list<class-string> */
     public const PANELS = [];
-
-    /**
-     * View and component namespace (`billing::invoices.index`, `<x-billing::card />`).
-     *
-     * //> Empty falls back to composer extra.webkernel.prefix.
-     * //> Several packages may share one namespace. Dump concatenates their dirs.
-     *
-     * @var string
-     */
-    public const VIEW_NAMESPACE = '';
 
     /**
      * @return list<mixed>
@@ -57,22 +66,5 @@ abstract class PlatformProvider
         }
 
         return [];
-    }
-
-    /**
-     * @param $fallback string
-     *
-     * @return string
-     */
-    public static function view_namespace(string $fallback = ''): string
-    {
-        if (\defined(static::class.'::VIEW_NAMESPACE')) {
-            $namespace = \constant(static::class.'::VIEW_NAMESPACE');
-            if (\is_string($namespace) && $namespace !== '') {
-                return $namespace;
-            }
-        }
-
-        return $fallback;
     }
 }

@@ -81,16 +81,14 @@ final class PanelViewTest extends TestCase
     /**
      * @return void
      */
-    public function test_providers_declare_view_namespace(): void
+    public function test_providers_declare_view_namespaces_on_views(): void
     {
-        $this->assertSame('webkernel', \Webkernel\CodebaseProvider::VIEW_NAMESPACE);
-        $this->assertSame('webkernel', \Webkernel\Platform\PanelsProvider::VIEW_NAMESPACE);
-        $this->assertSame('webkernel', \Webkernel\Platform\Components\ComponentsProvider::VIEW_NAMESPACE);
-        $this->assertSame('billing', \Acme\Billing\BillingProvider::VIEW_NAMESPACE);
-        $this->assertSame(
-            'webkernel',
-            \Webkernel\Platform\PanelsProvider::view_namespace('fallback'),
-        );
+        $this->assertArrayHasKey('webkernel', \Webkernel\CodebaseProvider::VIEWS);
+        $this->assertArrayHasKey('webkernel', \Webkernel\Platform\PanelsProvider::VIEWS);
+        $this->assertArrayHasKey('webkernel', \Webkernel\Platform\Components\ComponentsProvider::VIEWS);
+        $this->assertArrayHasKey('billing', \Acme\Billing\BillingProvider::VIEWS);
+        $this->assertArrayHasKey('billing', \Acme\Billing\BillingProvider::COMPONENTS);
+        $this->assertNotEmpty(\Acme\Billing\BillingProvider::LANG_PATH);
     }
 
     /**

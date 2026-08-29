@@ -17,6 +17,7 @@ return array(
     'Webkernel\\Lifecycle\\' => array($vendorDir . '/webkernel/lifecycle/Lifecycle'),
     'Webkernel\\Imagery\\Tests\\' => array($baseDir . '/x-webkernel/platform/imagery/tests'),
     'Webkernel\\Imagery\\' => array($vendorDir . '/webkernel/imagery/src'),
+    'Webkernel\\I18n\\Tests\\' => array($baseDir . '/x-webkernel/platform/i18n/tests'),
     'Webkernel\\' => array($vendorDir . '/webkernel/codebase/src'),
     'Psr\\SimpleCache\\' => array($vendorDir . '/psr/simple-cache/src'),
     'Psr\\Log\\' => array($vendorDir . '/psr/log/src'),

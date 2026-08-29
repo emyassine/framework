@@ -5,17 +5,9 @@
 //> For the full copyright and license information, please view the LICENSE
 //> file that was distributed with this source code.
 
-namespace Webkernel\Platform\Components;
-
-use Webkernel\PlatformProvider;
-
-final class ComponentsProvider extends PlatformProvider
-{
-    public const VIEWS = [
-        'webkernel' => __DIR__.'/../resources/views',
-    ];
-
-    public const COMPONENTS = [
-        'webkernel' => __DIR__.'/../resources/views',
-    ];
+if (! \defined('START_REQUEST')) {
+    \define('START_REQUEST', \hrtime(true));
 }
+
+$root = \dirname(__DIR__, 4);
+require $root.'/platform/fast-boot.php';

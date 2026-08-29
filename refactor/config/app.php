@@ -8,6 +8,7 @@
 return [
     'app' => [
         'name' => 'Webkernel',
+        'locale' => 'en',
         'debug' => false,
         'timezone' => 'Africa/Casablanca',
         'env' => 'prod',

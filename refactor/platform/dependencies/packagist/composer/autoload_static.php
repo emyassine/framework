@@ -24,6 +24,7 @@ class ComposerStaticInitcc6f492cc5d64cb7f09b9024726d6929
             'Webkernel\\Lifecycle\\' => 20,
             'Webkernel\\Imagery\\Tests\\' => 24,
             'Webkernel\\Imagery\\' => 18,
+            'Webkernel\\I18n\\Tests\\' => 21,
             'Webkernel\\' => 10,
         ),
         'P' =>
@@ -99,6 +100,10 @@ class ComposerStaticInitcc6f492cc5d64cb7f09b9024726d6929
         'Webkernel\\Imagery\\' =>
         array (
             0 => __DIR__ . '/..' . '/webkernel/imagery/src',
+        ),
+        'Webkernel\\I18n\\Tests\\' =>
+        array (
+            0 => __DIR__ . '/../../../..' . '/x-webkernel/platform/i18n/tests',
         ),
         'Webkernel\\' =>
         array (
@@ -1839,6 +1844,7 @@ class ComposerStaticInitcc6f492cc5d64cb7f09b9024726d6929
         'Webkernel\\Csrf' => __DIR__ . '/..' . '/webkernel/codebase/src/Csrf.php',
         'Webkernel\\DevEnv\\IdeHelper' => __DIR__ . '/..' . '/webkernel/codebase/src/DevEnv/IdeHelper.php',
         'Webkernel\\Http' => __DIR__ . '/..' . '/webkernel/codebase/src/Http.php',
+        'Webkernel\\I18n\\Tests\\Feature\\FastI18nTest' => __DIR__ . '/../../../..' . '/x-webkernel/platform/i18n/tests/Feature/FastI18nTest.php',
         'Webkernel\\Imagery\\Branding' => __DIR__ . '/..' . '/webkernel/imagery/src/Branding.php',
         'Webkernel\\Imagery\\Http\\Controllers\\BrandingController' => __DIR__ . '/..' . '/webkernel/imagery/src/Http/Controllers/BrandingController.php',
         'Webkernel\\Imagery\\Icon' => __DIR__ . '/..' . '/webkernel/imagery/src/Icon.php',

@@ -10,6 +10,9 @@
         <testsuite name="imagery">
             <directory>x-webkernel/platform/imagery/tests</directory>
         </testsuite>
+        <testsuite name="i18n">
+            <directory>x-webkernel/platform/i18n/tests</directory>
+        </testsuite>
         <testsuite name="lifecycle">
             <directory>x-webkernel/lifecycle/tests</directory>
         </testsuite>
@@ -25,6 +28,7 @@
             <directory>x-webkernel/codebase/src</directory>
             <directory>x-webkernel/lifecycle/Lifecycle</directory>
             <directory>x-webkernel/platform/imagery/src</directory>
+            <directory>x-webkernel/platform/i18n/src</directory>
             <directory>x-webkernel/platform/components/src</directory>
             <directory>x-webkernel/platform/schemas/src</directory>
             <directory>x-webkernel/platform/panels/src</directory>

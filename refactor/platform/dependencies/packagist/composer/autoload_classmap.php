@@ -1689,6 +1689,7 @@ return array(
     'Webkernel\\Csrf' => $vendorDir . '/webkernel/codebase/src/Csrf.php',
     'Webkernel\\DevEnv\\IdeHelper' => $vendorDir . '/webkernel/codebase/src/DevEnv/IdeHelper.php',
     'Webkernel\\Http' => $vendorDir . '/webkernel/codebase/src/Http.php',
+    'Webkernel\\I18n\\Tests\\Feature\\FastI18nTest' => $baseDir . '/x-webkernel/platform/i18n/tests/Feature/FastI18nTest.php',
     'Webkernel\\Imagery\\Branding' => $vendorDir . '/webkernel/imagery/src/Branding.php',
     'Webkernel\\Imagery\\Http\\Controllers\\BrandingController' => $vendorDir . '/webkernel/imagery/src/Http/Controllers/BrandingController.php',
     'Webkernel\\Imagery\\Icon' => $vendorDir . '/webkernel/imagery/src/Icon.php',

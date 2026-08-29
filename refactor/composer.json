@@ -18,6 +18,7 @@
         "psr-4": {
             "Webkernel\\Tests\\": "x-webkernel/codebase/tests/",
             "Webkernel\\Imagery\\Tests\\": "x-webkernel/platform/imagery/tests/",
+            "Webkernel\\I18n\\Tests\\": "x-webkernel/platform/i18n/tests/",
             "Webkernel\\Lifecycle\\Tests\\": "x-webkernel/lifecycle/tests/",
             "Webkernel\\Platform\\Components\\Tests\\": "x-webkernel/platform/components/tests/",
             "Webkernel\\Platform\\Schemas\\Tests\\": "x-webkernel/platform/schemas/tests/"
