@@ -7,5 +7,5 @@
 //> file that was distributed with this source code.
 
 define('START_REQUEST', hrtime(true));
-require __DIR__.'/platform/fast-boot.php';
-\Webkernel\Console::run($argv);
+
+require __DIR__.'/platform/fast-boot.php'; \Webkernel\Console::run($argv);

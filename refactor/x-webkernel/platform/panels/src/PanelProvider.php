@@ -22,6 +22,6 @@ abstract class PanelProvider
             ->dark_mode_brand_logo(Config::get('branding.logo_dark'))
             ->brand_logo_height(Config::get('branding.logo_height', '2rem'))
             ->colors(Config::get('branding.colors', ['primary' => Color::Blue]))
-            ->dark_mode(Config::get('ui.dark_mode', true));
+            ->dark_mode(Config::get('ui.dark_mode', false));
     }
 }
