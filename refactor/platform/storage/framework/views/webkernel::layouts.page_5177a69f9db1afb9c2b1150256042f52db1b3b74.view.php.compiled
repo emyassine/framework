@@ -36,6 +36,7 @@
     <link rel="icon" href="<?php echo \Webkernel\View\View::echo($favicon); ?>" />
   <?php endif; ?>
   <title><?php echo $this->yield_content('title'); ?></title>
+  <?php echo $this->run_child('webkernel::layouts.partials.typography'); ?>
   <?php echo $this->run_child('webkernel::wds.tokens'); ?>
   <?php echo $this->run_child('webkernel::wds.shell'); ?>
   <?php echo  $this->stack('styles'); ?>

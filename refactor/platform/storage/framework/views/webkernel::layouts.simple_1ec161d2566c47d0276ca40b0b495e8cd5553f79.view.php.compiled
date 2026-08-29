@@ -18,6 +18,7 @@
 
   <?php endif; ?>
   <title><?php echo \Webkernel\View\View::echo($title); ?></title>
+  <?php echo $this->run_child('webkernel::layouts.partials.typography'); ?>
   <?php echo $this->run_child('webkernel::wds.tokens'); ?>
   <?php echo $this->run_child('webkernel::wds.simple'); ?>
   <?php echo  $this->stack('styles'); ?>

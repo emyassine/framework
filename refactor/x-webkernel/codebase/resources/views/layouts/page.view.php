@@ -35,6 +35,7 @@
     <link rel="icon" href="{{ $favicon }}" />
   @endif
   <title>@yield('title')</title>
+  @include('webkernel::layouts.partials.typography')
   @include('webkernel::wds.tokens')
   @include('webkernel::wds.shell')
   @stack('styles')

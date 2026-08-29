@@ -18,6 +18,7 @@
     {!! \Webkernel\Csrf::meta() !!}
   @endif
   <title>{{ $title }}</title>
+  @include('webkernel::layouts.partials.typography')
   @include('webkernel::wds.tokens')
   @stack('styles')
   @stack('head')

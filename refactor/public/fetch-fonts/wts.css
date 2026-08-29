@@ -1,0 +1,187 @@
+/* Webkernel Typography System — copied to public/fetch-fonts/wts.css on dump-autoload. */
+
+:root {
+    --prose-color: var(--wds-text, var(--gray-700, #374151));
+    --prose-heading-color: var(--wds-text, var(--gray-950, #030712));
+
+    --wts-font-latin: "DM Sans", ui-sans-serif, system-ui, sans-serif;
+    --wts-font-arabic: "IBM Plex Sans Arabic", "Rubik", "Noto Naskh Arabic", ui-sans-serif, sans-serif;
+    --wts-font-hebrew: "Noto Sans Hebrew", "David Libre", ui-sans-serif, sans-serif;
+    --wts-font-cjk: "Noto Sans JP", "Noto Sans SC", "Noto Sans KR", "Hiragino Sans", "PingFang SC", sans-serif;
+    --wts-font-urdu: "Noto Nastaliq Urdu", "IBM Plex Sans Arabic", ui-sans-serif, sans-serif;
+    --wts-font-mono: "Lilex", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    --wts-font-stack:
+        var(--wts-font-latin),
+        var(--wts-font-arabic),
+        var(--wts-font-hebrew),
+        var(--wts-font-cjk),
+        sans-serif;
+
+    --wts-p-scale: 1.07;
+    --wts-p-scale-rtl: 1.1556;
+    --wts-p-scale-ar: 1.1342;
+    --wts-p-scale-he: 1.1235;
+    --wts-p-scale-fa: 1.1355;
+    --wts-p-scale-ur: 1.1573;
+    --wts-content-scale-rtl: 1.07;
+}
+
+[data-wds-theme="dark"] {
+    --prose-color: var(--wds-text-muted, var(--gray-300, #d1d5db));
+    --prose-heading-color: var(--wds-text, #fff);
+}
+
+html, body {
+    font-family: var(--wts-font-stack);
+    font-optical-sizing: auto;
+    font-weight: 400;
+}
+
+code, kbd, pre, samp {
+    font-family: var(--wts-font-mono);
+}
+
+.wds-header-heading {
+    font-weight: 400;
+    font-family: var(--wts-font-stack);
+}
+
+h1 {
+    font-size: calc(var(--wds-text-3xl, 1.75rem) * 1.5);
+    line-height: 1.2;
+    letter-spacing: -0.025em;
+    font-weight: 400;
+    color: var(--prose-heading-color);
+}
+h2 {
+    font-size: var(--wds-text-2xl, 1.75rem);
+    line-height: 1.33333;
+    letter-spacing: -0.025em;
+    font-weight: 400;
+    color: var(--prose-heading-color);
+}
+h3 {
+    font-size: var(--wds-text-xl, 1.375rem);
+    font-weight: 400;
+    color: var(--prose-heading-color);
+}
+h4 {
+    font-size: var(--wds-text-lg, 1.125rem);
+    font-weight: 400;
+    color: var(--prose-heading-color);
+}
+h5 {
+    font-size: var(--wds-text-base, 0.875rem);
+    font-weight: 400;
+    color: var(--prose-heading-color);
+}
+h6 {
+    font-size: var(--wds-text-sm, 0.8125rem);
+    font-weight: 400;
+    color: var(--prose-heading-color);
+}
+p {
+    font-size: calc(var(--wds-text-sm, 0.8125rem) * var(--wts-p-scale));
+    color: var(--prose-color);
+    font-weight: 400;
+}
+
+[dir="rtl"],
+:lang(ar),
+:lang(fa),
+:lang(ur),
+:lang(he) {
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    direction: rtl;
+    text-align: start;
+}
+
+html[lang|="ar"] .wds-main,
+html[lang|="ar"] .wds-sidebar-nav,
+html[lang|="fa"] .wds-main,
+html[lang|="fa"] .wds-sidebar-nav,
+html[lang|="he"] .wds-main,
+html[lang|="he"] .wds-sidebar-nav,
+html[lang|="ur"] .wds-main,
+html[lang|="ur"] .wds-sidebar-nav,
+html[dir="rtl"] .wds-main,
+html[dir="rtl"] .wds-sidebar-nav {
+    font-size: calc(1em * var(--wts-content-scale-rtl, 1));
+}
+
+:lang(ar),
+:lang(fa),
+html[lang|="ar"],
+html[lang|="fa"] {
+    --wts-font-stack:
+        var(--wts-font-arabic),
+        var(--wts-font-latin),
+        var(--wts-font-hebrew),
+        var(--wts-font-cjk),
+        sans-serif;
+    font-family: var(--wts-font-stack);
+    letter-spacing: 0;
+}
+
+:lang(he),
+html[lang|="he"] {
+    --wts-font-stack:
+        var(--wts-font-hebrew),
+        var(--wts-font-latin),
+        var(--wts-font-arabic),
+        var(--wts-font-cjk),
+        sans-serif;
+    font-family: var(--wts-font-stack);
+}
+
+:lang(ur),
+html[lang|="ur"] {
+    --wts-font-stack:
+        var(--wts-font-urdu),
+        var(--wts-font-arabic),
+        var(--wts-font-latin),
+        sans-serif;
+    font-family: var(--wts-font-stack);
+}
+
+:lang(ar) p,
+html[lang|="ar"] p {
+    font-family: "Rubik", "IBM Plex Sans Arabic", var(--wts-font-latin);
+    font-size: calc(var(--wds-text-sm, 0.8125rem) * var(--wts-p-scale-ar));
+    line-height: 1.9;
+    letter-spacing: 0;
+}
+
+:lang(fa) p,
+html[lang|="fa"] p {
+    font-family: "Rubik", "IBM Plex Sans Arabic", var(--wts-font-latin);
+    font-size: calc(var(--wds-text-sm, 0.8125rem) * var(--wts-p-scale-fa));
+    line-height: 1.9;
+    letter-spacing: 0;
+}
+
+:lang(he) p,
+html[lang|="he"] p {
+    font-size: calc(var(--wds-text-sm, 0.8125rem) * var(--wts-p-scale-he));
+    line-height: 1.7;
+}
+
+:lang(ur) p,
+html[lang|="ur"] p {
+    font-size: calc(var(--wds-text-sm, 0.8125rem) * var(--wts-p-scale-ur));
+    line-height: 2;
+}
+
+:lang(ja),
+:lang(zh),
+:lang(ko),
+html[lang|="ja"],
+html[lang|="zh"],
+html[lang|="ko"] {
+    --wts-font-stack:
+        var(--wts-font-cjk),
+        var(--wts-font-latin),
+        sans-serif;
+    font-family: var(--wts-font-stack);
+}

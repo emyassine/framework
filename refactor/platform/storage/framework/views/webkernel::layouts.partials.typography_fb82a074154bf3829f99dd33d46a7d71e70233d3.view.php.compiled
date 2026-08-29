@@ -1,0 +1,15 @@
+<?php 
+  $wts_fonts = \Webkernel\Typography\TypographySystem::fonts_href();
+  $wts_rules = \Webkernel\Typography\TypographySystem::rules_href();
+  $wts_local = \Webkernel\Typography\TypographySystem::has_local_fonts();
+ ?>
+<?php if($wts_local): ?>
+  <link rel="stylesheet" href="<?php echo \Webkernel\View\View::echo($wts_fonts); ?>" data-wts-fonts="local">
+<?php else: ?>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="<?php echo \Webkernel\View\View::echo($wts_fonts); ?>" rel="stylesheet" data-wts-fonts="cdn">
+<?php endif; ?>
+<?php if($wts_rules !== ''): ?>
+  <link rel="stylesheet" href="<?php echo \Webkernel\View\View::echo($wts_rules); ?>" data-wts-rules>
+<?php endif; ?>
