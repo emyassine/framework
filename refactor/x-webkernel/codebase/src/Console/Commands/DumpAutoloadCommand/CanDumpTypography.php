@@ -7,7 +7,6 @@
 
 namespace Webkernel\Console\Commands\DumpAutoloadCommand;
 
-use Webkernel\DevEnv\IdeHelper;
 use Webkernel\Typography\TypographySystem;
 
 trait CanDumpTypography
@@ -174,7 +173,7 @@ trait CanDumpTypography
     private function typography_css_header(string $note): string
     {
         return "/*\n"
-            .IdeHelper::generated_header()."\n"
+            .self::generated_header()."\n"
             ."//>\n"
             ."//> Generated. Do not edit.\n"
             ."//> ".$note."\n"

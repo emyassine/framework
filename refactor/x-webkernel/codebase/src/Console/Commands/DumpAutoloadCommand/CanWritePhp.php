@@ -7,8 +7,6 @@
 
 namespace Webkernel\Console\Commands\DumpAutoloadCommand;
 
-use Webkernel\DevEnv\IdeHelper;
-
 trait CanWritePhp
 {
     use _DumpAutoloadCommand;
@@ -16,7 +14,7 @@ trait CanWritePhp
     private function write_php(string $path, mixed $data): void
     {
         $export = var_export($data, true);
-        $header = IdeHelper::generated_header();
+        $header = self::generated_header();
         $body = <<<PHP
 <?php declare(strict_types=1);
 {$header}
@@ -36,7 +34,7 @@ PHP;
     {
         $vendor_dir = rtrim(str_replace('\\', '/', $vendor_dir), '/');
         $root = rtrim(str_replace('\\', '/', $root), '/');
-        $header = IdeHelper::generated_header();
+        $header = self::generated_header();
         $lines = [];
 
         foreach ($map as $class => $file) {
@@ -66,7 +64,7 @@ PHP;
     {
         $vendor_dir = rtrim(str_replace('\\', '/', $vendor_dir), '/');
         $root = rtrim(str_replace('\\', '/', $root), '/');
-        $header = IdeHelper::generated_header();
+        $header = self::generated_header();
         $items = [];
         foreach ($files as $file) {
             $items[] = '    '.$this->path_code(str_replace('\\', '/', $file), $vendor_dir, $root).',';
@@ -102,7 +100,7 @@ PHP;
     {
         $vendor_dir = rtrim(str_replace('\\', '/', $vendor_dir), '/');
         $root = rtrim(str_replace('\\', '/', $root), '/');
-        $header = IdeHelper::generated_header();
+        $header = self::generated_header();
         $items = [];
         foreach ($paths as $item) {
             $items[] = '    '.$this->path_code(str_replace('\\', '/', $item), $vendor_dir, $root).',';
@@ -130,7 +128,7 @@ PHP;
     {
         $vendor_dir = rtrim(str_replace('\\', '/', $vendor_dir), '/');
         $root = rtrim(str_replace('\\', '/', $root), '/');
-        $header = IdeHelper::generated_header();
+        $header = self::generated_header();
         $ns_lines = [];
         $dir_lines = [];
         foreach ($namespaces as $namespace => $dirs) {
@@ -168,7 +166,7 @@ PHP;
      */
     private function write_class_list(string $path, array $classes): void
     {
-        $header = IdeHelper::generated_header();
+        $header = self::generated_header();
         $lines = [];
         foreach ($classes as $class) {
             $lines[] = '    \\'.$class.'::class,';
@@ -192,7 +190,7 @@ PHP;
      */
     private function write_composables(string $path, array $map): void
     {
-        $header = IdeHelper::generated_header();
+        $header = self::generated_header();
         $lines = [];
         foreach ($map as $name => $class) {
             $lines[] = '    '.var_export($name, true).' => \\'.$class.'::class,';
@@ -217,7 +215,7 @@ PHP;
     private function write_webapp_ide(array $map): void
     {
         $path = $this->codebase_root().'/_ide_helpers/_ide_webapp.php';
-        $header = IdeHelper::generated_header();
+        $header = self::generated_header();
         $methods = [
             '     * @method \Webkernel\Composables\ConfigComposable|mixed config(?string $key = null, mixed $default = null)',
         ];

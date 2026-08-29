@@ -7,7 +7,6 @@
 
 namespace Webkernel\Platform;
 
-use Webkernel\Platform\System\SystemPanelProvider;
 use Webkernel\PlatformProvider;
 
 final class PanelsProvider extends PlatformProvider
@@ -17,6 +16,4 @@ final class PanelsProvider extends PlatformProvider
     ];
 
     public const LANG_PATH = [__DIR__.'/../lang'];
-
-    public const PANELS = [SystemPanelProvider::class];
 }

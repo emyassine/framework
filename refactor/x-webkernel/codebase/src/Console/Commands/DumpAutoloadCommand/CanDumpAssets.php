@@ -11,7 +11,6 @@ use FilesystemIterator;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 
-use Webkernel\DevEnv\IdeHelper;
 use Webkernel\Platform\Colors\Color;
 use Webkernel\Platform\Wds;
 
@@ -20,7 +19,7 @@ trait CanDumpAssets
     use _DumpAutoloadCommand;
 
     /** @var list<string> */
-    private const WDS_CSS_ORDER = ['tokens', 'shell', 'simple', 'btn', 'page', 'field'];
+    private const WDS_CSS_ORDER = ['tokens', 'shell', 'simple'];
 
     /**
      * @param list<array{path: string, package: array<string, mixed>}> $packages
@@ -195,7 +194,7 @@ trait CanDumpAssets
             return;
         }
         $header = "/*\n"
-            .IdeHelper::generated_header()."\n"
+            .self::generated_header()."\n"
             ."//>\n"
             ."//> Generated. Do not edit.\n"
             ."//> WDS chrome. Source: resources/views/wds/*.view.php\n"
@@ -264,7 +263,49 @@ trait CanDumpAssets
         }
         \ksort($named);
 
-        return [...$ordered, ...\array_values($named)];
+        return [...$ordered, ...\array_values($named), ...$this->component_css_parts($providers)];
+    }
+
+    /**
+     * `<style>` blocks colocated on component views. Source of truth is the view file.
+     *
+     * @param $providers list<array{class: class-string, prefix: string, path: string}>
+     *
+     * @return list<string>
+     */
+    private function component_css_parts(array $providers): array
+    {
+        /** @var array<string, true> $seen */
+        $seen = [];
+        $parts = [];
+        foreach ($this->collect_provider_paths($providers, 'COMPONENTS') as $dirs) {
+            foreach ($dirs as $dir) {
+                $dir = \rtrim(\str_replace('\\', '/', $dir), '/');
+                if (! \is_dir($dir)) {
+                    continue;
+                }
+                $it = new RecursiveIteratorIterator(
+                    new RecursiveDirectoryIterator($dir, FilesystemIterator::SKIP_DOTS),
+                );
+                foreach ($it as $file) {
+                    if (! $file->isFile() || ! \str_ends_with($file->getFilename(), '.view.php')) {
+                        continue;
+                    }
+                    $path = \str_replace('\\', '/', $file->getPathname());
+                    if (\str_contains($path, '/wds/') || isset($seen[$path])) {
+                        continue;
+                    }
+                    $css = $this->wds_style_from_view($path);
+                    if ($css === '') {
+                        continue;
+                    }
+                    $seen[$path] = true;
+                    $parts[] = $css;
+                }
+            }
+        }
+
+        return $parts;
     }
 
     /**
@@ -283,8 +324,14 @@ trait CanDumpAssets
             $src = $stripped;
         }
         $src = \str_replace(
-            '{!! \\Webkernel\\Platform\\Colors\\Color::root_css() !!}',
-            Color::root_css(),
+            [
+                '{!! \\Webkernel\\Platform\\Colors\\Color::root_css() !!}',
+                '{!! \\Webkernel\\Platform\\Colors\\Color::dark_root_css() !!}',
+            ],
+            [
+                Color::root_css(),
+                Color::dark_root_css(),
+            ],
             $src,
         );
         if (\preg_match_all('/<style\b[^>]*>(.*?)<\/style>/s', $src, $matches) < 1) {

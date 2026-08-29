@@ -1,5 +1,6 @@
 {{--
   WDS tokens + palettes + reset. Always in <head>. Critical path only.
+  Text and surfaces use semantic aliases so dark mode inverts stops.
 --}}
 <style>
 :root {
@@ -9,6 +10,7 @@
   --wds-rail-width: 60px;
   --wds-nav-width: clamp(280px, 16vw, 340px);
   --wds-nav-width-collapsed: 0px;
+  --wds-aside-width: 20rem;
   --wds-radius: 6px;
   --wds-radius-lg: 0.75rem;
   --wds-radius-full: 9999px;
@@ -23,36 +25,27 @@
   --wds-text-2xl: 1.625rem;
   --wds-transition: 180ms ease;
 
-  --wds-bg: hsl(220 20% 97%);
-  --wds-bg-subtle: hsl(220 16% 94%);
-  --wds-surface: #fff;
-  --wds-border: hsl(220 16% 88%);
-  --wds-border-strong: hsl(220 12% 78%);
-  --wds-text: hsl(220 20% 16%);
-  --wds-text-muted: hsl(220 10% 42%);
-  --wds-text-faint: hsl(220 8% 58%);
+  --wds-bg: var(--gray-50);
+  --wds-bg-subtle: var(--gray-100);
+  --wds-surface: var(--gray-50);
+  --wds-border: var(--gray-200);
+  --wds-border-strong: var(--gray-300);
+  --wds-text: var(--gray-900);
+  --wds-text-muted: var(--gray-600);
+  --wds-text-faint: var(--gray-500);
 
-  --wds-rail-bg: #0e1d30;
-  --wds-nav-bg: oklch(0.247 0.012 260);
-  --wds-nav-text: oklch(0.73 0.016 260);
+  --wds-rail-bg: var(--color-gray-950);
+  --wds-nav-bg: var(--color-gray-900);
+  --wds-nav-text: var(--color-gray-400);
 }
 
 [data-wds-theme="dark"] {
-  --wds-bg: hsl(220 18% 8%);
-  --wds-bg-subtle: hsl(220 16% 12%);
-  --wds-surface: hsl(220 16% 11%);
-  --wds-border: hsl(220 12% 18%);
-  --wds-border-strong: hsl(220 10% 26%);
-  --wds-text: hsl(220 16% 92%);
-  --wds-text-muted: hsl(220 10% 64%);
-  --wds-text-faint: hsl(220 8% 48%);
-  --wds-nav-bg: oklch(0.22 0.012 260);
-  --wds-nav-text: oklch(0.78 0.014 260);
-  --primary-50: var(--color-blue-950);
+{!! \Webkernel\Platform\Colors\Color::dark_root_css() !!}
 }
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html { font-size: 16px; }
+html { font-size: 16px; color-scheme: light; }
+[data-wds-theme="dark"] { color-scheme: dark; }
 body {
   font-family: var(--wds-font-sans);
   font-size: 14px;
@@ -63,7 +56,7 @@ body {
   overflow-x: hidden;
 }
 a { color: inherit; text-decoration: none; }
-button { cursor: pointer; font: inherit; border: none; background: none; }
+button { cursor: pointer; font: inherit; border: none; background: none; color: inherit; }
 svg { display: block; flex-shrink: 0; }
 ul { list-style: none; }
 

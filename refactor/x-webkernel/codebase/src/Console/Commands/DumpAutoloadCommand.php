@@ -13,8 +13,8 @@ use Webkernel\Console\Commands\DumpAutoloadCommand\{
 	CanDumpTypography, CanStampPlatform, CanWritePhp,
 	HasPackages, HasPaths, HasProviders, _DumpAutoloadCommand
 };
+use Webkernel\Console\DumpHook;
 use Webkernel\Console\ExitCode;
-use Webkernel\DevEnv\IdeHelper;
 use Webkernel\Instance\InstanceId;
 
 /**
@@ -145,23 +145,45 @@ final readonly class DumpAutoloadCommand
         $this->ensure_path_helpers();
         $this->rebuild_compiled_routes($composer_dir);
         $this->compile_views($providers, $root, $vendor_dir);
+        $this->run_dump_hooks($packages, $vendor_dir);
 
         $io = $this->terminal();
         $io->success('wrote composer/'.self::BOOT_BASENAME.' (instance '.$instance_id.')');
 
-        try {
-            $ide = IdeHelper::generate($vendor_dir);
-            $io->info(\sprintf(
-                'ide helper %s (%d classes, %d bytes%s)',
-                $ide['path'],
-                $ide['classes'],
-                $ide['bytes'],
-                $ide['skipped'] ? ', unchanged' : '',
-            ));
-        } catch (\Throwable $e) {
-            $io->warning('ide helper: '.$e->getMessage());
-        }
-
         return ExitCode::SUCCESS;
+    }
+
+    /**
+     * @param $packages list<array{path: string, package: array<string, mixed>}>
+     * @param $vendor_dir string
+     *
+     * @return void
+     */
+    private function run_dump_hooks(array $packages, string $vendor_dir): void
+    {
+        foreach ($packages as $row) {
+            $target = $this->extra($row['package'])['post_autoload_dump'] ?? '';
+            if (! \is_string($target) || $target === '' || $target === self::class) {
+                continue;
+            }
+            $class = \str_contains($target, '::') ? \explode('::', $target, 2)[0] : $target;
+            if (! \class_exists($class)) {
+                $this->terminal()->warning('dump hook missing: '.$class);
+
+                continue;
+            }
+            if (! \is_a($class, DumpHook::class, true)) {
+                $this->terminal()->warning($class.' must implement '.DumpHook::class);
+
+                continue;
+            }
+            try {
+                /** @var DumpHook $hook */
+                $hook = new $class();
+                $hook->run($vendor_dir);
+            } catch (\Throwable $e) {
+                $this->terminal()->warning($class.': '.$e->getMessage());
+            }
+        }
     }
 }

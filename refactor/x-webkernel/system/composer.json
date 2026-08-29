@@ -1,31 +1,30 @@
 {
     "$schema": "https://getcomposer.org/schema.json",
-    "name": "webkernel/panels",
-    "description": "Webkernel admin chrome: Panel, Resource, Page, Table, Wds.",
+    "name": "webkernel/system",
+    "description": "Webkernel System admin panel and its resources.",
     "version": "0.12.0",
     "type": "webkernel-stdlib",
     "license": "proprietary",
     "require": {
         "php": ">=8.5",
         "webkernel/codebase": "^0.12.0",
-        "webkernel/components": "^0.12.0",
-        "webkernel/schemas": "^0.12.0"
+        "webkernel/panels": "^0.12.0"
     },
     "autoload": {
         "psr-4": {
-            "Webkernel\\Platform\\": "src/"
+            "Webkernel\\System\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Webkernel\\Platform\\Tests\\": "tests/"
+            "Webkernel\\System\\Tests\\": "tests/"
         }
     },
     "extra": {
         "webkernel": {
-            "package_repo": "git@github.com:webkernelphp/panels.git",
+            "package_repo": "git@github.com:webkernelphp/system.git",
             "production": true,
-            "provider": "Webkernel\\Platform\\PanelsProvider",
+            "provider": "Webkernel\\System\\SystemProvider",
             "prefix": "webkernel"
         }
     },

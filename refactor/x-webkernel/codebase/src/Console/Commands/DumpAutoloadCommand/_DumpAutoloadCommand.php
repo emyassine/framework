@@ -12,6 +12,24 @@ namespace Webkernel\Console\Commands\DumpAutoloadCommand;
  */
 trait _DumpAutoloadCommand
 {
+    /**
+     * Attribution block for generated dumps.
+     *
+     * @return string
+     */
+    public static function generated_header(): string
+    {
+        $end = ((int) \date('Y')) + 1;
+
+        return \implode("\n", [
+            '//> This file is part of Webkernel.',
+            '//> (c) 2025 - '.$end.' Numerimondes, El Moumen Yassine',
+            '//> Yassine El Moumen <yassine@numerimondes.com> | <platform@webkernelphp.com>',
+            '//> For the full copyright and license information, please view the LICENSE',
+            '//> file that was distributed with this source code.',
+        ]);
+    }
+
     private const PANEL_CLASS = 'Webkernel\\Platform\\Panel';
 
     private const PANEL_PROVIDER_CLASS = 'Webkernel\\Platform\\PanelProvider';

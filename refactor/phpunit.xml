@@ -25,6 +25,9 @@
         <testsuite name="panels">
             <directory>x-webkernel/platform/panels/tests</directory>
         </testsuite>
+        <testsuite name="system">
+            <directory>x-webkernel/system/tests</directory>
+        </testsuite>
     </testsuites>
     <source>
         <include>
@@ -35,6 +38,8 @@
             <directory>x-webkernel/platform/components/src</directory>
             <directory>x-webkernel/platform/schemas/src</directory>
             <directory>x-webkernel/platform/panels/src</directory>
+            <directory>x-webkernel/system/src</directory>
+            <directory>x-webkernel/devtools/src</directory>
             <directory>modules</directory>
         </include>
     </source>

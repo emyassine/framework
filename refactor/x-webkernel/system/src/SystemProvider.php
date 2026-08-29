@@ -5,10 +5,15 @@
 //> For the full copyright and license information, please view the LICENSE
 //> file that was distributed with this source code.
 
-namespace Webkernel\DevTools;
+namespace Webkernel\System;
 
 use Webkernel\PlatformProvider;
 
-final class DevToolsProvider extends PlatformProvider
+final class SystemProvider extends PlatformProvider
 {
+    public const VIEWS = [
+        'webkernel' => __DIR__.'/../resources/views',
+    ];
+
+    public const PANELS = [SystemPanelProvider::class];
 }

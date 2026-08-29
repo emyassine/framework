@@ -466,4 +466,63 @@ final class Color
 
         return $css;
     }
+
+    /**
+     * Dark mode remaps semantic stops (50 <-> 950, …). Text using `--gray-900` inverts.
+     *
+     * @return string
+     */
+    public static function dark_root_css(): string
+    {
+        $css = '';
+        foreach (self::semantic_palettes() as $alias => $palette) {
+            $css .= self::inverted_alias($alias, $palette);
+        }
+
+        return $css;
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    public static function semantic_palettes(): array
+    {
+        return [
+            'primary' => 'blue',
+            'gray' => 'gray',
+            'danger' => 'red',
+            'success' => 'green',
+            'warning' => 'amber',
+            'info' => 'blue',
+        ];
+    }
+
+    /**
+     * @param $alias string
+     * @param $palette string
+     *
+     * @return string
+     */
+    public static function inverted_alias(string $alias, string $palette): string
+    {
+        $invert = [
+            50 => 950,
+            100 => 900,
+            200 => 800,
+            300 => 700,
+            400 => 600,
+            500 => 500,
+            600 => 400,
+            700 => 300,
+            800 => 200,
+            900 => 100,
+            950 => 50,
+        ];
+        $css = '';
+        foreach ($invert as $stop => $from) {
+            $css .= '--'.$alias.'-'.$stop.': var(--color-'.$palette.'-'.$from.');'."\n";
+        }
+
+        return $css;
+    }
 }

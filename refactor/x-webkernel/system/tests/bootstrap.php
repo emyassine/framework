@@ -5,10 +5,9 @@
 //> For the full copyright and license information, please view the LICENSE
 //> file that was distributed with this source code.
 
-namespace Webkernel\DevTools;
-
-use Webkernel\PlatformProvider;
-
-final class DevToolsProvider extends PlatformProvider
-{
+if (! \defined('START_REQUEST')) {
+    \define('START_REQUEST', \hrtime(true));
 }
+
+$root = \dirname(__DIR__, 4);
+require $root.'/platform/fast-boot.php';

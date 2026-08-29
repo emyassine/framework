@@ -1,14 +1,11 @@
 {
     "$schema": "https://getcomposer.org/schema.json",
     "name": "webkernel/devtools",
-    "description": "Webkernel devlopper tools",
-    "type": "library",
+    "description": "Webkernel developer tools",
+    "type": "webkernel-devtool",
     "license": "proprietary",
     "version": "0.12.0",
     "autoload": {
-        "files": [
-            "namespacer.php"
-        ],
         "psr-4": {
             "Webkernel\\DevTools\\": "src/"
         }
@@ -20,21 +17,16 @@
     },
     "require": {
         "php": ">=8.5",
-        "psr/cache": "^3.0",
-        "psr/clock": "^1.0",
-        "psr/container": "^2.0",
-        "psr/http-message": "^2.0",
-        "psr/log": "^3.0",
-        "psr/simple-cache": "^3.0",
+        "webkernel/codebase": "^0.12.0",
         "webkernel/lifecycle": "^0.12.0"
     },
     "extra": {
         "webkernel": {
-            "package_repo": "git@github.com:webkernelphp/codebase.git",
-            "production": true,
-            "provider": "Webkernel\\DevToolsProvider",
-            "prefix": "webkernel",
-            "post_autoload_dump": ""
+            "package_repo": "git@github.com:webkernelphp/devtools.git",
+            "production": false,
+            "provider": "Webkernel\\DevTools\\DevToolsProvider",
+            "prefix": "devtools",
+            "post_autoload_dump": "Webkernel\\DevTools\\IdeHelper"
         }
     },
     "config": {

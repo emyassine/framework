@@ -25,6 +25,8 @@ use Webkernel\Console\Middleware\ConsoleMiddleware;
  *   method: string,
  *   description: string,
  *   middleware: list<class-string>,
+ *   aliases: list<string>,
+ *   hidden: bool,
  *   reflection: \ReflectionMethod
  * }
  *
@@ -125,16 +127,24 @@ final class Dispatcher implements ComposableContract
                 /** @var ConsoleCommand $attribute */
                 $attribute = $attrs[0]->newInstance();
                 $command_name = self::command_name($ref, $method, $attribute);
-                if (isset($out[$command_name])) {
-                    throw new \RuntimeException('Duplicate console command ['.$command_name.'].');
-                }
-                $out[$command_name] = [
+                $definition = [
                     'class' => $class,
                     'method' => $method->getName(),
                     'description' => $attribute->description,
                     'middleware' => $attribute->middleware,
+                    'aliases' => $attribute->aliases,
+                    'hidden' => $attribute->hidden,
                     'reflection' => $method,
                 ];
+                foreach ([$command_name, ...$attribute->aliases] as $name) {
+                    if ($name === '') {
+                        continue;
+                    }
+                    if (isset($out[$name])) {
+                        throw new \RuntimeException('Duplicate console command ['.$name.'].');
+                    }
+                    $out[$name] = $definition;
+                }
             }
         }
         \ksort($out);
@@ -352,6 +362,9 @@ final class Dispatcher implements ComposableContract
             $width = \max($width, \strlen($name));
         }
         foreach ($definitions as $name => $definition) {
+            if ($definition['hidden'] || \in_array($name, $definition['aliases'], true)) {
+                continue;
+            }
             $pad = \str_repeat(' ', $width - \strlen($name) + 3);
             $desc = $definition['description'] !== '' ? $definition['description'] : $this->signature_hint($definition['reflection']);
             echo '  '.Terminal::CYAN.$name.Terminal::RESET.$pad.Terminal::muted($desc)."\n";

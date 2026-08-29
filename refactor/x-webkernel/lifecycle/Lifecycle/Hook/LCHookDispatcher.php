@@ -7,10 +7,13 @@
 
 namespace Webkernel\Lifecycle\Hook;
 
+use Webkernel\Console\DumpHook;
+
 /**
  * Runs extra.webkernel.{event} callables declared on installed packages.
  *
  * //> webkernel/codebase runs first so dump-autoload exists for later hooks.
+ * //> DumpHook classes are injected by DumpAutoloadCommand, not here.
  */
 final class LCHookDispatcher
 {
@@ -69,6 +72,9 @@ final class LCHookDispatcher
         }
         if (! \class_exists($class)) {
             throw new \RuntimeException('Webkernel lifecycle hook class not found: '.$class);
+        }
+        if (\is_a($class, DumpHook::class, true)) {
+            return;
         }
         if (! \method_exists($class, $method)) {
             throw new \RuntimeException('Webkernel lifecycle hook method not found: '.$target);

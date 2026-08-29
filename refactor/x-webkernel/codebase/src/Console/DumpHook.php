@@ -5,10 +5,19 @@
 //> For the full copyright and license information, please view the LICENSE
 //> file that was distributed with this source code.
 
-namespace Webkernel\DevTools;
+namespace Webkernel\Console;
 
-use Webkernel\PlatformProvider;
-
-final class DevToolsProvider extends PlatformProvider
+/**
+ * Extra.webkernel.post_autoload_dump FQCN. Dump-autoload injects and runs these.
+ *
+ * //> DumpAutoloadCommand is the orchestrator, not a DumpHook.
+ */
+interface DumpHook
 {
+    /**
+     * @param $vendor_dir string
+     *
+     * @return void
+     */
+    public function run(string $vendor_dir): void;
 }

@@ -17,14 +17,18 @@ namespace Webkernel\Console\Attribute;
 final readonly class ConsoleCommand
 {
     /**
-     * @param string|null    $name
-     * @param string         $description
-     * @param MiddlewareList $middleware
+     * @param $name string|null
+     * @param $description string
+     * @param $middleware MiddlewareList
+     * @param $aliases list<string>
+     * @param $hidden bool
      */
     public function __construct(
         public ?string $name = null,
         public string $description = '',
         public array $middleware = [],
+        public array $aliases = [],
+        public bool $hidden = false,
     ) {
     }
 }

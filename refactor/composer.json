@@ -22,7 +22,9 @@
             "Webkernel\\Lifecycle\\Tests\\": "x-webkernel/lifecycle/tests/",
             "Webkernel\\Platform\\Components\\Tests\\": "x-webkernel/platform/components/tests/",
             "Webkernel\\Platform\\Schemas\\Tests\\": "x-webkernel/platform/schemas/tests/",
-            "Webkernel\\Platform\\Tests\\": "x-webkernel/platform/panels/tests/"
+            "Webkernel\\Platform\\Tests\\": "x-webkernel/platform/panels/tests/",
+            "Webkernel\\System\\Tests\\": "x-webkernel/system/tests/",
+            "Webkernel\\DevTools\\Tests\\": "x-webkernel/devtools/tests/"
         }
     },
     "minimum-stability": "stable",
@@ -92,7 +94,8 @@
 	    "webkernel/platform": "^0.12.0"
 	},
 	"require-dev": {
-        "phpunit/phpunit": "^11.5"
+        "phpunit/phpunit": "^11.5",
+        "webkernel/devtools": "^0.12.0"
     },
     "scripts": {
 	        "dump-autoload": ["composer dump-autoload -o",
