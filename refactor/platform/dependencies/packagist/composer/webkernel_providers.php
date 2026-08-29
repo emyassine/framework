@@ -11,7 +11,9 @@ return [
     \Acme\Billing\BillingProvider::class,
     \Webkernel\CodebaseProvider::class,
     \Webkernel\Platform\Components\ComponentsProvider::class,
+    \Webkernel\DevTools\DevToolsProvider::class,
     \Webkernel\I18n\I18nProvider::class,
     \Webkernel\Imagery\ImageryProvider::class,
     \Webkernel\Platform\PanelsProvider::class,
+    \Webkernel\System\SystemProvider::class,
 ];

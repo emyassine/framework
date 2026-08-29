@@ -22,12 +22,13 @@ final class EditInvoice extends Page
     private ?Invoice $invoice = null;
 
     /**
-     * @param $record string
+     * @param $arguments mixed
      *
      * @return string
      */
-    public function __invoke(string $record): string
+    public function __invoke(mixed ...$arguments): string
     {
+        $record = (string) ($arguments[0] ?? '');
         $invoice = InvoiceStore::find($record);
         if ($invoice === null) {
             \http_response_code(404);

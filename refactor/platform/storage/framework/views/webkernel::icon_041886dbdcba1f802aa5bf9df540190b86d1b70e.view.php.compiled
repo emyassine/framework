@@ -1,0 +1,10 @@
+<?php  $__props = [
+  'name' => '',
+  'set' => 'lucide',
+]; foreach ($__props as $__n => $__d) { if (!isset($$__n)) { $$__n = $__d; } } $attributes = (isset($attributes) && $attributes instanceof \Webkernel\View\AttributeBag ? $attributes : new \Webkernel\View\AttributeBag([]))->except(\array_keys($__props)); unset($__props, $__n, $__d); ?>
+<?php 
+  $markup = \function_exists('icon')
+      ? icon((string) $name, 'wds-icon-svg', '', (string) $set)
+      : '';
+ ?>
+<span class="wds-icon"><?php echo $markup; ?></span>

@@ -14,6 +14,8 @@ class ComposerStaticInitcc6f492cc5d64cb7f09b9024726d6929
         'W' =>
         array (
             'Webkernel\\Tests\\' => 16,
+            'Webkernel\\System\\Tests\\' => 23,
+            'Webkernel\\System\\' => 17,
             'Webkernel\\Platform\\Tests\\' => 25,
             'Webkernel\\Platform\\Schemas\\Tests\\' => 33,
             'Webkernel\\Platform\\Schemas\\' => 27,
@@ -26,6 +28,8 @@ class ComposerStaticInitcc6f492cc5d64cb7f09b9024726d6929
             'Webkernel\\Imagery\\' => 18,
             'Webkernel\\I18n\\Tests\\' => 21,
             'Webkernel\\I18n\\' => 15,
+            'Webkernel\\DevTools\\Tests\\' => 25,
+            'Webkernel\\DevTools\\' => 19,
             'Webkernel\\' => 10,
         ),
         'P' =>
@@ -61,6 +65,14 @@ class ComposerStaticInitcc6f492cc5d64cb7f09b9024726d6929
         'Webkernel\\Tests\\' =>
         array (
             0 => __DIR__ . '/../../../..' . '/x-webkernel/codebase/tests',
+        ),
+        'Webkernel\\System\\Tests\\' =>
+        array (
+            0 => __DIR__ . '/../../../..' . '/x-webkernel/system/tests',
+        ),
+        'Webkernel\\System\\' =>
+        array (
+            0 => __DIR__ . '/..' . '/webkernel/system/src',
         ),
         'Webkernel\\Platform\\Tests\\' =>
         array (
@@ -109,6 +121,14 @@ class ComposerStaticInitcc6f492cc5d64cb7f09b9024726d6929
         'Webkernel\\I18n\\' =>
         array (
             0 => __DIR__ . '/..' . '/webkernel/i18n/src',
+        ),
+        'Webkernel\\DevTools\\Tests\\' =>
+        array (
+            0 => __DIR__ . '/../../../..' . '/x-webkernel/devtools/tests',
+        ),
+        'Webkernel\\DevTools\\' =>
+        array (
+            0 => __DIR__ . '/..' . '/webkernel/devtools/src',
         ),
         'Webkernel\\' =>
         array (
@@ -1850,6 +1870,7 @@ class ComposerStaticInitcc6f492cc5d64cb7f09b9024726d6929
         'Webkernel\\Console\\Commands\\ServerCommand' => __DIR__ . '/..' . '/webkernel/codebase/src/Console/Commands/ServerCommand.php',
         'Webkernel\\Console\\Commands\\ServerCommand\\Engine' => __DIR__ . '/..' . '/webkernel/codebase/src/Console/Commands/ServerCommand/Engine.php',
         'Webkernel\\Console\\Dispatcher' => __DIR__ . '/..' . '/webkernel/codebase/src/Console/Dispatcher.php',
+        'Webkernel\\Console\\DumpHook' => __DIR__ . '/..' . '/webkernel/codebase/src/Console/DumpHook.php',
         'Webkernel\\Console\\ExitCode' => __DIR__ . '/..' . '/webkernel/codebase/src/Console/ExitCode.php',
         'Webkernel\\Console\\IncludeClock' => __DIR__ . '/..' . '/webkernel/codebase/src/Console/IncludeClock.php',
         'Webkernel\\Console\\Input\\ArgvInput' => __DIR__ . '/..' . '/webkernel/codebase/src/Console/Input/ArgvInput.php',
@@ -1857,9 +1878,11 @@ class ComposerStaticInitcc6f492cc5d64cb7f09b9024726d6929
         'Webkernel\\Console\\Prompt' => __DIR__ . '/..' . '/webkernel/codebase/src/Console/Prompt.php',
         'Webkernel\\Console\\Terminal' => __DIR__ . '/..' . '/webkernel/codebase/src/Console/Terminal.php',
         'Webkernel\\Csrf' => __DIR__ . '/..' . '/webkernel/codebase/src/Csrf.php',
-        'Webkernel\\DevEnv\\IdeHelper' => __DIR__ . '/..' . '/webkernel/codebase/src/DevEnv/IdeHelper.php',
+        'Webkernel\\DevTools\\DevToolsProvider' => __DIR__ . '/..' . '/webkernel/devtools/src/DevToolsProvider.php',
+        'Webkernel\\DevTools\\IdeHelper' => __DIR__ . '/..' . '/webkernel/devtools/src/IdeHelper.php',
         'Webkernel\\Http' => __DIR__ . '/..' . '/webkernel/codebase/src/Http.php',
         'Webkernel\\I18n\\Catalog' => __DIR__ . '/..' . '/webkernel/i18n/src/Catalog.php',
+        'Webkernel\\I18n\\Http\\SwitchLocale' => __DIR__ . '/..' . '/webkernel/i18n/src/Http/SwitchLocale.php',
         'Webkernel\\I18n\\I18nContext' => __DIR__ . '/..' . '/webkernel/i18n/src/I18nContext.php',
         'Webkernel\\I18n\\I18nProvider' => __DIR__ . '/..' . '/webkernel/i18n/src/I18nProvider.php',
         'Webkernel\\I18n\\Support\\LocaleDirection' => __DIR__ . '/..' . '/webkernel/i18n/src/Support/LocaleDirection.php',
@@ -1890,11 +1913,17 @@ class ComposerStaticInitcc6f492cc5d64cb7f09b9024726d6929
         'Webkernel\\Platform\\Components\\ComponentsProvider' => __DIR__ . '/..' . '/webkernel/components/src/ComponentsProvider.php',
         'Webkernel\\Platform\\Components\\IconPosition' => __DIR__ . '/..' . '/webkernel/components/src/IconPosition.php',
         'Webkernel\\Platform\\Components\\Size' => __DIR__ . '/..' . '/webkernel/components/src/Size.php',
+        'Webkernel\\Platform\\Components\\Tabs' => __DIR__ . '/..' . '/webkernel/components/src/Tabs.php',
+        'Webkernel\\Platform\\Components\\TabsItem' => __DIR__ . '/..' . '/webkernel/components/src/TabsItem.php',
+        'Webkernel\\Platform\\Components\\TabsPanel' => __DIR__ . '/..' . '/webkernel/components/src/TabsPanel.php',
         'Webkernel\\Platform\\Components\\Tests\\Feature\\ButtonTest' => __DIR__ . '/../../../..' . '/x-webkernel/platform/components/tests/Feature/ButtonTest.php',
+        'Webkernel\\Platform\\Components\\Tests\\Feature\\TabsTest' => __DIR__ . '/../../../..' . '/x-webkernel/platform/components/tests/Feature/TabsTest.php',
         'Webkernel\\Platform\\Components\\TextInput' => __DIR__ . '/..' . '/webkernel/components/src/TextInput.php',
         'Webkernel\\Platform\\Http\\Middleware\\Authenticate' => __DIR__ . '/..' . '/webkernel/panels/src/Http/Middleware/Authenticate.php',
         'Webkernel\\Platform\\Pages\\Dashboard' => __DIR__ . '/..' . '/webkernel/panels/src/Pages/Dashboard.php',
         'Webkernel\\Platform\\Pages\\ManagePanel' => __DIR__ . '/..' . '/webkernel/panels/src/Pages/ManagePanel.php',
+        'Webkernel\\Platform\\Pages\\Page' => __DIR__ . '/..' . '/webkernel/panels/src/Pages/Page.php',
+        'Webkernel\\Platform\\Pages\\PanelHome' => __DIR__ . '/..' . '/webkernel/panels/src/Pages/PanelHome.php',
         'Webkernel\\Platform\\Panel' => __DIR__ . '/..' . '/webkernel/panels/src/Panel.php',
         'Webkernel\\Platform\\PanelProvider' => __DIR__ . '/..' . '/webkernel/panels/src/PanelProvider.php',
         'Webkernel\\Platform\\PanelsProvider' => __DIR__ . '/..' . '/webkernel/panels/src/PanelsProvider.php',
@@ -1902,7 +1931,6 @@ class ComposerStaticInitcc6f492cc5d64cb7f09b9024726d6929
         'Webkernel\\Platform\\Schemas\\Schema' => __DIR__ . '/..' . '/webkernel/schemas/src/Schema.php',
         'Webkernel\\Platform\\Schemas\\SchemaMode' => __DIR__ . '/..' . '/webkernel/schemas/src/SchemaMode.php',
         'Webkernel\\Platform\\Schemas\\Tests\\Feature\\SchemaTest' => __DIR__ . '/../../../..' . '/x-webkernel/platform/schemas/tests/Feature/SchemaTest.php',
-        'Webkernel\\Platform\\System\\SystemPanelProvider' => __DIR__ . '/..' . '/webkernel/panels/src/System/SystemPanelProvider.php',
         'Webkernel\\Platform\\Tables\\Table' => __DIR__ . '/..' . '/webkernel/panels/src/Tables/Table.php',
         'Webkernel\\Platform\\Tests\\Feature\\PanelProviderTest' => __DIR__ . '/../../../..' . '/x-webkernel/platform/panels/tests/Feature/PanelProviderTest.php',
         'Webkernel\\Platform\\Wds' => __DIR__ . '/..' . '/webkernel/panels/src/Wds.php',
@@ -1922,6 +1950,9 @@ class ComposerStaticInitcc6f492cc5d64cb7f09b9024726d6929
         'Webkernel\\Route\\Route' => __DIR__ . '/..' . '/webkernel/codebase/src/Route/Route.php',
         'Webkernel\\Route\\Uri\\Uri' => __DIR__ . '/..' . '/webkernel/codebase/src/Route/Uri/Uri.php',
         'Webkernel\\Route\\Uri\\UriException' => __DIR__ . '/..' . '/webkernel/codebase/src/Route/Uri/UriException.php',
+        'Webkernel\\System\\Pages\\Dashboard' => __DIR__ . '/..' . '/webkernel/system/src/Pages/Dashboard.php',
+        'Webkernel\\System\\SystemPanelProvider' => __DIR__ . '/..' . '/webkernel/system/src/SystemPanelProvider.php',
+        'Webkernel\\System\\SystemProvider' => __DIR__ . '/..' . '/webkernel/system/src/SystemProvider.php',
         'Webkernel\\Tests\\Feature\\AttributeBagTest' => __DIR__ . '/../../../..' . '/x-webkernel/codebase/tests/Feature/AttributeBagTest.php',
         'Webkernel\\Tests\\Feature\\AttributionTest' => __DIR__ . '/../../../..' . '/x-webkernel/codebase/tests/Feature/AttributionTest.php',
         'Webkernel\\Tests\\Feature\\CompilerTest' => __DIR__ . '/../../../..' . '/x-webkernel/codebase/tests/Feature/CompilerTest.php',

@@ -10,7 +10,10 @@
     <?php echo $this->render_component(); ?>
     <?php  $this->start_component('webkernel::table.body',[]); ?>
       <?php foreach($invoices as $invoice): ?>
-        <?php  $this->start_component('webkernel::table.row',['href'=>]); ?>id.'/edit'">
+        <?php 
+          $edit_href = '/billing/invoices/'.$invoice->id.'/edit';
+         ?>
+        <?php  $this->start_component('webkernel::table.row',['href'=>$edit_href]); ?>
           <?php foreach($columns as $column): ?>
             <?php  $this->start_component('webkernel::table.cell',[]); ?><?php echo \Webkernel\View\View::echo($invoice->{$column['key']}); ?><?php echo $this->render_component(); ?>
           <?php endforeach; ?>

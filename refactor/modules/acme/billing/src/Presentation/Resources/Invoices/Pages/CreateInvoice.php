@@ -20,9 +20,11 @@ final class CreateInvoice extends Page
     protected static string $slug = 'create';
 
     /**
+     * @param $arguments mixed
+     *
      * @return string
      */
-    public function __invoke(): string
+    public function __invoke(mixed ...$arguments): string
     {
         if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST') {
             $invoice = new Invoice(

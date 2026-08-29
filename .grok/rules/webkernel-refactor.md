@@ -64,12 +64,15 @@ Do not hardcode dump side-effects (IDE helper, extra writers) inside `DumpAutolo
 
 Hidden commands exist and run, but they do not appear in default help.
 
-## Tabs have no dedicated class
+## Tabs have a view and a class
 
-`<x-webkernel::tabs>`, `tabs.item`, `tabs.panel` are views. There is no `Tabs.php`. Do not add a PHP class for Tabs unless the user asks.
-
-PHP declaration classes stay for components that need a fluent builder (`Button`, `TextInput`). Views-only is valid.
+`<x-webkernel::tabs>`, `tabs.item`, `tabs.panel` have views AND PHP classes (`Tabs`, `TabsItem`, `TabsPanel`). Same dual-use pattern as Button.
 
 ## No spaghetti
 
 One package, one job. One class, one job. Public API as clear as Laminas and Laravel. No god objects, no cross-package shortcuts, no second tag syntax (`<x-webkernel::…>` only).
+
+
+## Page chrome
+
+Only three page components, in `webkernel/components`: `page` (panel chrome), `page.base` (document), `page.simple` (centered). No `layouts/` in codebase. Title and breadcrumbs come from Page::get_header() / get_breadcrumbs().

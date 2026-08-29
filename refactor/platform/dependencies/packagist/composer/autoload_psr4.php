@@ -7,6 +7,8 @@ $baseDir = dirname(dirname(dirname($vendorDir)));
 
 return array(
     'Webkernel\\Tests\\' => array($baseDir . '/x-webkernel/codebase/tests'),
+    'Webkernel\\System\\Tests\\' => array($baseDir . '/x-webkernel/system/tests'),
+    'Webkernel\\System\\' => array($vendorDir . '/webkernel/system/src'),
     'Webkernel\\Platform\\Tests\\' => array($baseDir . '/x-webkernel/platform/panels/tests'),
     'Webkernel\\Platform\\Schemas\\Tests\\' => array($baseDir . '/x-webkernel/platform/schemas/tests'),
     'Webkernel\\Platform\\Schemas\\' => array($vendorDir . '/webkernel/schemas/src'),
@@ -19,6 +21,8 @@ return array(
     'Webkernel\\Imagery\\' => array($vendorDir . '/webkernel/imagery/src'),
     'Webkernel\\I18n\\Tests\\' => array($baseDir . '/x-webkernel/platform/i18n/tests'),
     'Webkernel\\I18n\\' => array($vendorDir . '/webkernel/i18n/src'),
+    'Webkernel\\DevTools\\Tests\\' => array($baseDir . '/x-webkernel/devtools/tests'),
+    'Webkernel\\DevTools\\' => array($vendorDir . '/webkernel/devtools/src'),
     'Webkernel\\' => array($vendorDir . '/webkernel/codebase/src'),
     'Psr\\SimpleCache\\' => array($vendorDir . '/psr/simple-cache/src'),
     'Psr\\Log\\' => array($vendorDir . '/psr/log/src'),

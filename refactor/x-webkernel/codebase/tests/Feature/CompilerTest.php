@@ -44,7 +44,7 @@ final class CompilerTest extends TestCase
     {
         $compiler = new Compiler(new Directives(), '\\'.View::class.'::echo(%s)');
         $php = $compiler->compile_string(
-            "@extends('webkernel::layouts.page')\n"
+            "@extends('webkernel::page')\n"
             ."@section('title', 'Hi')\n"
             ."@if (true)\n{{ \$name }}\n@endif\n"
             ."@foreach (\$rows as \$row)\n{{ \$row }}\n@endforeach\n"
@@ -60,7 +60,22 @@ final class CompilerTest extends TestCase
         $this->assertStringNotContainsString('add_loop', $php);
         $this->assertStringContainsString('View::echo($name)', $php);
         $this->assertStringContainsString('echo $raw;', $php);
-        $this->assertStringContainsString("run_child('webkernel::layouts.page')", $php);
+        $this->assertStringContainsString("run_child('webkernel::page')", $php);
+    }
+
+    /**
+     * @return void
+     */
+    public function test_component_bound_attributes_keep_underscores(): void
+    {
+        $compiler = new Compiler(new Directives(), '\\'.View::class.'::echo(%s)');
+        $php = $compiler->compile_string(
+            '<x-webkernel::page.panel.button :panel_id="$app_id" :logo_shape="$shape" />'
+        );
+
+        $this->assertStringContainsString("'panel_id'=>\$app_id", $php);
+        $this->assertStringContainsString("'logo_shape'=>\$shape", $php);
+        $this->assertStringNotContainsString("'panel'=>true", $php);
     }
 
     /**

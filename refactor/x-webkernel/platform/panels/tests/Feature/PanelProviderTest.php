@@ -11,7 +11,7 @@ use PHPUnit\Framework\TestCase;
 use Webkernel\Composables\PanelComposable;
 use Webkernel\Config\Config;
 use Webkernel\Platform\PanelProvider;
-use Webkernel\Platform\System\SystemPanelProvider;
+use Webkernel\System\SystemPanelProvider;
 use Webkernel\View\View;
 
 final class PanelProviderTest extends TestCase
@@ -40,7 +40,7 @@ final class PanelProviderTest extends TestCase
     public function test_register_applies_branding_without_provider_calling_it(): void
     {
         $src = (string) \file_get_contents(
-            \dirname(__DIR__, 2).'/src/System/SystemPanelProvider.php',
+            \dirname(__DIR__, 4).'/system/src/SystemPanelProvider.php',
         );
         $this->assertStringNotContainsString('apply_platform_config', $src);
         $this->assertStringNotContainsString("scope('platform')", $src);
@@ -70,9 +70,11 @@ final class PanelProviderTest extends TestCase
         $this->assertSame('module', $by_id['billing']['scope']);
         $this->assertSame('settings', $by_id['system']['icon']);
         $this->assertSame('receipt', $by_id['billing']['icon']);
+        $this->assertSame('/system', $by_id['system']['home_url']);
+        $this->assertSame('/billing/invoices', $by_id['billing']['home_url']);
         $this->assertSame('/system', $by_id['system']['href']);
         $this->assertNotEmpty($by_id['system']['navigation']);
-        $this->assertSame('Overview', $by_id['system']['navigation'][0]['label']);
+        $this->assertSame('Overview', $by_id['system']['navigation'][0]['items'][0]['label']);
         $this->assertSame('/system', $by_id['system']['navigation'][0]['items'][0]['href']);
         $this->assertSame('/billing/invoices', $by_id['billing']['navigation'][0]['items'][0]['href']);
     }

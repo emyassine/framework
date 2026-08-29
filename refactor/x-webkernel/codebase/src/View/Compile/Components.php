@@ -125,7 +125,7 @@ final class Components
             if ($params[$offset] === '/') {
                 break;
             }
-            if (preg_match('/:?[A-Za-z0-9:-]+/A', $params, $m, 0, $offset) !== 1) {
+            if (preg_match('/:?[A-Za-z0-9_:-]+/A', $params, $m, 0, $offset) !== 1) {
                 break;
             }
             $raw = $m[0];

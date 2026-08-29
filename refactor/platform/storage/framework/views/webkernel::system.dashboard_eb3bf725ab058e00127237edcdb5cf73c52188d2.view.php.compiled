@@ -1,0 +1,7 @@
+<p>System Admin Panel.</p>
+<div style="margin-top:1rem;">
+  <?php  $this->start_component('webkernel::button.group',[]); ?>
+    <?php  $this->start_component('webkernel::button',['color'=>'primary','size'=>'md']); ?>Save<?php echo $this->render_component(); ?>
+    <?php  $this->start_component('webkernel::button',['icon'=>'plus','outlined'=>true]); ?>New<?php echo $this->render_component(); ?>
+  <?php echo $this->render_component(); ?>
+</div>

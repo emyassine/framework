@@ -40,6 +40,7 @@ final readonly class DumpAutoloadCommand
     #[ConsoleCommand(
         name: 'dump-autoload',
         description: 'Write Webkernel dump files (classmap, providers, views, routes)',
+        aliases: ['dump'],
     )]
     public function __invoke(): ExitCode
     {
@@ -145,7 +146,7 @@ final readonly class DumpAutoloadCommand
         $this->ensure_path_helpers();
         $this->rebuild_compiled_routes($composer_dir);
         $this->compile_views($providers, $root, $vendor_dir);
-        $this->run_dump_hooks($packages, $vendor_dir);
+        $this->run_dump_hooks($packages, $classmap, $vendor_dir);
 
         $io = $this->terminal();
         $io->success('wrote composer/'.self::BOOT_BASENAME.' (instance '.$instance_id.')');
@@ -155,11 +156,12 @@ final readonly class DumpAutoloadCommand
 
     /**
      * @param $packages list<array{path: string, package: array<string, mixed>}>
+     * @param $classmap array<string, string>
      * @param $vendor_dir string
      *
      * @return void
      */
-    private function run_dump_hooks(array $packages, string $vendor_dir): void
+    private function run_dump_hooks(array $packages, array $classmap, string $vendor_dir): void
     {
         foreach ($packages as $row) {
             $target = $this->extra($row['package'])['post_autoload_dump'] ?? '';
@@ -167,6 +169,7 @@ final readonly class DumpAutoloadCommand
                 continue;
             }
             $class = \str_contains($target, '::') ? \explode('::', $target, 2)[0] : $target;
+            $this->ensure_class($class, $classmap);
             if (! \class_exists($class)) {
                 $this->terminal()->warning('dump hook missing: '.$class);
 

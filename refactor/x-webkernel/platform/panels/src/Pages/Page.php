@@ -12,7 +12,7 @@ use Webkernel\View\View;
 /**
  * Panel page. Title, subheader, breadcrumbs and header actions come from here.
  *
- * //> Views are the body only. Do not @extends the layout or set @section('title').
+ * //> Views are the body only. Chrome is <x-webkernel::page>.
  * //> can_access() is per page. Panel roles/permissions wire this later.
  */
 abstract class Page
@@ -147,9 +147,11 @@ abstract class Page
     }
 
     /**
+     * @param $arguments mixed
+     *
      * @return string
      */
-    public function __invoke(): string
+    public function __invoke(mixed ...$arguments): string
     {
         return $this->render();
     }
@@ -172,10 +174,10 @@ abstract class Page
             $body = $view !== '' ? View::make($view, $this->view_data())->render() : '';
         }
 
-        return View::make('webkernel::pages.render', [
+        return View::make('webkernel::page', [
             'title' => $this->get_title(),
             'header' => $this->get_header(),
-            'subheader' => $this->get_subheader(),
+            'description' => $this->get_subheader(),
             'header_actions' => $this->get_header_actions(),
             'breadcrumbs' => $this->get_breadcrumbs(),
             'slot' => $body,

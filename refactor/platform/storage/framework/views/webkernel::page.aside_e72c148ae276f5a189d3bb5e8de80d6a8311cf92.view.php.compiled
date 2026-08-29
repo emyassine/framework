@@ -1,0 +1,27 @@
+<?php  $__props = [
+  'position' => 'right',
+  'collapsed' => false,
+]; foreach ($__props as $__n => $__d) { if (!isset($$__n)) { $$__n = $__d; } } $attributes = (isset($attributes) && $attributes instanceof \Webkernel\View\AttributeBag ? $attributes : new \Webkernel\View\AttributeBag([]))->except(\array_keys($__props)); unset($__props, $__n, $__d); ?>
+<?php 
+  $attributes = $attributes ?? new \Webkernel\View\AttributeBag([]);
+ ?>
+<style>
+.wds-aside {
+  flex: 0 0 var(--wds-aside-width, 20rem);
+  min-width: 0;
+  background: var(--wds-surface);
+  color: var(--wds-text);
+  border-inline-start: 1px solid var(--wds-border);
+  padding: 1.25rem;
+}
+.wds-aside[data-collapsed="1"] { display: none; }
+</style>
+<aside
+  <?php echo \Webkernel\View\View::echo($attributes->class('wds-aside')); ?>
+
+  data-position="<?php echo \Webkernel\View\View::echo($position); ?>"
+  data-collapsed="<?php echo \Webkernel\View\View::echo($collapsed ? '1' : '0'); ?>"
+>
+  <?php echo $slot; ?>
+
+</aside>

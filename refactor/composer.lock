@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "590289a9a4dffc9e7a7154836e7b0171",
+    "content-hash": "6c068e370471de329b169a7638f92788",
     "packages": [
         {
             "name": "acme/billing",
@@ -829,7 +829,7 @@
             "dist": {
                 "type": "path",
                 "url": "x-webkernel/platform/panels",
-                "reference": "00a3b89544f7747165184fec4a1a3e87d16967c8"
+                "reference": "60bdb252f3310a9f2af0f52c25a2d06837fa6d18"
             },
             "require": {
                 "php": ">=8.5",
@@ -859,7 +859,7 @@
             "license": [
                 "proprietary"
             ],
-            "description": "Webkernel admin chrome: Panel, Resource, Page, System panel.",
+            "description": "Webkernel admin chrome: Panel, Resource, Page, Table, Wds.",
             "transport-options": {
                 "symlink": true,
                 "relative": true
@@ -871,7 +871,7 @@
             "dist": {
                 "type": "path",
                 "url": "x-webkernel/platform",
-                "reference": "87e25ad97de49f1a3d5cd776f7756e523eee7699"
+                "reference": "ab745381c0cd50cb0ac802ef5a978a397b4dcc2e"
             },
             "require": {
                 "php": ">=8.5",
@@ -880,7 +880,8 @@
                 "webkernel/i18n": "^0.12.0",
                 "webkernel/imagery": "^0.12.0",
                 "webkernel/panels": "^0.12.0",
-                "webkernel/schemas": "^0.12.0"
+                "webkernel/schemas": "^0.12.0",
+                "webkernel/system": "^0.12.0"
             },
             "type": "metapackage",
             "license": [
@@ -927,6 +928,47 @@
                 "proprietary"
             ],
             "description": "Webkernel schema tree: layout of components for forms and readonly views.",
+            "transport-options": {
+                "symlink": true,
+                "relative": true
+            }
+        },
+        {
+            "name": "webkernel/system",
+            "version": "0.12.0",
+            "dist": {
+                "type": "path",
+                "url": "x-webkernel/system",
+                "reference": "fa84aea6d919c966a78d9f63e0ec2c6b25567d7e"
+            },
+            "require": {
+                "php": ">=8.5",
+                "webkernel/codebase": "^0.12.0",
+                "webkernel/panels": "^0.12.0"
+            },
+            "type": "webkernel-stdlib",
+            "extra": {
+                "webkernel": {
+                    "package_repo": "git@github.com:webkernelphp/system.git",
+                    "production": true,
+                    "provider": "Webkernel\\System\\SystemProvider",
+                    "prefix": "webkernel"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Webkernel\\System\\": "src/"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "Webkernel\\System\\Tests\\": "tests/"
+                }
+            },
+            "license": [
+                "proprietary"
+            ],
+            "description": "Webkernel System admin panel and its resources.",
             "transport-options": {
                 "symlink": true,
                 "relative": true
@@ -2697,6 +2739,48 @@
                 }
             ],
             "time": "2025-11-17T20:03:58+00:00"
+        },
+        {
+            "name": "webkernel/devtools",
+            "version": "0.12.0",
+            "dist": {
+                "type": "path",
+                "url": "x-webkernel/devtools",
+                "reference": "fcd9eb935fa6e454f4badf89f9230f7c5e44f2f2"
+            },
+            "require": {
+                "php": ">=8.5",
+                "webkernel/codebase": "^0.12.0",
+                "webkernel/lifecycle": "^0.12.0"
+            },
+            "type": "webkernel-devtool",
+            "extra": {
+                "webkernel": {
+                    "package_repo": "git@github.com:webkernelphp/devtools.git",
+                    "production": false,
+                    "provider": "Webkernel\\DevTools\\DevToolsProvider",
+                    "prefix": "devtools",
+                    "post_autoload_dump": "Webkernel\\DevTools\\IdeHelper"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Webkernel\\DevTools\\": "src/"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "Webkernel\\DevTools\\Tests\\": "tests/"
+                }
+            },
+            "license": [
+                "proprietary"
+            ],
+            "description": "Webkernel developer tools",
+            "transport-options": {
+                "symlink": true,
+                "relative": true
+            }
         }
     ],
     "aliases": [],

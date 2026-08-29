@@ -1,0 +1,12 @@
+<?php  $__props = [
+  'label' => '',
+  'href' => '#',
+  'icon' => null,
+  'active' => false,
+]; foreach ($__props as $__n => $__d) { if (!isset($$__n)) { $$__n = $__d; } } $attributes = (isset($attributes) && $attributes instanceof \Webkernel\View\AttributeBag ? $attributes : new \Webkernel\View\AttributeBag([]))->except(\array_keys($__props)); unset($__props, $__n, $__d); ?>
+<a href="<?php echo \Webkernel\View\View::echo($href); ?>" class="wds-menu-element wds-nav-link<?php echo \Webkernel\View\View::echo($active ? ' wds-active' : ''); ?>"<?php echo $active ? ' aria-current="page"' : ''; ?>>
+  <?php if(!empty($icon)): ?>
+    <span class="wds-nav-icon" aria-hidden="true"><?php echo icon((string) $icon, 'wds-icon-svg'); ?></span>
+  <?php endif; ?>
+  <span><?php echo \Webkernel\View\View::echo($label); ?></span>
+</a>

@@ -14,7 +14,7 @@ use Webkernel\View\Compile\Mode;
  * Views. Templates: {name}.view.php
  * Compiled: platform/storage/framework/views/{name}_{hash}.view.php.compiled
  *
- * Namespaced: @include('webkernel::layouts.page'), <x-webkernel::page />.
+ * Namespaced: <x-webkernel::page />, <x-webkernel::page.base />, <x-webkernel::page.simple />.
  */
 final class View implements ComposableContract, \Stringable
 {

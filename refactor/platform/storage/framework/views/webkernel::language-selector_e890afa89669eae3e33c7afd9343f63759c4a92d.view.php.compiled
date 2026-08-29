@@ -1,0 +1,22 @@
+<?php 
+  $current = \function_exists('i18n_current_lang') ? i18n_current_lang() : 'en';
+  $codes = ['en', 'fr', 'ar', 'es', 'de', 'pt'];
+  $back = \parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?: '/';
+ ?>
+<div class="wds-lang" data-wds-lang>
+  <button type="button" class="wds-lang-trigger" onclick="this.parentElement.classList.toggle('wds-open')" title="<?php echo \Webkernel\View\View::echo(lang('panel.language')); ?>">
+    <span class="wds-lang-flag"><?php echo flag_markup($current); ?></span>
+    <span><?php echo \Webkernel\View\View::echo(\function_exists('i18n_catalog_language_label') ? i18n_catalog_language_label($current) : $current); ?></span>
+  </button>
+  <form class="wds-lang-panel" method="post" action="/locale" role="menu">
+    <?php echo \Webkernel\Csrf::field(); ?>
+
+    <input type="hidden" name="_back" value="<?php echo \Webkernel\View\View::echo($back); ?>" />
+    <?php foreach($codes as $code): ?>
+      <button type="submit" name="locale" value="<?php echo \Webkernel\View\View::echo($code); ?>" class="<?php echo \Webkernel\View\View::echo($code === $current ? 'wds-active' : ''); ?>" role="menuitem">
+        <span class="wds-lang-flag"><?php echo flag_markup($code); ?></span>
+        <span><?php echo \Webkernel\View\View::echo(\function_exists('i18n_catalog_language_label') ? i18n_catalog_language_label($code) : $code); ?></span>
+      </button>
+    <?php endforeach; ?>
+  </form>
+</div>

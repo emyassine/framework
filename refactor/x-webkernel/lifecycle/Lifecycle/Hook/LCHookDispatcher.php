@@ -71,7 +71,7 @@ final class LCHookDispatcher
             [$class, $method] = \explode('::', $target, 2);
         }
         if (! \class_exists($class)) {
-            throw new \RuntimeException('Webkernel lifecycle hook class not found: '.$class);
+            return;
         }
         if (\is_a($class, DumpHook::class, true)) {
             return;

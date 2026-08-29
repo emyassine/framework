@@ -1,0 +1,4 @@
+<?php  $this->start_component('webkernel::page',['title'=>'Webkernel','header'=>'Webkernel']); ?>
+  <p>Platform is working.</p>
+  <p>Open the <a href="/system">system panel</a> or <a href="/billing/invoices">invoices</a>.</p>
+<?php echo $this->render_component(); ?>

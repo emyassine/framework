@@ -17,6 +17,7 @@ return [
         $b . '/x-webkernel/platform/components/resources/views',
         $b . '/x-webkernel/platform/i18n/resources/views',
         $b . '/x-webkernel/platform/panels/resources/views',
+        $b . '/x-webkernel/system/resources/views',
     ],
     'namespaces' => [
         'billing' => [
@@ -27,6 +28,7 @@ return [
             $b . '/x-webkernel/platform/components/resources/views',
             $b . '/x-webkernel/platform/i18n/resources/views',
             $b . '/x-webkernel/platform/panels/resources/views',
+            $b . '/x-webkernel/system/resources/views',
         ],
     ],
 ];

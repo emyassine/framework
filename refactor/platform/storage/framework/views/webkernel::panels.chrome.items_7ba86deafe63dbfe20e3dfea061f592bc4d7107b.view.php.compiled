@@ -1,0 +1,17 @@
+<?php foreach($items as $item): ?>
+  <?php 
+    $item_href = (string) ($item['href'] ?? '#');
+    $item_label = (string) ($item['label'] ?? '');
+    if (\str_starts_with($item_label, 'panel.')) {
+      $item_label = lang($item_label);
+    }
+    $item_icon = (string) ($item['icon'] ?? 'package');
+    $item_active = $panel_api->href_is_active($item_href);
+   ?>
+  <li>
+    <a href="<?php echo \Webkernel\View\View::echo($item_href); ?>" class="wds-nav-link<?php echo \Webkernel\View\View::echo($item_active ? ' wds-active' : ''); ?>"<?php echo $item_active ? ' aria-current="page"' : ''; ?>>
+      <span class="wds-nav-icon" aria-hidden="true"><?php echo icon($item_icon, 'wds-icon-svg'); ?></span>
+      <span><?php echo \Webkernel\View\View::echo($item_label); ?></span>
+    </a>
+  </li>
+<?php endforeach; ?>

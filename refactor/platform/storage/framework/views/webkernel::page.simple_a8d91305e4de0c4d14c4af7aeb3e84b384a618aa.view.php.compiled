@@ -1,0 +1,39 @@
+
+<?php  $__props = [
+  'title' => 'Webkernel',
+  'lang' => 'en',
+  'theme' => null,
+  'csrf' => true,
+]; foreach ($__props as $__n => $__d) { if (!isset($$__n)) { $$__n = $__d; } } $attributes = (isset($attributes) && $attributes instanceof \Webkernel\View\AttributeBag ? $attributes : new \Webkernel\View\AttributeBag([]))->except(\array_keys($__props)); unset($__props, $__n, $__d); ?>
+<style>
+.wds-simple {
+  width: 100%;
+  max-width: 28rem;
+  padding: 1.5rem;
+  margin: 0 auto;
+  color: var(--wds-text);
+}
+.wds-simple-card {
+  background: var(--wds-surface);
+  border: 1px solid var(--wds-border);
+  border-radius: var(--wds-radius-lg);
+  padding: 2rem 1.75rem;
+  color: var(--wds-text);
+}
+[data-wds-layout="simple"] body {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--wds-bg);
+  color: var(--wds-text);
+}
+</style>
+<?php  $this->start_component('webkernel::page.base',['title'=>$title,'lang'=>$lang,'theme'=>$theme,'csrf'=>$csrf,'layout'=>'simple']); ?>
+  <main class="wds-simple">
+    <div class="wds-simple-card">
+      <?php echo $slot; ?>
+
+    </div>
+  </main>
+<?php echo $this->render_component(); ?>

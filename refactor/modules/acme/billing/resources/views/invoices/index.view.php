@@ -10,7 +10,10 @@
     </x-webkernel::table.header>
     <x-webkernel::table.body>
       @foreach ($invoices as $invoice)
-        <x-webkernel::table.row :href="'/billing/invoices/'.$invoice->id.'/edit'">
+        @php
+          $edit_href = '/billing/invoices/'.$invoice->id.'/edit';
+        @endphp
+        <x-webkernel::table.row :href="$edit_href">
           @foreach ($columns as $column)
             <x-webkernel::table.cell>{{ $invoice->{$column['key']} }}</x-webkernel::table.cell>
           @endforeach

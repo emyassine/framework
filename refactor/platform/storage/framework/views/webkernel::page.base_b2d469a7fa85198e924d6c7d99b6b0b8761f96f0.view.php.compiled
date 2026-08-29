@@ -1,0 +1,54 @@
+
+<?php  $__props = [
+  'lang' => 'en',
+  'theme' => null,
+  'title' => 'Webkernel',
+  'description' => null,
+  'csrf' => true,
+  'favicon' => null,
+  'layout' => 'base',
+]; foreach ($__props as $__n => $__d) { if (!isset($$__n)) { $$__n = $__d; } } $attributes = (isset($attributes) && $attributes instanceof \Webkernel\View\AttributeBag ? $attributes : new \Webkernel\View\AttributeBag([]))->except(\array_keys($__props)); unset($__props, $__n, $__d); ?>
+<?php 
+  $lang = \function_exists('i18n_current_lang') ? i18n_current_lang() : ($lang ?? 'en');
+  $theme = $theme ?? (\Webkernel\Config\Config::get('ui.dark_mode', true) ? 'dark' : 'light');
+  $description = $description ?? (string) $title;
+  if ($favicon === null && \function_exists('webkernel_branding_url')) {
+    $favicon = webkernel_branding_url('webkernel-favicon');
+  }
+ ?>
+<style>
+html { font-size: 16px; }
+body { margin: 0; }
+</style>
+<!DOCTYPE html>
+<html
+  lang="<?php echo \Webkernel\View\View::echo($lang); ?>"
+  dir="<?php echo \Webkernel\View\View::echo(\function_exists('i18n_direction') ? i18n_direction($lang) : 'ltr'); ?>"
+  data-wds-theme="<?php echo \Webkernel\View\View::echo($theme); ?>"
+  data-wds-layout="<?php echo \Webkernel\View\View::echo($layout); ?>"
+>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script>(function(d){var t=localStorage.getItem('wds-theme');if(t)d.dataset.wdsTheme=t;})(document.documentElement);</script>
+  <?php if($csrf): ?>
+    <?php echo \Webkernel\Csrf::meta(); ?>
+
+  <?php endif; ?>
+  <?php if(!empty($favicon)): ?>
+    <link rel="icon" href="<?php echo \Webkernel\View\View::echo($favicon); ?>" />
+  <?php endif; ?>
+  <title><?php echo \Webkernel\View\View::echo($title); ?></title>
+  <meta name="description" content="<?php echo \Webkernel\View\View::echo($description); ?>" />
+  <?php  $this->start_component('webkernel::page.typography',['lang'=>$lang]); ?><?php echo $this->render_component(); ?>
+  <link rel="stylesheet" href="<?php echo \Webkernel\View\View::echo(\Webkernel\Platform\Wds::css_href()); ?>">
+  <?php echo  $this->stack('styles'); ?>
+  <?php echo  $this->stack('head'); ?>
+</head>
+<body>
+  <?php echo $slot; ?>
+
+  <?php echo $this->run_child('webkernel::wds.script'); ?>
+  <?php echo  $this->stack('scripts'); ?>
+</body>
+</html>

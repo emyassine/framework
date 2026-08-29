@@ -1,0 +1,35 @@
+
+<?php  $__props = [
+  'heading' => null,
+  'description' => null,
+  'contained' => true,
+]; foreach ($__props as $__n => $__d) { if (!isset($$__n)) { $$__n = $__d; } } $attributes = (isset($attributes) && $attributes instanceof \Webkernel\View\AttributeBag ? $attributes : new \Webkernel\View\AttributeBag([]))->except(\array_keys($__props)); unset($__props, $__n, $__d); ?>
+<style>
+.wds-section {
+  background: var(--wds-surface);
+  border: 1px solid var(--wds-border);
+  border-radius: 8px;
+  overflow: hidden;
+  color: var(--wds-text);
+}
+.wds-section-header { padding: 1em 1.25em; border-bottom: 1px solid var(--wds-border); }
+.wds-section-heading { font-size: 1rem; font-weight: 600; color: var(--wds-text); }
+.wds-section-description { margin-top: 0.25em; font-size: 13px; color: var(--wds-text-muted); }
+.wds-section-body { padding: 0.25em 0; color: var(--wds-text); }
+</style>
+<section class="wds-section">
+  <?php if(($heading !== null && $heading !== '') || ($description !== null && $description !== '')): ?>
+    <header class="wds-section-header">
+      <?php if($heading !== null && $heading !== ''): ?>
+        <h2 class="wds-section-heading"><?php echo \Webkernel\View\View::echo($heading); ?></h2>
+      <?php endif; ?>
+      <?php if($description !== null && $description !== ''): ?>
+        <p class="wds-section-description"><?php echo \Webkernel\View\View::echo($description); ?></p>
+      <?php endif; ?>
+    </header>
+  <?php endif; ?>
+  <div class="wds-section-body">
+    <?php echo $slot; ?>
+
+  </div>
+</section>
