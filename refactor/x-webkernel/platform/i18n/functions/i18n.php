@@ -184,4 +184,44 @@ if (! \function_exists('i18n_catalog_language_label')) {
     }
 }
 
+if (! \function_exists('flag_markup')) {
+    /**
+     * Inline SVG for a language or country mark.
+     *
+     * @param $code string
+     * @param $class string
+     *
+     * @return string
+     */
+    function flag_markup(string $code, string $class = 'wds-lang-flag'): string
+    {
+        $code = \strtolower(\trim($code));
+        if ($code === '' || \preg_match('/^[a-z0-9][a-z0-9_-]{0,15}$/', $code) !== 1) {
+            return '';
+        }
+        $candidates = [$code, \explode('-', $code, 2)[0]];
+        $svg = '';
+        foreach (\array_unique($candidates) as $name) {
+            foreach (['language', 'countries'] as $set) {
+                $path = \function_exists('webapp_path')
+                    ? \webapp_path('public/flags/'.$set.'/'.$name.'.svg')
+                    : '';
+                if ($path === '' || ! \is_file($path)) {
+                    continue;
+                }
+                $raw = \file_get_contents($path);
+                if (\is_string($raw) && $raw !== '') {
+                    $svg = $raw;
+                    break 2;
+                }
+            }
+        }
+        if ($svg === '') {
+            return '';
+        }
+
+        return '<span class="'.\htmlspecialchars($class, \ENT_QUOTES, 'UTF-8').'">'.$svg.'</span>';
+    }
+}
+
 \class_exists(I18nContext::class, true);

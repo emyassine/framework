@@ -178,18 +178,25 @@ trait CanDumpPanels
                 'icon' => (string) ($panel['icon'] ?? 'package'),
             ];
         }
-        $items[] = [
+        $manage_item = [
             'label' => 'panel.manage',
             'href' => \rtrim($base, '/').'/manage',
             'icon' => 'sliders',
         ];
-
-        return [
-            [
-                'label' => 'panel.overview',
+        $groups = [];
+        if ($items !== []) {
+            $groups[] = [
+                'label' => '',
                 'items' => $items,
-            ],
+            ];
+        }
+        $groups[] = [
+            'label' => 'panel.settings',
+            'icon' => 'folder',
+            'items' => [$manage_item],
         ];
+
+        return $groups;
     }
 
     /**

@@ -1,0 +1,19 @@
+<?php  $__props = [
+  'name' => '',
+  'checked' => false,
+  'label' => null,
+]; foreach ($__props as $__n => $__d) { if (!isset($$__n)) { $$__n = $__d; } } $attributes = (isset($attributes) && $attributes instanceof \Webkernel\View\AttributeBag ? $attributes : new \Webkernel\View\AttributeBag([]))->except(\array_keys($__props)); unset($__props, $__n, $__d); ?>
+<span class="wds-toggle-wrap" style="display:inline-flex;align-items:center;gap:0.6em;">
+  <input type="hidden" name="<?php echo \Webkernel\View\View::echo($name); ?>" value="0" />
+  <button
+    type="button"
+    class="wds-toggle"
+    role="switch"
+    aria-checked="<?php echo \Webkernel\View\View::echo($checked ? 'true' : 'false'); ?>"
+    data-wds-toggle
+  ><i></i></button>
+  <input type="checkbox" name="<?php echo \Webkernel\View\View::echo($name); ?>" value="1" <?php echo \Webkernel\View\View::echo($checked ? 'checked' : ''); ?> hidden data-wds-toggle-input />
+  <?php if($label): ?>
+    <span><?php echo \Webkernel\View\View::echo($label); ?></span>
+  <?php endif; ?>
+</span>

@@ -293,4 +293,57 @@ trait CanDumpAssets
 
         return \trim(\implode("\n", $matches[1]));
     }
+
+    /**
+     * Copy language/country marks to public/flags.
+     *
+     * @return void
+     */
+    private function dump_flags(): void
+    {
+        if (! \class_exists(\Webkernel\I18n\I18nProvider::class, true)) {
+            return;
+        }
+        $src = \dirname((new \ReflectionClass(\Webkernel\I18n\I18nProvider::class))->getFileName(), 2).'/res/flags';
+        $dest = \webapp_path('public/flags');
+        if (! \is_dir($src)) {
+            return;
+        }
+        $this->copy_tree($src, $dest);
+    }
+
+    /**
+     * @param $from string
+     * @param $to string
+     *
+     * @return void
+     */
+    private function copy_tree(string $from, string $to): void
+    {
+        if (! \is_dir($to) && ! \mkdir($to, 0775, true) && ! \is_dir($to)) {
+            return;
+        }
+        $it = new RecursiveIteratorIterator(
+            new RecursiveDirectoryIterator($from, FilesystemIterator::SKIP_DOTS),
+            RecursiveIteratorIterator::SELF_FIRST,
+        );
+        foreach ($it as $file) {
+            $rel = \substr($file->getPathname(), \strlen($from) + 1);
+            if (! \is_string($rel) || $rel === '') {
+                continue;
+            }
+            $target = $to.DIRECTORY_SEPARATOR.$rel;
+            if ($file->isDir()) {
+                if (! \is_dir($target)) {
+                    \mkdir($target, 0775, true);
+                }
+                continue;
+            }
+            $dir = \dirname($target);
+            if (! \is_dir($dir)) {
+                \mkdir($dir, 0775, true);
+            }
+            \copy($file->getPathname(), $target);
+        }
+    }
 }

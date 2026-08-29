@@ -10,6 +10,9 @@
   'csrf' => true,
 ])
 @php
+  if (isset($_GET['lang']) && \is_string($_GET['lang']) && \class_exists(\Webkernel\I18n\I18nContext::class, true)) {
+    \Webkernel\I18n\I18nContext::set_locale($_GET['lang']);
+  }
   $brand = $brand ?? \Webkernel\Config\Config::get('app.name');
   $theme = $theme ?? (\Webkernel\Config\Config::get('ui.dark_mode', true) ? 'dark' : 'light');
   $description = $description ?? ($brand.' control panel');
@@ -47,6 +50,7 @@
 <body>
 <div class="wds-layout">
 
+  @include('webkernel::panels.chrome.rail', ['brand' => $brand, 'logo' => $logo])
   @include('webkernel::panels.chrome.nav', ['brand' => $brand, 'logo' => $logo])
 
   <div class="wds-main-ctn">
@@ -58,6 +62,7 @@
         @yield('breadcrumb')
       </div>
       <div class="wds-topbar-end">
+        <x-webkernel::language-selector />
         <button class="wds-icon-btn" onclick="toggleTheme()" title="{{ lang('panel.theme') }}" id="theme-btn">
           <svg id="icon-sun" viewBox="0 0 16 16"><circle cx="8" cy="8" r="3"/><line x1="8" y1="1" x2="8" y2="3"/><line x1="8" y1="13" x2="8" y2="15"/><line x1="1" y1="8" x2="3" y2="8"/><line x1="13" y1="8" x2="15" y2="8"/><line x1="3.2" y1="3.2" x2="4.6" y2="4.6"/><line x1="11.4" y1="11.4" x2="12.8" y2="12.8"/><line x1="12.8" y1="3.2" x2="11.4" y2="4.6"/><line x1="4.6" y1="11.4" x2="3.2" y2="12.8"/></svg>
           <svg id="icon-moon" viewBox="0 0 16 16" style="display:none;"><path d="M12 10A6 6 0 0 1 6 4a6.003 6 0 0 0 6 9 6 6 0 0 1 0-3z"/></svg>

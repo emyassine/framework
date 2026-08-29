@@ -1,71 +1,48 @@
 <?php 
   $panel_api = webapp()->panel();
-  $apps = $panel_api->all();
-  $customizable = (bool) \Webkernel\Config\Config::get('ui.sidebar_customizable', false);
+  $current = $panel_api->matching_path();
+  $groups = \is_array($current) ? ($current['navigation'] ?? []) : [];
+  $label = \is_array($current) ? (string) ($current['label'] ?? '') : ($brand ?? 'Webkernel');
  ?>
 <nav class="wds-nav" id="sidebar" aria-label="<?php echo \Webkernel\View\View::echo(lang('panel.navigation')); ?>">
-  <a class="wds-nav-brand" href="/" title="<?php echo \Webkernel\View\View::echo($brand ?? 'Webkernel'); ?>">
-    <span class="wds-nav-brand-mark">
-      <?php if(!empty($logo)): ?>
-        <img src="<?php echo \Webkernel\View\View::echo($logo); ?>" alt="" width="28" height="28" />
-      <?php else: ?>
-        <span class="wds-logo-icon">
-          <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="white" stroke-width="2" stroke-linecap="round">
-            <circle cx="8" cy="8" r="6"/><path d="M8 2v6l3 3"/>
-          </svg>
-        </span>
-      <?php endif; ?>
-    </span>
-    <span class="wds-nav-brand-name"><?php echo \Webkernel\View\View::echo($brand ?? 'Webkernel'); ?></span>
+  <a class="wds-nav-brand" href="<?php echo \Webkernel\View\View::echo(\is_array($current) ? ($current['href'] ?? '/') : '/'); ?>">
+    <span class="wds-nav-brand-name"><?php echo \Webkernel\View\View::echo($label); ?></span>
   </a>
-
   <div class="wds-nav-scroll">
-    <label class="wds-nav-search">
-      <span class="wds-nav-icon"><?php echo icon('search', 'wds-icon-svg'); ?></span>
-      <input type="search" placeholder="<?php echo \Webkernel\View\View::echo(lang('panel.search')); ?>" autocomplete="off" />
-    </label>
+    <ul class="wds-nav-list">
+      <li>
+        <button type="button" class="wds-nav-search" onclick="document.dispatchEvent(new CustomEvent('wds-search'))">
+          <span class="wds-nav-icon" aria-hidden="true"><?php echo icon('search', 'wds-icon-svg'); ?></span>
+          <?php echo \Webkernel\View\View::echo(lang('panel.search')); ?>
 
-    <ul class="wds-nav-list" id="wds-nav-list" data-customizable="<?php echo \Webkernel\View\View::echo($customizable ? '1' : '0'); ?>">
-      <?php foreach($apps as $app): ?>
+        </button>
+      </li>
+      <?php foreach($groups as $group): ?>
         <?php 
-          $app_id = (string) ($app['id'] ?? '');
-          $app_label = (string) ($app['label'] ?? \ucfirst($app_id));
-          $app_logo = (string) \Webkernel\Config\Config::get('panels.'.$app_id.'.logo', '');
-          $app_shape = (string) \Webkernel\Config\Config::get('panels.'.$app_id.'.logo_shape', 'favicon');
-          if ($app_shape !== 'round' && $app_shape !== 'square' && $app_shape !== 'favicon') {
-            $app_shape = 'favicon';
+          $group_label = (string) ($group['label'] ?? '');
+          if (\str_starts_with($group_label, 'panel.')) {
+            $group_label = lang($group_label);
           }
+          $group_icon = (string) ($group['icon'] ?? 'folder');
+          $is_group = $group_label !== '';
          ?>
-        <li data-app="<?php echo \Webkernel\View\View::echo($app_id); ?>">
-          <div class="wds-nav-section">
-            <?php if($app_logo !== ''): ?>
-              <span class="wds-nav-section-mark wds-nav-logo--<?php echo \Webkernel\View\View::echo($app_shape); ?>">
-                <img src="<?php echo \Webkernel\View\View::echo($app_logo); ?>" alt="" />
-              </span>
-            <?php endif; ?>
-            <span><?php echo \Webkernel\View\View::echo($app_label); ?></span>
-          </div>
-          <ul>
-            <?php foreach(($app['navigation'] ?? []) as $group): ?>
-              <?php foreach(($group['items'] ?? []) as $item): ?>
-                <?php 
-                  $item_href = (string) ($item['href'] ?? '#');
-                  $item_label = (string) ($item['label'] ?? '');
-                  if (\str_starts_with($item_label, 'panel.')) {
-                    $item_label = lang($item_label);
-                  }
-                  $item_icon = (string) ($item['icon'] ?? ($app['icon'] ?? 'package'));
-                  $item_active = $panel_api->href_is_active($item_href);
-                 ?>
-                <li>
-                  <a href="<?php echo \Webkernel\View\View::echo($item_href); ?>" class="wds-nav-link<?php echo \Webkernel\View\View::echo($item_active ? ' wds-active' : ''); ?>"<?php if($item_active): ?> aria-current="page"<?php endif; ?>>
-                    <span class="wds-nav-icon"><?php echo icon($item_icon, 'wds-icon-svg'); ?></span>
-                    <span><?php echo \Webkernel\View\View::echo($item_label); ?></span>
-                  </a>
-                </li>
-              <?php endforeach; ?>
-            <?php endforeach; ?>
-          </ul>
+        <li class="<?php echo \Webkernel\View\View::echo($is_group ? 'wds-nav-group' : ''); ?>">
+          <?php if($is_group): ?>
+            <details open>
+              <summary class="wds-nav-summary">
+                <span class="wds-nav-icon" aria-hidden="true"><?php echo icon($group_icon, 'wds-icon-svg'); ?></span>
+                <span><?php echo \Webkernel\View\View::echo($group_label); ?></span>
+                <span class="wds-nav-caret"><?php echo icon('chevron-down', 'wds-icon-svg'); ?></span>
+              </summary>
+              <ul class="wds-nav-sub">
+                <?php echo $this->run_child('webkernel::panels.chrome.items', ['items' => $group['items'] ?? [], 'panel_api' => $panel_api]); ?>
+              </ul>
+            </details>
+          <?php else: ?>
+            <ul>
+              <?php echo $this->run_child('webkernel::panels.chrome.items', ['items' => $group['items'] ?? [], 'panel_api' => $panel_api]); ?>
+            </ul>
+          <?php endif; ?>
         </li>
       <?php endforeach; ?>
     </ul>

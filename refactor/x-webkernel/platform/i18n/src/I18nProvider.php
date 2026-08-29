@@ -12,4 +12,12 @@ use Webkernel\PlatformProvider;
 final class I18nProvider extends PlatformProvider
 {
     public const LANG_PATH = [__DIR__.'/../lang'];
+
+    public const VIEWS = [
+        'webkernel' => __DIR__.'/../resources/views',
+    ];
+
+    public const COMPONENTS = [
+        'webkernel' => __DIR__.'/../resources/views',
+    ];
 }

@@ -54,7 +54,7 @@ return array (
     array (
       0 => 
       array (
-        'label' => 'panel.overview',
+        'label' => '',
         'items' => 
         array (
           0 => 
@@ -63,7 +63,15 @@ return array (
             'href' => '/billing/invoices',
             'icon' => 'receipt',
           ),
-          1 => 
+        ),
+      ),
+      1 => 
+      array (
+        'label' => 'panel.settings',
+        'icon' => 'folder',
+        'items' => 
+        array (
+          0 => 
           array (
             'label' => 'panel.manage',
             'href' => '/billing/manage',
@@ -120,7 +128,7 @@ return array (
     array (
       0 => 
       array (
-        'label' => 'panel.overview',
+        'label' => '',
         'items' => 
         array (
           0 => 
@@ -129,7 +137,15 @@ return array (
             'href' => '/system',
             'icon' => 'layout-dashboard',
           ),
-          1 => 
+        ),
+      ),
+      1 => 
+      array (
+        'label' => 'panel.settings',
+        'icon' => 'folder',
+        'items' => 
+        array (
+          0 => 
           array (
             'label' => 'panel.manage',
             'href' => '/system/manage',

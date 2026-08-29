@@ -5,15 +5,14 @@
 
 
   --wds-topbar-height: 50px;
-  --wds-nav-header-height: 65px;
+  --wds-rail-width: 60px;
   --wds-nav-width: clamp(280px, 16vw, 340px);
-  --wds-nav-width-collapsed: 72px;
-  --wds-radius-sm: 0.25rem;
+  --wds-nav-width-collapsed: 0px;
   --wds-radius: 6px;
   --wds-radius-lg: 0.75rem;
   --wds-radius-full: 9999px;
-  --wds-font-sans: var(--wts-font-stack, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif);
-  --wds-font-mono: var(--wts-font-mono, "JetBrains Mono", "Fira Code", "Cascadia Code", Consolas, monospace);
+  --wds-font-sans: var(--wts-font-stack, system-ui, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol");
+  --wds-font-mono: var(--wts-font-mono, ui-monospace, Consolas, monospace);
   --wds-text-xs: 0.6875rem;
   --wds-text-sm: 0.8125rem;
   --wds-text-base: 0.875rem;
@@ -32,13 +31,9 @@
   --wds-text-muted: hsl(220 10% 42%);
   --wds-text-faint: hsl(220 8% 58%);
 
-  --wds-nav-bg: hsl(220 40% 12%);
-  --wds-nav-text: hsl(220 18% 88%);
-  --wds-nav-muted: hsl(220 12% 70%);
-  --wds-nav-edge: color-mix(in srgb, var(--wds-nav-text) 20%, var(--wds-nav-bg));
-  --wds-nav-hover-bg: color-mix(in srgb, var(--wds-nav-text) 10%, var(--wds-nav-bg));
-  --wds-nav-active-bg: var(--primary-600, hsl(220 85% 50%));
-  --wds-nav-active-text: #fff;
+  --wds-rail-bg: #0e1d30;
+  --wds-nav-bg: oklch(0.247 0.012 260);
+  --wds-nav-text: oklch(0.73 0.016 260);
 }
 
 [data-wds-theme="dark"] {
@@ -50,8 +45,8 @@
   --wds-text: hsl(220 16% 92%);
   --wds-text-muted: hsl(220 10% 64%);
   --wds-text-faint: hsl(220 8% 48%);
-  --wds-nav-bg: hsl(220 22% 9%);
-  --wds-nav-text: hsl(220 14% 82%);
+  --wds-nav-bg: oklch(0.22 0.012 260);
+  --wds-nav-text: oklch(0.78 0.014 260);
   --primary-50: var(--color-blue-950);
 }
 
