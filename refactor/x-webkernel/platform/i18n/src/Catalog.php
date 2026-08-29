@@ -10,18 +10,18 @@ namespace Webkernel\I18n;
 use Webkernel\Config\Config;
 
 /**
- * File catalog from dumped LANG_PATH dirs, plus the known-language list.
+ * File catalog from dumped LANG_PATH dirs. Names and RTL come from ext-intl Locale.
  */
 final class Catalog
 {
-    /** @var list<string> */
-    public const RTL = ['ar', 'fa', 'he', 'ur', 'ps', 'ckb', 'ku'];
-
     /** @var array<string, array<string, mixed>> locale => tree */
     private static array $files = [];
 
     /** @var list<string>|null */
     private static ?array $paths = null;
+
+    /** @var list<string>|null */
+    private static ?array $codes = null;
 
     /**
      * @param $key string
@@ -69,19 +69,30 @@ final class Catalog
     }
 
     /**
+     * ISO 639 primary languages known to ICU. Regional tags still work in label().
+     *
      * @return list<string>
      */
     public static function codes(): array
     {
-        return \array_keys(self::names());
-    }
+        if (self::$codes !== null) {
+            return self::$codes;
+        }
+        $out = [];
+        foreach (\ResourceBundle::getLocales('') as $locale) {
+            if (! \is_string($locale) || $locale === '') {
+                continue;
+            }
+            $lang = \Locale::getPrimaryLanguage($locale);
+            if (! \is_string($lang) || $lang === '' || $lang === 'und') {
+                continue;
+            }
+            $out[$lang] = true;
+        }
+        $codes = \array_keys($out);
+        \sort($codes);
 
-    /**
-     * @return list<string>
-     */
-    public static function rtl_codes(): array
-    {
-        return self::RTL;
+        return self::$codes = $codes;
     }
 
     /**
@@ -92,178 +103,23 @@ final class Catalog
      */
     public static function label(string $code, bool $prefer_native = true): string
     {
-        $code = \str_replace('-', '_', \strtolower(\trim($code)));
+        $code = \trim($code);
         if ($code === '') {
             return '';
         }
-        $english = self::names()[$code] ?? null;
-        $native = self::native_names()[$code] ?? null;
-        if ($prefer_native && $native !== null) {
-            $text = $native;
-        } elseif ($english !== null) {
-            $text = $english;
-        } elseif ($native !== null) {
-            $text = $native;
-        } else {
-            $text = $code;
+        $tag = \str_replace('_', '-', $code);
+        $in = $prefer_native ? $tag : 'en';
+        $region = \Locale::getRegion($tag);
+        $script = \Locale::getScript($tag);
+        $has_variant = (\is_string($region) && $region !== '') || (\is_string($script) && $script !== '');
+        $name = $has_variant
+            ? \Locale::getDisplayName($tag, $in)
+            : \Locale::getDisplayLanguage($tag, $in);
+        if (! \is_string($name) || $name === '' || $name === $tag) {
+            $name = $code;
         }
 
-        return $text.' ('.$code.')';
-    }
-
-    /**
-     * @param $prefer_native bool
-     *
-     * @return array<string, string>
-     */
-    public static function options(bool $prefer_native = true): array
-    {
-        $out = [];
-        foreach (self::codes() as $code) {
-            $out[$code] = self::label($code, $prefer_native);
-        }
-
-        return $out;
-    }
-
-    /**
-     * @return array<string, string>
-     */
-    public static function names(): array
-    {
-        return [
-            'en' => 'English',
-            'ar' => 'Arabic',
-            'fr' => 'French',
-            'es' => 'Spanish',
-            'de' => 'German',
-            'it' => 'Italian',
-            'pt' => 'Portuguese',
-            'ru' => 'Russian',
-            'zh' => 'Chinese',
-            'ja' => 'Japanese',
-            'ko' => 'Korean',
-            'hi' => 'Hindi',
-            'az' => 'Azerbaijani',
-            'bg' => 'Bulgarian',
-            'bn' => 'Bengali',
-            'ha' => 'Hausa',
-            'ca' => 'Catalan',
-            'ckb' => 'Kurdish (Sorani)',
-            'cs' => 'Czech',
-            'da' => 'Danish',
-            'el' => 'Greek',
-            'fa' => 'Persian',
-            'fi' => 'Finnish',
-            'he' => 'Hebrew',
-            'hr' => 'Croatian',
-            'hu' => 'Hungarian',
-            'hy' => 'Armenian',
-            'id' => 'Indonesian',
-            'ka' => 'Georgian',
-            'km' => 'Khmer',
-            'ku' => 'Kurdish',
-            'lt' => 'Lithuanian',
-            'lv' => 'Latvian',
-            'mk' => 'Macedonian',
-            'ml' => 'Malayalam',
-            'mn' => 'Mongolian',
-            'ms' => 'Malay',
-            'my' => 'Myanmar',
-            'ne' => 'Nepali',
-            'nl' => 'Dutch',
-            'no' => 'Norwegian',
-            'pa' => 'Punjabi',
-            'pl' => 'Polish',
-            'ps' => 'Pashto',
-            'ro' => 'Romanian',
-            'si' => 'Sinhala',
-            'sk' => 'Slovak',
-            'sl' => 'Slovenian',
-            'so' => 'Somali',
-            'sq' => 'Albanian',
-            'sr' => 'Serbian',
-            'sv' => 'Swedish',
-            'sw' => 'Swahili',
-            'ta' => 'Tamil',
-            'th' => 'Thai',
-            'tr' => 'Turkish',
-            'uk' => 'Ukrainian',
-            'ur' => 'Urdu',
-            'uz' => 'Uzbek',
-            'vi' => 'Vietnamese',
-            'zh_CN' => 'Chinese (Simplified)',
-            'zh_TW' => 'Chinese (Traditional)',
-        ];
-    }
-
-    /**
-     * @return array<string, string>
-     */
-    public static function native_names(): array
-    {
-        return [
-            'en' => 'English',
-            'ar' => 'العربية',
-            'fr' => 'Français',
-            'es' => 'Español',
-            'de' => 'Deutsch',
-            'it' => 'Italiano',
-            'pt' => 'Português',
-            'ru' => 'Русский',
-            'zh' => '中文',
-            'ja' => '日本語',
-            'ko' => '한국어',
-            'hi' => 'हिन्दी',
-            'az' => 'Azərbaycan dili',
-            'bg' => 'Български',
-            'bn' => 'বাংলা',
-            'ca' => 'Català',
-            'cs' => 'Čeština',
-            'da' => 'Dansk',
-            'el' => 'Ελληνικά',
-            'fa' => 'فارسی',
-            'fi' => 'Suomi',
-            'he' => 'עברית',
-            'hr' => 'Hrvatski',
-            'hu' => 'Magyar',
-            'hy' => 'Հայերեն',
-            'id' => 'Bahasa Indonesia',
-            'ka' => 'ქართული',
-            'km' => 'ខ្មែរ',
-            'ku' => 'کوردی',
-            'lt' => 'Lietuvių',
-            'lv' => 'Latviešu',
-            'mk' => 'Македонски',
-            'ml' => 'മലയാളം',
-            'mn' => 'Монгол',
-            'ms' => 'Bahasa Melayu',
-            'my' => 'မြန်မာ',
-            'ne' => 'नेपाली',
-            'nl' => 'Nederlands',
-            'no' => 'Norsk',
-            'pa' => 'ਪੰਜਾਬੀ',
-            'pl' => 'Polski',
-            'ps' => 'پښتو',
-            'ro' => 'Română',
-            'si' => 'සිංහල',
-            'sk' => 'Slovenčina',
-            'sl' => 'Slovenščina',
-            'so' => 'Soomaali',
-            'sq' => 'Shqip',
-            'sr' => 'Српски',
-            'sv' => 'Svenska',
-            'sw' => 'Kiswahili',
-            'ta' => 'தமிழ்',
-            'th' => 'ไทย',
-            'tr' => 'Türkçe',
-            'uk' => 'Українська',
-            'ur' => 'اردو',
-            'uz' => 'Oʻzbekcha',
-            'vi' => 'Tiếng Việt',
-            'zh_CN' => '简体中文',
-            'zh_TW' => '繁體中文',
-        ];
+        return $name.' ('.$code.')';
     }
 
     /**
@@ -273,6 +129,7 @@ final class Catalog
     {
         self::$files = [];
         self::$paths = null;
+        self::$codes = null;
     }
 
     /**

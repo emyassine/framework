@@ -68,12 +68,23 @@ final class FastI18nTest extends TestCase
     /**
      * @return void
      */
-    public function test_direction_and_catalog(): void
+    public function test_direction_and_catalog_use_icu_locale(): void
     {
         $this->assertSame('rtl', i18n_direction('ar'));
         $this->assertTrue(i18n_is_rtl('he'));
+        $this->assertTrue(i18n_is_rtl('fa'));
+        $this->assertTrue(i18n_is_rtl('ur'));
         $this->assertFalse(i18n_is_rtl('en'));
-        $this->assertContains('fr', i18n_catalog_languages());
-        $this->assertStringContainsString('(ar)', i18n_catalog_language_label('ar'));
+        $this->assertSame('French', \Locale::getDisplayLanguage('fr', 'en'));
+        $this->assertSame(
+            'French (fr)',
+            i18n_catalog_language_label('fr', false),
+        );
+        $this->assertStringContainsString('العربية', i18n_catalog_language_label('ar', true));
+        $this->assertStringContainsString('China', \Locale::getDisplayName('zh_CN', 'en'));
+        $codes = i18n_catalog_languages();
+        $this->assertContains('fr', $codes);
+        $this->assertContains('yo', $codes);
+        $this->assertGreaterThan(100, \count($codes));
     }
 }

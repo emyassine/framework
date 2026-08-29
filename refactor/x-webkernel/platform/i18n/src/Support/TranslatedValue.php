@@ -32,7 +32,7 @@ final class TranslatedValue
      */
     public static function from_scalar(mixed $value, ?array $locales = null): array
     {
-        $locales ??= self::locales();
+        $locales ??= [self::default_locale()];
         $map = [];
         foreach ($locales as $locale) {
             $map[$locale] = $value;

@@ -13,6 +13,7 @@
     ],
     "require": {
         "php": ">=8.4",
+        "ext-intl": "*",
         "webkernel/codebase": "^0.12.0"
     },
     "autoload": {

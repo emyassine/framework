@@ -10,49 +10,9 @@ use Webkernel\I18n\I18nContext;
 use Webkernel\I18n\Support\LocaleDirection;
 use Webkernel\I18n\Support\TranslatedValue;
 
-if (! \function_exists('lang')) {
-    /**
-     * @param $key string
-     * @param $replace array<string, string|int|float>
-     * @param $locale string|null
-     *
-     * @return string
-     */
-    function lang(string $key, array $replace = [], ?string $locale = null): string
-    {
-        return Catalog::translate($key, $replace, $locale);
-    }
-}
-
-if (! \function_exists('i18n_path')) {
-    /**
-     * @param $path string|null
-     *
-     * @return string
-     */
-    function i18n_path(?string $path = null): string
-    {
-        $root = \dirname(__DIR__);
-
-        return $path ? $root.'/'.\ltrim($path, '/') : $root;
-    }
-}
-
-if (! \function_exists('component_i18n_path')) {
-    /**
-     * @param $path string|null
-     *
-     * @return string
-     */
-    function component_i18n_path(?string $path = null): string
-    {
-        return i18n_path($path);
-    }
-}
-
 if (! \function_exists('fast_i18n')) {
     /**
-     * Stateless O(1) locale map lookup. Pass $locale on hot paths.
+     * Inline locale map. Pass $locale on hot paths (no context lookup).
      *
      * @param $map array<string, string>
      * @param $locale string|null
@@ -84,8 +44,26 @@ if (! \function_exists('fast_i18n')) {
     }
 }
 
+if (! \function_exists('lang')) {
+    /**
+     * File catalog: LANG_PATH / {locale}/translations.php.
+     *
+     * @param $key string
+     * @param $replace array<string, string|int|float>
+     * @param $locale string|null
+     *
+     * @return string
+     */
+    function lang(string $key, array $replace = [], ?string $locale = null): string
+    {
+        return Catalog::translate($key, $replace, $locale);
+    }
+}
+
 if (! \function_exists('translated_value')) {
     /**
+     * Model column envelope: { translations: { en: …, fr: … } }.
+     *
      * @param $map array<string, mixed>
      *
      * @return array{translations: array<string, mixed>}
@@ -98,6 +76,8 @@ if (! \function_exists('translated_value')) {
 
 if (! \function_exists('fast_i18n_model')) {
     /**
+     * Resolve fast_i18n from a translated_value() column (or a bare string).
+     *
      * @param $column array<string, mixed>|string|null
      * @param $locale string|null
      * @param $key string
@@ -127,82 +107,27 @@ if (! \function_exists('fast_i18n_model')) {
     }
 }
 
-if (! \function_exists('i18n_catalog_languages')) {
+if (! \function_exists('i18n_current_lang')) {
     /**
-     * @return list<string>
-     */
-    function i18n_catalog_languages(): array
-    {
-        return Catalog::codes();
-    }
-}
-
-if (! \function_exists('i18n_catalog_language_label')) {
-    /**
-     * @param $code string
-     * @param $prefer_native bool
+     * Request locale (I18nContext), else app.locale.
      *
      * @return string
      */
-    function i18n_catalog_language_label(string $code, bool $prefer_native = true): string
+    function i18n_current_lang(): string
     {
-        return Catalog::label($code, $prefer_native);
-    }
-}
+        $locale = I18nContext::get_locale();
 
-if (! \function_exists('i18n_catalog_options')) {
-    /**
-     * @param $prefer_native bool
-     *
-     * @return array<string, string>
-     */
-    function i18n_catalog_options(bool $prefer_native = true): array
-    {
-        return Catalog::options($prefer_native);
-    }
-}
-
-if (! \function_exists('i18n_actual_langs')) {
-    /**
-     * @param $panel_id string|null
-     *
-     * @return list<string>
-     */
-    function i18n_actual_langs(?string $panel_id = null): array
-    {
-        // ponytail: panel locale allow-list is not built — catalog codes until panel scopes exist
-        unset($panel_id);
-
-        return Catalog::codes();
+        return $locale !== '' ? $locale : Catalog::default_locale();
     }
 }
 
 if (! \function_exists('i18n_default_lang')) {
     /**
-     * @param $panel_id string|null
-     *
      * @return string
      */
-    function i18n_default_lang(?string $panel_id = null): string
+    function i18n_default_lang(): string
     {
-        unset($panel_id);
-
         return Catalog::default_locale();
-    }
-}
-
-if (! \function_exists('i18n_current_lang')) {
-    /**
-     * @param $panel_id string|null
-     *
-     * @return string
-     */
-    function i18n_current_lang(?string $panel_id = null): string
-    {
-        unset($panel_id);
-        $locale = I18nContext::get_locale();
-
-        return $locale !== '' ? $locale : Catalog::default_locale();
     }
 }
 
@@ -232,15 +157,30 @@ if (! \function_exists('i18n_is_rtl')) {
     }
 }
 
-if (! \function_exists('i18n_lang_label')) {
+if (! \function_exists('i18n_catalog_languages')) {
     /**
+     * ICU primary languages (ext-intl). Any code still works in i18n_catalog_language_label().
+     *
+     * @return list<string>
+     */
+    function i18n_catalog_languages(): array
+    {
+        return Catalog::codes();
+    }
+}
+
+if (! \function_exists('i18n_catalog_language_label')) {
+    /**
+     * Locale::getDisplayLanguage / getDisplayName. $prefer_native = name in that language.
+     *
      * @param $code string
+     * @param $prefer_native bool
      *
      * @return string
      */
-    function i18n_lang_label(string $code): string
+    function i18n_catalog_language_label(string $code, bool $prefer_native = true): string
     {
-        return Catalog::label($code);
+        return Catalog::label($code, $prefer_native);
     }
 }
 
