@@ -7,16 +7,17 @@
 
 if (! function_exists('view')) {
     /**
-     * @param  array<string, mixed>  $data
-     * @param  array<string, mixed>  $merge_data
+     * @param $view string|null
+     * @param $data array<string, mixed>
+     * @param $merge_data array<string, mixed>
+     *
+     * @return \Webkernel\View\View
      */
-    function view(?string $view = null, array $data = [], array $merge_data = []): \Webkernel\View\View|\Webkernel\View\Compiler
+    function view(?string $view = null, array $data = [], array $merge_data = []): \Webkernel\View\View
     {
-        if ($view === null) {
-            return \Webkernel\View\View::compiler();
-        }
-
-        return \Webkernel\View\View::make($view, $data, $merge_data);
+        return $view === null
+            ? new \Webkernel\View\View()
+            : \Webkernel\View\View::make($view, $data, $merge_data);
     }
 }
 

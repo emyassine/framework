@@ -7,17 +7,14 @@
 
 namespace Webkernel\View;
 
+use Webkernel\View\Compile\Directives;
+use Webkernel\View\Compile\Mode;
+
 /**
- * Runtime for compiled views. Compiler.php is loaded only when a
- * template is missing or newer than its compiled file.
+ * Runtime for compiled views. Compiler is loaded only on compile miss.
  */
 final class Engine
 {
-    public const MODE_AUTO = 0;
-
-    public const MODE_SLOW = 1;
-
-    public const MODE_FAST = 2;
 
     private const PARENT_KEY = '@parentXYZABC';
 
@@ -57,9 +54,6 @@ final class Engine
     /** @var array<string, list<string>> */
     private array $component_namespaces = [];
 
-    /** @var array<string, string> */
-    private array $alias_classes = [];
-
     /** @var list<string> */
     private array $component_stack = [];
 
@@ -76,14 +70,19 @@ final class Engine
 
     private ?Compiler $compiler = null;
 
+    private readonly Directives $directives;
+
     /**
-     * @param list<string> $template_path
+     * @param $template_path list<string>
+     * @param $compile_dpath string
+     * @param $mode Mode
      */
     public function __construct(
         private array $template_path,
         private readonly string $compile_dpath,
-        private readonly int $mode = self::MODE_AUTO,
+        private readonly Mode $mode = Mode::Auto,
     ) {
+        $this->directives = new Directives();
     }
 
     /**
@@ -179,9 +178,15 @@ final class Engine
         return $last;
     }
 
-    public function compile_stack_final(mixed $a = null, mixed $b = null): string
+    /**
+     * @param $section string
+     * @param $default mixed
+     *
+     * @return string
+     */
+    public function stack(string $section, mixed $default = ''): string
     {
-        return self::ESCAPE_STACK_0.$a.','.$b.self::ESCAPE_STACK_1;
+        return self::ESCAPE_STACK_0.$section.','.$default.self::ESCAPE_STACK_1;
     }
 
     /**
@@ -286,11 +291,6 @@ final class Engine
         $this->echo_format = $format;
     }
 
-    public function add_alias_classes(string $alias_name, string $class_with_ns): void
-    {
-        $this->alias_classes[$alias_name] = $class_with_ns;
-    }
-
     public function template_file(string $template_name): string
     {
         if (isset($this->template_files[$template_name])) {
@@ -310,34 +310,41 @@ final class Engine
         return $this->template_files[$template_name] = $this->locate($rel, $namespace);
     }
 
-    public function __call(string $name, array $arguments): mixed
+    /**
+     * @return Directives
+     */
+    public function directives(): Directives
     {
-        return $this->compiler()->{$name}(...$arguments);
+        return $this->directives;
     }
 
+    /**
+     * @param $name string
+     * @param $args mixed ...
+     *
+     * @return bool
+     */
+    public function check(string $name, mixed ...$args): bool
+    {
+        return $this->directives->check($name, ...$args);
+    }
+
+    /**
+     * @param $view string
+     *
+     * @return void
+     */
+    public function compile(string $view): void
+    {
+        $this->compile_view($view, true);
+    }
+
+    /**
+     * @return Compiler
+     */
     public function compiler(): Compiler
     {
-        if ($this->compiler instanceof Compiler) {
-            return $this->compiler;
-        }
-        $compiler = new Compiler($this->template_path, $this->compile_dpath, $this->mode);
-        $compiler->throw_on_error = true;
-        $compiler->set_echo_format($this->echo_format);
-        foreach ($this->alias_classes as $alias => $class) {
-            $compiler->add_alias_classes($alias, $class);
-        }
-        foreach ($this->view_namespaces as $namespace => $dirs) {
-            foreach ($dirs as $dir) {
-                $compiler->add_view_namespace($namespace, $dir);
-            }
-        }
-        foreach ($this->component_namespaces as $namespace => $dirs) {
-            foreach ($dirs as $dir) {
-                $compiler->add_component_namespace($namespace, $dir);
-            }
-        }
-
-        return $this->compiler = $compiler;
+        return $this->compiler ??= new Compiler($this->directives, $this->echo_format);
     }
 
     private function include_view(string $view): void
@@ -360,25 +367,41 @@ final class Engine
 
     private function ensure_compiled(string $view): void
     {
-        if ($this->mode === self::MODE_FAST) {
+        if ($this->mode === Mode::Fast) {
             return;
         }
-        if ($this->mode === self::MODE_SLOW || $this->expired($view)) {
-            if (! is_dir($this->compile_dpath) && ! mkdir($this->compile_dpath, 0775, true) && ! is_dir($this->compile_dpath)) {
-                throw new \RuntimeException('Unable to create '.$this->compile_dpath);
-            }
-            $compiler = $this->compiler();
-            $module = null;
-            if (str_contains($view, '::')) {
-                $module = explode('::', $view, 2)[0];
-                if ($module === 'webkernel') {
-                    $module = 'platform';
-                }
-            }
-            $compiler->acl_view_module = $module;
-            $compiler->compile($view);
-            unset($this->compiled_files[$view], $this->template_files[$view]);
+        if ($this->mode === Mode::Slow || $this->expired($view)) {
+            $this->compile_view($view, false);
         }
+    }
+
+    /**
+     * @param $view string
+     * @param $forced bool
+     *
+     * @return void
+     */
+    private function compile_view(string $view, bool $forced): void
+    {
+        if (! $forced && $this->mode !== Mode::Slow && ! $this->expired($view)) {
+            return;
+        }
+        $template = $this->template_file($view);
+        $compiled = $this->compiled_file($view);
+        if ($template === '' || $compiled === '') {
+            throw new \RuntimeException('Template not found: '.$view);
+        }
+        $compiler = $this->compiler();
+        $module = null;
+        if (str_contains($view, '::')) {
+            $module = explode('::', $view, 2)[0];
+            if ($module === 'webkernel') {
+                $module = 'platform';
+            }
+        }
+        $compiler->set_acl_module($module);
+        $compiler->compile_file($template, $compiled);
+        unset($this->compiled_files[$view], $this->template_files[$view]);
     }
 
     private function expired(string $view): bool

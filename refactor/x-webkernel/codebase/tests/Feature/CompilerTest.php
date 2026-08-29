@@ -8,7 +8,8 @@
 namespace Webkernel\Tests\Feature;
 
 use PHPUnit\Framework\TestCase;
-use Webkernel\Config\Config;
+use Webkernel\View\Compile\Directives;
+use Webkernel\View\Compiler;
 use Webkernel\View\View;
 
 /**
@@ -34,32 +35,46 @@ use Webkernel\View\View;
  * @method void assertLessThan(mixed $expected, mixed $actual, string $message = '')
  * @method void assertLessThanOrEqual(mixed $expected, mixed $actual, string $message = '')
  */
-final class PanelViewTest extends TestCase
+final class CompilerTest extends TestCase
 {
-    protected function setUp(): void
+    /**
+     * @return void
+     */
+    public function test_compile_string_echo_if_foreach_and_extends(): void
     {
-        Config::boot();
-        View::flush();
+        $compiler = new Compiler(new Directives(), '\\'.View::class.'::echo(%s)');
+        $php = $compiler->compile_string(
+            "@extends('webkernel::layouts.page')\n"
+            ."@section('title', 'Hi')\n"
+            ."@if (true)\n{{ \$name }}\n@endif\n"
+            ."@foreach (\$rows as \$row)\n{{ \$row }}\n@endforeach\n"
+            .'{!! $raw !!}'."\n"
+            .'@endsection'."\n"
+        );
+
+        $this->assertStringContainsString('$_shouldextend[', $php);
+        $this->assertStringContainsString("start_section('title', 'Hi')", $php);
+        $this->assertStringContainsString('if(true):', $php);
+        $this->assertStringContainsString('foreach($rows as $row):', $php);
+        $this->assertStringContainsString('endforeach;', $php);
+        $this->assertStringNotContainsString('add_loop', $php);
+        $this->assertStringContainsString('View::echo($name)', $php);
+        $this->assertStringContainsString('echo $raw;', $php);
+        $this->assertStringContainsString("run_child('webkernel::layouts.page')", $php);
     }
 
-    public function test_system_dashboard_uses_page_component_and_sidebar(): void
+    /**
+     * @return void
+     */
+    public function test_custom_if_registers_runtime_check(): void
     {
-        $html = View::make('webkernel::panels.system.dashboard')->render();
+        $directives = new Directives();
+        $directives->condition('env', static fn (string $e): bool => $e === 'prod');
+        $compiler = new Compiler($directives);
+        $php = $compiler->compile_string("@env('prod') yes @endenv");
 
-        $this->assertStringContainsString('webkernel-shell-sidebar', $html);
-        $this->assertStringContainsString('webkernel-shell-page-title', $html);
-        $this->assertStringContainsString('System Admin Panel', $html);
-        $this->assertStringContainsString('href="/billing/invoices"', $html);
-        $this->assertStringContainsString('webkernel-shell-user-menu', $html);
-        $this->assertStringContainsString('<svg', $html);
-        $this->assertStringContainsString('<title>System</title>', $html);
-    }
-
-    public function test_page_component_renders_slot(): void
-    {
-        $html = View::make('webkernel::pages.home')->render();
-
-        $this->assertStringContainsString('webkernel-shell-page', $html);
-        $this->assertStringContainsString('Platform is working', $html);
+        $this->assertStringContainsString("check('env', 'prod')", $php);
+        $this->assertTrue($directives->check('env', 'prod'));
+        $this->assertFalse($directives->check('env', 'dev'));
     }
 }

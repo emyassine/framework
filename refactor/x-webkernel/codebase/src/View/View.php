@@ -8,6 +8,7 @@
 namespace Webkernel\View;
 
 use Webkernel\Composables\ComposableContract;
+use Webkernel\View\Compile\Mode;
 
 /**
  * Views. Templates: {name}.view.php
@@ -117,18 +118,7 @@ final class View implements ComposableContract, \Stringable
      */
     public static function if(string $name, callable $callback): void
     {
-        $compiler = self::compiler();
-        $compiler->register_if_statement($name, $callback);
-        $compiler->directive('unless'.$name, static function (?string $expression) use ($name, $compiler): string {
-            $tmp = $compiler->strip_parentheses($expression);
-
-            return ($expression !== null && $expression !== '')
-                ? $compiler->php_tag." if (! \$this->check('$name', $tmp)): ?>"
-                : $compiler->php_tag." if (! \$this->check('$name')): ?>";
-        });
-        $compiler->directive('endunless'.$name, static function () use ($compiler): string {
-            return $compiler->php_tag.' endif; ?>';
-        });
+        self::engine()->directives()->condition($name, $callback);
     }
 
     /**
@@ -174,11 +164,9 @@ final class View implements ComposableContract, \Stringable
         $engine = new Engine(
             $dirs,
             webapp_path('platform/storage/framework/views'),
-            Engine::MODE_AUTO,
+            Mode::Auto,
         );
         $engine->set_echo_format('\\'.self::class.'::echo(%s)');
-        $engine->add_alias_classes('Js', Js::class);
-        $engine->add_alias_classes('View', self::class);
         self::apply_namespaces($engine, $compiled);
 
         return self::$engine = $engine;

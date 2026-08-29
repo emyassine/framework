@@ -4,14 +4,19 @@
 //> Yassine El Moumen <yassine@numerimondes.com> | <platform@webkernelphp.com>
 //> For the full copyright and license information, please view the LICENSE
 //> file that was distributed with this source code.
-//
-// WARNING: Some keys in this file are written by the platform itself (see
-// "platform-managed" comments). Do not edit those keys by hand — your changes
-// will be overwritten on next boot if the platform detects a drift.
 
-return array (
-  'tests' => 
-  array (
-    'probe' => 1,
-  ),
-);
+namespace Webkernel\View\Compile;
+
+/**
+ * Compile policy for Engine.
+ *
+ * Auto: compile when the source is newer than the compiled file.
+ * Slow: compile every request.
+ * Fast: never compile (production, dump-autoload already wrote the files).
+ */
+enum Mode: int
+{
+    case Auto = 0;
+    case Slow = 1;
+    case Fast = 2;
+}

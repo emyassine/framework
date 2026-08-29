@@ -82,8 +82,10 @@
 	"require-dev": {
         "phpunit/phpunit": "^11.5"
     },
-	"scripts": {
-		"dump-autoload" : "composer dump-autoload -o",
-		"test": "phpunit"
+    "scripts": {
+	        "dump-autoload": ["composer dump-autoload -o",
+	        "composer dump-autoload --optimize --classmap-authoritative"
+        ],
+    		"test": "phpunit"
 	}
 }

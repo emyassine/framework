@@ -720,7 +720,7 @@ final readonly class DumpAutoloadCommand
             $name = \str_replace('/', '.', \substr($rel, 0, -9));
             $view = $namespace.'::'.$name;
             try {
-                $engine->compiler()->compile($view, true);
+                $engine->compile($view);
             } catch (\Throwable $e) {
                 $this->terminal()->warning('view compile '.$view.': '.$e->getMessage());
             }

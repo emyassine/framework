@@ -1,39 +1,39 @@
 <div class="webkernel-shell-user-menu" id="webkernel-shell-user-menu">
- <button type="button" class="webkernel-shell-user-menu__trigger" onclick="toggleUserMenu()" aria-haspopup="menu" aria-expanded="false">
- <span class="webkernel-shell-avatar"><?php echo \Webkernel\View\View::echo(strtoupper(substr((string) ($brand ?? 'W'), 0, 1))); ?></span>
- <span class="webkernel-shell-sidebar-footer__text">
- <span class="webkernel-shell-sidebar-footer__name"><?php echo \Webkernel\View\View::echo($brand ?? 'Webkernel'); ?></span>
- <span class="webkernel-shell-sidebar-footer__role">Signed in</span>
- </span>
- <span class="webkernel-shell-user-menu__chevron">
- <span class="webkernel-shell-icon"><svg class="webkernel-shell-icon__svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
- <path d="m18 15-6-6-6 6"/>
+  <button type="button" class="webkernel-shell-user-menu__trigger" onclick="toggleUserMenu()" aria-haspopup="menu" aria-expanded="false">
+    <span class="webkernel-shell-avatar"><?php echo \Webkernel\View\View::echo(strtoupper(substr((string) ($brand ?? 'W'), 0, 1))); ?></span>
+    <span class="webkernel-shell-sidebar-footer__text">
+      <span class="webkernel-shell-sidebar-footer__name"><?php echo \Webkernel\View\View::echo($brand ?? 'Webkernel'); ?></span>
+      <span class="webkernel-shell-sidebar-footer__role">Signed in</span>
+    </span>
+    <span class="webkernel-shell-user-menu__chevron">
+      <span class="webkernel-shell-icon"><svg class="webkernel-shell-icon__svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <path d="m18 15-6-6-6 6"/>
 </svg></span>
- </span>
- </button>
- <div class="webkernel-shell-user-menu__panel" role="menu">
- <a href="/system" role="menuitem">
- <span class="webkernel-shell-icon"><svg class="webkernel-shell-icon__svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
- <circle cx="12" cy="12" r="10"/>
- <circle cx="12" cy="10" r="3"/>
- <path d="M7 20.662V19a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v1.662"/>
+    </span>
+  </button>
+  <div class="webkernel-shell-user-menu__panel" role="menu">
+    <a href="/system" role="menuitem">
+      <span class="webkernel-shell-icon"><svg class="webkernel-shell-icon__svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <circle cx="12" cy="12" r="10"/>
+  <circle cx="12" cy="10" r="3"/>
+  <path d="M7 20.662V19a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v1.662"/>
 </svg></span>
- Profile
- </a>
- <a href="/system" role="menuitem">
- <span class="webkernel-shell-icon"><svg class="webkernel-shell-icon__svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
- <path d="M9.671 4.136a2.34 2.34 0 0 1 4.659 0 2.34 2.34 0 0 0 3.319 1.915 2.34 2.34 0 0 1 2.33 4.033 2.34 2.34 0 0 0 0 3.831 2.34 2.34 0 0 1-2.33 4.033 2.34 2.34 0 0 0-3.319 1.915 2.34 2.34 0 0 1-4.659 0 2.34 2.34 0 0 0-3.32-1.915 2.34 2.34 0 0 1-2.33-4.033 2.34 2.34 0 0 0 0-3.831A2.34 2.34 0 0 1 6.35 6.051a2.34 2.34 0 0 0 3.319-1.915"/>
- <circle cx="12" cy="12" r="3"/>
+      Profile
+    </a>
+    <a href="/system" role="menuitem">
+      <span class="webkernel-shell-icon"><svg class="webkernel-shell-icon__svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M9.671 4.136a2.34 2.34 0 0 1 4.659 0 2.34 2.34 0 0 0 3.319 1.915 2.34 2.34 0 0 1 2.33 4.033 2.34 2.34 0 0 0 0 3.831 2.34 2.34 0 0 1-2.33 4.033 2.34 2.34 0 0 0-3.319 1.915 2.34 2.34 0 0 1-4.659 0 2.34 2.34 0 0 0-3.32-1.915 2.34 2.34 0 0 1-2.33-4.033 2.34 2.34 0 0 0 0-3.831A2.34 2.34 0 0 1 6.35 6.051a2.34 2.34 0 0 0 3.319-1.915"/>
+  <circle cx="12" cy="12" r="3"/>
 </svg></span>
- Settings
- </a>
- <a href="/" role="menuitem">
- <span class="webkernel-shell-icon"><svg class="webkernel-shell-icon__svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
- <path d="m16 17 5-5-5-5"/>
- <path d="M21 12H9"/>
- <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+      Settings
+    </a>
+    <a href="/" role="menuitem">
+      <span class="webkernel-shell-icon"><svg class="webkernel-shell-icon__svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <path d="m16 17 5-5-5-5"/>
+  <path d="M21 12H9"/>
+  <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
 </svg></span>
- Sign out
- </a>
- </div>
+      Sign out
+    </a>
+  </div>
 </div>

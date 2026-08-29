@@ -6,6 +6,31 @@
 //> file that was distributed with this source code.
 
 namespace Webkernel\Lifecycle;
+/**
+ * @noinspection PhpUnusedParameterInspection
+ * @noinspection SyntaxError
+ * @noinspection ForgottenDebugOutputInspection
+ * @noinspection UnknownInspectionInspection
+ * @noinspection TypeUnsafeComparisonInspection
+ * @noinspection NonSecureExtractUsageInspection
+ * @noinspection PregQuoteUsageInspection
+ * @noinspection NotOptimalRegularExpressionsInspection
+ * @noinspection SubStrUsedAsStrPosInspection
+ * @noinspection ThrowRawExceptionInspection
+ * @noinspection Annotator
+ * @noinspection IsNullFunctionUsageInspection
+ * @noinspection CallableParameterUseCaseInTypeContextInspection
+ * @noinspection PhpUnused
+ * @noinspection PhpFullyQualifiedNameUsageInspection
+ * @noinspection PhpComposerExtensionStubsInspection
+ * @noinspection PhpUndefinedClassInspection
+ * @noinspection PhpUndefinedNamespaceInspection
+ * @noinspection PhpUndefinedTypeInspection
+ * @noinspection PhpMissingReturnTypeInspection
+ * @noinspection PhpMissingParamTypeInspection
+ * @noinspection PhpInconsistentReturnPointsInspection
+ * @noinspection PhpUnhandledExceptionInspection
+ */
 
 use Composer\Composer;
 use Composer\EventDispatcher\EventSubscriberInterface;
