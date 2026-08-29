@@ -1,0 +1,60 @@
+<script>
+  function toggleTheme() {
+    const html = document.documentElement;
+    const next = html.dataset.webkernelDesignTheme === 'dark' ? 'light' : 'dark';
+    html.dataset.webkernelDesignTheme = next;
+    const sun = document.getElementById('icon-sun');
+    const moon = document.getElementById('icon-moon');
+    if (sun) sun.style.display = next === 'dark' ? 'none' : 'block';
+    if (moon) moon.style.display = next === 'dark' ? 'block' : 'none';
+    localStorage.setItem('webkernel-design-theme', next);
+  }
+
+  function toggleSidebar() {
+    const html = document.documentElement;
+    html.dataset.webkernelDesignSidebar = html.dataset.webkernelDesignSidebar === 'collapsed' ? 'expanded' : 'collapsed';
+    localStorage.setItem('webkernel-design-sidebar', html.dataset.webkernelDesignSidebar);
+  }
+
+  function setLayout(layout) {
+    document.documentElement.dataset.webkernelDesignLayout = layout;
+    ['sidebar', 'topnav', 'horizontal'].forEach(id => {
+      const btn = document.getElementById('btn-layout-' + id);
+      if (btn) btn.classList.toggle('active', id === layout);
+    });
+    if (layout !== 'sidebar') {
+      document.documentElement.dataset.webkernelDesignSidebar = 'expanded';
+    }
+    localStorage.setItem('webkernel-design-layout', layout);
+  }
+
+  (function restoreState() {
+    const savedTheme = localStorage.getItem('webkernel-design-theme');
+    const savedLayout = localStorage.getItem('webkernel-design-layout');
+    const savedSidebar = localStorage.getItem('webkernel-design-sidebar');
+
+    if (savedTheme) {
+      document.documentElement.dataset.webkernelDesignTheme = savedTheme;
+      if (savedTheme === 'dark') {
+        const sun = document.getElementById('icon-sun');
+        const moon = document.getElementById('icon-moon');
+        if (sun) sun.style.display = 'none';
+        if (moon) moon.style.display = 'block';
+      }
+    }
+    if (savedLayout) setLayout(savedLayout);
+    if (savedSidebar) document.documentElement.dataset.webkernelDesignSidebar = savedSidebar;
+  })();
+
+  function toggleUserMenu() {
+    const el = document.getElementById('webkernel-shell-user-menu');
+    if (el) el.classList.toggle('is-open');
+  }
+  document.addEventListener('click', function (event) {
+    const el = document.getElementById('webkernel-shell-user-menu');
+    if (!el || el.contains(event.target)) {
+      return;
+    }
+    el.classList.remove('is-open');
+  });
+</script>

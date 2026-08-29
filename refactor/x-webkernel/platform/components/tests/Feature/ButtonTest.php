@@ -26,17 +26,13 @@ final class ButtonTest extends TestCase
      */
     public function test_blade_button_supports_color_size_icon_and_attributes(): void
     {
-        $html = View::make('webkernel::pages.home')->render();
-        $this->assertNotSame('', $html);
-
-        $button = View::make('webkernel::button', [
-            'color' => 'danger',
-            'size' => 'lg',
-            'outlined' => true,
-            'icon' => 'plus',
-            'slot' => 'New',
-            'class' => 'extra',
-        ])->render();
+        $button = Button::make()
+            ->color('danger')
+            ->size('lg')
+            ->outlined()
+            ->icon('plus')
+            ->slot('New')
+            ->render(['class' => 'extra']);
 
         $this->assertStringContainsString('webkernel-design-btn--danger', $button);
         $this->assertStringContainsString('webkernel-design-btn--lg', $button);

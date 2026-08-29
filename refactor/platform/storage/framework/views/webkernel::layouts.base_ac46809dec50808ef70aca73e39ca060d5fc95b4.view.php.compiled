@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html
+  lang="<?php echo \Webkernel\View\View::echo($lang ?? 'en'); ?>"
+  data-webkernel-design-theme="<?php echo \Webkernel\View\View::echo($theme ?? 'light'); ?>"
+  data-webkernel-design-layout="<?php echo \Webkernel\View\View::echo($layout ?? 'base'); ?>"
+>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title><?php echo \Webkernel\View\View::echo($title ?? 'Webkernel'); ?></title>
+  <?php echo $this->run_child('webkernel::layouts.partials.tokens'); ?>
+  <?php echo  $this->stack('styles'); ?>
+</head>
+<body>
+  <?php echo $this->yield_content('content'); ?>
+  <?php echo  $this->stack('scripts'); ?>
+</body>
+</html>

@@ -12,4 +12,5 @@ use Webkernel\PlatformProvider;
 final class ComponentsProvider extends PlatformProvider
 {
     public const COMPONENTS = [__DIR__.'/../resources/views'];
+    public const VIEWS = [__DIR__.'/../resources/views'];
 }

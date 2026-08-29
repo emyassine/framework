@@ -703,8 +703,14 @@ final readonly class DumpAutoloadCommand
         View::flush();
         $engine = View::engine();
         foreach (['VIEWS', 'COMPONENTS'] as $constant) {
+            $components = $constant === 'COMPONENTS';
             foreach ($this->collect_provider_paths($providers, $constant) as $namespace => $dirs) {
                 foreach ($dirs as $base) {
+                    if ($components) {
+                        $engine->add_component_namespace($namespace, $base);
+                    } else {
+                        $engine->add_view_namespace($namespace, $base);
+                    }
                     $this->compile_tree($engine, $base, $namespace);
                 }
             }
@@ -729,6 +735,9 @@ final readonly class DumpAutoloadCommand
                 continue;
             }
             $name = \str_replace('/', '.', \substr($rel, 0, -9));
+            if (\str_ends_with($name, '.index')) {
+                $name = \substr($name, 0, -6);
+            }
             $view = $namespace.'::'.$name;
             try {
                 $engine->compile($view);
