@@ -1894,6 +1894,7 @@ class ComposerStaticInitcc6f492cc5d64cb7f09b9024726d6929
         'Webkernel\\Platform\\Components\\TextInput' => __DIR__ . '/..' . '/webkernel/components/src/TextInput.php',
         'Webkernel\\Platform\\Http\\Middleware\\Authenticate' => __DIR__ . '/..' . '/webkernel/panels/src/Http/Middleware/Authenticate.php',
         'Webkernel\\Platform\\Pages\\Dashboard' => __DIR__ . '/..' . '/webkernel/panels/src/Pages/Dashboard.php',
+        'Webkernel\\Platform\\Pages\\ManagePanel' => __DIR__ . '/..' . '/webkernel/panels/src/Pages/ManagePanel.php',
         'Webkernel\\Platform\\Panel' => __DIR__ . '/..' . '/webkernel/panels/src/Panel.php',
         'Webkernel\\Platform\\PanelProvider' => __DIR__ . '/..' . '/webkernel/panels/src/PanelProvider.php',
         'Webkernel\\Platform\\PanelsProvider' => __DIR__ . '/..' . '/webkernel/panels/src/PanelsProvider.php',

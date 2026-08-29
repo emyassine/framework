@@ -140,7 +140,6 @@ final readonly class DumpAutoloadCommand
         );
         $this->dump_typography();
         $this->dump_wds_css($providers);
-        $this->dump_ips_chrome();
         $this->strip_dev_autoload_files($composer_dir);
         $this->ensure_path_helpers();
         $this->rebuild_compiled_routes($composer_dir);

@@ -14,4 +14,12 @@ return array (
   array (
     'probe' => 1,
   ),
+  'panels' => 
+  array (
+    'system' => 
+    array (
+      'logo' => '',
+      'logo_shape' => 'round',
+    ),
+  ),
 );

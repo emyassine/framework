@@ -83,6 +83,7 @@ return array(
     'Webkernel\\Platform\\Components\\TextInput' => $b . '/x-webkernel/platform/components/src/TextInput.php',
     'Webkernel\\Platform\\Http\\Middleware\\Authenticate' => $b . '/x-webkernel/platform/panels/src/Http/Middleware/Authenticate.php',
     'Webkernel\\Platform\\Pages\\Dashboard' => $b . '/x-webkernel/platform/panels/src/Pages/Dashboard.php',
+    'Webkernel\\Platform\\Pages\\ManagePanel' => $b . '/x-webkernel/platform/panels/src/Pages/ManagePanel.php',
     'Webkernel\\Platform\\Panel' => $b . '/x-webkernel/platform/panels/src/Panel.php',
     'Webkernel\\Platform\\PanelProvider' => $b . '/x-webkernel/platform/panels/src/PanelProvider.php',
     'Webkernel\\Platform\\PanelsProvider' => $b . '/x-webkernel/platform/panels/src/PanelsProvider.php',

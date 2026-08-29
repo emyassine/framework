@@ -16,5 +16,7 @@ final class PanelsProvider extends PlatformProvider
         'webkernel' => __DIR__.'/../resources/views',
     ];
 
+    public const LANG_PATH = [__DIR__.'/../lang'];
+
     public const PANELS = [SystemPanelProvider::class];
 }

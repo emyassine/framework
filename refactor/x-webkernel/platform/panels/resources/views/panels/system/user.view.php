@@ -9,15 +9,11 @@
   <div class="wds-user-menu-panel" role="menu">
     <a href="/system" role="menuitem">
       <span class="wds-icon">{!! icon('circle-user', 'wds-icon-svg') !!}</span>
-      Profile
-    </a>
-    <a href="/system" role="menuitem">
-      <span class="wds-icon">{!! icon('settings', 'wds-icon-svg') !!}</span>
-      Settings
+      {{ lang('panel.profile') }}
     </a>
     <a href="/" role="menuitem">
       <span class="wds-icon">{!! icon('log-out', 'wds-icon-svg') !!}</span>
-      Sign out
+      {{ lang('panel.sign_out') }}
     </a>
   </div>
 </div>

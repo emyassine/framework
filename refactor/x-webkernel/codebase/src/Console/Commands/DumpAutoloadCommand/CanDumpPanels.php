@@ -50,6 +50,10 @@ trait CanDumpPanels
                 $snapshot['package_provider'] = $provider;
                 $snapshot['prefix'] = $row['prefix'];
                 $snapshot['package'] = $row['package'] ?? '';
+                $manage = 'Webkernel\\Platform\\Pages\\ManagePanel';
+                if (! \in_array($manage, $snapshot['pages'], true)) {
+                    $snapshot['pages'][] = $manage;
+                }
                 $snapshot['navigation'] = $this->panel_navigation($snapshot, $classmap);
                 $out[] = $snapshot;
             }
@@ -73,7 +77,23 @@ trait CanDumpPanels
                 if (! \is_string($page) || $page === '') {
                     continue;
                 }
-                $out[] = [['GET', 'HEAD'], $prefix === '' ? '/' : $prefix, $page];
+                $uri = $prefix === '' ? '/' : $prefix;
+                $methods = ['GET', 'HEAD'];
+                $this->ensure_class($page, $classmap);
+                if (\class_exists($page) && \is_callable([$page, 'route'])) {
+                    $def = $page::route();
+                    if (\is_array($def)) {
+                        $path = \trim((string) ($def['path'] ?? '/'), '/');
+                        if ($path !== '') {
+                            $uri = ($prefix === '' ? '' : $prefix).'/'.$path;
+                        }
+                        if (isset($def['methods']) && \is_array($def['methods'])) {
+                            $methods = $def['methods'];
+                        }
+                    }
+                }
+                /** @var list<string> $methods */
+                $out[] = [\array_values(\array_map(\strval(...), $methods)), $uri === '' ? '/' : $uri, $page];
             }
             foreach ($panel['resources'] ?? [] as $resource) {
                 if (! \is_string($resource) || $resource === '') {
@@ -113,20 +133,21 @@ trait CanDumpPanels
     /**
      * @param $panel array<string, mixed>
      * @param $classmap array<string, string>
-     * @return list<array{label: string, items: list<array{label: string, href: string}>}>
+     * @return list<array{label: string, items: list<array{label: string, href: string, icon?: string}>}>
      */
     private function panel_navigation(array $panel, array $classmap): array
     {
         $base = '/'.\trim((string) ($panel['path'] ?? $panel['id'] ?? ''), '/');
+        $manage = 'Webkernel\\Platform\\Pages\\ManagePanel';
         $items = [];
         foreach ($panel['pages'] ?? [] as $page) {
-            if (! \is_string($page) || $page === '') {
+            if (! \is_string($page) || $page === '' || $page === $manage) {
                 continue;
             }
             $this->ensure_class($page, $classmap);
             $href = $base;
             if (\class_exists($page) && \is_callable([$page, 'route'])) {
-                $def = $page::route('/');
+                $def = $page::route();
                 if (\is_array($def)) {
                     $path = \trim((string) ($def['path'] ?? '/'), '/');
                     $href = $path === '' ? $base : $base.'/'.$path;
@@ -135,6 +156,7 @@ trait CanDumpPanels
             $items[] = [
                 'label' => $this->class_label($page),
                 'href' => $href === '' ? '/' : $href,
+                'icon' => 'layout-dashboard',
             ];
         }
         foreach ($panel['resources'] ?? [] as $resource) {
@@ -153,15 +175,18 @@ trait CanDumpPanels
             $items[] = [
                 'label' => $label,
                 'href' => $href === '' ? '/' : $href,
+                'icon' => (string) ($panel['icon'] ?? 'package'),
             ];
         }
-        if ($items === []) {
-            return [];
-        }
+        $items[] = [
+            'label' => 'panel.manage',
+            'href' => \rtrim($base, '/').'/manage',
+            'icon' => 'sliders',
+        ];
 
         return [
             [
-                'label' => 'Overview',
+                'label' => 'panel.overview',
                 'items' => $items,
             ],
         ];

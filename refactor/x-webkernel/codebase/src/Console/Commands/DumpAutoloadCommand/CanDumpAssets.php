@@ -20,7 +20,7 @@ trait CanDumpAssets
     use _DumpAutoloadCommand;
 
     /** @var list<string> */
-    private const WDS_CSS_ORDER = ['tokens', 'simple', 'btn', 'page', 'field'];
+    private const WDS_CSS_ORDER = ['tokens', 'shell', 'simple', 'btn', 'page', 'field'];
 
     /**
      * @param list<array{path: string, package: array<string, mixed>}> $packages
@@ -79,6 +79,20 @@ trait CanDumpAssets
             $icon = $panel['icon'] ?? '';
             if (\is_string($icon) && $icon !== '') {
                 $names['lucide/'.$icon] = true;
+            }
+            foreach ($panel['navigation'] ?? [] as $group) {
+                if (! \is_array($group)) {
+                    continue;
+                }
+                foreach ($group['items'] ?? [] as $item) {
+                    if (! \is_array($item)) {
+                        continue;
+                    }
+                    $item_icon = $item['icon'] ?? '';
+                    if (\is_string($item_icon) && $item_icon !== '') {
+                        $names['lucide/'.$item_icon] = true;
+                    }
+                }
             }
         }
         $out = [];

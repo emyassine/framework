@@ -19,6 +19,7 @@ return array (
     'default' => false,
     'pages' => 
     array (
+      0 => 'Webkernel\\Platform\\Pages\\ManagePanel',
     ),
     'widgets' => 
     array (
@@ -53,13 +54,20 @@ return array (
     array (
       0 => 
       array (
-        'label' => 'Overview',
+        'label' => 'panel.overview',
         'items' => 
         array (
           0 => 
           array (
             'label' => 'Invoices',
             'href' => '/billing/invoices',
+            'icon' => 'receipt',
+          ),
+          1 => 
+          array (
+            'label' => 'panel.manage',
+            'href' => '/billing/manage',
+            'icon' => 'sliders',
           ),
         ),
       ),
@@ -77,6 +85,7 @@ return array (
     'pages' => 
     array (
       0 => 'Webkernel\\Platform\\Pages\\Dashboard',
+      1 => 'Webkernel\\Platform\\Pages\\ManagePanel',
     ),
     'widgets' => 
     array (
@@ -111,13 +120,20 @@ return array (
     array (
       0 => 
       array (
-        'label' => 'Overview',
+        'label' => 'panel.overview',
         'items' => 
         array (
           0 => 
           array (
             'label' => 'Dashboard',
             'href' => '/system',
+            'icon' => 'layout-dashboard',
+          ),
+          1 => 
+          array (
+            'label' => 'panel.manage',
+            'href' => '/system/manage',
+            'icon' => 'sliders',
           ),
         ),
       ),

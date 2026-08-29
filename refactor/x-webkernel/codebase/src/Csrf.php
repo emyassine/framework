@@ -63,7 +63,7 @@ final class Csrf
      */
     public static function check(): bool
     {
-        $sent = $_POST[self::FIELD] ?? $_SERVER['HTTP_'.self::HEADER] ?? '';
+        $sent = $_POST[self::FIELD] ?? $_SERVER['HTTP_X_CSRF_TOKEN'] ?? '';
         if (! \is_string($sent) || $sent === '') {
             return false;
         }

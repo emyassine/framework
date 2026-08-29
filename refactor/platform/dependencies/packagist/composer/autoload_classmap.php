@@ -1734,6 +1734,7 @@ return array(
     'Webkernel\\Platform\\Components\\TextInput' => $vendorDir . '/webkernel/components/src/TextInput.php',
     'Webkernel\\Platform\\Http\\Middleware\\Authenticate' => $vendorDir . '/webkernel/panels/src/Http/Middleware/Authenticate.php',
     'Webkernel\\Platform\\Pages\\Dashboard' => $vendorDir . '/webkernel/panels/src/Pages/Dashboard.php',
+    'Webkernel\\Platform\\Pages\\ManagePanel' => $vendorDir . '/webkernel/panels/src/Pages/ManagePanel.php',
     'Webkernel\\Platform\\Panel' => $vendorDir . '/webkernel/panels/src/Panel.php',
     'Webkernel\\Platform\\PanelProvider' => $vendorDir . '/webkernel/panels/src/PanelProvider.php',
     'Webkernel\\Platform\\PanelsProvider' => $vendorDir . '/webkernel/panels/src/PanelsProvider.php',
