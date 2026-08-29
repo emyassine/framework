@@ -1103,7 +1103,7 @@ PHP;
      */
     private function write_webapp_ide(array $map): void
     {
-        $path = dirname(IdeHelper::output_path()).'/_ide_webapp.php';
+        $path = dirname(__DIR__, 3).'/_ide_helpers/_ide_webapp.php';
         $header = IdeHelper::generated_header();
         $methods = [
             '     * @method \Webkernel\Composables\ConfigComposable|mixed config(?string $key = null, mixed $default = null)',

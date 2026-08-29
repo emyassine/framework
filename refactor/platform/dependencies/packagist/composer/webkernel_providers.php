@@ -10,5 +10,7 @@
 return [
     \Acme\Billing\BillingProvider::class,
     \Webkernel\CodebaseProvider::class,
+    \Webkernel\Platform\Components\ComponentsProvider::class,
     \Webkernel\Imagery\ImageryProvider::class,
+    \Webkernel\Platform\PanelsProvider::class,
 ];

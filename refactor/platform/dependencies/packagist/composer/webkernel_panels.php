@@ -82,7 +82,7 @@ return array (
       'dark_mode' => true,
     ),
     'provider' => 'Webkernel\\Platform\\System\\SystemPanelProvider',
-    'package_provider' => 'Webkernel\\CodebaseProvider',
+    'package_provider' => 'Webkernel\\Platform\\PanelsProvider',
     'prefix' => 'webkernel',
   ),
 );
