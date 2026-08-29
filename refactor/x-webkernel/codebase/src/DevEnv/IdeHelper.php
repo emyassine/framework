@@ -17,7 +17,7 @@ final class IdeHelper
 {
     public static function output_path(): string
     {
-        return __DIR__.'/_ide_helper.php';
+    	return webkernel_package('codebase', '_ide_helpers') . '/_ide_helper.php';
     }
 
     /**
