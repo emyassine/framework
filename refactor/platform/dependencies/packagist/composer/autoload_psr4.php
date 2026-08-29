@@ -7,6 +7,7 @@ $baseDir = dirname(dirname(dirname($vendorDir)));
 
 return array(
     'Webkernel\\Tests\\' => array($baseDir . '/x-webkernel/codebase/tests'),
+    'Webkernel\\Platform\\Tests\\' => array($baseDir . '/x-webkernel/platform/panels/tests'),
     'Webkernel\\Platform\\Schemas\\Tests\\' => array($baseDir . '/x-webkernel/platform/schemas/tests'),
     'Webkernel\\Platform\\Schemas\\' => array($vendorDir . '/webkernel/schemas/src'),
     'Webkernel\\Platform\\Components\\Tests\\' => array($baseDir . '/x-webkernel/platform/components/tests'),

@@ -17,7 +17,7 @@ trait HasProviders
     /**
      * @param list<array{path: string, package: array<string, mixed>}> $packages
      * @param array<string, string> $classmap
-     * @return list<array{class: class-string, prefix: string, path: string}>
+     * @return list<array{class: class-string, prefix: string, path: string, package: string, type: string}>
      */
     private function providers_meta(array $packages, array $classmap): array
     {
@@ -32,17 +32,20 @@ trait HasProviders
             if (! class_exists($provider) || ! is_a($provider, PlatformProvider::class, true)) {
                 continue;
             }
+            $name = $row['package']['name'] ?? 'app';
             $prefix = $extra['prefix'] ?? null;
             if (! is_string($prefix) || $prefix === '') {
-                $name = $row['package']['name'] ?? 'app';
                 $prefix = is_string($name) && str_contains($name, '/')
                     ? substr($name, strrpos($name, '/') + 1)
                     : (string) $name;
             }
+            $type = $row['package']['type'] ?? '';
             $out[] = [
                 'class' => $provider,
                 'prefix' => $prefix,
                 'path' => $row['path'],
+                'package' => is_string($name) ? $name : '',
+                'type' => is_string($type) ? $type : '',
             ];
         }
 

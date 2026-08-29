@@ -1743,6 +1743,8 @@ return array(
     'Webkernel\\Platform\\Schemas\\Tests\\Feature\\SchemaTest' => $baseDir . '/x-webkernel/platform/schemas/tests/Feature/SchemaTest.php',
     'Webkernel\\Platform\\System\\SystemPanelProvider' => $vendorDir . '/webkernel/panels/src/System/SystemPanelProvider.php',
     'Webkernel\\Platform\\Tables\\Table' => $vendorDir . '/webkernel/panels/src/Tables/Table.php',
+    'Webkernel\\Platform\\Tests\\Feature\\PanelProviderTest' => $baseDir . '/x-webkernel/platform/panels/tests/Feature/PanelProviderTest.php',
+    'Webkernel\\Platform\\Wds' => $vendorDir . '/webkernel/panels/src/Wds.php',
     'Webkernel\\Route\\Action\\RedirectAction' => $vendorDir . '/webkernel/codebase/src/Route/Action/RedirectAction.php',
     'Webkernel\\Route\\Action\\ViewAction' => $vendorDir . '/webkernel/codebase/src/Route/Action/ViewAction.php',
     'Webkernel\\Route\\Binding' => $vendorDir . '/webkernel/codebase/src/Route/Binding.php',

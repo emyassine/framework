@@ -8,6 +8,7 @@
 namespace Webkernel\Tests\Feature;
 
 use PHPUnit\Framework\TestCase;
+use Webkernel\Composables\PanelComposable;
 use Webkernel\Config\Config;
 use Webkernel\View\View;
 
@@ -40,6 +41,7 @@ final class PanelViewTest extends TestCase
     {
         Config::boot();
         View::flush();
+        PanelComposable::flush();
     }
 
     public function test_system_dashboard_uses_page_component_and_sidebar(): void
@@ -47,6 +49,9 @@ final class PanelViewTest extends TestCase
         $html = View::make('webkernel::panels.system.dashboard')->render();
 
         $this->assertStringContainsString('wds-sidebar', $html);
+        $this->assertStringContainsString('wds-app-list', $html);
+        $this->assertStringContainsString('wds-app-submenu', $html);
+        $this->assertStringContainsString('wds-search', $html);
         $this->assertStringContainsString('wds-header-heading', $html);
         $this->assertStringContainsString('csrf-token', $html);
         $this->assertStringContainsString('name="_token"', $html);
@@ -59,6 +64,7 @@ final class PanelViewTest extends TestCase
         $this->assertStringContainsString('<title>System</title>', $html);
         $this->assertStringContainsString('name="description"', $html);
         $this->assertStringContainsString('<nav class="wds-sidebar"', $html);
+        $this->assertStringContainsString('Customize sidebar', $html);
         $this->assertStringNotContainsString('role="navigation"', $html);
     }
 
@@ -131,6 +137,8 @@ final class PanelViewTest extends TestCase
         $css = (string) \file_get_contents($path);
         $this->assertStringContainsString('--primary-50:', $css);
         $this->assertStringContainsString('.wds-sidebar', $css);
+        $this->assertStringContainsString('.wds-app-list', $css);
+        $this->assertStringContainsString('--wds-app-rail-bg', $css);
         $this->assertStringContainsString('.wds-btn', $css);
         $this->assertStringContainsString('.wds-page', $css);
         $this->assertStringStartsWith('/wds.css?v=', \Webkernel\Platform\Wds::css_href());

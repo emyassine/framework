@@ -7,13 +7,16 @@
 
 namespace Webkernel\Console\Commands\DumpAutoloadCommand;
 
+use Webkernel\Platform\PanelProvider;
+
 trait CanDumpPanels
 {
     use _DumpAutoloadCommand;
 
     /**
-     * @param list<array{class: class-string, prefix: string, path: string}> $providers
-     * @param array<string, string> $classmap
+     * @param $providers list<array{class: class-string, prefix: string, path: string, package?: string, type?: string}>
+     * @param $classmap array<string, string>
+     * @param $root string
      * @return list<array<string, mixed>>
      */
     private function panels_dump(array $providers, array $classmap, string $root): array
@@ -38,11 +41,16 @@ trait CanDumpPanels
                     continue;
                 }
                 $instance = new $panel_class();
-                $panel = self::PANEL_CLASS;
-                $snapshot = $instance->panel(new $panel())->to_array();
+                $scope = PanelProvider::scope_for_package(
+                    (string) ($row['package'] ?? ''),
+                    (string) ($row['type'] ?? ''),
+                );
+                $snapshot = $instance->register()->scope($scope)->to_array();
                 $snapshot['provider'] = $panel_class;
                 $snapshot['package_provider'] = $provider;
                 $snapshot['prefix'] = $row['prefix'];
+                $snapshot['package'] = $row['package'] ?? '';
+                $snapshot['navigation'] = $this->panel_navigation($snapshot, $classmap);
                 $out[] = $snapshot;
             }
         }
@@ -51,8 +59,8 @@ trait CanDumpPanels
     }
 
     /**
-     * @param list<array<string, mixed>> $panels
-     * @param array<string, string> $classmap
+     * @param $panels list<array<string, mixed>>
+     * @param $classmap array<string, string>
      * @return list<array{0: list<string>, 1: string, 2: class-string}>
      */
     private function panel_routes_dump(array $panels, array $classmap): array
@@ -103,7 +111,80 @@ trait CanDumpPanels
     }
 
     /**
-     * @param class-string $resource
+     * @param $panel array<string, mixed>
+     * @param $classmap array<string, string>
+     * @return list<array{label: string, items: list<array{label: string, href: string}>}>
+     */
+    private function panel_navigation(array $panel, array $classmap): array
+    {
+        $base = '/'.\trim((string) ($panel['path'] ?? $panel['id'] ?? ''), '/');
+        $items = [];
+        foreach ($panel['pages'] ?? [] as $page) {
+            if (! \is_string($page) || $page === '') {
+                continue;
+            }
+            $this->ensure_class($page, $classmap);
+            $href = $base;
+            if (\class_exists($page) && \is_callable([$page, 'route'])) {
+                $def = $page::route('/');
+                if (\is_array($def)) {
+                    $path = \trim((string) ($def['path'] ?? '/'), '/');
+                    $href = $path === '' ? $base : $base.'/'.$path;
+                }
+            }
+            $items[] = [
+                'label' => $this->class_label($page),
+                'href' => $href === '' ? '/' : $href,
+            ];
+        }
+        foreach ($panel['resources'] ?? [] as $resource) {
+            if (! \is_string($resource) || $resource === '') {
+                continue;
+            }
+            $this->ensure_class($resource, $classmap);
+            if (! \class_exists($resource) || ! \is_a($resource, self::RESOURCE_CLASS, true)) {
+                continue;
+            }
+            $slug = $resource::$slug !== '' ? $resource::$slug : $this->resource_slug($resource);
+            $label = $slug !== ''
+                ? \ucwords(\str_replace(['-', '_'], ' ', $slug))
+                : $this->class_label($resource);
+            $href = \rtrim($base, '/').'/'.$slug;
+            $items[] = [
+                'label' => $label,
+                'href' => $href === '' ? '/' : $href,
+            ];
+        }
+        if ($items === []) {
+            return [];
+        }
+
+        return [
+            [
+                'label' => 'Overview',
+                'items' => $items,
+            ],
+        ];
+    }
+
+    /**
+     * @param $class class-string
+     * @return string
+     */
+    private function class_label(string $class): string
+    {
+        $short = (new \ReflectionClass($class))->getShortName();
+        if (\str_ends_with($short, 'Resource')) {
+            $short = \substr($short, 0, -8);
+        }
+        $spaced = \preg_replace('/([a-z0-9])([A-Z])/', '$1 $2', $short);
+
+        return \is_string($spaced) ? $spaced : $short;
+    }
+
+    /**
+     * @param $resource class-string
+     * @return string
      */
     private function resource_slug(string $resource): string
     {

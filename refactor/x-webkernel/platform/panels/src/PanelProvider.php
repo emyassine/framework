@@ -10,11 +10,54 @@ namespace Webkernel\Platform;
 use Webkernel\Config\Config;
 use Webkernel\Platform\Colors\Color;
 
+/**
+ * One admin UI. Dump-autoload calls register(); panel() only declares the UI.
+ *
+ * //> Branding is applied here. Providers do not call apply_platform_config().
+ * //> Scope is inferred from the Composer package. Providers do not call scope().
+ */
 abstract class PanelProvider
 {
+    /**
+     * @param $panel Panel
+     * @return Panel
+     */
     abstract public function panel(Panel $panel): Panel;
 
-    final protected function apply_platform_config(Panel $panel): Panel
+    /**
+     * Dump-autoload entry. Same shape as Filament's PanelProvider::register().
+     *
+     * @return Panel
+     */
+    final public function register(): Panel
+    {
+        return $this->apply_platform_config($this->panel(Panel::make()));
+    }
+
+    /**
+     * A platform panel ships from a webkernel vendor package. Everything else is a module panel.
+     *
+     * @param $package string Composer name (`webkernel/panels`)
+     * @param $type string Composer type
+     * @return 'platform'|'module'
+     */
+    final public static function scope_for_package(string $package, string $type = ''): string
+    {
+        if (\str_starts_with($package, 'webkernel/')) {
+            return 'platform';
+        }
+        if ($type === 'webkernel-platform-module' || $type === 'webkernel-platform-module-feature') {
+            return 'platform';
+        }
+
+        return 'module';
+    }
+
+    /**
+     * @param $panel Panel
+     * @return Panel
+     */
+    private function apply_platform_config(Panel $panel): Panel
     {
         return $panel
             ->favicon(Config::get('branding.favicon'))

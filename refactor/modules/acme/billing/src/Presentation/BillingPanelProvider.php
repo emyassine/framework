@@ -13,13 +13,16 @@ use Webkernel\Platform\PanelProvider;
 
 final class BillingPanelProvider extends PanelProvider
 {
+    /**
+     * @param $panel Panel
+     * @return Panel
+     */
     public function panel(Panel $panel): Panel
     {
-        return $this->apply_platform_config($panel)
+        return $panel
             ->id('billing')
             ->path('billing')
-            ->scope('module')
-            ->pages([])
+            ->icon('receipt')
             ->resources([
                 InvoiceResource::class,
             ]);

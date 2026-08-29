@@ -9,12 +9,18 @@ namespace Webkernel\Platform;
 
 /**
  * Fluent panel declaration. Dump-autoload snapshots this; the request reads the dump.
+ *
+ * //> Scope is not declared here. Dump infers it from the Composer package.
  */
 final class Panel
 {
     private string $id = '';
 
     private string $path = '';
+
+    private string $label = '';
+
+    private string $icon = '';
 
     private string $scope = 'module';
 
@@ -47,6 +53,18 @@ final class Panel
 
     private mixed $dark_mode = null;
 
+    /**
+     * @return self
+     */
+    public static function make(): self
+    {
+        return new self();
+    }
+
+    /**
+     * @param $id string
+     * @return self
+     */
     public function id(string $id): self
     {
         $this->id = $id;
@@ -54,6 +72,10 @@ final class Panel
         return $this;
     }
 
+    /**
+     * @param $path string
+     * @return self
+     */
     public function path(string $path): self
     {
         $this->path = $path;
@@ -62,7 +84,34 @@ final class Panel
     }
 
     /**
-     * @param 'platform'|'module' $scope
+     * @param $label string
+     * @return self
+     */
+    public function label(string $label): self
+    {
+        $this->label = $label;
+
+        return $this;
+    }
+
+    /**
+     * Lucide icon basename for the app rail.
+     *
+     * @param $icon string
+     * @return self
+     */
+    public function icon(string $icon): self
+    {
+        $this->icon = $icon;
+
+        return $this;
+    }
+
+    /**
+     * Dump-autoload only. Providers do not call this.
+     *
+     * @param $scope 'platform'|'module'
+     * @return self
      */
     public function scope(string $scope): self
     {
@@ -74,6 +123,10 @@ final class Panel
         return $this;
     }
 
+    /**
+     * @param $default bool
+     * @return self
+     */
     public function default(bool $default = true): self
     {
         $this->default = $default;
@@ -82,7 +135,8 @@ final class Panel
     }
 
     /**
-     * @param list<class-string> $pages
+     * @param $pages list<class-string>
+     * @return self
      */
     public function pages(array $pages): self
     {
@@ -92,7 +146,8 @@ final class Panel
     }
 
     /**
-     * @param list<class-string> $widgets
+     * @param $widgets list<class-string>
+     * @return self
      */
     public function widgets(array $widgets): self
     {
@@ -102,7 +157,8 @@ final class Panel
     }
 
     /**
-     * @param list<class-string> $resources
+     * @param $resources list<class-string>
+     * @return self
      */
     public function resources(array $resources): self
     {
@@ -112,7 +168,8 @@ final class Panel
     }
 
     /**
-     * @param list<class-string> $middleware
+     * @param $middleware list<class-string>
+     * @return self
      */
     public function middleware(array $middleware): self
     {
@@ -122,7 +179,8 @@ final class Panel
     }
 
     /**
-     * @param list<class-string> $middleware
+     * @param $middleware list<class-string>
+     * @return self
      */
     public function auth_middleware(array $middleware): self
     {
@@ -131,6 +189,10 @@ final class Panel
         return $this;
     }
 
+    /**
+     * @param $favicon mixed
+     * @return self
+     */
     public function favicon(mixed $favicon): self
     {
         $this->favicon = $favicon;
@@ -138,6 +200,10 @@ final class Panel
         return $this;
     }
 
+    /**
+     * @param $logo mixed
+     * @return self
+     */
     public function brand_logo(mixed $logo): self
     {
         $this->brand_logo = $logo;
@@ -145,6 +211,10 @@ final class Panel
         return $this;
     }
 
+    /**
+     * @param $logo mixed
+     * @return self
+     */
     public function dark_mode_brand_logo(mixed $logo): self
     {
         $this->dark_mode_brand_logo = $logo;
@@ -152,6 +222,10 @@ final class Panel
         return $this;
     }
 
+    /**
+     * @param $height mixed
+     * @return self
+     */
     public function brand_logo_height(mixed $height): self
     {
         $this->brand_logo_height = $height;
@@ -159,6 +233,10 @@ final class Panel
         return $this;
     }
 
+    /**
+     * @param $colors mixed
+     * @return self
+     */
     public function colors(mixed $colors): self
     {
         $this->colors = $colors;
@@ -166,6 +244,10 @@ final class Panel
         return $this;
     }
 
+    /**
+     * @param $dark_mode mixed
+     * @return self
+     */
     public function dark_mode(mixed $dark_mode): self
     {
         $this->dark_mode = $dark_mode;
@@ -177,6 +259,9 @@ final class Panel
      * @return array{
      *   id: string,
      *   path: string,
+     *   href: string,
+     *   label: string,
+     *   icon: string,
      *   scope: string,
      *   default: bool,
      *   pages: list<class-string>,
@@ -192,13 +277,15 @@ final class Panel
         if ($this->id === '') {
             throw new \RuntimeException('Panel must declare id().');
         }
-        if ($this->scope !== 'platform' && $this->scope !== 'module') {
-            throw new \RuntimeException('Panel ['.$this->id.'] must declare scope platform|module.');
-        }
+        $path = $this->path !== '' ? $this->path : $this->id;
+        $href = '/'.\trim($path, '/');
 
         return [
             'id' => $this->id,
-            'path' => $this->path !== '' ? $this->path : $this->id,
+            'path' => $path,
+            'href' => $href === '/' ? '/'.$this->id : $href,
+            'label' => $this->label !== '' ? $this->label : \ucfirst($this->id),
+            'icon' => $this->icon !== '' ? $this->icon : 'package',
             'scope' => $this->scope,
             'default' => $this->default,
             'pages' => $this->pages,

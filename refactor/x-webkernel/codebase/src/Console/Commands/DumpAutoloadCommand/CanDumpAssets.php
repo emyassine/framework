@@ -10,6 +10,7 @@ namespace Webkernel\Console\Commands\DumpAutoloadCommand;
 use FilesystemIterator;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
+
 use Webkernel\DevEnv\IdeHelper;
 use Webkernel\Platform\Colors\Color;
 use Webkernel\Platform\Wds;
@@ -19,7 +20,7 @@ trait CanDumpAssets
     use _DumpAutoloadCommand;
 
     /** @var list<string> */
-    private const WDS_CSS_ORDER = ['tokens', 'shell', 'simple', 'btn', 'page', 'field'];
+    private const WDS_CSS_ORDER = ['tokens', 'simple', 'btn', 'page', 'field'];
 
     /**
      * @param list<array{path: string, package: array<string, mixed>}> $packages
@@ -59,10 +60,11 @@ trait CanDumpAssets
     }
 
     /**
-     * @param list<array{class: class-string, prefix: string, path: string}> $providers
+     * @param $providers list<array{class: class-string, prefix: string, path: string, package?: string, type?: string}>
+     * @param $panels list<array<string, mixed>>
      * @return array<string, string>
      */
-    private function icons_dump(array $providers): array
+    private function icons_dump(array $providers, array $panels = []): array
     {
         /** @var array<string, true> $names */
         $names = [];
@@ -71,6 +73,12 @@ trait CanDumpAssets
                 foreach ($dirs as $dir) {
                     $this->collect_icon_names($names, $dir);
                 }
+            }
+        }
+        foreach ($panels as $panel) {
+            $icon = $panel['icon'] ?? '';
+            if (\is_string($icon) && $icon !== '') {
+                $names['lucide/'.$icon] = true;
             }
         }
         $out = [];

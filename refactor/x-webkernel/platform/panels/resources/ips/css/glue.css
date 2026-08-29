@@ -1,0 +1,51 @@
+/* Collapsed rail (Invision hideAdminMenu). Keep submenu hidden, icon strip visible. */
+body.cAdminHideMenu #acpAppMenu {
+	--menu-width: 0px;
+}
+body.cAdminHideMenu .acpAppList__sub {
+	display: none !important;
+}
+body.cAdminHideMenu #elHideMenu {
+	inset-inline-start: calc(var(--icon-width, 60px) - 16px);
+}
+body.cAdminHideMenu #elHideMenu i {
+	transform: scaleX(-1);
+}
+
+.acpAppList_logo {
+	width: 28px;
+	height: 28px;
+	object-fit: contain;
+	display: block;
+}
+.acpAppList_logo--favicon {
+	width: 18px;
+	height: 18px;
+	object-fit: contain;
+	border-radius: 0;
+}
+.acpAppList_logo--round {
+	width: 28px;
+	height: 28px;
+	border-radius: 50%;
+	object-fit: cover;
+}
+.acpAppList_logo--square {
+	width: 28px;
+	height: 28px;
+	border-radius: 6px;
+	object-fit: cover;
+}
+
+#elReorderAppMenu.acpReorder_active a {
+	opacity: 1;
+	color: #fff;
+}
+
+.ipsApp_admin .wds-page {
+	gap: 1em;
+}
+.ipsApp_admin .wds-header-heading {
+	font-size: 26px;
+	font-weight: 500;
+}

@@ -2,14 +2,6 @@
 
 <?php $this->start_section('title', 'Home'); ?>
 
-<?php $this->start_section('navigation'); ?>
-  <?php echo $this->run_child('webkernel::panels.system.sidebar', ['current' => 'home']); ?>
-<?php $this->stop_section(); ?>
-
-<?php $this->start_section('user'); ?>
-  <?php echo $this->run_child('webkernel::panels.system.user'); ?>
-<?php $this->stop_section(); ?>
-
 <?php $this->start_section('breadcrumb'); ?>
   Home
 <?php $this->stop_section(); ?>

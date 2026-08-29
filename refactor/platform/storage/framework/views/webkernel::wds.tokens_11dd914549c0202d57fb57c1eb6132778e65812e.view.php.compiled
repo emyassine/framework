@@ -9,11 +9,14 @@
   --wds-space-top: 0.65rem;
   --wds-space-bottom: 0.65rem;
   --wds-bottom-clearance: 3.6rem;
-  --wds-topbar-height: 52px;
-  --wds-sidebar-width: 240px;
-  --wds-sidebar-width-collapsed: 56px;
+  --wds-topbar-height: 61px;
+  --wds-app-rail-width: 60px;
+  --wds-app-menu-width: 220px;
+  --wds-sidebar-width: calc(var(--wds-app-rail-width) + var(--wds-app-menu-width));
+  --wds-sidebar-width-collapsed: var(--wds-app-rail-width);
   --wds-sidebar-toggle-height: 2.5rem;
   --wds-sidebar-padding-x: 1rem;
+  --wds-app-rail-bg: #0e1d30;
   --wds-radius-sm: 0.25rem;
   --wds-radius: 0.5rem;
   --wds-radius-lg: 0.75rem;
@@ -73,6 +76,7 @@
   --wds-text-faint: var(--gray-600);
   --wds-color-background: var(--gray-950);
   --wds-color-topbar: var(--gray-950);
+  --wds-app-rail-bg: var(--gray-950);
   --primary-50: var(--color-blue-950);
 }
 

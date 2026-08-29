@@ -13,24 +13,24 @@ use Webkernel\Platform\Panel;
 use Webkernel\Platform\PanelProvider;
 
 /**
- * System Admin Panel.
- * Scope: platform — manages modules and platform-wide configuration.
- * Branding is not in this method. See NOTES.md §5.
+ * System Admin Panel. Scope is inferred: this class lives in vendor webkernel.
  */
 final class SystemPanelProvider extends PanelProvider
 {
+    /**
+     * @param $panel Panel
+     * @return Panel
+     */
     public function panel(Panel $panel): Panel
     {
-        return $this->apply_platform_config($panel)
+        return $panel
             ->id('system')
             ->path('system')
-            ->scope('platform')
+            ->default()
+            ->icon('settings')
             ->pages([
                 Dashboard::class,
             ])
-            ->widgets([])
-            ->resources([])
-            ->middleware([])
             ->auth_middleware([
                 Authenticate::class,
             ]);

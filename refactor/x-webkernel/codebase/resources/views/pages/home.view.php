@@ -2,14 +2,6 @@
 
 @section('title', 'Home')
 
-@section('navigation')
-  @include('webkernel::panels.system.sidebar', ['current' => 'home'])
-@endsection
-
-@section('user')
-  @include('webkernel::panels.system.user')
-@endsection
-
 @section('breadcrumb')
   Home
 @endsection

@@ -14,6 +14,7 @@ class ComposerStaticInitcc6f492cc5d64cb7f09b9024726d6929
         'W' =>
         array (
             'Webkernel\\Tests\\' => 16,
+            'Webkernel\\Platform\\Tests\\' => 25,
             'Webkernel\\Platform\\Schemas\\Tests\\' => 33,
             'Webkernel\\Platform\\Schemas\\' => 27,
             'Webkernel\\Platform\\Components\\Tests\\' => 36,
@@ -60,6 +61,10 @@ class ComposerStaticInitcc6f492cc5d64cb7f09b9024726d6929
         'Webkernel\\Tests\\' =>
         array (
             0 => __DIR__ . '/../../../..' . '/x-webkernel/codebase/tests',
+        ),
+        'Webkernel\\Platform\\Tests\\' =>
+        array (
+            0 => __DIR__ . '/../../../..' . '/x-webkernel/platform/panels/tests',
         ),
         'Webkernel\\Platform\\Schemas\\Tests\\' =>
         array (
@@ -1898,6 +1903,8 @@ class ComposerStaticInitcc6f492cc5d64cb7f09b9024726d6929
         'Webkernel\\Platform\\Schemas\\Tests\\Feature\\SchemaTest' => __DIR__ . '/../../../..' . '/x-webkernel/platform/schemas/tests/Feature/SchemaTest.php',
         'Webkernel\\Platform\\System\\SystemPanelProvider' => __DIR__ . '/..' . '/webkernel/panels/src/System/SystemPanelProvider.php',
         'Webkernel\\Platform\\Tables\\Table' => __DIR__ . '/..' . '/webkernel/panels/src/Tables/Table.php',
+        'Webkernel\\Platform\\Tests\\Feature\\PanelProviderTest' => __DIR__ . '/../../../..' . '/x-webkernel/platform/panels/tests/Feature/PanelProviderTest.php',
+        'Webkernel\\Platform\\Wds' => __DIR__ . '/..' . '/webkernel/panels/src/Wds.php',
         'Webkernel\\Route\\Action\\RedirectAction' => __DIR__ . '/..' . '/webkernel/codebase/src/Route/Action/RedirectAction.php',
         'Webkernel\\Route\\Action\\ViewAction' => __DIR__ . '/..' . '/webkernel/codebase/src/Route/Action/ViewAction.php',
         'Webkernel\\Route\\Binding' => __DIR__ . '/..' . '/webkernel/codebase/src/Route/Binding.php',

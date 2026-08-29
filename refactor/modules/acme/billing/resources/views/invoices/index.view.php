@@ -2,14 +2,6 @@
 
 @section('title', 'Invoices')
 
-@section('navigation')
-  @include('billing::sidebar', ['current' => 'invoices'])
-@endsection
-
-@section('user')
-  @include('webkernel::panels.system.user')
-@endsection
-
 @section('breadcrumb')
   Billing / Invoices
 @endsection

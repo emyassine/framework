@@ -12,6 +12,9 @@ return array (
   array (
     'id' => 'billing',
     'path' => 'billing',
+    'href' => '/billing',
+    'label' => 'Billing',
+    'icon' => 'receipt',
     'scope' => 'module',
     'default' => false,
     'pages' => 
@@ -45,13 +48,32 @@ return array (
     'provider' => 'Acme\\Billing\\Presentation\\BillingPanelProvider',
     'package_provider' => 'Acme\\Billing\\BillingProvider',
     'prefix' => 'billing',
+    'package' => 'acme/billing',
+    'navigation' => 
+    array (
+      0 => 
+      array (
+        'label' => 'Overview',
+        'items' => 
+        array (
+          0 => 
+          array (
+            'label' => 'Invoices',
+            'href' => '/billing/invoices',
+          ),
+        ),
+      ),
+    ),
   ),
   1 => 
   array (
     'id' => 'system',
     'path' => 'system',
+    'href' => '/system',
+    'label' => 'System',
+    'icon' => 'settings',
     'scope' => 'platform',
-    'default' => false,
+    'default' => true,
     'pages' => 
     array (
       0 => 'Webkernel\\Platform\\Pages\\Dashboard',
@@ -84,5 +106,21 @@ return array (
     'provider' => 'Webkernel\\Platform\\System\\SystemPanelProvider',
     'package_provider' => 'Webkernel\\Platform\\PanelsProvider',
     'prefix' => 'webkernel',
+    'package' => 'webkernel/panels',
+    'navigation' => 
+    array (
+      0 => 
+      array (
+        'label' => 'Overview',
+        'items' => 
+        array (
+          0 => 
+          array (
+            'label' => 'Dashboard',
+            'href' => '/system',
+          ),
+        ),
+      ),
+    ),
   ),
 );

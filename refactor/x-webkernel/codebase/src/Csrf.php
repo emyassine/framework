@@ -57,4 +57,17 @@ final class Csrf
     {
         return '<meta name="csrf-token" content="'.\htmlspecialchars(self::token(), \ENT_QUOTES).'">';
     }
+
+    /**
+     * @return bool
+     */
+    public static function check(): bool
+    {
+        $sent = $_POST[self::FIELD] ?? $_SERVER['HTTP_'.self::HEADER] ?? '';
+        if (! \is_string($sent) || $sent === '') {
+            return false;
+        }
+
+        return \hash_equals(self::token(), $sent);
+    }
 }

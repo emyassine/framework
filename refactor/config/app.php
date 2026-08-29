@@ -24,6 +24,7 @@ return [
     ],
     'ui' => [
         'dark_mode' => true,
+        'sidebar_customizable' => true,
     ],
     'database' => [
         'driver' => 'mysql',

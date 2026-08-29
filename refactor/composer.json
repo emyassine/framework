@@ -21,7 +21,8 @@
             "Webkernel\\I18n\\Tests\\": "x-webkernel/platform/i18n/tests/",
             "Webkernel\\Lifecycle\\Tests\\": "x-webkernel/lifecycle/tests/",
             "Webkernel\\Platform\\Components\\Tests\\": "x-webkernel/platform/components/tests/",
-            "Webkernel\\Platform\\Schemas\\Tests\\": "x-webkernel/platform/schemas/tests/"
+            "Webkernel\\Platform\\Schemas\\Tests\\": "x-webkernel/platform/schemas/tests/",
+            "Webkernel\\Platform\\Tests\\": "x-webkernel/platform/panels/tests/"
         }
     },
     "minimum-stability": "stable",

@@ -22,6 +22,9 @@
         <testsuite name="schemas">
             <directory>x-webkernel/platform/schemas/tests</directory>
         </testsuite>
+        <testsuite name="panels">
+            <directory>x-webkernel/platform/panels/tests</directory>
+        </testsuite>
     </testsuites>
     <source>
         <include>

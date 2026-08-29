@@ -9,9 +9,9 @@
   gap: 1rem;
 }
 .wds-header-heading {
-  font-size: var(--wds-text-2xl);
-  font-weight: 700;
-  letter-spacing: -0.03em;
+  font-size: 26px;
+  font-weight: 500;
+  letter-spacing: -0.02em;
   line-height: 1.2;
 }
 .wds-header-subheading {

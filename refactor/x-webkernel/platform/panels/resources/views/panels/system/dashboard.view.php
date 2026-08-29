@@ -2,14 +2,6 @@
 
 @section('title', 'System')
 
-@section('navigation')
-  @include('webkernel::panels.system.sidebar', ['current' => 'dashboard'])
-@endsection
-
-@section('user')
-  @include('webkernel::panels.system.user')
-@endsection
-
 @section('breadcrumb')
   System
 @endsection
