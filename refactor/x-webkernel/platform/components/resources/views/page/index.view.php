@@ -1,5 +1,5 @@
 {{--
-  <x-webkernel::page title="..." description="...">
+  <x-webkernel::page title="..." description="..." :csrf="false">
     @slot('actions') ... @endslot
     body
   </x-webkernel::page>
@@ -7,24 +7,29 @@
 @props([
   'title' => null,
   'description' => null,
+  'csrf' => true,
 ])
-<div class="webkernel-shell-page">
-  <header class="webkernel-shell-page-header">
+@include('webkernel::wds.page')
+@if ($csrf)
+  {!! \Webkernel\Csrf::field() !!}
+@endif
+<div class="wds-page">
+  <header class="wds-header">
     <div>
       @if ($title !== null && $title !== '')
-        <h1 class="webkernel-shell-page-title">{{ $title }}</h1>
+        <h1 class="wds-header-heading">{{ $title }}</h1>
       @endif
       @if ($description !== null && $description !== '')
-        <p class="webkernel-shell-page-desc">{{ $description }}</p>
+        <p class="wds-header-subheading">{{ $description }}</p>
       @endif
     </div>
     @if (!empty($actions))
-      <div class="webkernel-shell-page-actions">
+      <div class="wds-header-actions">
         {!! $actions !!}
       </div>
     @endif
   </header>
-  <div class="webkernel-shell-page-body">
+  <div class="wds-page-content">
     {!! $slot !!}
   </div>
 </div>

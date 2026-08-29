@@ -4,7 +4,7 @@
 ])
 @php
   $markup = \function_exists('icon')
-      ? icon((string) $name, 'webkernel-shell-icon__svg', '', (string) $set)
+      ? icon((string) $name, 'wds-icon-svg', '', (string) $set)
       : '';
 @endphp
-<span class="webkernel-shell-icon">{!! $markup !!}</span>
+<span class="wds-icon">{!! $markup !!}</span>

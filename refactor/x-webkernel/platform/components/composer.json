@@ -11,8 +11,7 @@
     },
     "autoload": {
         "psr-4": {
-            "Webkernel\\Platform\\Components\\": "src/",
-            "Webkernel\\Platform\\Colors\\": "src/Colors/"
+            "Webkernel\\Platform\\Components\\": "src/"
         }
     },
     "autoload-dev": {

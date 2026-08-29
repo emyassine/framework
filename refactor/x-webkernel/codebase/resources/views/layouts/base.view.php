@@ -1,15 +1,26 @@
+@props([
+  'lang' => 'en',
+  'theme' => 'light',
+  'layout' => 'base',
+  'title' => 'Webkernel',
+  'csrf' => true,
+])
 <!DOCTYPE html>
 <html
-  lang="{{ $lang ?? 'en' }}"
-  data-webkernel-design-theme="{{ $theme ?? 'light' }}"
-  data-webkernel-design-layout="{{ $layout ?? 'base' }}"
+  lang="{{ $lang }}"
+  data-wds-theme="{{ $theme }}"
+  data-wds-layout="{{ $layout }}"
 >
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>{{ $title ?? 'Webkernel' }}</title>
-  @include('webkernel::layouts.partials.tokens')
+  @if ($csrf)
+    {!! \Webkernel\Csrf::meta() !!}
+  @endif
+  <title>{{ $title }}</title>
+  @include('webkernel::wds.tokens')
   @stack('styles')
+  @stack('head')
 </head>
 <body>
   @yield('content')

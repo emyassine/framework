@@ -54,6 +54,9 @@ final class Engine
     /** @var array<string, list<string>> */
     private array $component_namespaces = [];
 
+    /** @var array<string, true> */
+    private array $once = [];
+
     /** @var list<string> */
     private array $component_stack = [];
 
@@ -90,6 +93,7 @@ final class Engine
      */
     public function run(string $view, array $variables = []): string
     {
+        $this->once = [];
         $this->sections = [];
         $this->variables = $this->variables_global === []
             ? $variables
@@ -295,6 +299,21 @@ final class Engine
         $this->component_namespaces[$namespace][] = rtrim($path, '/\\');
         $this->template_files = [];
         $this->compiled_files = [];
+    }
+
+    /**
+     * @param $id string
+     *
+     * @return bool
+     */
+    public function once(string $id): bool
+    {
+        if (isset($this->once[$id])) {
+            return false;
+        }
+        $this->once[$id] = true;
+
+        return true;
     }
 
     public function set_echo_format(string $format): void

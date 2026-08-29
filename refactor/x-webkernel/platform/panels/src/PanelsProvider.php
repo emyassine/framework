@@ -12,6 +12,8 @@ use Webkernel\PlatformProvider;
 
 final class PanelsProvider extends PlatformProvider
 {
+    public const VIEW_NAMESPACE = 'webkernel';
+
     public const VIEWS = [__DIR__.'/../resources/views'];
 
     public const PANELS = [SystemPanelProvider::class];

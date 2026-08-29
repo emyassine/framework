@@ -12,6 +12,8 @@ use Webkernel\PlatformProvider;
 
 final class BillingProvider extends PlatformProvider
 {
+    public const VIEW_NAMESPACE = 'billing';
+
     public const VIEWS = [__DIR__.'/../resources/views'];
 
     public const COMPONENTS = [__DIR__.'/../resources/views/components'];

@@ -19,6 +19,7 @@
   'tooltip' => null,
   'type' => 'button',
 ])
+@include('webkernel::wds.btn')
 @php
   $tag = $tag === 'a' || ($href !== null && $href !== '') ? 'a' : 'button';
   $size = $size instanceof \Webkernel\Platform\Components\Size ? $size->value : (string) $size;
@@ -43,23 +44,23 @@
   @if ($disabled) aria-disabled="true" @endif
   @if ($tooltip) title="{{ $tooltip }}" @endif
   {{ $attributes->class([
-    'webkernel-design-btn',
-    'webkernel-design-btn--'.$color,
-    'webkernel-design-btn--'.$size,
-    'webkernel-design-btn--outline' => $outlined,
-    'webkernel-design-btn--disabled' => $disabled,
+    'wds-btn',
+    'wds-color-'.$color,
+    'wds-size-'.$size,
+    'wds-outlined' => $outlined,
+    'wds-disabled' => $disabled,
   ]) }}
 >
   @if ($icon && $icon_position !== 'after')
     <x-webkernel::icon :name="$icon" />
   @endif
   @if ($slot !== '')
-    <span class="webkernel-design-btn__label">{!! $slot !!}</span>
+    <span class="wds-btn-label">{!! $slot !!}</span>
   @endif
   @if ($icon && $icon_position === 'after')
     <x-webkernel::icon :name="$icon" />
   @endif
   @if ($badge !== null && $badge !== '')
-    <span class="webkernel-design-btn__badge webkernel-design-badge webkernel-design-badge--{{ $badge_color }}">{!! $badge !!}</span>
+    <span class="wds-btn-badge wds-badge wds-color-{{ $badge_color }}">{!! $badge !!}</span>
   @endif
 </{{ $tag }}>

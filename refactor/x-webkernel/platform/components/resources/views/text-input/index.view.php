@@ -5,13 +5,14 @@
   'type' => 'text',
   'mode' => 'editable',
 ])
+@include('webkernel::wds.field')
 @if ($mode === 'readonly')
-  <div class="webkernel-field webkernel-field--readonly">
+  <div class="wds-fo-field wds-readonly">
     <dt>{{ $label ?? $name }}</dt>
     <dd>{{ $value }}</dd>
   </div>
 @else
-  <p class="webkernel-field">
+  <p class="wds-fo-field">
     <label>
       {{ $label ?? $name }}
       <input

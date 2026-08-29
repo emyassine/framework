@@ -93,6 +93,16 @@ final class Statements
             'push' => static fn (string $e): string => Php::OPEN.'$this->start_push'.$e.'; ?>',
             'endpush' => static fn (string $_): string => Php::OPEN.'$this->stop_push(); ?>',
             'stack' => static fn (string $e): string => Php::echo(' $this->stack'.$e),
+            'once' => static function (string $e): string {
+                $key = Php::strip_parentheses($e);
+                if ($key === '') {
+                    $key = var_export('once_'.bin2hex(random_bytes(8)), true);
+                }
+
+                return Php::OPEN.'if ($this->once('.$key.')): ?>';
+            },
+            'endonce' => static fn (string $_): string => Php::OPEN.'endif; ?>',
+            'csrf' => static fn (string $_): string => Php::echo('\\Webkernel\\Csrf::field()'),
             'slot' => static fn (string $e): string => Php::OPEN.' $this->slot'.$e.'; ?>',
             'endslot' => static fn (string $_): string => Php::OPEN.' $this->end_slot(); ?>',
             'props' => static function (string $e): string {

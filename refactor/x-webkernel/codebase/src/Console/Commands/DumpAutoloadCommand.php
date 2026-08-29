@@ -807,6 +807,7 @@ final readonly class DumpAutoloadCommand
     {
         $out = [];
         foreach ($providers as $row) {
+            $namespace = $row['class']::view_namespace($row['prefix']);
             foreach ($row['class']::declaration($constant) as $path) {
                 if (! is_string($path) || $path === '') {
                     continue;
@@ -815,7 +816,10 @@ final readonly class DumpAutoloadCommand
                 if (! is_dir($real)) {
                     continue;
                 }
-                $out[$row['prefix']][] = str_replace('\\', '/', $real);
+                $dir = str_replace('\\', '/', $real);
+                if (! isset($out[$namespace]) || ! in_array($dir, $out[$namespace], true)) {
+                    $out[$namespace][] = $dir;
+                }
             }
         }
 
