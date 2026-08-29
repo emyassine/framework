@@ -25,6 +25,7 @@ final class View implements ComposableContract, \Stringable
     private static ?Engine $engine = null;
 
     /**
+     * @param string               $name
      * @param array<string, mixed> $data
      */
     public function __construct(
@@ -33,13 +34,19 @@ final class View implements ComposableContract, \Stringable
     ) {
     }
 
+    /**
+     * @return string
+     */
     public static function api_name(): string
     {
         return 'view';
     }
 
     /**
+     * @param string|null          $template
      * @param array<string, mixed> $data
+     *
+     * @return self
      */
     public function __invoke(?string $template = null, array $data = []): self
     {
@@ -47,8 +54,11 @@ final class View implements ComposableContract, \Stringable
     }
 
     /**
+     * @param string               $view
      * @param array<string, mixed> $data
      * @param array<string, mixed> $merge_data
+     *
+     * @return self
      */
     public static function make(string $view, array $data = [], array $merge_data = []): self
     {
@@ -57,31 +67,58 @@ final class View implements ComposableContract, \Stringable
 
     /**
      * @param string|array<string, mixed> $key
+     * @param mixed                       $value
+     *
+     * @return void
      */
     public static function share(string|array $key, mixed $value = null): void
     {
         self::engine()->share($key, $value);
     }
 
+    /**
+     * @param string $view
+     *
+     * @return bool
+     */
     public static function exists(string $view): bool
     {
         return self::engine()->template_file($view) !== '';
     }
 
+    /**
+     * @param string $path
+     *
+     * @return void
+     */
     public static function add_location(string $path): void
     {
         self::engine()->add_template_path($path);
     }
 
+    /**
+     * @param string                         $name
+     * @param callable(string|null): string  $handler
+     *
+     * @return void
+     */
     public static function directive(string $name, callable $handler): void
     {
         self::compiler()->directive($name, $handler);
     }
 
+    /**
+     * Register `@{$name}` / `@else{$name}` / `@end{$name}` plus unless variants.
+     *
+     * @param string                   $name
+     * @param callable(mixed...): bool $callback
+     *
+     * @return void
+     */
     public static function if(string $name, callable $callback): void
     {
         $compiler = self::compiler();
-        $compiler->if($name, $callback);
+        $compiler->register_if_statement($name, $callback);
         $compiler->directive('unless'.$name, static function (?string $expression) use ($name, $compiler): string {
             $tmp = $compiler->strip_parentheses($expression);
 
@@ -94,6 +131,15 @@ final class View implements ComposableContract, \Stringable
         });
     }
 
+    /**
+     * First parameter of $handler must be a type-hinted object.
+     *
+     * @param callable(object): string $handler
+     *
+     * @return void
+     *
+     * @throws \InvalidArgumentException
+     */
     public static function stringable(callable $handler): void
     {
         $ref = $handler instanceof \Closure
@@ -107,11 +153,17 @@ final class View implements ComposableContract, \Stringable
         self::$stringable[$class] = $handler;
     }
 
+    /**
+     * @return void
+     */
     public static function without_double_encoding(): void
     {
         self::$double_encode = false;
     }
 
+    /**
+     * @return Engine
+     */
     public static function engine(): Engine
     {
         if (self::$engine instanceof Engine) {
@@ -132,11 +184,17 @@ final class View implements ComposableContract, \Stringable
         return self::$engine = $engine;
     }
 
+    /**
+     * @return Compiler
+     */
     public static function compiler(): Compiler
     {
         return self::engine()->compiler();
     }
 
+    /**
+     * @return void
+     */
     public static function flush(): void
     {
         self::$engine = null;
@@ -144,6 +202,11 @@ final class View implements ComposableContract, \Stringable
         self::$double_encode = true;
     }
 
+    /**
+     * @param mixed $value
+     *
+     * @return string
+     */
     public static function echo(mixed $value): string
     {
         if ($value instanceof Js) {
@@ -162,6 +225,9 @@ final class View implements ComposableContract, \Stringable
 
     /**
      * @param string|array<string, mixed> $key
+     * @param mixed                       $value
+     *
+     * @return self
      */
     public function with(string|array $key, mixed $value = null): self
     {
@@ -175,7 +241,10 @@ final class View implements ComposableContract, \Stringable
     }
 
     /**
+     * @param string|null          $template
      * @param array<string, mixed> $data
+     *
+     * @return string
      */
     public function render(?string $template = null, array $data = []): string
     {
@@ -186,6 +255,9 @@ final class View implements ComposableContract, \Stringable
         return self::engine()->run($this->name, $this->data);
     }
 
+    /**
+     * @return string
+     */
     public function __toString(): string
     {
         return $this->render();
@@ -246,6 +318,8 @@ final class View implements ComposableContract, \Stringable
     }
 
     /**
+     * @param string $basename
+     *
      * @return array<string, mixed>|list<mixed>
      */
     private static function load_dump(string $basename): array
@@ -261,6 +335,7 @@ final class View implements ComposableContract, \Stringable
 
     /**
      * @param array{dirs: list<string>, namespaces: array<string, list<string>>, components: array<string, list<string>>} $compiled
+     *
      * @return list<string>
      */
     private static function fallback_dirs(array $compiled): array
@@ -278,7 +353,10 @@ final class View implements ComposableContract, \Stringable
     }
 
     /**
+     * @param Engine                                                                                                     $engine
      * @param array{dirs: list<string>, namespaces: array<string, list<string>>, components: array<string, list<string>>} $compiled
+     *
+     * @return void
      */
     private static function apply_namespaces(Engine $engine, array $compiled): void
     {
