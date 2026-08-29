@@ -3,7 +3,7 @@
         'name' => 'webkernel/webkernel',
         'pretty_version' => 'dev-main',
         'version' => 'dev-main',
-        'reference' => '1d1bbe62e44391300c4db05a9bf9f810396200c2',
+        'reference' => 'dd4b81bf6b56609f020232d7811667f47a3f0bec',
         'type' => 'project',
         'install_path' => __DIR__ . '/../../../../',
         'aliases' => array(),
@@ -346,7 +346,7 @@
         'webkernel/codebase' => array(
             'pretty_version' => '0.12.0',
             'version' => '0.12.0.0',
-            'reference' => '007be11fd3ec3739c857ecfaa08cf5faa487e0b4',
+            'reference' => '5cc94a3397012e5a27e1b8f347882070f4ce4560',
             'type' => 'library',
             'install_path' => __DIR__ . '/../webkernel/codebase',
             'aliases' => array(),
@@ -355,7 +355,7 @@
         'webkernel/components' => array(
             'pretty_version' => '0.12.0',
             'version' => '0.12.0.0',
-            'reference' => '2c0586a6e55b9a3f97b85e19a34828224ea65c73',
+            'reference' => '32427587e6f2f78c52e49a61bf0564cf12157f85',
             'type' => 'webkernel-component',
             'install_path' => __DIR__ . '/../webkernel/components',
             'aliases' => array(),
@@ -364,7 +364,7 @@
         'webkernel/i18n' => array(
             'pretty_version' => '0.12.0',
             'version' => '0.12.0.0',
-            'reference' => '7297966fffcf4b912a409362217c25af1ae26fa6',
+            'reference' => '1eeb7bda5a569c79b9f40196d5018f9edecc6aa2',
             'type' => 'webkernel-stdlib',
             'install_path' => __DIR__ . '/../webkernel/i18n',
             'aliases' => array(),
@@ -373,7 +373,7 @@
         'webkernel/imagery' => array(
             'pretty_version' => '0.12.0',
             'version' => '0.12.0.0',
-            'reference' => 'd2445bf9f9dba090eea07a77a4d142ca47462b44',
+            'reference' => '4a46b099a4f50b115b5ea5af74f20debdab935bd',
             'type' => 'webkernel-stdlib',
             'install_path' => __DIR__ . '/../webkernel/imagery',
             'aliases' => array(),
@@ -382,7 +382,7 @@
         'webkernel/lifecycle' => array(
             'pretty_version' => '0.12.0',
             'version' => '0.12.0.0',
-            'reference' => 'b5d1272c06d175e97b49705d9a6e857aa367b99e',
+            'reference' => 'b2b04435a3bf5aa0bca375cfa704aeffe138da4d',
             'type' => 'composer-plugin',
             'install_path' => __DIR__ . '/../webkernel/lifecycle',
             'aliases' => array(),
@@ -391,7 +391,7 @@
         'webkernel/panels' => array(
             'pretty_version' => '0.12.0',
             'version' => '0.12.0.0',
-            'reference' => 'fac7efa544ddad19e4ea6d6073114cdd91f134d6',
+            'reference' => '00a3b89544f7747165184fec4a1a3e87d16967c8',
             'type' => 'webkernel-stdlib',
             'install_path' => __DIR__ . '/../webkernel/panels',
             'aliases' => array(),
@@ -400,7 +400,7 @@
         'webkernel/platform' => array(
             'pretty_version' => '0.12.0',
             'version' => '0.12.0.0',
-            'reference' => '315ab1edd6d4224309b50a1d72846fb7541739f2',
+            'reference' => '87e25ad97de49f1a3d5cd776f7756e523eee7699',
             'type' => 'metapackage',
             'install_path' => null,
             'aliases' => array(),
@@ -409,7 +409,7 @@
         'webkernel/schemas' => array(
             'pretty_version' => '0.12.0',
             'version' => '0.12.0.0',
-            'reference' => '471ec5b8e135ff9489856f90540630da57ba8037',
+            'reference' => '8a2ea71d2a927431f500049bfcdeb9723f45037d',
             'type' => 'webkernel-stdlib',
             'install_path' => __DIR__ . '/../webkernel/schemas',
             'aliases' => array(),
@@ -418,7 +418,7 @@
         'webkernel/webkernel' => array(
             'pretty_version' => 'dev-main',
             'version' => 'dev-main',
-            'reference' => '1d1bbe62e44391300c4db05a9bf9f810396200c2',
+            'reference' => 'dd4b81bf6b56609f020232d7811667f47a3f0bec',
             'type' => 'project',
             'install_path' => __DIR__ . '/../../../../',
             'aliases' => array(),

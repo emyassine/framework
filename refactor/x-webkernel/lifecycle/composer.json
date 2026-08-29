@@ -14,7 +14,7 @@
         }
     ],
     "require": {
-        "php": ">=8.4",
+        "php": ">=8.5",
         "composer-plugin-api": "^2.0",
         "composer/installers": "^2.0",
         "webkernel/codebase": "^0.12.0"

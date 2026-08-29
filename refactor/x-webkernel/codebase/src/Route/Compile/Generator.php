@@ -124,7 +124,7 @@ final class Generator
         foreach ($regex_to_routes as $regex => $route) {
             $regexes[] = $regex.'(*MARK:'.$mark.')';
             $route_map[$mark] = [$route->handler, $route->variables, $route->extra];
-            ++$mark;
+            $mark = \str_increment($mark);
         }
 
         return [

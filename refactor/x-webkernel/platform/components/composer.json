@@ -6,7 +6,7 @@
     "type": "webkernel-component",
     "license": "proprietary",
     "require": {
-        "php": ">=8.4",
+        "php": ">=8.5",
         "webkernel/codebase": "^0.12.0"
     },
     "autoload": {

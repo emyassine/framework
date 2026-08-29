@@ -36,29 +36,12 @@ final class LocaleDirection
         if ($tag === '') {
             return false;
         }
-        $full = $tag;
-        if (\method_exists(\Locale::class, 'addLikelySubtags')) {
-            $expanded = \Locale::addLikelySubtags($tag);
-            if (\is_string($expanded) && $expanded !== '') {
-                $full = $expanded;
-            }
+        $full = \Locale::addLikelySubtags($tag);
+        if (! \is_string($full) || $full === '') {
+            $full = $tag;
         }
         $script = \Locale::getScript($full);
-        if (\is_string($script) && $script !== '') {
-            return \in_array($script, self::RTL_SCRIPTS, true);
-        }
-        // PHP 8.4 intl has no Locale::addLikelySubtags (8.5). Native name's first letter.
-        $native = \Locale::getDisplayLanguage($tag, $tag);
-        if (! \is_string($native) || $native === '' || \preg_match('/./u', $native, $letter) !== 1) {
-            return false;
-        }
-        $cp = \IntlChar::ord($letter[0]);
-        if (! \is_int($cp)) {
-            return false;
-        }
-        $dir = \IntlChar::charDirection($cp);
 
-        return $dir === \IntlChar::CHAR_DIRECTION_RIGHT_TO_LEFT
-            || $dir === \IntlChar::CHAR_DIRECTION_RIGHT_TO_LEFT_ARABIC;
+        return \is_string($script) && \in_array($script, self::RTL_SCRIPTS, true);
     }
 }

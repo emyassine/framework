@@ -62,7 +62,7 @@
         }
     ],
 	"require": {
-	    "php": ">8.4",
+	    "php": ">=8.5",
 	    "acme/billing": "*",
 	    "ext-dom": "*",
 	    "ext-fileinfo": "*",
