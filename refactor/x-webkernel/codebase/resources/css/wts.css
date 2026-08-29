@@ -10,12 +10,7 @@
     --wts-font-cjk: "Noto Sans JP", "Noto Sans SC", "Noto Sans KR", "Hiragino Sans", "PingFang SC", sans-serif;
     --wts-font-urdu: "Noto Nastaliq Urdu", "IBM Plex Sans Arabic", ui-sans-serif, sans-serif;
     --wts-font-mono: "Lilex", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-    --wts-font-stack:
-        var(--wts-font-latin),
-        var(--wts-font-arabic),
-        var(--wts-font-hebrew),
-        var(--wts-font-cjk),
-        sans-serif;
+    --wts-font-stack: var(--wts-font-latin), sans-serif;
 
     --wts-p-scale: 1.07;
     --wts-p-scale-rtl: 1.1556;

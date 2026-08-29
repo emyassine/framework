@@ -14,12 +14,10 @@ final class TypographySystem
 {
     public const DIR = 'fetch-fonts';
 
-    public const FONTS_CSS = 'fetch-fonts/wts-fonts.css';
-
     public const RULES_CSS = 'fetch-fonts/wts.css';
 
     /**
-     * @return array<string, array{family: string, google: string}>
+     * @return array<string, array{family: string, google: string, pack: string}>
      */
     public static function catalog(): array
     {
@@ -27,48 +25,87 @@ final class TypographySystem
             'dm-sans' => [
                 'family' => 'DM Sans',
                 'google' => 'DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000',
+                'pack' => 'latin',
             ],
             'lilex' => [
                 'family' => 'Lilex',
                 'google' => 'Lilex:ital,wght@0,100..700;1,100..700',
+                'pack' => 'latin',
             ],
             'ibm-plex-sans-arabic' => [
                 'family' => 'IBM Plex Sans Arabic',
                 'google' => 'IBM+Plex+Sans+Arabic:wght@100;200;300;400;500;600;700',
+                'pack' => 'arabic',
             ],
             'rubik' => [
                 'family' => 'Rubik',
                 'google' => 'Rubik:ital,wght@0,300..900;1,300..900',
+                'pack' => 'arabic',
             ],
             'amiri-quran' => [
                 'family' => 'Amiri Quran',
                 'google' => 'Amiri+Quran',
+                'pack' => 'arabic',
             ],
             'noto-nastaliq-urdu' => [
                 'family' => 'Noto Nastaliq Urdu',
                 'google' => 'Noto+Nastaliq+Urdu:wght@400..700',
+                'pack' => 'arabic',
             ],
             'noto-sans-hebrew' => [
                 'family' => 'Noto Sans Hebrew',
                 'google' => 'Noto+Sans+Hebrew:wght@100..900',
+                'pack' => 'hebrew',
             ],
             'noto-sans-jp' => [
                 'family' => 'Noto Sans JP',
                 'google' => 'Noto+Sans+JP:wght@100..900',
+                'pack' => 'cjk',
             ],
             'noto-sans-sc' => [
                 'family' => 'Noto Sans SC',
                 'google' => 'Noto+Sans+SC:wght@100..900',
+                'pack' => 'cjk',
             ],
             'noto-sans-kr' => [
                 'family' => 'Noto Sans KR',
                 'google' => 'Noto+Sans+KR:wght@100..900',
+                'pack' => 'cjk',
             ],
             'space-grotesk' => [
                 'family' => 'Space Grotesk',
                 'google' => 'Space+Grotesk:wght@500;600;700',
+                'pack' => 'latin',
             ],
         ];
+    }
+
+    /**
+     * @param $locale string|null
+     *
+     * @return string
+     */
+    public static function pack(?string $locale = null): string
+    {
+        $tag = \strtolower(\str_replace('_', '-', \trim((string) $locale)));
+        $lang = \explode('-', $tag === '' ? 'en' : $tag, 2)[0];
+
+        return match ($lang) {
+            'ar', 'fa', 'ur', 'ps', 'ckb', 'ku' => 'arabic',
+            'he', 'yi' => 'hebrew',
+            'ja', 'zh', 'ko' => 'cjk',
+            default => 'latin',
+        };
+    }
+
+    /**
+     * @param $pack string
+     *
+     * @return string
+     */
+    public static function fonts_css(string $pack): string
+    {
+        return self::DIR.'/wts-fonts-'.$pack.'.css';
     }
 
     /**
@@ -82,45 +119,85 @@ final class TypographySystem
     }
 
     /**
+     * @param $locale string|null
+     *
      * @return string
      */
-    public static function google_css_url(): string
+    public static function google_css_url(?string $locale = null): string
     {
+        $pack = self::pack($locale);
         $parts = [];
         foreach (self::catalog() as $meta) {
-            if ($meta['family'] === 'Space Grotesk') {
+            if ($meta['family'] === 'Space Grotesk' || $meta['pack'] !== $pack) {
                 continue;
             }
             $parts[] = 'family='.$meta['google'];
         }
 
-        return 'https://fonts.googleapis.com/css2?'.\implode('&', $parts).'&display=swap';
+        return 'https://fonts.googleapis.com/css2?'.\implode('&', $parts).'&display=optional';
     }
 
     /**
+     * @param $locale string|null
+     *
      * @return bool
      */
-    public static function has_local_fonts(): bool
+    public static function has_local_fonts(?string $locale = null): bool
     {
-        $path = self::path(self::FONTS_CSS);
+        $path = self::path(self::fonts_css(self::pack($locale)));
 
         return \is_file($path) && (\filesize($path) ?: 0) > 32;
     }
 
     /**
-     * Public href for self-hosted font CSS, or the Google CDN URL.
+     * Public href for the script pack CSS, or the Google CDN URL for that pack.
+     *
+     * @param $locale string|null
      *
      * @return string
      */
-    public static function fonts_href(): string
+    public static function fonts_href(?string $locale = null): string
     {
-        if (! self::has_local_fonts()) {
-            return self::google_css_url();
+        if (! self::has_local_fonts($locale)) {
+            return self::google_css_url($locale);
         }
-        $path = self::path(self::FONTS_CSS);
-        $mtime = \filemtime($path) ?: 0;
+        $rel = self::fonts_css(self::pack($locale));
+        $mtime = \filemtime(self::path($rel)) ?: 0;
 
-        return '/'.self::FONTS_CSS.'?v='.$mtime;
+        return '/'.$rel.'?v='.$mtime;
+    }
+
+    /**
+     * Critical woff2 for preload (latin/arabic/… regular, no late swap).
+     *
+     * @param $locale string|null
+     *
+     * @return string
+     */
+    public static function preload_href(?string $locale = null): string
+    {
+        $rel = self::fonts_css(self::pack($locale));
+        $css_path = self::path($rel);
+        if (! \is_file($css_path)) {
+            return '';
+        }
+        $css = \file_get_contents($css_path);
+        if (! \is_string($css) || $css === '') {
+            return '';
+        }
+        if (\preg_match(
+            '/font-style:\s*normal;[^}]*src:\s*url\(([^)]+)\)[^}]*unicode-range:\s*U\+0000-00FF/s',
+            $css,
+            $match,
+        ) !== 1 && \preg_match(
+            '/font-style:\s*normal;[^}]*src:\s*url\(([^)]+)\)/s',
+            $css,
+            $match,
+        ) !== 1) {
+            return '';
+        }
+
+        return \trim($match[1]);
     }
 
     /**

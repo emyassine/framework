@@ -27,13 +27,17 @@ final class TypographyTest extends TestCase
     public function test_path_is_webapp_public(): void
     {
         $this->assertSame(
-            webapp_path('public/'.TypographySystem::FONTS_CSS),
-            TypographySystem::path(TypographySystem::FONTS_CSS),
-        );
-        $this->assertSame(
             webapp_path('public/fetch-fonts'),
             TypographySystem::path(TypographySystem::DIR),
         );
+        $this->assertSame('latin', TypographySystem::pack('en'));
+        $this->assertSame('latin', TypographySystem::pack('ru'));
+        $this->assertSame('arabic', TypographySystem::pack('ar'));
+        $this->assertSame('hebrew', TypographySystem::pack('he'));
+        $this->assertSame('cjk', TypographySystem::pack('ja'));
+        $this->assertSame('fetch-fonts/wts-fonts-latin.css', TypographySystem::fonts_css('latin'));
+        $this->assertStringNotContainsString('Plex+Sans+Arabic', TypographySystem::google_css_url('en'));
+        $this->assertStringContainsString('Plex+Sans+Arabic', TypographySystem::google_css_url('ar'));
         $this->assertArrayHasKey('dm-sans', TypographySystem::catalog());
     }
 }
