@@ -12,6 +12,8 @@ use Webkernel\Instance\InstanceId;
 
 trait CanStampPlatform
 {
+    use _DumpAutoloadCommand;
+
     private function stamp_platform_config(string $root, string $vendor_rel, string $instance_id): void
     {
         $config_path = $root.DIRECTORY_SEPARATOR.'config'.DIRECTORY_SEPARATOR.'platform.php';

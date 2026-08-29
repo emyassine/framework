@@ -8,15 +8,11 @@
 namespace Webkernel\Console\Commands;
 
 use Webkernel\Console\Attribute\ConsoleCommand;
-use Webkernel\Console\Commands\DumpAutoloadCommand\CanCompileRuntime;
-use Webkernel\Console\Commands\DumpAutoloadCommand\CanDumpAssets;
-use Webkernel\Console\Commands\DumpAutoloadCommand\CanDumpPanels;
-use Webkernel\Console\Commands\DumpAutoloadCommand\CanDumpTypography;
-use Webkernel\Console\Commands\DumpAutoloadCommand\CanStampPlatform;
-use Webkernel\Console\Commands\DumpAutoloadCommand\CanWritePhp;
-use Webkernel\Console\Commands\DumpAutoloadCommand\HasPackages;
-use Webkernel\Console\Commands\DumpAutoloadCommand\HasPaths;
-use Webkernel\Console\Commands\DumpAutoloadCommand\HasProviders;
+use Webkernel\Console\Commands\DumpAutoloadCommand\{
+	CanCompileRuntime, CanDumpAssets, CanDumpPanels,
+	CanDumpTypography, CanStampPlatform, CanWritePhp,
+	HasPackages, HasPaths, HasProviders, _DumpAutoloadCommand
+};
 use Webkernel\Console\ExitCode;
 use Webkernel\DevEnv\IdeHelper;
 use Webkernel\Instance\InstanceId;
@@ -27,6 +23,7 @@ use Webkernel\Instance\InstanceId;
  */
 final readonly class DumpAutoloadCommand
 {
+    use _DumpAutoloadCommand;
     use CanCompileRuntime;
     use CanDumpAssets;
     use CanDumpPanels;
@@ -36,27 +33,6 @@ final readonly class DumpAutoloadCommand
     use HasPackages;
     use HasPaths;
     use HasProviders;
-
-    private const PANEL_CLASS = 'Webkernel\\Platform\\Panel';
-
-    private const PANEL_PROVIDER_CLASS = 'Webkernel\\Platform\\PanelProvider';
-
-    private const RESOURCE_CLASS = 'Webkernel\\Platform\\Resources\\Resource';
-
-    public const BOOT_BASENAME = 'webkernel.php';
-    public const CLASSMAP_BASENAME = 'webkernel_classmap.php';
-    public const FILES_BASENAME = 'webkernel_files.php';
-    public const VIEWS_BASENAME = 'webkernel_views.php';
-    public const COMPONENTS_BASENAME = 'webkernel_components.php';
-    public const ROUTES_BASENAME = 'webkernel_routes.php';
-    public const COMPOSABLES_BASENAME = 'webkernel_composables.php';
-    public const PROVIDERS_BASENAME = 'webkernel_providers.php';
-    public const COMMANDS_BASENAME = 'webkernel_commands.php';
-    public const PANELS_BASENAME = 'webkernel_panels.php';
-    public const PANEL_ROUTES_BASENAME = 'webkernel_panel_routes.php';
-    public const BRANDING_BASENAME = 'webkernel_branding.php';
-    public const ICONS_BASENAME = 'webkernel_icons.php';
-    public const LANG_BASENAME = 'webkernel_lang.php';
 
     /**
      * @return ExitCode

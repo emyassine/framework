@@ -11,6 +11,8 @@ use Webkernel\Console\Terminal;
 
 trait HasPaths
 {
+    use _DumpAutoloadCommand;
+
     private function project_root(): string
     {
         $dir = getcwd() ?: '';

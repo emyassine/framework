@@ -17,6 +17,8 @@ use Webkernel\View\View;
 
 trait CanCompileRuntime
 {
+    use _DumpAutoloadCommand;
+
     /**
      * @param list<array{class: class-string, prefix: string, path: string}> $providers
      */

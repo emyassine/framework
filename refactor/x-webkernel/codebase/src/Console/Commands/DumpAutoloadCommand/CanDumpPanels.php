@@ -9,6 +9,8 @@ namespace Webkernel\Console\Commands\DumpAutoloadCommand;
 
 trait CanDumpPanels
 {
+    use _DumpAutoloadCommand;
+
     /**
      * @param list<array{class: class-string, prefix: string, path: string}> $providers
      * @param array<string, string> $classmap

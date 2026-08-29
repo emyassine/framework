@@ -11,6 +11,8 @@ use Webkernel\DevEnv\IdeHelper;
 
 trait CanWritePhp
 {
+    use _DumpAutoloadCommand;
+
     private function write_php(string $path, mixed $data): void
     {
         $export = var_export($data, true);

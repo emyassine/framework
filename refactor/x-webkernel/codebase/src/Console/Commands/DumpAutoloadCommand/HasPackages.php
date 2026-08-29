@@ -13,6 +13,8 @@ use RecursiveIteratorIterator;
 
 trait HasPackages
 {
+    use _DumpAutoloadCommand;
+
     /**
      * @return list<array{path: string, package: array<string, mixed>}>
      */

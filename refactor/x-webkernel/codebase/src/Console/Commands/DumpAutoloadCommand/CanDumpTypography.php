@@ -11,6 +11,8 @@ use Webkernel\Typography\TypographySystem;
 
 trait CanDumpTypography
 {
+    use _DumpAutoloadCommand;
+
     /**
      * Write WTS rules + self-hosted fonts under webapp_path("public/$typo_path").
      *

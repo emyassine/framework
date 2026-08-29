@@ -13,6 +13,8 @@ use RecursiveIteratorIterator;
 
 trait CanDumpAssets
 {
+    use _DumpAutoloadCommand;
+
     /**
      * @param list<array{path: string, package: array<string, mixed>}> $packages
      * @return array<string, array{brand: string, format: string, hash: string, source: string}>

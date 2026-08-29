@@ -12,6 +12,8 @@ use Webkernel\PlatformProvider;
 
 trait HasProviders
 {
+    use _DumpAutoloadCommand;
+
     /**
      * @param list<array{path: string, package: array<string, mixed>}> $packages
      * @param array<string, string> $classmap
