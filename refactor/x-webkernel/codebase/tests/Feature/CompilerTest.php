@@ -103,4 +103,18 @@ final class CompilerTest extends TestCase
         $this->assertStringContainsString('AttributeBag', $php);
         $this->assertStringContainsString('except', $php);
     }
+
+    /**
+     * @return void
+     */
+    public function test_once_and_csrf_compile(): void
+    {
+        $compiler = new Compiler(new Directives(), '\\'.View::class.'::echo(%s)');
+        $once = $compiler->compile_string("@once('wds.btn')\nyes\n@endonce");
+        $csrf = $compiler->compile_string('@csrf');
+
+        $this->assertStringContainsString("once('wds.btn')", $once);
+        $this->assertStringContainsString('endif;', $once);
+        $this->assertStringContainsString('Csrf::field()', $csrf);
+    }
 }

@@ -94,12 +94,12 @@ final class Components
         if ($icon === '' || ! function_exists('icon')) {
             return null;
         }
-        $markup = icon($icon, 'webkernel-shell-icon__svg', '', $set);
+        $markup = icon($icon, 'wds-icon-svg', '', $set);
         if ($markup === '') {
             return null;
         }
 
-        return '<span class="webkernel-shell-icon">'.$markup.'</span>';
+        return '<span class="wds-icon">'.$markup.'</span>';
     }
 
     /**

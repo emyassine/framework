@@ -1,6 +1,6 @@
-<a href="<?php echo \Webkernel\View\View::echo($href); ?>" class="webkernel-shell-nav-item<?php echo \Webkernel\View\View::echo(!empty($active) ? ' active' : ''); ?>">
+<a href="<?php echo \Webkernel\View\View::echo($href); ?>" class="wds-sidebar-item<?php echo \Webkernel\View\View::echo(!empty($active) ? ' wds-active' : ''); ?>">
   <?php if(!empty($icon)): ?>
     <?php  $this->start_component('webkernel::icon',['name'=>$icon]); ?><?php echo $this->render_component(); ?>
   <?php endif; ?>
-  <span class="webkernel-shell-nav-label"><?php echo $slot; ?></span>
+  <span class="wds-sidebar-item-label"><?php echo $slot; ?></span>
 </a>

@@ -1,15 +1,27 @@
+<?php  $__props = [
+  'lang' => 'en',
+  'theme' => 'light',
+  'layout' => 'base',
+  'title' => 'Webkernel',
+  'csrf' => true,
+]; foreach ($__props as $__n => $__d) { if (!isset($$__n)) { $$__n = $__d; } } $attributes = (isset($attributes) && $attributes instanceof \Webkernel\View\AttributeBag ? $attributes : new \Webkernel\View\AttributeBag([]))->except(\array_keys($__props)); unset($__props, $__n, $__d); ?>
 <!DOCTYPE html>
 <html
-  lang="<?php echo \Webkernel\View\View::echo($lang ?? 'en'); ?>"
-  data-webkernel-design-theme="<?php echo \Webkernel\View\View::echo($theme ?? 'light'); ?>"
-  data-webkernel-design-layout="<?php echo \Webkernel\View\View::echo($layout ?? 'base'); ?>"
+  lang="<?php echo \Webkernel\View\View::echo($lang); ?>"
+  data-wds-theme="<?php echo \Webkernel\View\View::echo($theme); ?>"
+  data-wds-layout="<?php echo \Webkernel\View\View::echo($layout); ?>"
 >
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title><?php echo \Webkernel\View\View::echo($title ?? 'Webkernel'); ?></title>
-  <?php echo $this->run_child('webkernel::layouts.partials.tokens'); ?>
+  <?php if($csrf): ?>
+    <?php echo \Webkernel\Csrf::meta(); ?>
+
+  <?php endif; ?>
+  <title><?php echo \Webkernel\View\View::echo($title); ?></title>
+  <?php echo $this->run_child('webkernel::wds.tokens'); ?>
   <?php echo  $this->stack('styles'); ?>
+  <?php echo  $this->stack('head'); ?>
 </head>
 <body>
   <?php echo $this->yield_content('content'); ?>

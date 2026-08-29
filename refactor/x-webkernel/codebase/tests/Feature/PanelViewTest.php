@@ -46,11 +46,14 @@ final class PanelViewTest extends TestCase
     {
         $html = View::make('webkernel::panels.system.dashboard')->render();
 
-        $this->assertStringContainsString('webkernel-shell-sidebar', $html);
-        $this->assertStringContainsString('webkernel-shell-page-title', $html);
+        $this->assertStringContainsString('wds-sidebar', $html);
+        $this->assertStringContainsString('wds-header-heading', $html);
+        $this->assertStringContainsString('csrf-token', $html);
+        $this->assertStringContainsString('name="_token"', $html);
+        $this->assertStringContainsString('--primary-50', $html);
         $this->assertStringContainsString('System Admin Panel', $html);
         $this->assertStringContainsString('href="/billing/invoices"', $html);
-        $this->assertStringContainsString('webkernel-shell-user-menu', $html);
+        $this->assertStringContainsString('wds-user-menu', $html);
         $this->assertStringContainsString('<svg', $html);
         $this->assertStringContainsString('<title>System</title>', $html);
     }
@@ -59,7 +62,46 @@ final class PanelViewTest extends TestCase
     {
         $html = View::make('webkernel::pages.home')->render();
 
-        $this->assertStringContainsString('webkernel-shell-page', $html);
+        $this->assertStringContainsString('wds-page', $html);
         $this->assertStringContainsString('Platform is working', $html);
+    }
+
+    /**
+     * @return void
+     */
+    public function test_page_csrf_is_on_by_default_and_disableable(): void
+    {
+        $on = View::make('webkernel::page', ['title' => 'X', 'slot' => 'hi'])->render();
+        $this->assertStringContainsString('name="_token"', $on);
+
+        $off = View::make('webkernel::page', ['title' => 'X', 'csrf' => false, 'slot' => 'hi'])->render();
+        $this->assertStringNotContainsString('name="_token"', $off);
+    }
+
+    /**
+     * @return void
+     */
+    public function test_providers_declare_view_namespace(): void
+    {
+        $this->assertSame('webkernel', \Webkernel\CodebaseProvider::VIEW_NAMESPACE);
+        $this->assertSame('webkernel', \Webkernel\Platform\PanelsProvider::VIEW_NAMESPACE);
+        $this->assertSame('webkernel', \Webkernel\Platform\Components\ComponentsProvider::VIEW_NAMESPACE);
+        $this->assertSame('billing', \Acme\Billing\BillingProvider::VIEW_NAMESPACE);
+        $this->assertSame(
+            'webkernel',
+            \Webkernel\Platform\PanelsProvider::view_namespace('fallback'),
+        );
+    }
+
+    /**
+     * @return void
+     */
+    public function test_color_root_css_exposes_primary_stops(): void
+    {
+        $css = \Webkernel\Platform\Colors\Color::root_css();
+        $this->assertStringContainsString('--primary-50:', $css);
+        $this->assertStringContainsString('--primary-950:', $css);
+        $this->assertStringContainsString('--color-red-500:', $css);
+        $this->assertStringContainsString('--color-mauve-50:', $css);
     }
 }

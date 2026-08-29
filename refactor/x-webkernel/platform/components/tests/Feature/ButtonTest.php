@@ -34,9 +34,10 @@ final class ButtonTest extends TestCase
             ->slot('New')
             ->render(['class' => 'extra']);
 
-        $this->assertStringContainsString('webkernel-design-btn--danger', $button);
-        $this->assertStringContainsString('webkernel-design-btn--lg', $button);
-        $this->assertStringContainsString('webkernel-design-btn--outline', $button);
+        $this->assertStringContainsString('wds-btn', $button);
+        $this->assertStringContainsString('wds-color-danger', $button);
+        $this->assertStringContainsString('wds-size-lg', $button);
+        $this->assertStringContainsString('wds-outlined', $button);
         $this->assertStringContainsString('New', $button);
         $this->assertStringContainsString('extra', $button);
         $this->assertStringContainsString('<button', $button);

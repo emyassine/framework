@@ -302,6 +302,8 @@ final class Engine
     }
 
     /**
+     * First call for $id returns true and records it. Later calls return false.
+     *
      * @param $id string
      *
      * @return bool
