@@ -5,8 +5,10 @@
 //> For the full copyright and license information, please view the LICENSE
 //> file that was distributed with this source code.
 
-//> No declare(strict_types=1) until this compiler is specialized.
-// ponytail: compiler is not strict_types — add it when the compiler is specialized.
+//> Copied BladeOne compiler (eftec/bladeone). Not the Webkernel design.
+//> Engine.php is the runtime. This file loads only on compile miss.
+//> No strict_types until this blob is replaced. Flipping the switch is a
+//> 4000-line type hunt, not a one-liner. Replacement is the work.
 /**
  * @noinspection PhpUnusedParameterInspection
  * @noinspection SyntaxError
@@ -237,10 +239,9 @@ class Compiler
     /** @var string tag unique */
     protected string $PARENTKEY = '@parentXYZABC';
     /**
-     * Indicates the compile mode.
-     * if the constant BLADEONE_MODE is defined, then it is used instead of this field.
+     * Compile mode. Compiler::MODE_AUTO|SLOW|FAST|DEBUG. Set by the constructor / set_mode().
      *
-     * @var int=[Compiler::MODE_AUTO,Compiler::MODE_DEBUG,Compiler::MODE_SLOW,Compiler::MODE_FAST][$i]
+     * @var int
      */
     protected int $mode;
     /** @var int Indicates the number of open switches */
@@ -1479,15 +1480,10 @@ class Compiler
     }
 
     /**
-     * Get the mode of the engine.See Compiler::MODE_* constants
-     *
-     * @return int=[self::MODE_AUTO,self::MODE_DEBUG,self::MODE_FAST,self::MODE_SLOW][$i]
+     * @return int Compiler::MODE_AUTO|MODE_DEBUG|MODE_FAST|MODE_SLOW
      */
     public function get_mode(): int
     {
-        if (\defined('BLADEONE_MODE')) {
-            $this->mode = BLADEONE_MODE;
-        }
         return $this->mode;
     }
 
