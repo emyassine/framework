@@ -10,14 +10,6 @@
   <?php echo $this->run_child('webkernel::panels.system.user'); ?>
 <?php $this->stop_section(); ?>
 
-<?php $this->start_section('topnav'); ?>
-  <?php echo $this->run_child('webkernel::panels.system.sidebar', ['current' => 'home']); ?>
-<?php $this->stop_section(); ?>
-
-<?php $this->start_section('horizontal'); ?>
-  <?php echo $this->run_child('webkernel::panels.system.sidebar', ['current' => 'home']); ?>
-<?php $this->stop_section(); ?>
-
 <?php $this->start_section('breadcrumb'); ?>
   Home
 <?php $this->stop_section(); ?>

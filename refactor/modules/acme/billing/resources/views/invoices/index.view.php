@@ -10,14 +10,6 @@
   @include('webkernel::panels.system.user')
 @endsection
 
-@section('topnav')
-  @include('billing::sidebar', ['current' => 'invoices'])
-@endsection
-
-@section('horizontal')
-  @include('billing::sidebar', ['current' => 'invoices'])
-@endsection
-
 @section('breadcrumb')
   Billing / Invoices
 @endsection

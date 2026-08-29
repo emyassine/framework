@@ -139,10 +139,11 @@ final readonly class DumpAutoloadCommand
             $this->icons_dump($providers),
         );
         $this->dump_typography();
+        $this->dump_wds_css($providers);
         $this->strip_dev_autoload_files($composer_dir);
         $this->ensure_path_helpers();
         $this->rebuild_compiled_routes($composer_dir);
-        $this->compile_views($providers, $root);
+        $this->compile_views($providers, $root, $vendor_dir);
 
         $io = $this->terminal();
         $io->success('wrote composer/'.self::BOOT_BASENAME.' (instance '.$instance_id.')');

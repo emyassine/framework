@@ -152,22 +152,29 @@ final class View implements ComposableContract, \Stringable
     }
 
     /**
+     * @param $mode Mode|null Fast when dump-autoload wrote compiled paths. Pass Auto to compile.
+     *
      * @return Engine
      */
-    public static function engine(): Engine
+    public static function engine(?Mode $mode = null): Engine
     {
         if (self::$engine instanceof Engine) {
             return self::$engine;
         }
         $compiled = self::compiled_views();
         $dirs = $compiled['dirs'] !== [] ? $compiled['dirs'] : self::fallback_dirs($compiled);
+        $map = self::compiled_map();
+        $mode ??= $map !== [] ? Mode::Fast : Mode::Auto;
         $engine = new Engine(
             $dirs,
             webapp_path('platform/storage/framework/views'),
-            Mode::Auto,
+            $mode,
         );
         $engine->set_echo_format('\\'.self::class.'::echo(%s)');
         self::apply_namespaces($engine, $compiled);
+        if ($mode === Mode::Fast && $map !== []) {
+            $engine->set_compiled_map($map);
+        }
 
         return self::$engine = $engine;
     }
@@ -249,6 +256,22 @@ final class View implements ComposableContract, \Stringable
     public function __toString(): string
     {
         return $this->render();
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    private static function compiled_map(): array
+    {
+        $loaded = self::load_dump('webkernel_compiled_views.php');
+        $map = [];
+        foreach ($loaded as $view => $path) {
+            if (\is_string($view) && $view !== '' && \is_string($path) && $path !== '') {
+                $map[$view] = $path;
+            }
+        }
+
+        return $map;
     }
 
     /**

@@ -5,7 +5,6 @@
   'type' => 'text',
   'mode' => 'editable',
 ]; foreach ($__props as $__n => $__d) { if (!isset($$__n)) { $$__n = $__d; } } $attributes = (isset($attributes) && $attributes instanceof \Webkernel\View\AttributeBag ? $attributes : new \Webkernel\View\AttributeBag([]))->except(\array_keys($__props)); unset($__props, $__n, $__d); ?>
-<?php echo $this->run_child('webkernel::wds.field'); ?>
 <?php if($mode === 'readonly'): ?>
   <div class="wds-fo-field wds-readonly">
     <dt><?php echo \Webkernel\View\View::echo($label ?? $name); ?></dt>

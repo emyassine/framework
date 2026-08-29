@@ -19,7 +19,6 @@
   'tooltip' => null,
   'type' => 'button',
 ])
-@include('webkernel::wds.btn')
 @php
   $tag = $tag === 'a' || ($href !== null && $href !== '') ? 'a' : 'button';
   $size = $size instanceof \Webkernel\Platform\Components\Size ? $size->value : (string) $size;

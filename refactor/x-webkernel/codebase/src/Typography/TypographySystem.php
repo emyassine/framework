@@ -16,6 +16,12 @@ final class TypographySystem
 
     public const RULES_CSS = 'fetch-fonts/wts.css';
 
+    /** @var array<string, string|false> */
+    private static array $pack_css = [];
+
+    /** @var array<string, string> */
+    private static array $preload = [];
+
     /**
      * @return array<string, array{family: string, google: string, pack: string}>
      */
@@ -184,12 +190,8 @@ final class TypographySystem
      */
     public static function has_local_fonts(?string $locale = null): bool
     {
-        $path = self::path(self::fonts_css(self::pack($locale)));
-        if (! \is_file($path)) {
-            return false;
-        }
-        $css = \file_get_contents($path);
-        if (! \is_string($css) || $css === '') {
+        $css = self::pack_css($locale);
+        if ($css === null) {
             return false;
         }
 
@@ -224,14 +226,13 @@ final class TypographySystem
      */
     public static function preload_href(?string $locale = null): string
     {
-        $rel = self::fonts_css(self::pack($locale));
-        $css_path = self::path($rel);
-        if (! \is_file($css_path)) {
-            return '';
+        $pack = self::pack($locale);
+        if (\array_key_exists($pack, self::$preload)) {
+            return self::$preload[$pack];
         }
-        $css = \file_get_contents($css_path);
-        if (! \is_string($css) || $css === '') {
-            return '';
+        $css = self::pack_css($locale);
+        if ($css === null) {
+            return self::$preload[$pack] = '';
         }
         if (\preg_match(
             '/font-style:\s*normal;[^}]*src:\s*url\(([^)]+)\)[^}]*unicode-range:\s*U\+0000-00FF/s',
@@ -242,10 +243,10 @@ final class TypographySystem
             $css,
             $match,
         ) !== 1) {
-            return '';
+            return self::$preload[$pack] = '';
         }
 
-        return \trim($match[1]);
+        return self::$preload[$pack] = \trim($match[1]);
     }
 
     /**
@@ -260,5 +261,37 @@ final class TypographySystem
         $mtime = \filemtime($path) ?: 0;
 
         return '/'.self::RULES_CSS.'?v='.$mtime;
+    }
+
+    /**
+     * Pack CSS body, one read per process per pack.
+     *
+     * @param $locale string|null
+     *
+     * @return string|null
+     */
+    private static function pack_css(?string $locale): ?string
+    {
+        $pack = self::pack($locale);
+        if (\array_key_exists($pack, self::$pack_css)) {
+            $cached = self::$pack_css[$pack];
+
+            return $cached === false ? null : $cached;
+        }
+        $path = self::path(self::fonts_css($pack));
+        if (! \is_file($path)) {
+            self::$pack_css[$pack] = false;
+
+            return null;
+        }
+        $css = \file_get_contents($path);
+        if (! \is_string($css) || $css === '') {
+            self::$pack_css[$pack] = false;
+
+            return null;
+        }
+        self::$pack_css[$pack] = $css;
+
+        return $css;
     }
 }

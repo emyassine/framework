@@ -9,7 +9,6 @@
   'description' => null,
   'csrf' => true,
 ])
-@include('webkernel::wds.page')
 @if ($csrf)
   {!! \Webkernel\Csrf::field() !!}
 @endif

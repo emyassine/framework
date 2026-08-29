@@ -5,7 +5,6 @@
   </x-webkernel::button.group>
 --}}
 @props([])
-@include('webkernel::wds.btn')
 @php
   $attributes = $attributes ?? new \Webkernel\View\AttributeBag([]);
 @endphp

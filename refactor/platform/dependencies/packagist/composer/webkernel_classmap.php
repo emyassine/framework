@@ -91,6 +91,7 @@ return array(
     'Webkernel\\Platform\\Schemas\\SchemaMode' => $b . '/x-webkernel/platform/schemas/src/SchemaMode.php',
     'Webkernel\\Platform\\System\\SystemPanelProvider' => $b . '/x-webkernel/platform/panels/src/System/SystemPanelProvider.php',
     'Webkernel\\Platform\\Tables\\Table' => $b . '/x-webkernel/platform/panels/src/Tables/Table.php',
+    'Webkernel\\Platform\\Wds' => $b . '/x-webkernel/platform/panels/src/Wds.php',
     'Webkernel\\Route\\Action\\RedirectAction' => $b . '/x-webkernel/codebase/src/Route/Action/RedirectAction.php',
     'Webkernel\\Route\\Action\\ViewAction' => $b . '/x-webkernel/codebase/src/Route/Action/ViewAction.php',
     'Webkernel\\Route\\Binding' => $b . '/x-webkernel/codebase/src/Route/Binding.php',

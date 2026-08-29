@@ -50,7 +50,8 @@ final class PanelViewTest extends TestCase
         $this->assertStringContainsString('wds-header-heading', $html);
         $this->assertStringContainsString('csrf-token', $html);
         $this->assertStringContainsString('name="_token"', $html);
-        $this->assertStringContainsString('--primary-50', $html);
+        $this->assertStringContainsString('/wds.css', $html);
+        $this->assertStringNotContainsString('--color-mauve-50', $html);
         $this->assertStringContainsString('System Admin Panel', $html);
         $this->assertStringContainsString('href="/billing/invoices"', $html);
         $this->assertStringContainsString('wds-user-menu', $html);
@@ -101,5 +102,44 @@ final class PanelViewTest extends TestCase
         $this->assertStringContainsString('--primary-950:', $css);
         $this->assertStringContainsString('--color-red-500:', $css);
         $this->assertStringContainsString('--color-mauve-50:', $css);
+    }
+
+    /**
+     * @return void
+     */
+    /**
+     * @return void
+     */
+    public function test_compiled_view_map_enables_fast_include(): void
+    {
+        $map = require vendor_dir('composer/webkernel_compiled_views.php');
+        $this->assertIsArray($map);
+        $this->assertArrayHasKey('webkernel::panels.system.dashboard', $map);
+        $this->assertFileExists($map['webkernel::panels.system.dashboard']);
+    }
+
+    /**
+     * @return void
+     */
+    public function test_dumped_wds_css_is_linked_and_contains_chrome(): void
+    {
+        $path = \Webkernel\Platform\Wds::css_path();
+        $this->assertFileExists($path);
+        $css = (string) \file_get_contents($path);
+        $this->assertStringContainsString('--primary-50:', $css);
+        $this->assertStringContainsString('.wds-sidebar', $css);
+        $this->assertStringContainsString('.wds-btn', $css);
+        $this->assertStringContainsString('.wds-page', $css);
+        $this->assertStringStartsWith('/wds.css?v=', \Webkernel\Platform\Wds::css_href());
+    }
+
+    /**
+     * @return void
+     */
+    public function test_engine_does_not_accumulate_pushes_across_renders(): void
+    {
+        $first = View::make('webkernel::panels.system.dashboard')->render();
+        $second = View::make('webkernel::panels.system.dashboard')->render();
+        $this->assertSame(\strlen($first), \strlen($second));
     }
 }

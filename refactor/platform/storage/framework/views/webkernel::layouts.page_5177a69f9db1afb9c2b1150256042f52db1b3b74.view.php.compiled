@@ -37,8 +37,7 @@
   <?php endif; ?>
   <title><?php echo $this->yield_content('title'); ?></title>
   <?php echo $this->run_child('webkernel::layouts.partials.typography'); ?>
-  <?php echo $this->run_child('webkernel::wds.tokens'); ?>
-  <?php echo $this->run_child('webkernel::wds.shell'); ?>
+  <link rel="stylesheet" href="<?php echo \Webkernel\View\View::echo(\Webkernel\Platform\Wds::css_href()); ?>">
   <?php echo  $this->stack('styles'); ?>
   <?php echo  $this->stack('head'); ?>
 </head>
@@ -88,7 +87,7 @@
       </div>
 
       <nav class="wds-topbar-nav">
-        <?php echo $this->yield_content('topnav'); ?>
+        <?php echo $this->yield_content('navigation'); ?>
       </nav>
 
       <div class="wds-breadcrumbs">
@@ -111,7 +110,7 @@
     </header>
 
     <div class="wds-horizontal-nav">
-      <?php echo $this->yield_content('horizontal'); ?>
+      <?php echo $this->yield_content('navigation'); ?>
     </div>
 
     <main class="wds-main">

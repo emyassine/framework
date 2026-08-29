@@ -41,8 +41,10 @@ final readonly class ServerCommand
         ?bool $with_jit = null,
     ): ExitCode {
         $jit = $with_jit;
-        if ($jit === null && Performance::wants_jit()) {
-            $jit = true;
+        if ($jit === null) {
+            $jit = \is_file(Performance::preference_path())
+                ? Performance::wants_jit()
+                : true;
         }
 
         return $this->engine->serve($host, $port, $profile_lifecycle, $jit);

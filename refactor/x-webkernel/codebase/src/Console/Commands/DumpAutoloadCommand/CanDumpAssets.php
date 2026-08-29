@@ -10,10 +10,16 @@ namespace Webkernel\Console\Commands\DumpAutoloadCommand;
 use FilesystemIterator;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
+use Webkernel\DevEnv\IdeHelper;
+use Webkernel\Platform\Colors\Color;
+use Webkernel\Platform\Wds;
 
 trait CanDumpAssets
 {
     use _DumpAutoloadCommand;
+
+    /** @var list<string> */
+    private const WDS_CSS_ORDER = ['tokens', 'shell', 'simple', 'btn', 'page', 'field'];
 
     /**
      * @param list<array{path: string, package: array<string, mixed>}> $packages
@@ -111,19 +117,30 @@ trait CanDumpAssets
             if (! \is_string($src) || $src === '') {
                 continue;
             }
-            if (\preg_match_all('/<x-webkernel::icon\b([^>]*)>/', $src, $tags) === false) {
+            if (\preg_match_all('/\bicon\(\s*[\'"]([^\'"]+)[\'"]/', $src, $calls) !== false) {
+                foreach ($calls[1] as $call_name) {
+                    if (\is_string($call_name) && $call_name !== '') {
+                        $names['lucide/'.$call_name] = true;
+                    }
+                }
+            }
+            if (\preg_match_all('/<x-webkernel::(icon|button)\b([^>]*)>/', $src, $tags, \PREG_SET_ORDER) === false) {
                 continue;
             }
-            foreach ($tags[1] as $attrs) {
-                if (! \is_string($attrs) || \preg_match('/(?:^|\s):name\b/', $attrs) === 1) {
+            foreach ($tags as $tag) {
+                $kind = $tag[1];
+                $attrs = $tag[2];
+                $dynamic = $kind === 'icon' ? '/(?:^|\s):name\b/' : '/(?:^|\s):icon\b/';
+                if (\preg_match($dynamic, $attrs) === 1) {
                     continue;
                 }
                 $name = '';
                 $set = 'lucide';
-                if (\preg_match('/\bname="([^"]+)"/', $attrs, $m) === 1) {
+                $attr = $kind === 'icon' ? 'name' : 'icon';
+                if (\preg_match('/\b'.$attr.'="([^"]+)"/', $attrs, $m) === 1) {
                     $name = $m[1];
                 }
-                if (\preg_match('/\bset="([^"]+)"/', $attrs, $m) === 1) {
+                if ($kind === 'icon' && \preg_match('/\bset="([^"]+)"/', $attrs, $m) === 1) {
                     $set = $m[1];
                 }
                 if ($name !== '') {
@@ -131,5 +148,106 @@ trait CanDumpAssets
                 }
             }
         }
+    }
+
+    /**
+     * Concatenate WDS `<style>` blocks into public/wds.css. Palettes are baked here.
+     *
+     * @param $providers list<array{class: class-string, prefix: string, path: string}>
+     *
+     * @return void
+     */
+    private function dump_wds_css(array $providers): void
+    {
+        $parts = $this->wds_css_parts($providers);
+        if ($parts === []) {
+            $this->terminal()->warning('wds css: no style blocks in views/wds');
+
+            return;
+        }
+        $dest = Wds::css_path();
+        $dir = \dirname($dest);
+        if (! \is_dir($dir) && ! \mkdir($dir, 0775, true) && ! \is_dir($dir)) {
+            $this->terminal()->warning('cannot create '.$dir);
+
+            return;
+        }
+        $header = "/*\n"
+            .IdeHelper::generated_header()."\n"
+            ."//>\n"
+            ."//> Generated. Do not edit.\n"
+            ."//> WDS chrome. Source: resources/views/wds/*.view.php\n"
+            ."*/\n\n";
+        \file_put_contents($dest, $header.\implode("\n", $parts)."\n", \LOCK_EX);
+    }
+
+    /**
+     * @param $providers list<array{class: class-string, prefix: string, path: string}>
+     *
+     * @return list<string>
+     */
+    private function wds_css_parts(array $providers): array
+    {
+        /** @var array<string, string> $named */
+        $named = [];
+        foreach ($this->collect_provider_paths($providers, 'VIEWS') as $dirs) {
+            foreach ($dirs as $dir) {
+                $wds = \rtrim(\str_replace('\\', '/', $dir), '/').'/wds';
+                if (! \is_dir($wds)) {
+                    continue;
+                }
+                $files = \glob($wds.'/*.view.php');
+                if (! \is_array($files)) {
+                    continue;
+                }
+                foreach ($files as $file) {
+                    if (! \is_string($file) || $file === '') {
+                        continue;
+                    }
+                    $css = $this->wds_style_from_view($file);
+                    if ($css === '') {
+                        continue;
+                    }
+                    $named[\basename($file, '.view.php')] = $css;
+                }
+            }
+        }
+        $ordered = [];
+        foreach (self::WDS_CSS_ORDER as $name) {
+            if (isset($named[$name])) {
+                $ordered[] = $named[$name];
+                unset($named[$name]);
+            }
+        }
+        \ksort($named);
+
+        return [...$ordered, ...\array_values($named)];
+    }
+
+    /**
+     * @param $file string
+     *
+     * @return string
+     */
+    private function wds_style_from_view(string $file): string
+    {
+        $src = \file_get_contents($file);
+        if (! \is_string($src) || $src === '') {
+            return '';
+        }
+        $stripped = \preg_replace('/\{\{--.*?--\}\}/s', '', $src);
+        if (\is_string($stripped)) {
+            $src = $stripped;
+        }
+        $src = \str_replace(
+            '{!! \\Webkernel\\Platform\\Colors\\Color::root_css() !!}',
+            Color::root_css(),
+            $src,
+        );
+        if (\preg_match_all('/<style\b[^>]*>(.*?)<\/style>/s', $src, $matches) < 1) {
+            return '';
+        }
+
+        return \trim(\implode("\n", $matches[1]));
     }
 }

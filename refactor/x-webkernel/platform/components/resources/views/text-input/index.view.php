@@ -5,7 +5,6 @@
   'type' => 'text',
   'mode' => 'editable',
 ])
-@include('webkernel::wds.field')
 @if ($mode === 'readonly')
   <div class="wds-fo-field wds-readonly">
     <dt>{{ $label ?? $name }}</dt>

@@ -8,7 +8,6 @@
 namespace Webkernel;
 
 use Webkernel\Config\Config;
-use Webkernel\Route\Compile\Cache;
 use Webkernel\Route\Route;
 
 /**
@@ -23,9 +22,6 @@ final class Http
             \Webkernel\I18n\I18nContext::flush();
         }
         self::maybe_compress();
-        if (! Cache::is_fresh()) {
-            Route::register_dumped_panel_routes();
-        }
         $out = Route::dispatch();
         if ($out instanceof \Stringable || \is_scalar($out) || $out === null) {
             echo (string) $out;

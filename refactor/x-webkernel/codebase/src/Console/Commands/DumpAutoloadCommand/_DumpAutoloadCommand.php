@@ -32,4 +32,5 @@ trait _DumpAutoloadCommand
     public const BRANDING_BASENAME = 'webkernel_branding.php';
     public const ICONS_BASENAME = 'webkernel_icons.php';
     public const LANG_BASENAME = 'webkernel_lang.php';
+    public const COMPILED_VIEWS_BASENAME = 'webkernel_compiled_views.php';
 }

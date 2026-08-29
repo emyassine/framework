@@ -36,8 +36,7 @@
   @endif
   <title>@yield('title')</title>
   @include('webkernel::layouts.partials.typography')
-  @include('webkernel::wds.tokens')
-  @include('webkernel::wds.shell')
+  <link rel="stylesheet" href="{{ \Webkernel\Platform\Wds::css_href() }}">
   @stack('styles')
   @stack('head')
 </head>
@@ -87,7 +86,7 @@
       </div>
 
       <nav class="wds-topbar-nav">
-        @yield('topnav')
+        @yield('navigation')
       </nav>
 
       <div class="wds-breadcrumbs">
@@ -110,7 +109,7 @@
     </header>
 
     <div class="wds-horizontal-nav">
-      @yield('horizontal')
+      @yield('navigation')
     </div>
 
     <main class="wds-main">

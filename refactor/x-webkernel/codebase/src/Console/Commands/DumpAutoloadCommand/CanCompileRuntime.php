@@ -12,6 +12,7 @@ use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 use Webkernel\Route\Compile\Cache;
 use Webkernel\Route\Route;
+use Webkernel\View\Compile\Mode;
 use Webkernel\View\Engine;
 use Webkernel\View\View;
 
@@ -20,9 +21,13 @@ trait CanCompileRuntime
     use _DumpAutoloadCommand;
 
     /**
-     * @param list<array{class: class-string, prefix: string, path: string}> $providers
+     * @param $providers list<array{class: class-string, prefix: string, path: string}>
+     * @param $root string
+     * @param $vendor_dir string
+     *
+     * @return void
      */
-    private function compile_views(array $providers, string $root): void
+    private function compile_views(array $providers, string $root, string $vendor_dir): void
     {
         $dir = $root.'/platform/storage/framework/views';
         if (\is_dir($dir)) {
@@ -36,7 +41,8 @@ trait CanCompileRuntime
             }
         }
         View::flush();
-        $engine = View::engine();
+        $engine = View::engine(Mode::Auto);
+        $map = [];
         foreach (['VIEWS', 'COMPONENTS'] as $constant) {
             $components = $constant === 'COMPONENTS';
             foreach ($this->collect_provider_paths($providers, $constant) as $namespace => $dirs) {
@@ -46,13 +52,28 @@ trait CanCompileRuntime
                     } else {
                         $engine->add_view_namespace($namespace, $base);
                     }
-                    $this->compile_tree($engine, $base, $namespace);
+                    $this->compile_tree($engine, $base, $namespace, $map);
                 }
             }
         }
+        \ksort($map);
+        $this->write_classmap(
+            $vendor_dir.DIRECTORY_SEPARATOR.'composer'.DIRECTORY_SEPARATOR.self::COMPILED_VIEWS_BASENAME,
+            $map,
+            $vendor_dir,
+            $root,
+        );
     }
 
-    private function compile_tree(Engine $engine, string $base, string $namespace): void
+    /**
+     * @param $engine Engine
+     * @param $base string
+     * @param $namespace string
+     * @param $map array<string, string>
+     *
+     * @return void
+     */
+    private function compile_tree(Engine $engine, string $base, string $namespace, array &$map): void
     {
         $base = \rtrim(\str_replace('\\', '/', $base), '/');
         if (! \is_dir($base)) {
@@ -76,6 +97,10 @@ trait CanCompileRuntime
             $view = $namespace.'::'.$name;
             try {
                 $engine->compile($view);
+                $compiled = $engine->compiled_path($view);
+                if ($compiled !== '') {
+                    $map[$view] = $compiled;
+                }
             } catch (\Throwable $e) {
                 $this->terminal()->warning('view compile '.$view.': '.$e->getMessage());
             }

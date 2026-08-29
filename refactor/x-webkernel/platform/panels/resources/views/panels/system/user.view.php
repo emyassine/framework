@@ -6,20 +6,20 @@
       <span class="wds-sidebar-footer-role">Signed in</span>
     </span>
     <span class="wds-user-menu-chevron">
-      <x-webkernel::icon name="chevron-up" />
+      <span class="wds-icon">{!! icon('chevron-up', 'wds-icon-svg') !!}</span>
     </span>
   </button>
   <div class="wds-user-menu-panel" role="menu">
     <a href="/system" role="menuitem">
-      <x-webkernel::icon name="circle-user" />
+      <span class="wds-icon">{!! icon('circle-user', 'wds-icon-svg') !!}</span>
       Profile
     </a>
     <a href="/system" role="menuitem">
-      <x-webkernel::icon name="settings" />
+      <span class="wds-icon">{!! icon('settings', 'wds-icon-svg') !!}</span>
       Settings
     </a>
     <a href="/" role="menuitem">
-      <x-webkernel::icon name="log-out" />
+      <span class="wds-icon">{!! icon('log-out', 'wds-icon-svg') !!}</span>
       Sign out
     </a>
   </div>

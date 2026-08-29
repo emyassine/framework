@@ -10,14 +10,6 @@
   @include('webkernel::panels.system.user')
 @endsection
 
-@section('topnav')
-  @include('webkernel::panels.system.sidebar', ['current' => 'home'])
-@endsection
-
-@section('horizontal')
-  @include('webkernel::panels.system.sidebar', ['current' => 'home'])
-@endsection
-
 @section('breadcrumb')
   Home
 @endsection

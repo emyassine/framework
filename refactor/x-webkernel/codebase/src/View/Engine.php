@@ -48,6 +48,9 @@ final class Engine
     /** @var array<string, string> */
     private array $compiled_files = [];
 
+    /** @var array<string, string> */
+    private array $compiled_map = [];
+
     /** @var array<string, list<string>> */
     private array $view_namespaces = [];
 
@@ -95,6 +98,8 @@ final class Engine
     {
         $this->once = [];
         $this->sections = [];
+        $this->pushes = [];
+        $this->push_stack = [];
         $this->variables = $this->variables_global === []
             ? $variables
             : array_merge($variables, $this->variables_global);
@@ -323,6 +328,29 @@ final class Engine
         $this->echo_format = $format;
     }
 
+    /**
+     * Dump-autoload map: view name => compiled absolute path. Fast include skips locate.
+     *
+     * @param $map array<string, string>
+     *
+     * @return void
+     */
+    public function set_compiled_map(array $map): void
+    {
+        $this->compiled_map = $map;
+        $this->compiled_files = [];
+    }
+
+    /**
+     * @param $view string
+     *
+     * @return string
+     */
+    public function compiled_path(string $view): string
+    {
+        return $this->compiled_file($view);
+    }
+
     public function template_file(string $template_name): string
     {
         if (isset($this->template_files[$template_name])) {
@@ -458,6 +486,9 @@ final class Engine
     {
         if (isset($this->compiled_files[$template_name])) {
             return $this->compiled_files[$template_name];
+        }
+        if (isset($this->compiled_map[$template_name]) && $this->compiled_map[$template_name] !== '') {
+            return $this->compiled_files[$template_name] = $this->compiled_map[$template_name];
         }
         $full = $this->template_file($template_name);
         if ($full === '') {

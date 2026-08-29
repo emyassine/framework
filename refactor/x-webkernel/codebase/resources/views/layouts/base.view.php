@@ -19,7 +19,7 @@
   @endif
   <title>{{ $title }}</title>
   @include('webkernel::layouts.partials.typography')
-  @include('webkernel::wds.tokens')
+  <link rel="stylesheet" href="{{ \Webkernel\Platform\Wds::css_href() }}">
   @stack('styles')
   @stack('head')
 </head>
