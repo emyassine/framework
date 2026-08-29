@@ -25,8 +25,8 @@ final class View implements ComposableContract, \Stringable
     private static ?Engine $engine = null;
 
     /**
-     * @param string               $name
-     * @param array<string, mixed> $data
+     * @param $name string
+     * @param $data array<string, mixed>
      */
     public function __construct(
         private readonly string $name = '',
@@ -43,8 +43,8 @@ final class View implements ComposableContract, \Stringable
     }
 
     /**
-     * @param string|null          $template
-     * @param array<string, mixed> $data
+     * @param $template string|null
+     * @param $data array<string, mixed>
      *
      * @return self
      */
@@ -54,9 +54,9 @@ final class View implements ComposableContract, \Stringable
     }
 
     /**
-     * @param string               $view
-     * @param array<string, mixed> $data
-     * @param array<string, mixed> $merge_data
+     * @param $view string
+     * @param $data array<string, mixed>
+     * @param $merge_data array<string, mixed>
      *
      * @return self
      */
@@ -66,8 +66,8 @@ final class View implements ComposableContract, \Stringable
     }
 
     /**
-     * @param string|array<string, mixed> $key
-     * @param mixed                       $value
+     * @param $key string|array<string, mixed>
+     * @param $value mixed
      *
      * @return void
      */
@@ -77,7 +77,7 @@ final class View implements ComposableContract, \Stringable
     }
 
     /**
-     * @param string $view
+     * @param $view string
      *
      * @return bool
      */
@@ -87,7 +87,7 @@ final class View implements ComposableContract, \Stringable
     }
 
     /**
-     * @param string $path
+     * @param $path string
      *
      * @return void
      */
@@ -97,8 +97,8 @@ final class View implements ComposableContract, \Stringable
     }
 
     /**
-     * @param string                         $name
-     * @param callable(string|null): string  $handler
+     * @param $name string
+     * @param $handler callable(string|null): string
      *
      * @return void
      */
@@ -110,8 +110,8 @@ final class View implements ComposableContract, \Stringable
     /**
      * Register `@{$name}` / `@else{$name}` / `@end{$name}` plus unless variants.
      *
-     * @param string                   $name
-     * @param callable(mixed...): bool $callback
+     * @param $name string
+     * @param $callback callable(mixed...): bool
      *
      * @return void
      */
@@ -134,7 +134,7 @@ final class View implements ComposableContract, \Stringable
     /**
      * First parameter of $handler must be a type-hinted object.
      *
-     * @param callable(object): string $handler
+     * @param $handler callable(object): string
      *
      * @return void
      *
@@ -203,7 +203,7 @@ final class View implements ComposableContract, \Stringable
     }
 
     /**
-     * @param mixed $value
+     * @param $value mixed
      *
      * @return string
      */
@@ -224,8 +224,8 @@ final class View implements ComposableContract, \Stringable
     }
 
     /**
-     * @param string|array<string, mixed> $key
-     * @param mixed                       $value
+     * @param $key string|array<string, mixed>
+     * @param $value mixed
      *
      * @return self
      */
@@ -241,8 +241,8 @@ final class View implements ComposableContract, \Stringable
     }
 
     /**
-     * @param string|null          $template
-     * @param array<string, mixed> $data
+     * @param $template string|null
+     * @param $data array<string, mixed>
      *
      * @return string
      */
@@ -318,7 +318,7 @@ final class View implements ComposableContract, \Stringable
     }
 
     /**
-     * @param string $basename
+     * @param $basename string
      *
      * @return array<string, mixed>|list<mixed>
      */
@@ -334,7 +334,7 @@ final class View implements ComposableContract, \Stringable
     }
 
     /**
-     * @param array{dirs: list<string>, namespaces: array<string, list<string>>, components: array<string, list<string>>} $compiled
+     * @param $compiled array{dirs: list<string>, namespaces: array<string, list<string>>, components: array<string, list<string>>}
      *
      * @return list<string>
      */
@@ -353,8 +353,8 @@ final class View implements ComposableContract, \Stringable
     }
 
     /**
-     * @param Engine                                                                                                     $engine
-     * @param array{dirs: list<string>, namespaces: array<string, list<string>>, components: array<string, list<string>>} $compiled
+     * @param $engine Engine
+     * @param $compiled array{dirs: list<string>, namespaces: array<string, list<string>>, components: array<string, list<string>>}
      *
      * @return void
      */
