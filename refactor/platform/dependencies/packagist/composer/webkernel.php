@@ -1,5 +1,4 @@
 <?php declare(strict_types=1);
-
 //> This file is part of Webkernel.
 //> (c) 2025 - 2027 Numerimondes, El Moumen Yassine
 //> Yassine El Moumen <yassine@numerimondes.com> | <platform@webkernelphp.com>
@@ -13,5 +12,5 @@ return array (
   'webapp_root' => '/home/yassine/Projects/framework/refactor',
   'vendor_dir' => '/home/yassine/Projects/framework/refactor/platform/dependencies/packagist',
   'vendor_rel' => 'platform/dependencies/packagist',
-  'generated_at' => '2026-08-28T23:54:17+00:00',
+  'generated_at' => '2026-08-28T23:58:07+00:00',
 );

@@ -4,6 +4,7 @@
 //> Yassine El Moumen <yassine@numerimondes.com> | <platform@webkernelphp.com>
 //> For the full copyright and license information, please view the LICENSE
 //> file that was distributed with this source code.
+
 //>
 //> Hot path tier-1 : hardcoded autoload -> require -> done. Zero class overhead.
 //> Hot path tier-2 : config/platform.php stamped path (OPcache) -> require -> done.

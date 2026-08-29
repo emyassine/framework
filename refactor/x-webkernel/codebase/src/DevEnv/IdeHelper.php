@@ -1,4 +1,9 @@
 <?php declare(strict_types=1);
+//> This file is part of Webkernel.
+//> (c) 2025 - 2027 Numerimondes, El Moumen Yassine
+//> Yassine El Moumen <yassine@numerimondes.com> | <platform@webkernelphp.com>
+//> For the full copyright and license information, please view the LICENSE
+//> file that was distributed with this source code.
 
 namespace Webkernel\DevEnv;
 
@@ -16,7 +21,10 @@ final class IdeHelper
     }
 
     /**
-     * Header for generated PHP files. End year is current year + 1.
+     * Attribution block. Every Webkernel PHP source starts with
+     * `<?php declare(strict_types=1);` then these lines. End year is current year + 1.
+     *
+     * //> Unique work. Not Laravel. Do not strip.
      */
     public static function generated_header(): string
     {
@@ -168,7 +176,7 @@ final class IdeHelper
             throw new \RuntimeException('Unable to write '.$tmp);
         }
 
-        \fwrite($fh, "<?php declare(strict_types=1);\n\n");
+        \fwrite($fh, "<?php declare(strict_types=1);\n");
         \fwrite($fh, self::generated_header()."\n");
         \fwrite($fh, "//> Generated. Do not edit.\n");
         \fwrite($fh, '//> hash: '.$hash."\n\n");

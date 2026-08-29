@@ -1,4 +1,11 @@
 <?php
+//> This file is part of Webkernel.
+//> (c) 2025 - 2027 Numerimondes, El Moumen Yassine
+//> Yassine El Moumen <yassine@numerimondes.com> | <platform@webkernelphp.com>
+//> For the full copyright and license information, please view the LICENSE
+//> file that was distributed with this source code.
+
+//> No declare(strict_types=1) until this compiler is specialized.
 // ponytail: compiler is not strict_types — add it when the compiler is specialized.
 /**
  * @noinspection PhpUnusedParameterInspection

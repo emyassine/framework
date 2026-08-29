@@ -1,4 +1,9 @@
 <?php declare(strict_types=1);
+//> This file is part of Webkernel.
+//> (c) 2025 - 2027 Numerimondes, El Moumen Yassine
+//> Yassine El Moumen <yassine@numerimondes.com> | <platform@webkernelphp.com>
+//> For the full copyright and license information, please view the LICENSE
+//> file that was distributed with this source code.
 
 namespace Webkernel\Console\Commands;
 
@@ -954,7 +959,6 @@ final readonly class DumpAutoloadCommand
 
         $body = <<<PHP
 <?php declare(strict_types=1);
-
 {$header}
 //>
 //> Generated. Do not edit.
@@ -996,7 +1000,6 @@ PHP;
 
         $body = <<<PHP
 <?php declare(strict_types=1);
-
 {$header}
 //>
 //> Generated. Do not edit.
@@ -1032,7 +1035,6 @@ PHP;
 
         $body = <<<PHP
 <?php declare(strict_types=1);
-
 {$header}
 //>
 //> Generated. Do not edit.
@@ -1070,7 +1072,6 @@ PHP;
 
         $body = <<<PHP
 <?php declare(strict_types=1);
-
 {$header}
 //>
 //> Generated. Do not edit.
@@ -1106,7 +1107,6 @@ PHP;
         $block = implode("\n", $methods);
         $body = <<<PHP
 <?php declare(strict_types=1);
-
 {$header}
 //>
 //> Generated. Do not edit. IDE / PHPStan stub for webapp() composables.
@@ -1208,7 +1208,6 @@ PHP;
 
         $body = <<<PHP
 <?php declare(strict_types=1);
-
 {$header}
 //>
 //> Generated. Do not edit.
@@ -1233,7 +1232,6 @@ PHP;
 
         $body = <<<PHP
 <?php declare(strict_types=1);
-
 {$header}
 //>
 //> Generated. Do not edit.
@@ -1250,7 +1248,6 @@ PHP;
         $header = IdeHelper::generated_header();
         $body = <<<PHP
 <?php declare(strict_types=1);
-
 {$header}
 //> Generated. Do not edit.
 //> Host moved? Run: composer dump-autoload

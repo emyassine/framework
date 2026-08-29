@@ -1,5 +1,4 @@
 <?php declare(strict_types=1);
-
 //> This file is part of Webkernel.
 //> (c) 2025 - 2027 Numerimondes, El Moumen Yassine
 //> Yassine El Moumen <yassine@numerimondes.com> | <platform@webkernelphp.com>
