@@ -418,6 +418,14 @@ final class Engine
     {
         $this->ensure_compiled($view);
         $compiled = $this->compiled_file($view);
+        if ($compiled === '' || ! is_file($compiled)) {
+            unset($this->compiled_files[$view]);
+            $this->compile_view($view, true);
+            $compiled = $this->compiled_file($view);
+        }
+        if ($compiled === '' || ! is_file($compiled)) {
+            throw new \RuntimeException('Compiled view missing: '.$view);
+        }
         extract($this->variables);
         if (\function_exists('webkernel_profile_enter')) {
             \webkernel_profile_enter($compiled);
@@ -487,8 +495,9 @@ final class Engine
         if (isset($this->compiled_files[$template_name])) {
             return $this->compiled_files[$template_name];
         }
-        if (isset($this->compiled_map[$template_name]) && $this->compiled_map[$template_name] !== '') {
-            return $this->compiled_files[$template_name] = $this->compiled_map[$template_name];
+        $mapped = $this->compiled_map_path($template_name);
+        if ($mapped !== '') {
+            return $this->compiled_files[$template_name] = $mapped;
         }
         $full = $this->template_file($template_name);
         if ($full === '') {
@@ -496,6 +505,32 @@ final class Engine
         }
 
         return $this->compiled_files[$template_name] = $this->compile_dpath.'/'.basename($template_name).'_'.sha1($full).'.view.php.compiled';
+    }
+
+    /**
+     * `foo/index.view.php` is dumped as `ns::foo` and requested as `ns::foo.index`.
+     *
+     * @param $template_name string
+     *
+     * @return string
+     */
+    private function compiled_map_path(string $template_name): string
+    {
+        if (isset($this->compiled_map[$template_name]) && $this->compiled_map[$template_name] !== '') {
+            return $this->compiled_map[$template_name];
+        }
+        if (\str_ends_with($template_name, '.index')) {
+            $short = \substr($template_name, 0, -6);
+
+            return (isset($this->compiled_map[$short]) && $this->compiled_map[$short] !== '')
+                ? $this->compiled_map[$short]
+                : '';
+        }
+        $index = $template_name.'.index';
+
+        return (isset($this->compiled_map[$index]) && $this->compiled_map[$index] !== '')
+            ? $this->compiled_map[$index]
+            : '';
     }
 
     private function locate(string $rel, string $namespace): string

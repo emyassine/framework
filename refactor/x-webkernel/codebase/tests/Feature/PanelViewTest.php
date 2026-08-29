@@ -139,6 +139,25 @@ final class PanelViewTest extends TestCase
     /**
      * @return void
      */
+    /**
+     * @return void
+     */
+    public function test_billing_invoices_index_alias_renders(): void
+    {
+        $html = View::make('billing::invoices.index', [
+            'title' => 'Invoices',
+            'invoices' => [],
+            'columns' => [['key' => 'id', 'label' => 'Id']],
+        ])->render();
+
+        $this->assertStringContainsString('Invoices', $html);
+        $this->assertStringContainsString('No invoices yet', $html);
+        $this->assertStringContainsString('wds-sidebar', $html);
+    }
+
+    /**
+     * @return void
+     */
     public function test_engine_does_not_accumulate_pushes_across_renders(): void
     {
         $first = View::make('webkernel::panels.system.dashboard')->render();

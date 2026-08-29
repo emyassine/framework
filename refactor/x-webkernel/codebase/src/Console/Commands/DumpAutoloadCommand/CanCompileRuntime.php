@@ -91,7 +91,8 @@ trait CanCompileRuntime
                 continue;
             }
             $name = \str_replace('/', '.', \substr($rel, 0, -9));
-            if (\str_ends_with($name, '.index')) {
+            $index = \str_ends_with($name, '.index');
+            if ($index) {
                 $name = \substr($name, 0, -6);
             }
             $view = $namespace.'::'.$name;
@@ -100,6 +101,9 @@ trait CanCompileRuntime
                 $compiled = $engine->compiled_path($view);
                 if ($compiled !== '') {
                     $map[$view] = $compiled;
+                    if ($index) {
+                        $map[$view.'.index'] = $compiled;
+                    }
                 }
             } catch (\Throwable $e) {
                 $this->terminal()->warning('view compile '.$view.': '.$e->getMessage());
