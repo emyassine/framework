@@ -1,40 +1,24 @@
-@extends('webkernel::layouts.page')
-
-@section('title', 'Invoices')
-
-@section('breadcrumb')
-  Billing / Invoices
-@endsection
-
-@section('content')
-  <x-webkernel::page title="Invoices">
-    @slot('actions')
-      <a href="/billing/invoices/create">Create invoice</a>
-    @endslot
-
-    <table>
-      <thead>
-        <tr>
+@if ($invoices === [])
+  <p>No invoices yet.</p>
+@else
+  <x-webkernel::table>
+    <x-webkernel::table.header>
+      @foreach ($columns as $column)
+        <x-webkernel::table.header-cell>{{ $column['label'] }}</x-webkernel::table.header-cell>
+      @endforeach
+      <x-webkernel::table.header-cell></x-webkernel::table.header-cell>
+    </x-webkernel::table.header>
+    <x-webkernel::table.body>
+      @foreach ($invoices as $invoice)
+        <x-webkernel::table.row :href="'/billing/invoices/'.$invoice->id.'/edit'">
           @foreach ($columns as $column)
-            <th>{{ $column['label'] }}</th>
+            <x-webkernel::table.cell>{{ $invoice->{$column['key']} }}</x-webkernel::table.cell>
           @endforeach
-          <th></th>
-        </tr>
-      </thead>
-      <tbody>
-        @forelse ($invoices as $invoice)
-          <tr>
-            @foreach ($columns as $column)
-              <td>{{ $invoice->{$column['key']} }}</td>
-            @endforeach
-            <td><a href="/billing/invoices/{{ $invoice->id }}/edit">Edit</a></td>
-          </tr>
-        @empty
-          <tr>
-            <td colspan="{{ count($columns) + 1 }}">No invoices yet.</td>
-          </tr>
-        @endforelse
-      </tbody>
-    </table>
-  </x-webkernel::page>
-@endsection
+          <x-webkernel::table.cell>
+            <x-webkernel::button href="/billing/invoices/{{ $invoice->id }}/edit" tag="a" size="sm" color="gray">Edit</x-webkernel::button>
+          </x-webkernel::table.cell>
+        </x-webkernel::table.row>
+      @endforeach
+    </x-webkernel::table.body>
+  </x-webkernel::table>
+@endif

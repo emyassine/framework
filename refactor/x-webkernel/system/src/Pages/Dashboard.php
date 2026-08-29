@@ -7,25 +7,21 @@
 
 namespace Webkernel\System\Pages;
 
-use Webkernel\View\View;
+use Webkernel\Platform\Pages\Page;
 
-final class Dashboard
+final class Dashboard extends Page
 {
-    /**
-     * @param $path string
-     *
-     * @return array{class: class-string, path: string, methods: list<string>}
-     */
-    public static function route(string $path = '/'): array
-    {
-        return ['class' => self::class, 'path' => $path, 'methods' => ['GET']];
-    }
+    public const HEADER = 'Overview';
+
+    public const SUBHEADER = 'System Admin Panel';
+
+    protected static string $slug = '/';
 
     /**
      * @return string
      */
-    public function __invoke(): string
+    public function view(): string
     {
-        return View::make('webkernel::system.dashboard')->render();
+        return 'webkernel::system.dashboard';
     }
 }

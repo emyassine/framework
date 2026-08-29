@@ -1,8 +1,0 @@
-<?php  $__props = [
-  'tab' => '',
-  'active' => false,
-]; foreach ($__props as $__n => $__d) { if (!isset($$__n)) { $$__n = $__d; } } $attributes = (isset($attributes) && $attributes instanceof \Webkernel\View\AttributeBag ? $attributes : new \Webkernel\View\AttributeBag([]))->except(\array_keys($__props)); unset($__props, $__n, $__d); ?>
-<section class="wds-tabs-panel" role="tabpanel" data-tab-panel="<?php echo \Webkernel\View\View::echo($tab); ?>" <?php if(! $active): ?> hidden <?php endif; ?>>
-  <?php echo $slot; ?>
-
-</section>

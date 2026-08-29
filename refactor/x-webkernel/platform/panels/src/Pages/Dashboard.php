@@ -7,20 +7,20 @@
 
 namespace Webkernel\Platform\Pages;
 
-use Webkernel\View\View;
-
-final class Dashboard
+/**
+ * Default panel landing page. System panel keeps its own Dashboard.
+ */
+class Dashboard extends Page
 {
-    /**
-     * @return array{class: class-string, path: string, methods: list<string>}
-     */
-    public static function route(string $path = '/'): array
-    {
-        return ['class' => self::class, 'path' => $path, 'methods' => ['GET']];
-    }
+    public const HEADER = 'Overview';
 
-    public function __invoke(): string
+    protected static string $slug = '/';
+
+    /**
+     * @return string
+     */
+    public function view(): string
     {
-        return View::make('webkernel::panels.system.dashboard')->render();
+        return 'webkernel::pages.dashboard';
     }
 }

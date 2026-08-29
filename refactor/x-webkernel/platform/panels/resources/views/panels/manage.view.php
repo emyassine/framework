@@ -5,19 +5,9 @@
   $logo_light = $g('logo_light', $g('logo'));
   $logo_alt = $g('logo_alt', $g('name'));
 @endphp
-@extends('webkernel::layouts.page')
-
-@section('title', lang('panel.manage'))
-
-@section('breadcrumb')
-  {{ $panel['label'] ?? '' }} / {{ lang('panel.manage') }}
-@endsection
-
-@section('content')
-  <x-webkernel::page :title="lang('panel.manage')" :description="lang('panel.manage_help')">
-    @if (!empty($saved))
-      <p class="wds-flash">{{ lang('panel.saved') }}</p>
-    @endif
+@if (!empty($saved))
+  <p class="wds-flash">{{ lang('panel.saved') }}</p>
+@endif
 
     <form method="post" action="">
       {!! \Webkernel\Csrf::field() !!}
@@ -205,5 +195,3 @@
         <x-webkernel::button type="submit" color="primary">{{ lang('panel.save') }}</x-webkernel::button>
       </div>
     </form>
-  </x-webkernel::page>
-@endsection

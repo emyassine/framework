@@ -35,6 +35,16 @@ abstract class PanelProvider
     }
 
     /**
+     * Per-panel gate. Roles and permissions fill this in later.
+     *
+     * @return bool
+     */
+    public function can_access(): bool
+    {
+        return true;
+    }
+
+    /**
      * A platform panel ships from a webkernel vendor package. Everything else is a module panel.
      *
      * @param $package string Composer name (`webkernel/panels`)

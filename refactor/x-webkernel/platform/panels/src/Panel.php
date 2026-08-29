@@ -53,6 +53,8 @@ final class Panel
 
     private mixed $dark_mode = null;
 
+    private string $home_url = '';
+
     /**
      * @return self
      */
@@ -256,10 +258,24 @@ final class Panel
     }
 
     /**
+     * Landing URL. Empty means dump-autoload uses the first page.
+     *
+     * @param $url string
+     * @return self
+     */
+    public function home_url(string $url): self
+    {
+        $this->home_url = $url;
+
+        return $this;
+    }
+
+    /**
      * @return array{
      *   id: string,
      *   path: string,
      *   href: string,
+     *   home_url: string,
      *   label: string,
      *   icon: string,
      *   scope: string,
@@ -284,6 +300,7 @@ final class Panel
             'id' => $this->id,
             'path' => $path,
             'href' => $href === '/' ? '/'.$this->id : $href,
+            'home_url' => $this->home_url,
             'label' => $this->label !== '' ? $this->label : \ucfirst($this->id),
             'icon' => $this->icon !== '' ? $this->icon : 'package',
             'scope' => $this->scope,

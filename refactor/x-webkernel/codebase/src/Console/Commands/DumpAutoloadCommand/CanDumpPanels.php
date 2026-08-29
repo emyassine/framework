@@ -55,6 +55,8 @@ trait CanDumpPanels
                     $snapshot['pages'][] = $manage;
                 }
                 $snapshot['navigation'] = $this->panel_navigation($snapshot, $classmap);
+                $snapshot['home_url'] = $this->panel_home_url($snapshot);
+                $snapshot['href'] = (string) $snapshot['home_url'];
                 $out[] = $snapshot;
             }
         }
@@ -73,6 +75,10 @@ trait CanDumpPanels
         foreach ($panels as $panel) {
             $base = \trim((string) ($panel['path'] ?? ''), '/');
             $prefix = $base === '' ? '' : '/'.$base;
+            $home = (string) ($panel['home_url'] ?? '');
+            if ($prefix !== '' && $home !== '' && $home !== $prefix) {
+                $out[] = [['GET', 'HEAD'], $prefix, 'Webkernel\\Platform\\Pages\\PanelHome'];
+            }
             foreach ($panel['pages'] ?? [] as $page) {
                 if (! \is_string($page) || $page === '') {
                     continue;
@@ -146,6 +152,9 @@ trait CanDumpPanels
             }
             $this->ensure_class($page, $classmap);
             $href = $base;
+            $label = \is_a($page, 'Webkernel\\Platform\\Pages\\Page', true)
+                ? $page::get_navigation_label()
+                : $this->class_label($page);
             if (\class_exists($page) && \is_callable([$page, 'route'])) {
                 $def = $page::route();
                 if (\is_array($def)) {
@@ -154,7 +163,7 @@ trait CanDumpPanels
                 }
             }
             $items[] = [
-                'label' => $this->class_label($page),
+                'label' => $label,
                 'href' => $href === '' ? '/' : $href,
                 'icon' => 'layout-dashboard',
             ];
@@ -197,6 +206,41 @@ trait CanDumpPanels
         ];
 
         return $groups;
+    }
+
+    /**
+     * First real page, or an explicit Panel::home_url().
+     *
+     * @param $panel array<string, mixed>
+     *
+     * @return string
+     */
+    private function panel_home_url(array $panel): string
+    {
+        $explicit = \trim((string) ($panel['home_url'] ?? ''));
+        if ($explicit !== '') {
+            return $explicit[0] === '/' ? $explicit : '/'.$explicit;
+        }
+        foreach ($panel['navigation'] ?? [] as $group) {
+            if (! \is_array($group)) {
+                continue;
+            }
+            foreach ($group['items'] ?? [] as $item) {
+                if (! \is_array($item)) {
+                    continue;
+                }
+                $href = (string) ($item['href'] ?? '');
+                $label = (string) ($item['label'] ?? '');
+                if ($href === '' || $label === 'panel.manage') {
+                    continue;
+                }
+
+                return $href;
+            }
+        }
+        $path = '/'.\trim((string) ($panel['path'] ?? $panel['id'] ?? ''), '/');
+
+        return $path === '/' ? '/'.(string) ($panel['id'] ?? '') : $path;
     }
 
     /**

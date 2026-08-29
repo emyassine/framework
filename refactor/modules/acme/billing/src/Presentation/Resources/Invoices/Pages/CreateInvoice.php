@@ -10,20 +10,18 @@ namespace Acme\Billing\Presentation\Resources\Invoices\Pages;
 use Acme\Billing\Domain\Invoice;
 use Acme\Billing\Infrastructure\InvoiceStore;
 use Acme\Billing\Presentation\Resources\Invoices\InvoiceResource;
+use Webkernel\Platform\Pages\Page;
 use Webkernel\Platform\Schemas\Schema;
-use Webkernel\View\View;
 
-final class CreateInvoice
+final class CreateInvoice extends Page
 {
-    /**
-     * @param list<string> $methods
-     * @return array{class: class-string, path: string, methods: list<string>}
-     */
-    public static function route(string $path, array $methods = ['GET']): array
-    {
-        return ['class' => self::class, 'path' => $path, 'methods' => $methods];
-    }
+    public const HEADER = 'Create invoice';
 
+    protected static string $slug = 'create';
+
+    /**
+     * @return string
+     */
     public function __invoke(): string
     {
         if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST') {
@@ -40,13 +38,26 @@ final class CreateInvoice
             return '';
         }
 
-        $schema = InvoiceResource::form(new Schema());
+        return $this->render();
+    }
 
-        return View::make('billing::invoices.form', [
-            'title' => 'Create invoice',
+    /**
+     * @return string
+     */
+    public function view(): string
+    {
+        return 'billing::invoices.form';
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function view_data(): array
+    {
+        return [
             'action' => '/billing/invoices/create',
-            'schema' => $schema,
+            'schema' => InvoiceResource::form(new Schema()),
             'state' => [],
-        ])->render();
+        ];
     }
 }

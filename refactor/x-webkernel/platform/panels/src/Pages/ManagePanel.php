@@ -10,13 +10,13 @@ namespace Webkernel\Platform\Pages;
 use Webkernel\Config\Config;
 use Webkernel\Csrf;
 use Webkernel\I18n\I18nContext;
-use Webkernel\View\View;
 
 /**
  * Injected into every panel. App owner edits branding, locale, legal, and system keys.
  */
-final class ManagePanel
+final class ManagePanel extends Page
 {
+    protected static string $slug = 'manage';
     /** @var list<string> */
     private const STRINGS = [
         'name',
@@ -63,17 +63,43 @@ final class ManagePanel
 
     /**
      * @param $path string
+     * @param $methods list<string>
+     *
      * @return array{class: class-string, path: string, methods: list<string>}
      */
-    public static function route(string $path = '/manage'): array
+    public static function route(string $path = '/manage', array $methods = ['GET', 'POST']): array
     {
-        return ['class' => self::class, 'path' => $path, 'methods' => ['GET', 'POST']];
+        return parent::route($path, $methods);
     }
 
     /**
      * @return string
      */
-    public function __invoke(): string
+    public function get_header(): string
+    {
+        return \function_exists('lang') ? lang('panel.manage') : 'Manage';
+    }
+
+    /**
+     * @return string
+     */
+    public function get_subheader(): string
+    {
+        return \function_exists('lang') ? lang('panel.manage_help') : '';
+    }
+
+    /**
+     * @return string
+     */
+    public function view(): string
+    {
+        return 'webkernel::panels.manage';
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function view_data(): array
     {
         $panel = \webapp()->panel()->matching_path();
         $id = \is_array($panel) ? (string) ($panel['id'] ?? '') : '';
@@ -87,14 +113,14 @@ final class ManagePanel
             $saved = true;
         }
 
-        return View::make('webkernel::panels.manage', [
+        return [
             'panel' => \is_array($panel) ? $panel : [],
             'id' => $id,
             'values' => $id !== '' ? $this->values($id) : [],
             'edit_locale' => $edit_locale,
             'i18n' => $id !== '' ? $this->i18n($id, $edit_locale) : [],
             'saved' => $saved,
-        ])->render();
+        ];
     }
 
     /**

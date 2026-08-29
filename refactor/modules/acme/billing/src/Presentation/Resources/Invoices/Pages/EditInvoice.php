@@ -10,20 +10,22 @@ namespace Acme\Billing\Presentation\Resources\Invoices\Pages;
 use Acme\Billing\Domain\Invoice;
 use Acme\Billing\Infrastructure\InvoiceStore;
 use Acme\Billing\Presentation\Resources\Invoices\InvoiceResource;
+use Webkernel\Platform\Pages\Page;
 use Webkernel\Platform\Schemas\Schema;
-use Webkernel\View\View;
 
-final class EditInvoice
+final class EditInvoice extends Page
 {
-    /**
-     * @param list<string> $methods
-     * @return array{class: class-string, path: string, methods: list<string>}
-     */
-    public static function route(string $path, array $methods = ['GET']): array
-    {
-        return ['class' => self::class, 'path' => $path, 'methods' => $methods];
-    }
+    public const HEADER = 'Edit invoice';
 
+    protected static string $slug = '{record}/edit';
+
+    private ?Invoice $invoice = null;
+
+    /**
+     * @param $record string
+     *
+     * @return string
+     */
     public function __invoke(string $record): string
     {
         $invoice = InvoiceStore::find($record);
@@ -47,13 +49,33 @@ final class EditInvoice
             return '';
         }
 
-        $schema = InvoiceResource::form(new Schema());
+        $this->invoice = $invoice;
 
-        return View::make('billing::invoices.form', [
-            'title' => 'Edit invoice',
+        return $this->render();
+    }
+
+    /**
+     * @return string
+     */
+    public function view(): string
+    {
+        return 'billing::invoices.form';
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function view_data(): array
+    {
+        $invoice = $this->invoice;
+        if ($invoice === null) {
+            return [];
+        }
+
+        return [
             'action' => '/billing/invoices/'.$invoice->id.'/edit',
-            'schema' => $schema,
+            'schema' => InvoiceResource::form(new Schema()),
             'state' => $invoice->to_array(),
-        ])->render();
+        ];
     }
 }
