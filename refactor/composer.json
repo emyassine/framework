@@ -56,6 +56,13 @@
         },
         {
             "type": "path",
+            "url": "x-webkernel/my-panels/*",
+            "options": {
+                "symlink": true
+            }
+        },
+        {
+            "type": "path",
             "url": "modules/*/*",
             "options": {
                 "symlink": true
