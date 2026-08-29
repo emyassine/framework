@@ -99,6 +99,14 @@ final class TypographySystem
     }
 
     /**
+     * @return list<string>
+     */
+    public static function packs(): array
+    {
+        return ['latin', 'arabic', 'hebrew', 'cjk'];
+    }
+
+    /**
      * @param $pack string
      *
      * @return string
@@ -119,13 +127,35 @@ final class TypographySystem
     }
 
     /**
-     * @param $locale string|null
+     * Remote Google woff2 urls in $css, mapped to /fetch-fonts/{slug}/{basename}.
+     *
+     * @param $css string
+     * @param $slug string
+     *
+     * @return array<string, string>
+     */
+    public static function woff2_targets(string $css, string $slug): array
+    {
+        if (\preg_match_all('#url\([\'"]?(https://[^\'")\s]+\.woff2)[\'"]?\)#', $css, $matches) < 1) {
+            return [];
+        }
+        $map = [];
+        foreach (\array_unique($matches[1]) as $remote) {
+            $path = \parse_url($remote, PHP_URL_PATH);
+            $name = \basename(\is_string($path) && $path !== '' ? $path : $remote);
+            $map[$remote] = '/'.self::DIR.'/'.$slug.'/'.$name;
+        }
+
+        return $map;
+    }
+
+    /**
+     * @param $pack string
      *
      * @return string
      */
-    public static function google_css_url(?string $locale = null): string
+    public static function google_css_url_for_pack(string $pack): string
     {
-        $pack = self::pack($locale);
         $parts = [];
         foreach (self::catalog() as $meta) {
             if ($meta['family'] === 'Space Grotesk' || $meta['pack'] !== $pack) {
@@ -140,13 +170,31 @@ final class TypographySystem
     /**
      * @param $locale string|null
      *
+     * @return string
+     */
+    public static function google_css_url(?string $locale = null): string
+    {
+        return self::google_css_url_for_pack(self::pack($locale));
+    }
+
+    /**
+     * @param $locale string|null
+     *
      * @return bool
      */
     public static function has_local_fonts(?string $locale = null): bool
     {
         $path = self::path(self::fonts_css(self::pack($locale)));
+        if (! \is_file($path)) {
+            return false;
+        }
+        $css = \file_get_contents($path);
+        if (! \is_string($css) || $css === '') {
+            return false;
+        }
 
-        return \is_file($path) && (\filesize($path) ?: 0) > 32;
+        return \str_contains($css, '/'.self::DIR.'/')
+            && ! \str_contains($css, 'fonts.googleapis.com');
     }
 
     /**

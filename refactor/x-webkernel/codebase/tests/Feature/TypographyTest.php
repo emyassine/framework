@@ -39,5 +39,13 @@ final class TypographyTest extends TestCase
         $this->assertStringNotContainsString('Plex+Sans+Arabic', TypographySystem::google_css_url('en'));
         $this->assertStringContainsString('Plex+Sans+Arabic', TypographySystem::google_css_url('ar'));
         $this->assertArrayHasKey('dm-sans', TypographySystem::catalog());
+        $this->assertSame(
+            ['https://fonts.gstatic.com/s/dmsans/v1/abc.woff2' => '/fetch-fonts/dm-sans/abc.woff2'],
+            TypographySystem::woff2_targets(
+                '@font-face{src:url(https://fonts.gstatic.com/s/dmsans/v1/abc.woff2) format("woff2")}',
+                'dm-sans',
+            ),
+        );
+        $this->assertSame([], TypographySystem::woff2_targets('@import url(https://fonts.googleapis.com/css2?family=DM+Sans);', 'dm-sans'));
     }
 }
