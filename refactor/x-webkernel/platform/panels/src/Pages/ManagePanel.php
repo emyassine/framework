@@ -77,7 +77,7 @@ final class ManagePanel
     {
         $panel = \webapp()->panel()->matching_path();
         $id = \is_array($panel) ? (string) ($panel['id'] ?? '') : '';
-        $edit_locale = I18nContext::normalize((string) ($_POST['edit_locale'] ?? $_GET['edit_locale'] ?? I18nContext::get_locale()));
+        $edit_locale = I18nContext::normalize((string) ($_POST['edit_locale'] ?? I18nContext::get_locale()));
         if ($edit_locale === '') {
             $edit_locale = 'en';
         }

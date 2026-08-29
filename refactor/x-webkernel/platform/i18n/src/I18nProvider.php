@@ -11,6 +11,8 @@ use Webkernel\PlatformProvider;
 
 final class I18nProvider extends PlatformProvider
 {
+    public const ROUTES = [__DIR__.'/../routes.php'];
+
     public const LANG_PATH = [__DIR__.'/../lang'];
 
     public const VIEWS = [

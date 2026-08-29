@@ -10,9 +10,7 @@
   'csrf' => true,
 ])
 @php
-  if (isset($_GET['lang']) && \is_string($_GET['lang']) && \class_exists(\Webkernel\I18n\I18nContext::class, true)) {
-    \Webkernel\I18n\I18nContext::set_locale($_GET['lang']);
-  }
+  $lang = \function_exists('i18n_current_lang') ? i18n_current_lang() : ($lang ?? 'en');
   $brand = $brand ?? \Webkernel\Config\Config::get('app.name');
   $theme = $theme ?? (\Webkernel\Config\Config::get('ui.dark_mode', true) ? 'dark' : 'light');
   $description = $description ?? ($brand.' control panel');
@@ -26,6 +24,7 @@
 <!DOCTYPE html>
 <html
   lang="{{ $lang }}"
+  dir="{{ \function_exists('i18n_direction') ? i18n_direction($lang) : 'ltr' }}"
   data-wds-theme="{{ $theme }}"
   data-wds-layout="{{ $layout }}"
   data-wds-sidebar="{{ $sidebar }}"

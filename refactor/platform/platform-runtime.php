@@ -40,7 +40,7 @@ return array (
       'help_url' => '',
       'terms_url' => '',
       'privacy_url' => '',
-      'copyright' => '',
+      'copyright' => 'dsds',
       'social_twitter' => '',
       'social_github' => '',
       'social_facebook' => '',

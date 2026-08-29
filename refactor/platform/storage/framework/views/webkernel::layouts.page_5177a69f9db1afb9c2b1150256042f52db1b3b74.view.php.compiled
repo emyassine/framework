@@ -10,9 +10,7 @@
   'csrf' => true,
 ]; foreach ($__props as $__n => $__d) { if (!isset($$__n)) { $$__n = $__d; } } $attributes = (isset($attributes) && $attributes instanceof \Webkernel\View\AttributeBag ? $attributes : new \Webkernel\View\AttributeBag([]))->except(\array_keys($__props)); unset($__props, $__n, $__d); ?>
 <?php 
-  if (isset($_GET['lang']) && \is_string($_GET['lang']) && \class_exists(\Webkernel\I18n\I18nContext::class, true)) {
-    \Webkernel\I18n\I18nContext::set_locale($_GET['lang']);
-  }
+  $lang = \function_exists('i18n_current_lang') ? i18n_current_lang() : ($lang ?? 'en');
   $brand = $brand ?? \Webkernel\Config\Config::get('app.name');
   $theme = $theme ?? (\Webkernel\Config\Config::get('ui.dark_mode', true) ? 'dark' : 'light');
   $description = $description ?? ($brand.' control panel');
@@ -26,6 +24,7 @@
 <!DOCTYPE html>
 <html
   lang="<?php echo \Webkernel\View\View::echo($lang); ?>"
+  dir="<?php echo \Webkernel\View\View::echo(\function_exists('i18n_direction') ? i18n_direction($lang) : 'ltr'); ?>"
   data-wds-theme="<?php echo \Webkernel\View\View::echo($theme); ?>"
   data-wds-layout="<?php echo \Webkernel\View\View::echo($layout); ?>"
   data-wds-sidebar="<?php echo \Webkernel\View\View::echo($sidebar); ?>"

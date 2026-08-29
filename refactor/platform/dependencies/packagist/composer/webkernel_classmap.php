@@ -53,6 +53,7 @@ return array(
     'Webkernel\\DevEnv\\IdeHelper' => $b . '/x-webkernel/codebase/src/DevEnv/IdeHelper.php',
     'Webkernel\\Http' => $b . '/x-webkernel/codebase/src/Http.php',
     'Webkernel\\I18n\\Catalog' => $b . '/x-webkernel/platform/i18n/src/Catalog.php',
+    'Webkernel\\I18n\\Http\\SwitchLocale' => $b . '/x-webkernel/platform/i18n/src/Http/SwitchLocale.php',
     'Webkernel\\I18n\\I18nContext' => $b . '/x-webkernel/platform/i18n/src/I18nContext.php',
     'Webkernel\\I18n\\I18nProvider' => $b . '/x-webkernel/platform/i18n/src/I18nProvider.php',
     'Webkernel\\I18n\\Support\\LocaleDirection' => $b . '/x-webkernel/platform/i18n/src/Support/LocaleDirection.php',

@@ -408,12 +408,13 @@
       border-radius: 8px; box-shadow: 0 8px 24px hsl(220 40% 10% / 0.16); z-index: 70; padding: 4px;
     }
     .wds-lang.wds-open .wds-lang-panel { display: block; }
-    .wds-lang-panel a {
+    .wds-lang-panel button {
       display: flex; align-items: center; gap: 0.6em; padding: 0.55em 0.75em;
-      border-radius: 6px; font-size: 13px; font-weight: 500;
+      border-radius: 6px; font-size: 13px; font-weight: 500; width: 100%;
+      color: inherit; text-align: start;
     }
-    .wds-lang-panel a:hover { background: var(--wds-bg-subtle); }
-    .wds-lang-panel a.wds-active { background: color-mix(in srgb, var(--primary-600, hsl(220 85% 50%)) 12%, transparent); }
+    .wds-lang-panel button:hover { background: var(--wds-bg-subtle); }
+    .wds-lang-panel button.wds-active { background: color-mix(in srgb, var(--primary-600, hsl(220 85% 50%)) 12%, transparent); }
 
     @media (max-width: 979px) {
       .wds-rail, .wds-nav { display: none; }
