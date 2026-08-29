@@ -19,7 +19,9 @@ trait CanDumpTypography
 
     private const FONT_CSS_TIMEOUT = 20;
 
-    private const FONT_WOFF_TIMEOUT = 60;
+    private const FONT_WOFF_TIMEOUT = 120;
+
+    private const FONT_WOFF_ATTEMPTS = 3;
 
     /**
      * Write WTS rules + self-hosted fonts under webapp_path("public/$typo_path").
@@ -76,7 +78,7 @@ trait CanDumpTypography
             }
             $family_dir = $dir.DIRECTORY_SEPARATOR.$slug;
             $family_css = $family_dir.DIRECTORY_SEPARATOR.'family.css';
-            if (\is_file($family_css) && (\filesize($family_css) ?: 0) > 0) {
+            if ($this->typography_family_complete($family_css, $family_dir)) {
                 continue;
             }
             $css = $this->font_http_string(
@@ -99,7 +101,7 @@ trait CanDumpTypography
 
                 continue;
             }
-            $failed = false;
+            $failed = 0;
             foreach ($targets as $remote => $public) {
                 $dest = $family_dir.DIRECTORY_SEPARATOR.\basename($public);
                 $css = \str_replace($remote, $public, $css);
@@ -108,12 +110,10 @@ trait CanDumpTypography
                 }
                 if (! $this->font_http_save($remote, $dest, self::FONT_WOFF_TIMEOUT)) {
                     $this->terminal()->warning('woff2 failed: '.$meta['family'].' '.\basename($public));
-                    $failed = true;
-
-                    break;
+                    $failed++;
                 }
             }
-            if ($failed) {
+            if ($failed > 0) {
                 continue;
             }
             $css = \str_replace('font-display: swap', 'font-display: optional', $css);
@@ -200,7 +200,37 @@ trait CanDumpTypography
     }
 
     /**
-     * Stream $url onto $dest. Rejects non-woff2 payloads.
+     * True when family.css exists and every referenced woff2 is on disk.
+     *
+     * @param $family_css string
+     * @param $family_dir string
+     *
+     * @return bool
+     */
+    private function typography_family_complete(string $family_css, string $family_dir): bool
+    {
+        if (! \is_file($family_css) || (\filesize($family_css) ?: 0) === 0) {
+            return false;
+        }
+        $css = \file_get_contents($family_css);
+        if (! \is_string($css) || $css === '') {
+            return false;
+        }
+        if (\preg_match_all('#url\((/fetch-fonts/[^)]+\.woff2)\)#', $css, $matches) < 1) {
+            return false;
+        }
+        foreach (\array_unique($matches[1]) as $public) {
+            $dest = $family_dir.DIRECTORY_SEPARATOR.\basename($public);
+            if (! \is_file($dest) || (\filesize($dest) ?: 0) === 0) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * Stream $url onto $dest. Rejects non-woff2 payloads. Retries on drop.
      *
      * @param $url string
      * @param $dest string
@@ -209,6 +239,27 @@ trait CanDumpTypography
      * @return bool
      */
     private function font_http_save(string $url, string $dest, int $timeout): bool
+    {
+        for ($attempt = 1; $attempt <= self::FONT_WOFF_ATTEMPTS; $attempt++) {
+            if ($this->font_http_save_once($url, $dest, $timeout)) {
+                return true;
+            }
+            if ($attempt < self::FONT_WOFF_ATTEMPTS) {
+                \usleep(250_000 * $attempt);
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * @param $url string
+     * @param $dest string
+     * @param $timeout int
+     *
+     * @return bool
+     */
+    private function font_http_save_once(string $url, string $dest, int $timeout): bool
     {
         $fp = $this->font_http_open($url, $timeout);
         if ($fp === null) {
@@ -221,17 +272,21 @@ trait CanDumpTypography
 
             return false;
         }
-        $copied = \stream_copy_to_stream($fp, $out);
+        $copied = @\stream_copy_to_stream($fp, $out);
         \fclose($fp);
+        \fflush($out);
         \fclose($out);
-        if ($copied === false || (\filesize($tmp) ?: 0) === 0) {
-            @\unlink($tmp);
+        $size = \is_file($tmp) ? (\filesize($tmp) ?: 0) : 0;
+        if ($copied === false || $size === 0) {
+            if (\is_file($tmp)) {
+                \unlink($tmp);
+            }
 
             return false;
         }
         $magic = \file_get_contents($tmp, false, null, 0, 4);
         if ($magic !== 'wOF2') {
-            @\unlink($tmp);
+            \unlink($tmp);
 
             return false;
         }

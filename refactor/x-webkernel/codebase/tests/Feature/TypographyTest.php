@@ -46,6 +46,13 @@ final class TypographyTest extends TestCase
                 'dm-sans',
             ),
         );
+        $this->assertSame(
+            ['https://fonts.gstatic.com/s/sc/v1/hash.100.woff2' => '/fetch-fonts/noto-sans-sc/hash.100.woff2'],
+            TypographySystem::woff2_targets(
+                'src:url(https://fonts.gstatic.com/s/sc/v1/hash.100.woff2)',
+                'noto-sans-sc',
+            ),
+        );
         $this->assertSame([], TypographySystem::woff2_targets('@import url(https://fonts.googleapis.com/css2?family=DM+Sans);', 'dm-sans'));
     }
 }
