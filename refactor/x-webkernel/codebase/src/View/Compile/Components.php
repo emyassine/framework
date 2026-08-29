@@ -109,15 +109,48 @@ final class Components
      */
     private static function params(string $params): string
     {
-        preg_match_all('/([a-zA-Z0-9:-]*?)\s*?=\s*?(.+?)(\s|$)/ms', $params, $matches);
+        $params = trim($params);
+        if ($params === '' || $params === '/') {
+            return '[]';
+        }
         $out = [];
-        foreach ($matches[1] as $i => $key) {
-            $value = str_replace('"', '', $matches[2][$i]);
-            if (str_starts_with($key, ':')) {
-                $out[] = '"'.substr($key, 1).'"=>'.$value;
+        $offset = 0;
+        $len = strlen($params);
+        while ($offset < $len) {
+            if (preg_match('/\s+/A', $params, $ws, 0, $offset) === 1) {
+                $offset += strlen($ws[0]);
+
                 continue;
             }
-            $out[] = '"'.$key.'"=>"'.$value.'"';
+            if ($params[$offset] === '/') {
+                break;
+            }
+            if (preg_match('/:?[A-Za-z0-9:-]+/A', $params, $m, 0, $offset) !== 1) {
+                break;
+            }
+            $raw = $m[0];
+            $offset += strlen($raw);
+            $bound = str_starts_with($raw, ':');
+            $key = str_replace('-', '_', $bound ? substr($raw, 1) : $raw);
+            if (preg_match('/\s*=\s*/A', $params, $eq, 0, $offset) === 1) {
+                $offset += strlen($eq[0]);
+                $quote = $params[$offset] ?? '';
+                if ($quote === '"' || $quote === "'") {
+                    $end = strpos($params, $quote, $offset + 1);
+                    $value = $end === false ? '' : substr($params, $offset + 1, $end - $offset - 1);
+                    $offset = $end === false ? $len : $end + 1;
+                } else {
+                    preg_match('/[^\s]+/A', $params, $vm, 0, $offset);
+                    $value = $vm[0] ?? '';
+                    $offset += strlen($value);
+                }
+                $out[] = $bound
+                    ? var_export($key, true).'=>'.$value
+                    : var_export($key, true).'=>'.var_export($value, true);
+
+                continue;
+            }
+            $out[] = var_export($key, true).'=>true';
         }
 
         return '['.implode(',', $out).']';

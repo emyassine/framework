@@ -14,6 +14,7 @@ return [
     'dirs' => [
         $b . '/modules/acme/billing/resources/views',
         $b . '/x-webkernel/codebase/resources/views',
+        $b . '/x-webkernel/platform/panels/resources/views',
     ],
     'namespaces' => [
         'billing' => [
@@ -21,6 +22,7 @@ return [
         ],
         'webkernel' => [
             $b . '/x-webkernel/codebase/resources/views',
+            $b . '/x-webkernel/platform/panels/resources/views',
         ],
     ],
 ];

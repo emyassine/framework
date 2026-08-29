@@ -315,6 +315,86 @@
       padding: 0.25rem 0.625rem;
       font-size: var(--webkernel-design-font-size-xs);
     }
+    .webkernel-design-btn--xs {
+      padding: 0.125rem 0.5rem;
+      font-size: var(--webkernel-design-font-size-xs);
+      gap: 0.25rem;
+    }
+    .webkernel-design-btn--lg {
+      padding: 0.625rem 1.125rem;
+      font-size: var(--webkernel-design-font-size-base);
+    }
+    .webkernel-design-btn--xl {
+      padding: 0.75rem 1.375rem;
+      font-size: var(--webkernel-design-font-size-md);
+    }
+    .webkernel-design-btn--danger {
+      background: var(--webkernel-design-danger-text);
+      color: #fff;
+    }
+    .webkernel-design-btn--danger:hover {
+      filter: brightness(0.92);
+    }
+    .webkernel-design-btn--gray {
+      background: var(--webkernel-design-bg-subtle);
+      color: var(--webkernel-design-text);
+      border-color: var(--webkernel-design-border);
+    }
+    .webkernel-design-btn--gray:hover {
+      background: var(--webkernel-design-border);
+    }
+    .webkernel-design-btn--info {
+      background: var(--webkernel-design-info-text);
+      color: #fff;
+    }
+    .webkernel-design-btn--success {
+      background: var(--webkernel-design-success-text);
+      color: #fff;
+    }
+    .webkernel-design-btn--warning {
+      background: var(--webkernel-design-warning-text);
+      color: #fff;
+    }
+    .webkernel-design-btn--outline.webkernel-design-btn--primary {
+      background: transparent;
+      color: var(--webkernel-design-accent-text);
+      border-color: var(--webkernel-design-accent);
+    }
+    .webkernel-design-btn--outline.webkernel-design-btn--danger {
+      background: transparent;
+      color: var(--webkernel-design-danger-text);
+      border-color: var(--webkernel-design-danger-text);
+    }
+    .webkernel-design-btn--disabled,
+    .webkernel-design-btn[disabled],
+    .webkernel-design-btn[aria-disabled="true"] {
+      opacity: 0.55;
+      pointer-events: none;
+      cursor: not-allowed;
+    }
+    a.webkernel-design-btn { text-decoration: none; color: inherit; }
+    .webkernel-design-btn__label { display: inline-flex; align-items: center; }
+    .webkernel-design-btn__badge {
+      margin-inline-start: 0.25rem;
+    }
+    .webkernel-design-btn-group {
+      display: inline-flex;
+      align-items: stretch;
+    }
+    .webkernel-design-btn-group > .webkernel-design-btn {
+      border-radius: 0;
+    }
+    .webkernel-design-btn-group > .webkernel-design-btn:first-child {
+      border-top-left-radius: var(--webkernel-design-radius);
+      border-bottom-left-radius: var(--webkernel-design-radius);
+    }
+    .webkernel-design-btn-group > .webkernel-design-btn:last-child {
+      border-top-right-radius: var(--webkernel-design-radius);
+      border-bottom-right-radius: var(--webkernel-design-radius);
+    }
+    .webkernel-design-btn-group > .webkernel-design-btn + .webkernel-design-btn {
+      margin-inline-start: -1px;
+    }
 
     /* ============================================================
        ACTIVITY / RECENT LIST

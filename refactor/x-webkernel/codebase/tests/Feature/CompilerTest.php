@@ -77,4 +77,30 @@ final class CompilerTest extends TestCase
         $this->assertTrue($directives->check('env', 'prod'));
         $this->assertFalse($directives->check('env', 'dev'));
     }
+
+    /**
+     * @return void
+     */
+    public function test_component_boolean_and_kebab_attributes(): void
+    {
+        $compiler = new Compiler(new Directives(), '\\'.View::class.'::echo(%s)');
+        $php = $compiler->compile_string('<x-webkernel::button outlined icon-position="after" class="x">Go</x-webkernel::button>');
+
+        $this->assertStringContainsString("'outlined'=>true", $php);
+        $this->assertStringContainsString("'icon_position'=>'after'", $php);
+        $this->assertStringContainsString('start_component', $php);
+    }
+
+    /**
+     * @return void
+     */
+    public function test_props_builds_attribute_bag_except(): void
+    {
+        $compiler = new Compiler(new Directives(), '\\'.View::class.'::echo(%s)');
+        $php = $compiler->compile_string("@props(['color' => 'primary'])");
+
+        $this->assertStringContainsString('$__props =', $php);
+        $this->assertStringContainsString('AttributeBag', $php);
+        $this->assertStringContainsString('except', $php);
+    }
 }

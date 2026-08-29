@@ -33,7 +33,8 @@
             "package_repo": "git@github.com:webkernelphp/codebase.git",
             "production": true,
             "provider": "Webkernel\\CodebaseProvider",
-            "prefix": "webkernel"
+            "prefix": "webkernel",
+            "post_autoload_dump": "Webkernel\\Console\\Commands\\DumpAutoloadCommand"
         }
     },
     "config": {

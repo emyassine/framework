@@ -8,12 +8,21 @@ class ComposerStaticInitcc6f492cc5d64cb7f09b9024726d6929
 {
     public static $files = array (
         'b3937b7fa35431fe0895577483870c74' => __DIR__ . '/..' . '/webkernel/codebase/namespacer.php',
+        '6124b4c8570aa390c21fafd04a26c69f' => __DIR__ . '/..' . '/myclabs/deep-copy/src/DeepCopy/deep_copy.php',
+        'ec07570ca5a812141189b1fa81503674' => __DIR__ . '/..' . '/phpunit/phpunit/src/Framework/Assert/Functions.php',
     );
 
     public static $prefixLengthsPsr4 = array (
         'W' =>
         array (
             'Webkernel\\Tests\\' => 16,
+            'Webkernel\\Platform\\Schemas\\Tests\\' => 33,
+            'Webkernel\\Platform\\Schemas\\' => 27,
+            'Webkernel\\Platform\\Components\\Tests\\' => 36,
+            'Webkernel\\Platform\\Components\\' => 30,
+            'Webkernel\\Platform\\Colors\\' => 26,
+            'Webkernel\\Platform\\' => 19,
+            'Webkernel\\Lifecycle\\Tests\\' => 26,
             'Webkernel\\Lifecycle\\' => 20,
             'Webkernel\\Imagery\\Tests\\' => 24,
             'Webkernel\\Imagery\\' => 18,
@@ -52,6 +61,34 @@ class ComposerStaticInitcc6f492cc5d64cb7f09b9024726d6929
         'Webkernel\\Tests\\' =>
         array (
             0 => __DIR__ . '/../../../..' . '/x-webkernel/codebase/tests',
+        ),
+        'Webkernel\\Platform\\Schemas\\Tests\\' =>
+        array (
+            0 => __DIR__ . '/../../../..' . '/x-webkernel/platform/schemas/tests',
+        ),
+        'Webkernel\\Platform\\Schemas\\' =>
+        array (
+            0 => __DIR__ . '/..' . '/webkernel/schemas/src',
+        ),
+        'Webkernel\\Platform\\Components\\Tests\\' =>
+        array (
+            0 => __DIR__ . '/../../../..' . '/x-webkernel/platform/components/tests',
+        ),
+        'Webkernel\\Platform\\Components\\' =>
+        array (
+            0 => __DIR__ . '/..' . '/webkernel/components/src',
+        ),
+        'Webkernel\\Platform\\Colors\\' =>
+        array (
+            0 => __DIR__ . '/..' . '/webkernel/components/src/Colors',
+        ),
+        'Webkernel\\Platform\\' =>
+        array (
+            0 => __DIR__ . '/..' . '/webkernel/panels/src',
+        ),
+        'Webkernel\\Lifecycle\\Tests\\' =>
+        array (
+            0 => __DIR__ . '/../../../..' . '/x-webkernel/lifecycle/tests',
         ),
         'Webkernel\\Lifecycle\\' =>
         array (
@@ -1810,23 +1847,37 @@ class ComposerStaticInitcc6f492cc5d64cb7f09b9024726d6929
         'Webkernel\\Imagery\\Tests\\Feature\\BrandingTest' => __DIR__ . '/../../../..' . '/x-webkernel/platform/imagery/tests/Feature/BrandingTest.php',
         'Webkernel\\Instance\\InstanceId' => __DIR__ . '/..' . '/webkernel/codebase/src/Instance/InstanceId.php',
         'Webkernel\\Lifecycle\\ComposerScripts' => __DIR__ . '/..' . '/webkernel/lifecycle/Lifecycle/ComposerScripts.php',
+        'Webkernel\\Lifecycle\\Hook\\LCHook' => __DIR__ . '/..' . '/webkernel/lifecycle/Lifecycle/Hook/LCHook.php',
+        'Webkernel\\Lifecycle\\Hook\\LCHookDispatcher' => __DIR__ . '/..' . '/webkernel/lifecycle/Lifecycle/Hook/LCHookDispatcher.php',
         'Webkernel\\Lifecycle\\Installer\\LCBaseInstaller' => __DIR__ . '/..' . '/webkernel/lifecycle/Lifecycle/Installer/LCBaseInstaller.php',
         'Webkernel\\Lifecycle\\Installer\\LCInstallerLocations' => __DIR__ . '/..' . '/webkernel/lifecycle/Lifecycle/Installer/LCInstallerLocations.php',
         'Webkernel\\Lifecycle\\Installer\\LCPackageType' => __DIR__ . '/..' . '/webkernel/lifecycle/Lifecycle/Installer/LCPackageType.php',
         'Webkernel\\Lifecycle\\LCInstaller' => __DIR__ . '/..' . '/webkernel/lifecycle/Lifecycle/LCInstaller.php',
+        'Webkernel\\Lifecycle\\Tests\\Feature\\LCHookDispatcherTest' => __DIR__ . '/../../../..' . '/x-webkernel/lifecycle/tests/Feature/LCHookDispatcherTest.php',
         'Webkernel\\Paths\\Package' => __DIR__ . '/..' . '/webkernel/codebase/src/Paths/Package.php',
         'Webkernel\\Performance\\Performance' => __DIR__ . '/..' . '/webkernel/codebase/src/Performance/Performance.php',
         'Webkernel\\Performance\\Status' => __DIR__ . '/..' . '/webkernel/codebase/src/Performance/Status.php',
         'Webkernel\\PlatformProvider' => __DIR__ . '/..' . '/webkernel/codebase/src/PlatformProvider.php',
-        'Webkernel\\Platform\\Colors\\Color' => __DIR__ . '/..' . '/webkernel/codebase/src/Platform/Colors/Color.php',
-        'Webkernel\\Platform\\Http\\Middleware\\Authenticate' => __DIR__ . '/..' . '/webkernel/codebase/src/Platform/Http/Middleware/Authenticate.php',
-        'Webkernel\\Platform\\Pages\\Dashboard' => __DIR__ . '/..' . '/webkernel/codebase/src/Platform/Pages/Dashboard.php',
-        'Webkernel\\Platform\\Panel' => __DIR__ . '/..' . '/webkernel/codebase/src/Platform/Panel.php',
-        'Webkernel\\Platform\\PanelProvider' => __DIR__ . '/..' . '/webkernel/codebase/src/Platform/PanelProvider.php',
-        'Webkernel\\Platform\\Resources\\Resource' => __DIR__ . '/..' . '/webkernel/codebase/src/Platform/Resources/Resource.php',
-        'Webkernel\\Platform\\Schemas\\Schema' => __DIR__ . '/..' . '/webkernel/codebase/src/Platform/Schemas/Schema.php',
-        'Webkernel\\Platform\\System\\SystemPanelProvider' => __DIR__ . '/..' . '/webkernel/codebase/src/Platform/System/SystemPanelProvider.php',
-        'Webkernel\\Platform\\Tables\\Table' => __DIR__ . '/..' . '/webkernel/codebase/src/Platform/Tables/Table.php',
+        'Webkernel\\Platform\\Colors\\Color' => __DIR__ . '/..' . '/webkernel/components/src/Colors/Color.php',
+        'Webkernel\\Platform\\Components\\Button' => __DIR__ . '/..' . '/webkernel/components/src/Button.php',
+        'Webkernel\\Platform\\Components\\ButtonGroup' => __DIR__ . '/..' . '/webkernel/components/src/ButtonGroup.php',
+        'Webkernel\\Platform\\Components\\Component' => __DIR__ . '/..' . '/webkernel/components/src/Component.php',
+        'Webkernel\\Platform\\Components\\ComponentsProvider' => __DIR__ . '/..' . '/webkernel/components/src/ComponentsProvider.php',
+        'Webkernel\\Platform\\Components\\IconPosition' => __DIR__ . '/..' . '/webkernel/components/src/IconPosition.php',
+        'Webkernel\\Platform\\Components\\Size' => __DIR__ . '/..' . '/webkernel/components/src/Size.php',
+        'Webkernel\\Platform\\Components\\Tests\\Feature\\ButtonTest' => __DIR__ . '/../../../..' . '/x-webkernel/platform/components/tests/Feature/ButtonTest.php',
+        'Webkernel\\Platform\\Components\\TextInput' => __DIR__ . '/..' . '/webkernel/components/src/TextInput.php',
+        'Webkernel\\Platform\\Http\\Middleware\\Authenticate' => __DIR__ . '/..' . '/webkernel/panels/src/Http/Middleware/Authenticate.php',
+        'Webkernel\\Platform\\Pages\\Dashboard' => __DIR__ . '/..' . '/webkernel/panels/src/Pages/Dashboard.php',
+        'Webkernel\\Platform\\Panel' => __DIR__ . '/..' . '/webkernel/panels/src/Panel.php',
+        'Webkernel\\Platform\\PanelProvider' => __DIR__ . '/..' . '/webkernel/panels/src/PanelProvider.php',
+        'Webkernel\\Platform\\PanelsProvider' => __DIR__ . '/..' . '/webkernel/panels/src/PanelsProvider.php',
+        'Webkernel\\Platform\\Resources\\Resource' => __DIR__ . '/..' . '/webkernel/panels/src/Resources/Resource.php',
+        'Webkernel\\Platform\\Schemas\\Schema' => __DIR__ . '/..' . '/webkernel/schemas/src/Schema.php',
+        'Webkernel\\Platform\\Schemas\\SchemaMode' => __DIR__ . '/..' . '/webkernel/schemas/src/SchemaMode.php',
+        'Webkernel\\Platform\\Schemas\\Tests\\Feature\\SchemaTest' => __DIR__ . '/../../../..' . '/x-webkernel/platform/schemas/tests/Feature/SchemaTest.php',
+        'Webkernel\\Platform\\System\\SystemPanelProvider' => __DIR__ . '/..' . '/webkernel/panels/src/System/SystemPanelProvider.php',
+        'Webkernel\\Platform\\Tables\\Table' => __DIR__ . '/..' . '/webkernel/panels/src/Tables/Table.php',
         'Webkernel\\Route\\Action\\RedirectAction' => __DIR__ . '/..' . '/webkernel/codebase/src/Route/Action/RedirectAction.php',
         'Webkernel\\Route\\Action\\ViewAction' => __DIR__ . '/..' . '/webkernel/codebase/src/Route/Action/ViewAction.php',
         'Webkernel\\Route\\Binding' => __DIR__ . '/..' . '/webkernel/codebase/src/Route/Binding.php',
@@ -1843,18 +1894,24 @@ class ComposerStaticInitcc6f492cc5d64cb7f09b9024726d6929
         'Webkernel\\Route\\Route' => __DIR__ . '/..' . '/webkernel/codebase/src/Route/Route.php',
         'Webkernel\\Route\\Uri\\Uri' => __DIR__ . '/..' . '/webkernel/codebase/src/Route/Uri/Uri.php',
         'Webkernel\\Route\\Uri\\UriException' => __DIR__ . '/..' . '/webkernel/codebase/src/Route/Uri/UriException.php',
+        'Webkernel\\Tests\\Feature\\AttributeBagTest' => __DIR__ . '/../../../..' . '/x-webkernel/codebase/tests/Feature/AttributeBagTest.php',
         'Webkernel\\Tests\\Feature\\AttributionTest' => __DIR__ . '/../../../..' . '/x-webkernel/codebase/tests/Feature/AttributionTest.php',
+        'Webkernel\\Tests\\Feature\\CompilerTest' => __DIR__ . '/../../../..' . '/x-webkernel/codebase/tests/Feature/CompilerTest.php',
         'Webkernel\\Tests\\Feature\\ConfigTest' => __DIR__ . '/../../../..' . '/x-webkernel/codebase/tests/Feature/ConfigTest.php',
         'Webkernel\\Tests\\Feature\\HttpTest' => __DIR__ . '/../../../..' . '/x-webkernel/codebase/tests/Feature/HttpTest.php',
         'Webkernel\\Tests\\Feature\\IncludeClockTest' => __DIR__ . '/../../../..' . '/x-webkernel/codebase/tests/Feature/IncludeClockTest.php',
         'Webkernel\\Tests\\Feature\\PanelViewTest' => __DIR__ . '/../../../..' . '/x-webkernel/codebase/tests/Feature/PanelViewTest.php',
         'Webkernel\\Tests\\Feature\\RouteCacheTest' => __DIR__ . '/../../../..' . '/x-webkernel/codebase/tests/Feature/RouteCacheTest.php',
+        'Webkernel\\View\\AttributeBag' => __DIR__ . '/..' . '/webkernel/codebase/src/View/AttributeBag.php',
         'Webkernel\\View\\Compile\\Comments' => __DIR__ . '/..' . '/webkernel/codebase/src/View/Compile/Comments.php',
+        'Webkernel\\View\\Compile\\Components' => __DIR__ . '/..' . '/webkernel/codebase/src/View/Compile/Components.php',
         'Webkernel\\View\\Compile\\Directives' => __DIR__ . '/..' . '/webkernel/codebase/src/View/Compile/Directives.php',
         'Webkernel\\View\\Compile\\Echoes' => __DIR__ . '/..' . '/webkernel/codebase/src/View/Compile/Echoes.php',
         'Webkernel\\View\\Compile\\Mode' => __DIR__ . '/..' . '/webkernel/codebase/src/View/Compile/Mode.php',
         'Webkernel\\View\\Compile\\Php' => __DIR__ . '/..' . '/webkernel/codebase/src/View/Compile/Php.php',
+        'Webkernel\\View\\Compile\\Pipeline' => __DIR__ . '/..' . '/webkernel/codebase/src/View/Compile/Pipeline.php',
         'Webkernel\\View\\Compile\\State' => __DIR__ . '/..' . '/webkernel/codebase/src/View/Compile/State.php',
+        'Webkernel\\View\\Compile\\Statements' => __DIR__ . '/..' . '/webkernel/codebase/src/View/Compile/Statements.php',
         'Webkernel\\View\\Compiler' => __DIR__ . '/..' . '/webkernel/codebase/src/View/Compiler.php',
         'Webkernel\\View\\Engine' => __DIR__ . '/..' . '/webkernel/codebase/src/View/Engine.php',
         'Webkernel\\View\\Js' => __DIR__ . '/..' . '/webkernel/codebase/src/View/Js.php',

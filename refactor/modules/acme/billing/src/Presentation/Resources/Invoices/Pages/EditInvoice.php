@@ -47,13 +47,13 @@ final class EditInvoice
             return '';
         }
 
-        $form = InvoiceResource::form(new Schema());
+        $schema = InvoiceResource::form(new Schema());
 
         return View::make('billing::invoices.form', [
             'title' => 'Edit invoice',
             'action' => '/billing/invoices/'.$invoice->id.'/edit',
-            'invoice' => $invoice,
-            'fields' => $form->get_fields(),
+            'schema' => $schema,
+            'state' => $invoice->to_array(),
         ])->render();
     }
 }

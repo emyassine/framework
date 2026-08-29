@@ -1,0 +1,16 @@
+{
+    "$schema": "https://getcomposer.org/schema.json",
+    "name": "webkernel/platform",
+    "description": "Webkernel platform metapackage: imagery, components, schemas, panels.",
+    "version": "0.12.0",
+    "type": "metapackage",
+    "license": "proprietary",
+    "require": {
+        "php": ">=8.4",
+        "webkernel/codebase": "^0.12.0",
+        "webkernel/components": "^0.12.0",
+        "webkernel/imagery": "^0.12.0",
+        "webkernel/panels": "^0.12.0",
+        "webkernel/schemas": "^0.12.0"
+    }
+}

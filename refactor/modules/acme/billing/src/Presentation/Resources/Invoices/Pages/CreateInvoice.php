@@ -40,13 +40,13 @@ final class CreateInvoice
             return '';
         }
 
-        $form = InvoiceResource::form(new Schema());
+        $schema = InvoiceResource::form(new Schema());
 
         return View::make('billing::invoices.form', [
             'title' => 'Create invoice',
             'action' => '/billing/invoices/create',
-            'invoice' => null,
-            'fields' => $form->get_fields(),
+            'schema' => $schema,
+            'state' => [],
         ])->render();
     }
 }

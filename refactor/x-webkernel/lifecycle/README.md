@@ -10,6 +10,18 @@ Follows [Custom Installers](https://getcomposer.org/doc/articles/custom-installe
 
 Webkernel packages that use a custom type (`webkernel-business-module`, …) must require this plugin so it is present at install time.
 
+Packages hook Composer script events through `extra.webkernel.{event}` (hyphens become underscores):
+
+```json
+"extra": {
+  "webkernel": {
+    "post_autoload_dump": "Vendor\\Package\\OnDump"
+  }
+}
+```
+
+`OnDump` is `new Class()->__invoke()` or `Class::method`. Zero-arg callables are allowed. `webkernel/codebase` declares `DumpAutoloadCommand` and runs first.
+
 On `composer dump-autoload` (and `php webkernel dump-autoload`) `DumpAutoloadCommand` writes:
 
 - `{vendor}/composer/webkernel.php` — `webapp_root`, `vendor_dir`, `instance_id`

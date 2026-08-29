@@ -95,7 +95,16 @@ final class Statements
             'stack' => static fn (string $e): string => Php::echo(' $this->stack'.$e),
             'slot' => static fn (string $e): string => Php::OPEN.' $this->slot'.$e.'; ?>',
             'endslot' => static fn (string $_): string => Php::OPEN.' $this->end_slot(); ?>',
-            'props' => static fn (string $e): string => Php::OPEN.' foreach ('.$e.' as $__n => $__d) { if (!isset($$__n)) { $$__n = $__d; } } unset($__n, $__d); ?>',
+            'props' => static function (string $e): string {
+                $list = Php::strip_parentheses($e);
+
+                return Php::OPEN
+                    .' $__props = '.$list.';'
+                    .' foreach ($__props as $__n => $__d) { if (!isset($$__n)) { $$__n = $__d; } }'
+                    .' $attributes = (isset($attributes) && $attributes instanceof \\Webkernel\\View\\AttributeBag'
+                    .' ? $attributes : new \\Webkernel\\View\\AttributeBag([]))->except(\\array_keys($__props));'
+                    .' unset($__props, $__n, $__d); ?>';
+            },
             'component' => static fn (string $e): string => Php::OPEN.' $this->start_component'.$e.'; ?>',
             'endcomponent' => static fn (string $_): string => Php::echo('$this->render_component()'),
         ];

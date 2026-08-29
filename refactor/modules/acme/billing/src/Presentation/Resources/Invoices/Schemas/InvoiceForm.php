@@ -7,17 +7,23 @@
 
 namespace Acme\Billing\Presentation\Resources\Invoices\Schemas;
 
+use Webkernel\Platform\Components\TextInput;
 use Webkernel\Platform\Schemas\Schema;
 
 final class InvoiceForm
 {
+    /**
+     * @param $schema Schema
+     *
+     * @return Schema
+     */
     public static function configure(Schema $schema): Schema
     {
-        return $schema->fields([
-            ['name' => 'number', 'label' => 'Number'],
-            ['name' => 'customer', 'label' => 'Customer'],
-            ['name' => 'total', 'label' => 'Total'],
-            ['name' => 'status', 'label' => 'Status'],
+        return $schema->components([
+            TextInput::make('number')->label('Number'),
+            TextInput::make('customer')->label('Customer'),
+            TextInput::make('total')->label('Total'),
+            TextInput::make('status')->label('Status'),
         ]);
     }
 }

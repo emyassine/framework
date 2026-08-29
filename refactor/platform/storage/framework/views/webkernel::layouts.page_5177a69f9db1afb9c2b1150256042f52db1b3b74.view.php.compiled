@@ -1,4 +1,4 @@
-<?php  foreach (([
+<?php  $__props = [
   'lang' => 'en',
   'theme' => null,
   'layout' => 'sidebar',
@@ -6,7 +6,7 @@
   'brand' => null,
   'favicon' => null,
   'logo' => null,
-]) as $__n => $__d) { if (!isset($$__n)) { $$__n = $__d; } } unset($__n, $__d); ?>
+]; foreach ($__props as $__n => $__d) { if (!isset($$__n)) { $$__n = $__d; } } $attributes = (isset($attributes) && $attributes instanceof \Webkernel\View\AttributeBag ? $attributes : new \Webkernel\View\AttributeBag([]))->except(\array_keys($__props)); unset($__props, $__n, $__d); ?>
 <?php 
   $brand = $brand ?? \Webkernel\Config\Config::get('app.name');
   $theme = $theme ?? (\Webkernel\Config\Config::get('ui.dark_mode', true) ? 'dark' : 'light');

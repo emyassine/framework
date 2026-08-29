@@ -9,19 +9,20 @@ Follow https://getcomposer.org/doc/articles/custom-installers.md :
 - Require `composer-plugin-api` and `composer/installers`. `composer/composer` is require-dev.
 - Packages with `webkernel-*` types must require this plugin.
 
-snake_case on Webkernel methods (`on_post_autoload_dump`, `parent_module`). Keep Composer interface names (`activate`, `getSubscribedEvents`, `getInstallPath`, `supports`).
+snake_case on Webkernel methods (`on_script_event`, `parent_module`). Keep Composer interface names (`activate`, `getSubscribedEvents`, `getInstallPath`, `supports`).
 
 No Laravel, no Vite, no request-path module scanner.
 
 Never `sys_get_temp_dir()`. Shared hosting often blocks it (`open_basedir`). Transient files go under `platform/temporary/`. Delete after use. Do not persist `composer.phar` in the tree.
 
-`DumpAutoloadCommand` writes `{vendor}/composer/webkernel.php`, classmap, path/instance function files, `webkernel_views.php`, `webkernel_routes.php`, `webkernel_composables.php`, `webkernel_providers.php`, and `webkernel_commands.php`. The plugin invokes that command on `post-autoload-dump`.
+`DumpAutoloadCommand` writes `{vendor}/composer/webkernel.php`, classmap, path/instance function files, `webkernel_views.php`, `webkernel_routes.php`, `webkernel_composables.php`, `webkernel_providers.php`, and `webkernel_commands.php`. It runs because `webkernel/codebase` declares `extra.webkernel.post_autoload_dump`. The plugin does not hardcode that class.
 
 Packages declare themselves in `extra.webkernel`:
 
 - `prefix` — package alias for `webkernel_package_root()`.
 - `provider` — one FQCN per package, dumped into `webkernel_providers.php`.
 - `package_repo` — used by webkernel/x-monorepo to split the dev tree.
+- `post_autoload_dump` (and the other Composer script events, hyphens to underscores) — FQCN or `Class::method`. `webkernel/codebase` runs first.
 
 ComposableContract implementors already in the classmap are mapped `api_name => class` into `webkernel_composables.php`.
 Avoiding glob's on the request path.

@@ -233,15 +233,26 @@ final class Engine
         $this->slots[$i][$name] = trim((string) ob_get_clean());
     }
 
+    /**
+     * @return string
+     */
     public function render_component(): string
     {
         $name = array_pop($this->component_stack);
         $cs = count($this->component_stack);
-        $cd = array_merge(
-            $this->component_data[$cs] ?? [],
-            ['slot' => trim((string) ob_get_clean())],
-            $this->slots[$cs] ?? [],
-        );
+        $data = $this->component_data[$cs] ?? [];
+        $slots = $this->slots[$cs] ?? [];
+        $slots['slot'] = trim((string) ob_get_clean());
+        $bag = [];
+        foreach ($data as $key => $value) {
+            if ($key === 'slot' || $key === 'attributes' || array_key_exists($key, $slots)) {
+                continue;
+            }
+            $bag[$key] = $value;
+        }
+        $cd = array_merge($data, $slots, [
+            'attributes' => new AttributeBag($bag),
+        ]);
         $html = $this->run_child((string) $name, $cd);
         unset($this->component_data[$cs], $this->slots[$cs]);
         foreach (array_keys($cd) as $key) {
@@ -303,11 +314,18 @@ final class Engine
             $namespace = substr($template_name, 0, $sep);
             $name = substr($template_name, $sep + 2);
         }
-        $rel = str_contains($name, '/')
-            ? $name
-            : str_replace('.', '/', $name).'.view.php';
+        if (str_contains($name, '/')) {
+            return $this->template_files[$template_name] = $this->locate($name, $namespace);
+        }
+        $path = str_replace('.', '/', $name);
+        foreach ([$path.'.view.php', $path.'/index.view.php'] as $rel) {
+            $found = $this->locate($rel, $namespace);
+            if ($found !== '') {
+                return $this->template_files[$template_name] = $found;
+            }
+        }
 
-        return $this->template_files[$template_name] = $this->locate($rel, $namespace);
+        return $this->template_files[$template_name] = '';
     }
 
     /**

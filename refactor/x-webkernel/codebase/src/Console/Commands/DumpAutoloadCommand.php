@@ -20,7 +20,6 @@ use Webkernel\Console\{ExitCode, Terminal};
 use Webkernel\DevEnv\IdeHelper;
 use Webkernel\Instance\InstanceId;
 
-use Webkernel\Platform\{Panel, PanelProvider, Resources\Resource};
 use Webkernel\PlatformProvider;
 
 use Webkernel\Route\Compile\Cache;
@@ -34,6 +33,12 @@ use Webkernel\View\{Engine,View};
  */
 final readonly class DumpAutoloadCommand
 {
+    private const PANEL_CLASS = 'Webkernel\\Platform\\Panel';
+
+    private const PANEL_PROVIDER_CLASS = 'Webkernel\\Platform\\PanelProvider';
+
+    private const RESOURCE_CLASS = 'Webkernel\\Platform\\Resources\\Resource';
+
     public const BOOT_BASENAME = 'webkernel.php';
     public const CLASSMAP_BASENAME = 'webkernel_classmap.php';
     public const FILES_BASENAME = 'webkernel_files.php';
@@ -54,6 +59,7 @@ final readonly class DumpAutoloadCommand
     )]
     public function __invoke(): ExitCode
     {
+        $this->ensure_path_helpers();
         $root = $this->project_root();
         $vendor_dir = $this->vendor_dir($root);
         $composer_dir = $vendor_dir.DIRECTORY_SEPARATOR.'composer';
@@ -438,12 +444,17 @@ final readonly class DumpAutoloadCommand
                     continue;
                 }
                 $this->ensure_class($panel_class, $classmap);
-                if (! class_exists($panel_class) || ! is_a($panel_class, PanelProvider::class, true)) {
+                if (
+                    ! class_exists($panel_class)
+                    || ! class_exists(self::PANEL_CLASS)
+                    || ! class_exists(self::PANEL_PROVIDER_CLASS)
+                    || ! is_a($panel_class, self::PANEL_PROVIDER_CLASS, true)
+                ) {
                     continue;
                 }
-                /** @var PanelProvider $instance */
                 $instance = new $panel_class();
-                $snapshot = $instance->panel(new Panel())->to_array();
+                $panel = self::PANEL_CLASS;
+                $snapshot = $instance->panel(new $panel())->to_array();
                 $snapshot['provider'] = $panel_class;
                 $snapshot['package_provider'] = $provider;
                 $snapshot['prefix'] = $row['prefix'];
@@ -476,7 +487,7 @@ final readonly class DumpAutoloadCommand
                     continue;
                 }
                 $this->ensure_class($resource, $classmap);
-                if (! \class_exists($resource) || ! \is_a($resource, Resource::class, true)) {
+                if (! \class_exists($resource) || ! \is_a($resource, self::RESOURCE_CLASS, true)) {
                     continue;
                 }
                 $slug = $resource::$slug !== '' ? $resource::$slug : $this->resource_slug($resource);

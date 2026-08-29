@@ -2468,7 +2468,7 @@
             "dist": {
                 "type": "path",
                 "url": "x-webkernel/codebase",
-                "reference": "af1761bd9fb13995192260330858dde32c04a860"
+                "reference": "007be11fd3ec3739c857ecfaa08cf5faa487e0b4"
             },
             "require": {
                 "php": ">=8.4",
@@ -2486,7 +2486,8 @@
                     "package_repo": "git@github.com:webkernelphp/codebase.git",
                     "production": true,
                     "provider": "Webkernel\\CodebaseProvider",
-                    "prefix": "webkernel"
+                    "prefix": "webkernel",
+                    "post_autoload_dump": "Webkernel\\Console\\Commands\\DumpAutoloadCommand"
                 }
             },
             "installation-source": "dist",
@@ -2512,6 +2513,50 @@
                 "relative": true
             },
             "install-path": "../webkernel/codebase"
+        },
+        {
+            "name": "webkernel/components",
+            "version": "0.12.0",
+            "version_normalized": "0.12.0.0",
+            "dist": {
+                "type": "path",
+                "url": "x-webkernel/platform/components",
+                "reference": "3d3db4fc20f51b7224a06a039a5ff6fa4a14f836"
+            },
+            "require": {
+                "php": ">=8.4",
+                "webkernel/codebase": "^0.12.0"
+            },
+            "type": "webkernel-component",
+            "extra": {
+                "webkernel": {
+                    "package_repo": "git@github.com:webkernelphp/components.git",
+                    "production": true,
+                    "provider": "Webkernel\\Platform\\Components\\ComponentsProvider",
+                    "prefix": "webkernel"
+                }
+            },
+            "installation-source": "dist",
+            "autoload": {
+                "psr-4": {
+                    "Webkernel\\Platform\\Components\\": "src/",
+                    "Webkernel\\Platform\\Colors\\": "src/Colors/"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "Webkernel\\Platform\\Components\\Tests\\": "tests/"
+                }
+            },
+            "license": [
+                "proprietary"
+            ],
+            "description": "Webkernel UI atoms: views plus dumpable PHP declarations.",
+            "transport-options": {
+                "symlink": true,
+                "relative": true
+            },
+            "install-path": "../webkernel/components"
         },
         {
             "name": "webkernel/imagery",
@@ -2612,6 +2657,122 @@
                 "relative": true
             },
             "install-path": "../webkernel/lifecycle"
+        },
+        {
+            "name": "webkernel/panels",
+            "version": "0.12.0",
+            "version_normalized": "0.12.0.0",
+            "dist": {
+                "type": "path",
+                "url": "x-webkernel/platform/panels",
+                "reference": "fac7efa544ddad19e4ea6d6073114cdd91f134d6"
+            },
+            "require": {
+                "php": ">=8.4",
+                "webkernel/codebase": "^0.12.0",
+                "webkernel/components": "^0.12.0",
+                "webkernel/schemas": "^0.12.0"
+            },
+            "type": "webkernel-stdlib",
+            "extra": {
+                "webkernel": {
+                    "package_repo": "git@github.com:webkernelphp/panels.git",
+                    "production": true,
+                    "provider": "Webkernel\\Platform\\PanelsProvider",
+                    "prefix": "webkernel"
+                }
+            },
+            "installation-source": "dist",
+            "autoload": {
+                "psr-4": {
+                    "Webkernel\\Platform\\": "src/"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "Webkernel\\Platform\\Tests\\": "tests/"
+                }
+            },
+            "license": [
+                "proprietary"
+            ],
+            "description": "Webkernel admin chrome: Panel, Resource, Page, System panel.",
+            "transport-options": {
+                "symlink": true,
+                "relative": true
+            },
+            "install-path": "../webkernel/panels"
+        },
+        {
+            "name": "webkernel/platform",
+            "version": "0.12.0",
+            "version_normalized": "0.12.0.0",
+            "dist": {
+                "type": "path",
+                "url": "x-webkernel/platform",
+                "reference": "a0c154af82b182121a6912e972289e94c33414af"
+            },
+            "require": {
+                "php": ">=8.4",
+                "webkernel/codebase": "^0.12.0",
+                "webkernel/components": "^0.12.0",
+                "webkernel/imagery": "^0.12.0",
+                "webkernel/panels": "^0.12.0",
+                "webkernel/schemas": "^0.12.0"
+            },
+            "type": "metapackage",
+            "license": [
+                "proprietary"
+            ],
+            "description": "Webkernel platform metapackage: imagery, components, schemas, panels.",
+            "transport-options": {
+                "symlink": true,
+                "relative": true
+            },
+            "install-path": null
+        },
+        {
+            "name": "webkernel/schemas",
+            "version": "0.12.0",
+            "version_normalized": "0.12.0.0",
+            "dist": {
+                "type": "path",
+                "url": "x-webkernel/platform/schemas",
+                "reference": "471ec5b8e135ff9489856f90540630da57ba8037"
+            },
+            "require": {
+                "php": ">=8.4",
+                "webkernel/codebase": "^0.12.0",
+                "webkernel/components": "^0.12.0"
+            },
+            "type": "webkernel-stdlib",
+            "extra": {
+                "webkernel": {
+                    "package_repo": "git@github.com:webkernelphp/schemas.git",
+                    "production": true,
+                    "prefix": "schemas"
+                }
+            },
+            "installation-source": "dist",
+            "autoload": {
+                "psr-4": {
+                    "Webkernel\\Platform\\Schemas\\": "src/"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "Webkernel\\Platform\\Schemas\\Tests\\": "tests/"
+                }
+            },
+            "license": [
+                "proprietary"
+            ],
+            "description": "Webkernel schema tree: layout of components for forms and readonly views.",
+            "transport-options": {
+                "symlink": true,
+                "relative": true
+            },
+            "install-path": "../webkernel/schemas"
         }
     ],
     "dev": true,

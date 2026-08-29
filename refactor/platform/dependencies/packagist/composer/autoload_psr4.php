@@ -7,6 +7,13 @@ $baseDir = dirname(dirname(dirname($vendorDir)));
 
 return array(
     'Webkernel\\Tests\\' => array($baseDir . '/x-webkernel/codebase/tests'),
+    'Webkernel\\Platform\\Schemas\\Tests\\' => array($baseDir . '/x-webkernel/platform/schemas/tests'),
+    'Webkernel\\Platform\\Schemas\\' => array($vendorDir . '/webkernel/schemas/src'),
+    'Webkernel\\Platform\\Components\\Tests\\' => array($baseDir . '/x-webkernel/platform/components/tests'),
+    'Webkernel\\Platform\\Components\\' => array($vendorDir . '/webkernel/components/src'),
+    'Webkernel\\Platform\\Colors\\' => array($vendorDir . '/webkernel/components/src/Colors'),
+    'Webkernel\\Platform\\' => array($vendorDir . '/webkernel/panels/src'),
+    'Webkernel\\Lifecycle\\Tests\\' => array($baseDir . '/x-webkernel/lifecycle/tests'),
     'Webkernel\\Lifecycle\\' => array($vendorDir . '/webkernel/lifecycle/Lifecycle'),
     'Webkernel\\Imagery\\Tests\\' => array($baseDir . '/x-webkernel/platform/imagery/tests'),
     'Webkernel\\Imagery\\' => array($vendorDir . '/webkernel/imagery/src'),

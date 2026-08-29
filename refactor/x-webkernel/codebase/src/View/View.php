@@ -197,7 +197,7 @@ final class View implements ComposableContract, \Stringable
      */
     public static function echo(mixed $value): string
     {
-        if ($value instanceof Js) {
+        if ($value instanceof Js || $value instanceof AttributeBag) {
             return (string) $value;
         }
         if (is_object($value)) {
