@@ -1,0 +1,58 @@
+<?php $_shouldextend[1]=1; ?>
+
+<?php $this->start_section('title', 'Invoices'); ?>
+
+<?php $this->start_section('navigation'); ?>
+  <?php echo $this->run_child('billing::sidebar', ['current' => 'invoices']); ?>
+<?php $this->stop_section(); ?>
+
+<?php $this->start_section('user'); ?>
+  <?php echo $this->run_child('webkernel::panels.system.user'); ?>
+<?php $this->stop_section(); ?>
+
+<?php $this->start_section('topnav'); ?>
+  <?php echo $this->run_child('billing::sidebar', ['current' => 'invoices']); ?>
+<?php $this->stop_section(); ?>
+
+<?php $this->start_section('horizontal'); ?>
+  <?php echo $this->run_child('billing::sidebar', ['current' => 'invoices']); ?>
+<?php $this->stop_section(); ?>
+
+<?php $this->start_section('breadcrumb'); ?>
+  Billing / Invoices
+<?php $this->stop_section(); ?>
+
+<?php $this->start_section('content'); ?>
+  <?php  $this->start_component('webkernel::page',['title'=>'Invoices']); ?>
+    <?php  $this->slot('actions'); ?>
+      <a href="/billing/invoices/create">Create invoice</a>
+    <?php  $this->end_slot(); ?>
+
+    <table>
+      <thead>
+        <tr>
+          <?php foreach($columns as $column): ?>
+            <th><?php echo \Webkernel\View\View::echo($column['label']); ?></th>
+          <?php endforeach; ?>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <?php $__empty_1 = true; foreach($invoices as $invoice): $__empty_1 = false; ?>
+          <tr>
+            <?php foreach($columns as $column): ?>
+              <td><?php echo \Webkernel\View\View::echo($invoice->{$column['key']}); ?></td>
+            <?php endforeach; ?>
+            <td><a href="/billing/invoices/<?php echo \Webkernel\View\View::echo($invoice->id); ?>/edit">Edit</a></td>
+          </tr>
+        <?php endforeach; if ($__empty_1): ?>
+          <tr>
+            <td colspan="<?php echo \Webkernel\View\View::echo(count($columns) + 1); ?>">No invoices yet.</td>
+          </tr>
+        <?php endif; ?>
+      </tbody>
+    </table>
+  <?php echo $this->render_component(); ?>
+<?php $this->stop_section(); ?>
+
+<?php if (isset($_shouldextend[1])) { echo $this->run_child('webkernel::layouts.page'); } ?>

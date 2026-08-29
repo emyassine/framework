@@ -8,7 +8,7 @@
 namespace Webkernel\View;
 
 /**
- * Leftover HTML attributes on a Blade component after `@props`.
+ * Leftover HTML attributes on a View component after `@props`.
  *
  * //> `__toString()` is already escaped. `View::echo` must not escape it again.
  */
