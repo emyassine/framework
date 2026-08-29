@@ -16,6 +16,7 @@ $files = [
     $b . '/x-webkernel/codebase/functions/terminal.php',
     $b . '/x-webkernel/codebase/functions/view.php',
     $b . '/x-webkernel/codebase/functions/webapp.php',
+    $b . '/x-webkernel/platform/i18n/functions/i18n.php',
     $b . '/x-webkernel/platform/imagery/functions/branding.php',
     $b . '/x-webkernel/platform/imagery/functions/icon.php',
 ];

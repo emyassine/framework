@@ -648,7 +648,7 @@
             "dist": {
                 "type": "path",
                 "url": "x-webkernel/platform/components",
-                "reference": "3d3db4fc20f51b7224a06a039a5ff6fa4a14f836"
+                "reference": "2c0586a6e55b9a3f97b85e19a34828224ea65c73"
             },
             "require": {
                 "php": ">=8.4",
@@ -665,8 +665,7 @@
             },
             "autoload": {
                 "psr-4": {
-                    "Webkernel\\Platform\\Components\\": "src/",
-                    "Webkernel\\Platform\\Colors\\": "src/Colors/"
+                    "Webkernel\\Platform\\Components\\": "src/"
                 }
             },
             "autoload-dev": {
@@ -678,6 +677,52 @@
                 "proprietary"
             ],
             "description": "Webkernel UI atoms: views plus dumpable PHP declarations.",
+            "transport-options": {
+                "symlink": true,
+                "relative": true
+            }
+        },
+        {
+            "name": "webkernel/i18n",
+            "version": "0.12.0",
+            "dist": {
+                "type": "path",
+                "url": "x-webkernel/platform/i18n",
+                "reference": "7297966fffcf4b912a409362217c25af1ae26fa6"
+            },
+            "require": {
+                "php": ">=8.4",
+                "webkernel/codebase": "^0.12.0"
+            },
+            "type": "webkernel-stdlib",
+            "extra": {
+                "webkernel": {
+                    "package_repo": "git@github.com:webkernelphp/i18n.git",
+                    "production": true,
+                    "provider": "Webkernel\\I18n\\I18nProvider",
+                    "prefix": "i18n"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Webkernel\\I18n\\": "src/"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "Webkernel\\I18n\\Tests\\": "tests/"
+                }
+            },
+            "license": [
+                "EPL-2.0"
+            ],
+            "authors": [
+                {
+                    "name": "El Moumen Yassine",
+                    "email": "yassine@numerimondes.com"
+                }
+            ],
+            "description": "Webkernel i18n: fast_i18n, locale context, translation catalog from LANG_PATH.",
             "transport-options": {
                 "symlink": true,
                 "relative": true
@@ -825,12 +870,13 @@
             "dist": {
                 "type": "path",
                 "url": "x-webkernel/platform",
-                "reference": "a0c154af82b182121a6912e972289e94c33414af"
+                "reference": "315ab1edd6d4224309b50a1d72846fb7541739f2"
             },
             "require": {
                 "php": ">=8.4",
                 "webkernel/codebase": "^0.12.0",
                 "webkernel/components": "^0.12.0",
+                "webkernel/i18n": "^0.12.0",
                 "webkernel/imagery": "^0.12.0",
                 "webkernel/panels": "^0.12.0",
                 "webkernel/schemas": "^0.12.0"
@@ -839,7 +885,7 @@
             "license": [
                 "proprietary"
             ],
-            "description": "Webkernel platform metapackage: imagery, components, schemas, panels.",
+            "description": "Webkernel platform metapackage: imagery, i18n, components, schemas, panels.",
             "transport-options": {
                 "symlink": true,
                 "relative": true

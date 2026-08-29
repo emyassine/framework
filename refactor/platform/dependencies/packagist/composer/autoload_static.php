@@ -18,13 +18,13 @@ class ComposerStaticInitcc6f492cc5d64cb7f09b9024726d6929
             'Webkernel\\Platform\\Schemas\\' => 27,
             'Webkernel\\Platform\\Components\\Tests\\' => 36,
             'Webkernel\\Platform\\Components\\' => 30,
-            'Webkernel\\Platform\\Colors\\' => 26,
             'Webkernel\\Platform\\' => 19,
             'Webkernel\\Lifecycle\\Tests\\' => 26,
             'Webkernel\\Lifecycle\\' => 20,
             'Webkernel\\Imagery\\Tests\\' => 24,
             'Webkernel\\Imagery\\' => 18,
             'Webkernel\\I18n\\Tests\\' => 21,
+            'Webkernel\\I18n\\' => 15,
             'Webkernel\\' => 10,
         ),
         'P' =>
@@ -77,10 +77,6 @@ class ComposerStaticInitcc6f492cc5d64cb7f09b9024726d6929
         array (
             0 => __DIR__ . '/..' . '/webkernel/components/src',
         ),
-        'Webkernel\\Platform\\Colors\\' =>
-        array (
-            0 => __DIR__ . '/..' . '/webkernel/components/src/Colors',
-        ),
         'Webkernel\\Platform\\' =>
         array (
             0 => __DIR__ . '/..' . '/webkernel/panels/src',
@@ -104,6 +100,10 @@ class ComposerStaticInitcc6f492cc5d64cb7f09b9024726d6929
         'Webkernel\\I18n\\Tests\\' =>
         array (
             0 => __DIR__ . '/../../../..' . '/x-webkernel/platform/i18n/tests',
+        ),
+        'Webkernel\\I18n\\' =>
+        array (
+            0 => __DIR__ . '/..' . '/webkernel/i18n/src',
         ),
         'Webkernel\\' =>
         array (
@@ -1844,6 +1844,11 @@ class ComposerStaticInitcc6f492cc5d64cb7f09b9024726d6929
         'Webkernel\\Csrf' => __DIR__ . '/..' . '/webkernel/codebase/src/Csrf.php',
         'Webkernel\\DevEnv\\IdeHelper' => __DIR__ . '/..' . '/webkernel/codebase/src/DevEnv/IdeHelper.php',
         'Webkernel\\Http' => __DIR__ . '/..' . '/webkernel/codebase/src/Http.php',
+        'Webkernel\\I18n\\Catalog' => __DIR__ . '/..' . '/webkernel/i18n/src/Catalog.php',
+        'Webkernel\\I18n\\I18nContext' => __DIR__ . '/..' . '/webkernel/i18n/src/I18nContext.php',
+        'Webkernel\\I18n\\I18nProvider' => __DIR__ . '/..' . '/webkernel/i18n/src/I18nProvider.php',
+        'Webkernel\\I18n\\Support\\LocaleDirection' => __DIR__ . '/..' . '/webkernel/i18n/src/Support/LocaleDirection.php',
+        'Webkernel\\I18n\\Support\\TranslatedValue' => __DIR__ . '/..' . '/webkernel/i18n/src/Support/TranslatedValue.php',
         'Webkernel\\I18n\\Tests\\Feature\\FastI18nTest' => __DIR__ . '/../../../..' . '/x-webkernel/platform/i18n/tests/Feature/FastI18nTest.php',
         'Webkernel\\Imagery\\Branding' => __DIR__ . '/..' . '/webkernel/imagery/src/Branding.php',
         'Webkernel\\Imagery\\Http\\Controllers\\BrandingController' => __DIR__ . '/..' . '/webkernel/imagery/src/Http/Controllers/BrandingController.php',
