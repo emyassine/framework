@@ -42,7 +42,7 @@
     <div class="w-modal-window w-width-{{ $width }}" role="dialog" aria-modal="true" aria-labelledby="{{ $id }}-heading">
       @if ($close_button)
         <div class="w-modal-close-btn">
-          <x-webkernel::icon-button icon="x" :label="lang('panel.close')" size="sm" color="gray" data-w-modal-close />
+          <x-webkernel::button-icon icon="x" :label="lang('panel.close')" size="sm" color="gray" data-w-modal-close />
         </div>
       @endif
       @if ($has_heading || $has_icon)

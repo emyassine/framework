@@ -85,6 +85,9 @@ abstract class Component
     public function render(array $extra = []): string
     {
         $data = \array_merge($this->to_props(), $extra);
+        if (! \array_key_exists('slot', $data)) {
+            $data['slot'] = '';
+        }
         if (! isset($data['attributes']) || ! $data['attributes'] instanceof \Webkernel\View\AttributeBag) {
             $data['attributes'] = new \Webkernel\View\AttributeBag($data);
         }

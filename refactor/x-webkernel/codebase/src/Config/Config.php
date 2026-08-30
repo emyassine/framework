@@ -98,7 +98,9 @@ final class Config
      */
     private static function package_configs(string $root): array
     {
-        $file = $root.'/vendor/composer/webkernel_providers.php';
+        $file = \function_exists('vendor_dir')
+            ? vendor_dir('composer/webkernel_providers.php')
+            : $root.'/vendor/composer/webkernel_providers.php';
         if (! \is_file($file)) {
             return [];
         }

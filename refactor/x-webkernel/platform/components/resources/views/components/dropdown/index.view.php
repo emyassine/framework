@@ -1,6 +1,6 @@
 {{--
   <x-webkernel::dropdown>
-    <x-slot name="trigger"><x-webkernel::icon-button icon="ellipsis" /></x-slot>
+    <x-slot name="trigger"><x-webkernel::button-icon icon="ellipsis" /></x-slot>
     <x-webkernel::dropdown.list>…</x-webkernel::dropdown.list>
   </x-webkernel::dropdown>
 --}}

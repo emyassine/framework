@@ -1997,6 +1997,7 @@ class ComposerStaticInitcc6f492cc5d64cb7f09b9024726d6929
         'Webkernel\\Platform\\Css' => __DIR__ . '/..' . '/webkernel/codebase/src/Platform/Css.php',
         'Webkernel\\Platform\\Http\\Middleware\\Authenticate' => __DIR__ . '/..' . '/webkernel/panels/src/Http/Middleware/Authenticate.php',
         'Webkernel\\Platform\\Js' => __DIR__ . '/..' . '/webkernel/codebase/src/Platform/Js.php',
+        'Webkernel\\Platform\\Notification' => __DIR__ . '/..' . '/webkernel/panels/src/Notification.php',
         'Webkernel\\Platform\\Pages\\Dashboard' => __DIR__ . '/..' . '/webkernel/panels/src/Pages/Dashboard.php',
         'Webkernel\\Platform\\Pages\\ManagePanel' => __DIR__ . '/..' . '/webkernel/panels/src/Pages/ManagePanel.php',
         'Webkernel\\Platform\\Pages\\Page' => __DIR__ . '/..' . '/webkernel/panels/src/Pages/Page.php',

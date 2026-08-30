@@ -157,17 +157,20 @@ final class Schema
         if ($component instanceof Tabs) {
             return $component->render(\array_merge($extra, ['state' => $state, 'errors' => $errors]));
         }
-        if (\is_string($name) && $name !== '') {
-            if (! \array_key_exists('value', $props) && \array_key_exists($name, $state)) {
-                $value = $state[$name];
+        if (\is_string($name) && $name !== '' && \array_key_exists($name, $state)) {
+            $value = $state[$name];
+            if (\is_bool($value)) {
+                if (! \array_key_exists('checked', $props)) {
+                    $extra['checked'] = $value;
+                }
+            } elseif (! \array_key_exists('value', $props)) {
                 $extra['value'] = \is_scalar($value) ? (string) $value : '';
-            }
-            if (isset($state[$name]) && \is_bool($state[$name]) && ! \array_key_exists('checked', $props)) {
-                $extra['checked'] = $state[$name];
             }
             if (isset($errors[$name])) {
                 $extra['error'] = $errors[$name];
             }
+        } elseif (\is_string($name) && $name !== '' && isset($errors[$name])) {
+            $extra['error'] = $errors[$name];
         }
 
         return $component->render($extra);

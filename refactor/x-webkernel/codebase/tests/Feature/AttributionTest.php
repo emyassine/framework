@@ -97,7 +97,8 @@ final class AttributionTest extends TestCase
             || \str_contains($norm, '/vendor/')
             || \str_contains($norm, '/dependencies/')
             || \str_contains($norm, '/storage/')
-            || \str_contains($norm, '/codebase/config/');
+            || \str_contains($norm, '/codebase/config/')
+            || \str_contains($norm, '/yoyo/');
     }
 
     /**

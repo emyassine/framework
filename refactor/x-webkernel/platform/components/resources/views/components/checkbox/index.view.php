@@ -11,6 +11,7 @@
 ])
 @php
   $attributes = $attributes ?? new \Webkernel\View\AttributeBag([]);
+  $slot = $slot ?? '';
 @endphp
 <label class="w-checkbox-wrap">
   <input

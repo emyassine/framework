@@ -149,10 +149,11 @@ final readonly class DumpAutoloadCommand
         $this->run_dump_hooks($packages, $classmap, $vendor_dir);
 
         $io = $this->terminal();
-        $io->line();
         $io->success('wrote composer/'.self::BOOT_BASENAME.' (instance '.$instance_id.')');
-        $io->line();
-        $io->note('Took ' . number_format((\hrtime(true) - \START_REQUEST) / 1e6, 2) . ' ms', 'EXECUTION DURATION');
+        if (\defined('START_REQUEST')) {
+            $io->note('Took '.number_format((\hrtime(true) - (int) \constant('START_REQUEST')) / 1e6, 2).' ms', 'EXECUTION DURATION');
+        }
+
         return ExitCode::SUCCESS;
     }
 
