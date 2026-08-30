@@ -19,7 +19,7 @@
 .wds-simple-card {
   background: var(--wds-surface);
   border: 1px solid var(--wds-border);
-  border-radius: var(--wds-radius-lg);
+  border-radius: var(--wds-radius);
   padding: 2rem 1.75rem;
   color: var(--wds-text);
 }
