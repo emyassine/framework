@@ -1,6 +1,7 @@
 <?php 
   $attributes = $attributes ?? new \Webkernel\View\AttributeBag([]);
  ?>
+<?php if ($this->once('wds.page.panels.rail.view')): ?>
 <style>
 .wds-rail {
   width: var(--wds-rail-width);
@@ -31,6 +32,7 @@
   }
 }
 </style>
+<?php endif; ?>
 <aside <?php echo \Webkernel\View\View::echo($attributes->class('wds-rail')); ?> aria-label="<?php echo \Webkernel\View\View::echo(lang('panel.apps')); ?>">
   <?php echo $slot; ?>
 

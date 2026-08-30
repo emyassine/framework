@@ -5,6 +5,7 @@
 <?php 
   $attributes = $attributes ?? new \Webkernel\View\AttributeBag([]);
  ?>
+<?php if ($this->once('wds.page.aside.view')): ?>
 <style>
 .wds-aside {
   flex: 0 0 var(--wds-aside-width, 20rem);
@@ -16,6 +17,7 @@
 }
 .wds-aside[data-collapsed="1"] { display: none; }
 </style>
+<?php endif; ?>
 <aside
   <?php echo \Webkernel\View\View::echo($attributes->class('wds-aside')); ?>
 

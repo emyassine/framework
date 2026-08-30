@@ -7,6 +7,7 @@
 @php
   $size = \in_array((string) $size, ['sm', 'md', 'lg'], true) ? (string) $size : 'md';
 @endphp
+@once('wds.avatar')
 <style>
 .wds-avatar {
   width: 36px; height: 36px;
@@ -24,6 +25,7 @@
 .wds-avatar.wds-size-sm { width: 24px; height: 24px; font-size: 0.65rem; }
 .wds-avatar.wds-size-lg { width: 48px; height: 48px; }
 </style>
+@endonce
 @if (!empty($src))
   <img
     class="wds-avatar{{ $circular ? ' wds-circular' : '' }} wds-size-{{ $size }}"

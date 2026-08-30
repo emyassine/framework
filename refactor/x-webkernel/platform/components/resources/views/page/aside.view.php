@@ -5,6 +5,7 @@
 @php
   $attributes = $attributes ?? new \Webkernel\View\AttributeBag([]);
 @endphp
+@once('wds.page.aside.view')
 <style>
 .wds-aside {
   flex: 0 0 var(--wds-aside-width, 20rem);
@@ -16,6 +17,7 @@
 }
 .wds-aside[data-collapsed="1"] { display: none; }
 </style>
+@endonce
 <aside
   {{ $attributes->class('wds-aside') }}
   data-position="{{ $position }}"

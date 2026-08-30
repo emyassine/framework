@@ -1,6 +1,11 @@
 <?php  $__props = [
   'href' => null,
 ]; foreach ($__props as $__n => $__d) { if (!isset($$__n)) { $$__n = $__d; } } $attributes = (isset($attributes) && $attributes instanceof \Webkernel\View\AttributeBag ? $attributes : new \Webkernel\View\AttributeBag([]))->except(\array_keys($__props)); unset($__props, $__n, $__d); ?>
+<?php if ($this->once('wds.table.row')): ?>
+<style>
+.wds-ta-row:hover td { background: var(--wds-bg-subtle); }
+</style>
+<?php endif; ?>
 <tr class="wds-ta-row" <?php if(!empty($href)): ?> onclick="window.location.href=<?php echo \Webkernel\View\View::echo(json_encode($href)); ?>" style="cursor:pointer" <?php endif; ?>>
   <?php echo $slot; ?>
 

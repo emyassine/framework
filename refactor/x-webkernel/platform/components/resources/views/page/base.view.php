@@ -18,10 +18,12 @@
     $favicon = webkernel_branding_url('webkernel-favicon');
   }
 @endphp
+@once('wds.page.base.view')
 <style>
 html { font-size: 16px; }
 body { margin: 0; }
 </style>
+@endonce
 <!DOCTYPE html>
 <html
   lang="{{ $lang }}"

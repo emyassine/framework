@@ -1,2 +1,9 @@
 <?php  $__props = ['align' => 'start']; foreach ($__props as $__n => $__d) { if (!isset($$__n)) { $$__n = $__d; } } $attributes = (isset($attributes) && $attributes instanceof \Webkernel\View\AttributeBag ? $attributes : new \Webkernel\View\AttributeBag([]))->except(\array_keys($__props)); unset($__props, $__n, $__d); ?>
+<?php if ($this->once('wds.table.header-cell')): ?>
+<style>
+th.wds-align-start { text-align: start; }
+th.wds-align-center { text-align: center; }
+th.wds-align-end { text-align: end; }
+</style>
+<?php endif; ?>
 <th class="wds-align-<?php echo \Webkernel\View\View::echo($align); ?>"><?php echo $slot; ?></th>

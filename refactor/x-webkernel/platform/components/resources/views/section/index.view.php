@@ -8,6 +8,7 @@
   'description' => null,
   'contained' => true,
 ])
+@once('wds.section')
 <style>
 .wds-section {
   background: var(--wds-surface);
@@ -21,6 +22,7 @@
 .wds-section-description { margin-top: 0.25em; font-size: 13px; color: var(--wds-text-muted); }
 .wds-section-body { padding: 0.25em 0; color: var(--wds-text); }
 </style>
+@endonce
 <section class="wds-section">
   @if (($heading !== null && $heading !== '') || ($description !== null && $description !== ''))
     <header class="wds-section-header">

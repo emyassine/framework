@@ -1,6 +1,7 @@
 @php
   $attributes = $attributes ?? new \Webkernel\View\AttributeBag([]);
 @endphp
+@once('wds.page.panels.rail.view')
 <style>
 .wds-rail {
   width: var(--wds-rail-width);
@@ -31,6 +32,7 @@
   }
 }
 </style>
+@endonce
 <aside {{ $attributes->class('wds-rail') }} aria-label="{{ lang('panel.apps') }}">
   {!! $slot !!}
 </aside>

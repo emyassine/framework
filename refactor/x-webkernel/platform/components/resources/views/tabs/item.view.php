@@ -3,6 +3,52 @@
   'active' => false,
   'icon' => null,
 ])
+@once('wds.tabs.item')
+<style>
+.wds-tabs-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4em;
+  padding: 0.7em 1em;
+  font-weight: 550;
+  font-size: 13px;
+  color: var(--wds-text-muted);
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  border-radius: 4px 4px 0 0;
+  background: transparent;
+}
+.wds-tabs-item:hover { color: var(--wds-text); }
+.wds-tabs-item.wds-active,
+.wds-tabs-item[aria-selected="true"] {
+  color: var(--wds-text);
+  border-bottom-color: var(--primary-600);
+}
+.wds-tabs.wds-vertical .wds-tabs-item {
+  border-bottom: 0;
+  border-inline-end: 2px solid transparent;
+  margin-bottom: 0;
+  margin-inline-end: -1px;
+  border-radius: 4px 0 0 4px;
+}
+.wds-tabs.wds-vertical .wds-tabs-item.wds-active,
+.wds-tabs.wds-vertical .wds-tabs-item[aria-selected="true"] {
+  border-inline-end-color: var(--primary-600);
+}
+.wds-tabs.wds-contained .wds-tabs-item {
+  border-radius: var(--wds-radius);
+  margin-bottom: 0;
+  border-bottom-width: 0;
+}
+.wds-tabs.wds-contained .wds-tabs-item.wds-active,
+.wds-tabs.wds-contained .wds-tabs-item[aria-selected="true"] {
+  background: var(--primary-50);
+  color: var(--primary-700);
+  border-bottom-color: transparent;
+}
+.wds-tabs-item .wds-icon { font-size: 1em; }
+</style>
+@endonce
 <button
   type="button"
   class="wds-tabs-item{{ $active ? ' wds-active' : '' }}"
@@ -10,8 +56,10 @@
   aria-selected="{{ $active ? 'true' : 'false' }}"
   data-tab="{{ $tab }}"
 >
-  @if (!empty($icon))
-    <span class="wds-icon">{!! icon((string) $icon, 'wds-icon-svg') !!}</span>
-  @endif
-  <span>{{ $slot }}</span>
+  <span style="display: inline-flex; align-items: center; gap: 8px;">
+    @if (!empty($icon))
+      <x-webkernel::icon :name="$icon" />
+    @endif
+    <span>{{ $slot }}</span>
+  </span>
 </button>

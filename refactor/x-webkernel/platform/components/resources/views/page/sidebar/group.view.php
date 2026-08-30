@@ -4,6 +4,7 @@
 @php
   $attributes = $attributes ?? new \Webkernel\View\AttributeBag([]);
 @endphp
+@once('wds.page.sidebar.group.view')
 <style>
 .wds-sidebar-group {
   display: flex;
@@ -15,6 +16,7 @@
   z-index: 50;
 }
 </style>
+@endonce
 <div {{ $attributes->class('wds-sidebar-group') }} data-position="{{ $position }}">
   {!! $slot !!}
 </div>

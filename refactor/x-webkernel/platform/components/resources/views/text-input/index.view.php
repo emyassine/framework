@@ -5,6 +5,7 @@
   'type' => 'text',
   'mode' => 'editable',
 ])
+@once('wds.field')
 <style>
 .wds-fo-field { margin: 0 0 0.75rem; color: var(--wds-text); }
 .wds-fo-field label {
@@ -41,6 +42,7 @@
 .wds-fo-field.wds-readonly dt { color: var(--wds-text-muted); font-weight: 500; }
 .wds-fo-field.wds-readonly dd { margin: 0; color: var(--wds-text); }
 </style>
+@endonce
 @if ($mode === 'readonly')
   <div class="wds-fo-field wds-readonly">
     <dt>{{ $label ?? $name }}</dt>

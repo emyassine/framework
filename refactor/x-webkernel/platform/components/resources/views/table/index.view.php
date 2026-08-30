@@ -13,6 +13,7 @@
 @props([
   'striped' => false,
 ])
+@once('wds.table')
 <style>
 .wds-ta-ctn { overflow: auto; border: 1px solid var(--wds-border); border-radius: 8px; background: var(--wds-surface); color: var(--wds-text); }
 .wds-ta-table { width: 100%; border-collapse: collapse; font-size: 13px; }
@@ -22,6 +23,7 @@
 .wds-ta-row:hover td { background: var(--wds-bg-subtle); }
 .wds-ta-table.wds-striped tbody tr:nth-child(even) td { background: var(--wds-bg-subtle); }
 </style>
+@endonce
 <div class="wds-ta-ctn">
   <table class="wds-ta-table{{ $striped ? ' wds-striped' : '' }}">
     {!! $slot !!}

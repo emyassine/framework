@@ -4,6 +4,7 @@
 @php
   $attributes = $attributes ?? new \Webkernel\View\AttributeBag([]);
 @endphp
+@once('wds.page.menu.drawer.view')
 <style>
 .wds-nav, .wds-drawer {
   color: var(--wds-nav-text);
@@ -73,6 +74,7 @@ details[open] > .wds-nav-summary .wds-nav-caret { transform: rotate(180deg); }
   }
 }
 </style>
+@endonce
 <nav {{ $attributes->class('wds-nav wds-drawer') }} data-wds-drawer @if (! $open) hidden @endif aria-label="{{ lang('panel.navigation') }}">
   {!! $slot !!}
 </nav>

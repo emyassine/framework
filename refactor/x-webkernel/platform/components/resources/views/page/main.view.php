@@ -1,6 +1,7 @@
 @php
   $attributes = $attributes ?? new \Webkernel\View\AttributeBag([]);
 @endphp
+@once('wds.page.main.view')
 <style>
 .wds-main-ctn { flex: 1 1 100%; min-width: 0; display: flex; flex-direction: column; }
 .wds-main {
@@ -8,6 +9,7 @@
   display: flex; flex-direction: column; gap: 1em; color: var(--wds-text);
 }
 </style>
+@endonce
 <div {{ $attributes->class('wds-main-ctn') }}>
   {!! $slot !!}
 </div>

@@ -3,6 +3,7 @@
   'checked' => false,
   'label' => null,
 ])
+@once('wds.toggle')
 <style>
 .wds-toggle-wrap { display: inline-flex; align-items: center; gap: 0.6em; color: var(--wds-text); }
 .wds-toggle {
@@ -17,6 +18,7 @@
 }
 .wds-toggle[aria-checked="true"] i { inset-inline-start: calc(100% - 1.05em - 2px); }
 </style>
+@endonce
 <span class="wds-toggle-wrap">
   <input type="hidden" name="{{ $name }}" value="0" />
   <button

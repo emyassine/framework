@@ -10,6 +10,7 @@
 @php
   $attributes = $attributes ?? new \Webkernel\View\AttributeBag([]);
 @endphp
+@once('wds.page.panel.button.view')
 <style>
 .wds-rail-item { width: 100%; }
 .wds-rail-item > a, .wds-rail-item > button {
@@ -29,6 +30,7 @@
 .wds-rail-item .wds-nav-logo--round img { border-radius: 50%; object-fit: cover; }
 .wds-rail-item .wds-nav-logo--square img { border-radius: 6px; object-fit: cover; }
 </style>
+@endonce
 <li class="wds-rail-item{{ $active ? ' wds-active' : '' }}">
   <a
     href="{{ $href }}"
@@ -40,7 +42,7 @@
     @if ($logo !== '')
       <span class="wds-nav-logo--{{ $logo_shape }}"><img src="{{ $logo }}" alt="" /></span>
     @elseif (!empty($icon))
-      <span class="wds-icon">{!! icon((string) $icon, 'wds-icon-svg') !!}</span>
+      <x-webkernel::icon :name="$icon" />
     @endif
   </a>
 </li>

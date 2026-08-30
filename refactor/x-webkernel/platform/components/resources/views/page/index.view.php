@@ -34,6 +34,7 @@
   $document_title = $title !== '' ? $title : $header;
   $document_description = $description !== '' ? $description : $header;
 @endphp
+@once('wds.page.view')
 <style>
 	.wds-layout { display: flex; min-height: 100vh; background: var(--wds-bg); color: var(--wds-text); }
 	.wds-topbar {
@@ -70,6 +71,7 @@
 	.wds-user-menu-panel a { display: flex; align-items: center; gap: 0.6em; padding: 0.55em 0.75em; border-radius: 6px; color: var(--wds-text); }
 	.wds-user-menu-panel a:hover { background: var(--wds-bg-subtle); }
 </style>
+@endonce
 <x-webkernel::page.base :title="$document_title" :lang="$lang" :theme="$theme" :csrf="$csrf" :favicon="$favicon" :description="$document_description" layout="sidebar">
   <script>
   (function(d){var s=localStorage.getItem('wds-sidebar');if(s)d.dataset.wdsSidebar=s;})(document.documentElement);</script>

@@ -2,6 +2,13 @@
   'tab' => '',
   'active' => false,
 ]; foreach ($__props as $__n => $__d) { if (!isset($$__n)) { $$__n = $__d; } } $attributes = (isset($attributes) && $attributes instanceof \Webkernel\View\AttributeBag ? $attributes : new \Webkernel\View\AttributeBag([]))->except(\array_keys($__props)); unset($__props, $__n, $__d); ?>
+<?php if ($this->once('wds.tabs.panel')): ?>
+<style>
+.wds-tabs-panel { color: var(--wds-text); min-width: 0; }
+.wds-tabs-panel[hidden] { display: none; }
+.wds-tabs.wds-contained .wds-tabs-panel { padding: 0.75rem; }
+</style>
+<?php endif; ?>
 <section class="wds-tabs-panel" role="tabpanel" data-tab-panel="<?php echo \Webkernel\View\View::echo($tab); ?>" <?php if(! $active): ?> hidden <?php endif; ?>>
   <?php echo $slot; ?>
 

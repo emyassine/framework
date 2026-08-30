@@ -7,6 +7,7 @@
   'theme' => null,
   'csrf' => true,
 ])
+@once('wds.page.simple.view')
 <style>
 .wds-simple {
   width: 100%;
@@ -31,6 +32,7 @@
   color: var(--wds-text);
 }
 </style>
+@endonce
 <x-webkernel::page.base :title="$title" :lang="$lang" :theme="$theme" :csrf="$csrf" layout="simple">
   <main class="wds-simple">
     <div class="wds-simple-card">

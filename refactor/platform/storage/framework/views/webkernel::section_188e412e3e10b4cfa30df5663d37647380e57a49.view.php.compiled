@@ -4,6 +4,7 @@
   'description' => null,
   'contained' => true,
 ]; foreach ($__props as $__n => $__d) { if (!isset($$__n)) { $$__n = $__d; } } $attributes = (isset($attributes) && $attributes instanceof \Webkernel\View\AttributeBag ? $attributes : new \Webkernel\View\AttributeBag([]))->except(\array_keys($__props)); unset($__props, $__n, $__d); ?>
+<?php if ($this->once('wds.section')): ?>
 <style>
 .wds-section {
   background: var(--wds-surface);
@@ -17,6 +18,7 @@
 .wds-section-description { margin-top: 0.25em; font-size: 13px; color: var(--wds-text-muted); }
 .wds-section-body { padding: 0.25em 0; color: var(--wds-text); }
 </style>
+<?php endif; ?>
 <section class="wds-section">
   <?php if(($heading !== null && $heading !== '') || ($description !== null && $description !== '')): ?>
     <header class="wds-section-header">

@@ -27,6 +27,7 @@
       : (string) $icon_position;
   $attributes = $attributes ?? new \Webkernel\View\AttributeBag([]);
 @endphp
+@once('wds.btn')
 <style>
 .wds-btn {
   display: inline-flex;
@@ -68,11 +69,6 @@
 a.wds-btn { text-decoration: none; color: inherit; }
 .wds-btn-label { display: inline-flex; align-items: center; }
 .wds-btn-badge { margin-inline-start: 0.25rem; }
-.wds-btn-group { display: inline-flex; align-items: stretch; }
-.wds-btn-group > .wds-btn { border-radius: 0; }
-.wds-btn-group > .wds-btn:first-child { border-top-left-radius: var(--wds-radius); border-bottom-left-radius: var(--wds-radius); }
-.wds-btn-group > .wds-btn:last-child { border-top-right-radius: var(--wds-radius); border-bottom-right-radius: var(--wds-radius); }
-.wds-btn-group > .wds-btn + .wds-btn { margin-inline-start: -1px; }
 .wds-badge {
   display: inline-flex; align-items: center; gap: 0.25rem;
   padding: 0.125rem 0.5rem; border-radius: var(--wds-radius-full);
@@ -85,6 +81,7 @@ a.wds-btn { text-decoration: none; color: inherit; }
 .wds-badge.wds-color-primary { background: var(--primary-50); color: var(--primary-700); }
 .wds-badge.wds-color-gray { background: var(--wds-bg-subtle); color: var(--wds-text-muted); }
 </style>
+@endonce
 <{{ $tag }}
   @if ($tag === 'a' && $href && ! $disabled)
     href="{{ $href }}"
