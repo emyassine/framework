@@ -153,6 +153,8 @@
 }
 </style>
 @endonce
-<aside {{ $attributes->class('wds-rail') }} aria-label="{{ lang('panel.apps') }}">
+<aside {{ $attributes->class('wds-rail') }}
+  style="border-right: 1px solid color-mix(in srgb, var(--wds-border) 65%, transparent);"
+  aria-label="{{ lang('panel.apps') }}">
   {!! $slot !!}
 </aside>

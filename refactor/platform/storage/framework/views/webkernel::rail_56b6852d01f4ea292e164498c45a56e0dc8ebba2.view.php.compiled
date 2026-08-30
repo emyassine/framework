@@ -153,7 +153,10 @@
 }
 </style>
 <?php endif; ?>
-<aside <?php echo \Webkernel\View\View::echo($attributes->class('wds-rail')); ?> aria-label="<?php echo \Webkernel\View\View::echo(lang('panel.apps')); ?>">
+<aside <?php echo \Webkernel\View\View::echo($attributes->class('wds-rail')); ?>
+
+  style="border-right: 1px solid color-mix(in srgb, var(--wds-border) 65%, transparent);"
+  aria-label="<?php echo \Webkernel\View\View::echo(lang('panel.apps')); ?>">
   <?php echo $slot; ?>
 
 </aside>
