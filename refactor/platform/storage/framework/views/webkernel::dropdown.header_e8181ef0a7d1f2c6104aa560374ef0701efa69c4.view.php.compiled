@@ -1,0 +1,23 @@
+<?php  $__props = [
+  'icon' => null,
+  'color' => null,
+]; foreach ($__props as $__n => $__d) { if (!isset($$__n)) { $$__n = $__d; } } $attributes = (isset($attributes) && $attributes instanceof \Webkernel\View\AttributeBag ? $attributes : new \Webkernel\View\AttributeBag([]))->except(\array_keys($__props)); unset($__props, $__n, $__d); ?>
+<?php 
+  $attributes = $attributes ?? new \Webkernel\View\AttributeBag([]);
+ ?>
+<?php if ($this->once('wds.dropdown.header')): ?>
+<style>
+.wds-dropdown-header {
+  display: flex; width: 100%; gap: 0.5rem; padding: 0.75rem;
+  font-size: var(--wds-text-sm); font-weight: 500; color: var(--wds-text);
+}
+.wds-dropdown-header .wds-icon { color: var(--wds-text-faint); }
+.wds-dropdown-header > span { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-align: start; }
+</style>
+<?php endif; ?>
+<div <?php echo \Webkernel\View\View::echo($attributes->class('wds-dropdown-header')); ?>>
+  <?php if($icon): ?>
+    <?php  $this->start_component('webkernel::icon',['name'=>$icon]); ?><?php echo $this->render_component(); ?>
+  <?php endif; ?>
+  <span><?php echo $slot; ?></span>
+</div>

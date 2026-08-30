@@ -12,7 +12,7 @@ use Webkernel\PlatformProvider;
 final class SystemProvider extends PlatformProvider
 {
     public const VIEWS = [
-        'webkernel' => __DIR__.'/../resources/views',
+        'webkernel-system' => __DIR__.'/../resources/views',
     ];
 
     public const PANELS = [SystemPanelProvider::class];

@@ -1,0 +1,72 @@
+
+<?php  $__props = [
+  'href' => null,
+  'color' => 'primary',
+  'size' => 'md',
+  'icon' => null,
+  'icon_position' => 'before',
+  'tag' => 'a',
+  'target' => null,
+  'disabled' => false,
+  'tooltip' => null,
+  'weight' => 'medium',
+]; foreach ($__props as $__n => $__d) { if (!isset($$__n)) { $$__n = $__d; } } $attributes = (isset($attributes) && $attributes instanceof \Webkernel\View\AttributeBag ? $attributes : new \Webkernel\View\AttributeBag([]))->except(\array_keys($__props)); unset($__props, $__n, $__d); ?>
+<?php 
+  $attributes = $attributes ?? new \Webkernel\View\AttributeBag([]);
+  $size = $size instanceof \Webkernel\Platform\Components\Size ? $size->value : (string) $size;
+  $icon_position = $icon_position instanceof \Webkernel\Platform\Components\IconPosition
+      ? $icon_position->value
+      : (string) $icon_position;
+  $tag = $tag === 'button' ? 'button' : 'a';
+ ?>
+<?php if ($this->once('wds.link')): ?>
+<style>
+.wds-link {
+  position: relative;
+  display: inline-flex; align-items: center; justify-content: center;
+  gap: 0.375rem; font-weight: 500;
+  color: var(--wds-text-muted); outline: none;
+}
+.wds-link-label { align-self: baseline; }
+.wds-link:hover, .wds-link:focus-visible { text-decoration: underline; color: var(--wds-text); }
+.wds-link:focus-visible { border-radius: 2px; outline: 2px solid currentColor; outline-offset: 2px; }
+.wds-link.wds-size-xs { gap: 0.25rem; font-size: var(--wds-text-xs); }
+.wds-link.wds-size-sm { gap: 0.25rem; font-size: var(--wds-text-sm); }
+.wds-link.wds-size-md, .wds-link.wds-size-lg, .wds-link.wds-size-xl { gap: 0.375rem; font-size: var(--wds-text-sm); }
+.wds-link.wds-color-primary { color: var(--primary-700); }
+.wds-link.wds-color-danger { color: var(--danger-700); }
+.wds-link.wds-color-success { color: var(--success-700); }
+.wds-link.wds-color-warning { color: var(--warning-700); }
+.wds-link.wds-color-info { color: var(--info-700); }
+.wds-link.wds-color-gray { color: var(--wds-text-muted); }
+.wds-link.wds-disabled { opacity: 0.7; pointer-events: none; cursor: default; text-decoration: none; }
+p > .wds-link, span > .wds-link { padding-bottom: 2px; vertical-align: middle; }
+</style>
+<?php endif; ?>
+<<?php echo \Webkernel\View\View::echo($tag); ?>
+
+  <?php if($tag === 'a' && $href && ! $disabled): ?>
+    href="<?php echo \Webkernel\View\View::echo($href); ?>"
+    <?php if($target): ?>
+      target="<?php echo \Webkernel\View\View::echo($target); ?>"
+    <?php endif; ?>
+  <?php endif; ?>
+  <?php if($tag === 'button'): ?> type="button" <?php endif; ?>
+  <?php if($disabled): ?> aria-disabled="true" <?php endif; ?>
+  <?php if($tooltip): ?> title="<?php echo \Webkernel\View\View::echo($tooltip); ?>" <?php endif; ?>
+  <?php echo \Webkernel\View\View::echo($attributes->class([
+    'wds-link',
+    'wds-color-'.$color,
+    'wds-size-'.$size,
+    'wds-disabled' => $disabled,
+  ])); ?>
+
+>
+  <?php if($icon && $icon_position !== 'after'): ?>
+    <?php  $this->start_component('webkernel::icon',['name'=>$icon]); ?><?php echo $this->render_component(); ?>
+  <?php endif; ?>
+  <span class="wds-link-label"><?php echo $slot; ?></span>
+  <?php if($icon && $icon_position === 'after'): ?>
+    <?php  $this->start_component('webkernel::icon',['name'=>$icon]); ?><?php echo $this->render_component(); ?>
+  <?php endif; ?>
+</<?php echo \Webkernel\View\View::echo($tag); ?>>

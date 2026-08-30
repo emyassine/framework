@@ -22,6 +22,6 @@ final class Dashboard extends Page
      */
     public function view(): string
     {
-        return 'webkernel::system.dashboard';
+        return 'webkernel-system::system.dashboard';
     }
 }

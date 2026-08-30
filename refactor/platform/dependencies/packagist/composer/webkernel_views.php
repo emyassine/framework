@@ -34,6 +34,8 @@ return [
             $b . '/x-webkernel/platform/components/resources/views/components',
             $b . '/x-webkernel/platform/i18n/resources/views',
             $b . '/x-webkernel/platform/panels/resources/views',
+        ],
+        'webkernel-system' => [
             $b . '/x-webkernel/system/resources/views',
         ],
     ],
