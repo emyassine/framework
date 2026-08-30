@@ -1,22 +1,78 @@
+
+<?php  $__props = [
+  'context' => 'topbar',
+  'languages' => null,
+  'show_flags' => true,
+]; foreach ($__props as $__n => $__d) { if (!isset($$__n)) { $$__n = $__d; } } $attributes = (isset($attributes) && $attributes instanceof \Webkernel\View\AttributeBag ? $attributes : new \Webkernel\View\AttributeBag([]))->except(\array_keys($__props)); unset($__props, $__n, $__d); ?>
 <?php 
   $current = \function_exists('i18n_current_lang') ? i18n_current_lang() : 'en';
-  $codes = ['en', 'fr', 'ar', 'es', 'de', 'pt'];
-  $back = \parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?: '/';
+  $codes = \is_array($languages) && $languages !== [] ? $languages : ['en', 'fr', 'ar', 'es', 'de', 'pt'];
+  $back = \parse_url($_SERVER['REQUEST_URI'] ?? '/', \PHP_URL_PATH) ?: '/';
+  $context = \in_array($context, ['topbar', 'user-menu', 'sidebar'], true) ? $context : 'topbar';
+  $is_topbar = $context === 'topbar';
+  $rtl = \function_exists('i18n_is_rtl') && i18n_is_rtl();
+  $placement = $is_topbar ? ($rtl ? 'bottom-end' : 'bottom-start') : 'top-end';
+  $available = \function_exists('fast_i18n')
+    ? fast_i18n([
+      'en' => 'Available Languages',
+      'fr' => 'Langues disponibles',
+      'es' => 'Idiomas disponibles',
+      'ar' => 'اللغات المتاحة',
+    ], null, 'i18n_language_selector_available_languages')
+    : 'Available Languages';
+  $empty = \function_exists('fast_i18n')
+    ? fast_i18n([
+      'en' => 'No Available Languages',
+      'fr' => 'Aucune langue disponible',
+      'es' => 'No hay idiomas disponibles',
+      'ar' => 'لا توجد لغات متاحة',
+    ], null, 'i18n_language_selector_no_available_languages')
+    : 'No Available Languages';
+  $tooltip = \function_exists('fast_i18n')
+    ? fast_i18n([
+      'en' => 'Switch Language',
+      'fr' => 'Changer de langue',
+      'es' => 'Cambiar idioma',
+      'ar' => 'تغيير اللغة',
+    ], null, 'i18n_language_selector_switch_language')
+    : 'Switch Language';
+  $current_label = \function_exists('i18n_catalog_language_label')
+    ? i18n_catalog_language_label($current)
+    : $current;
  ?>
-<div class="w-lang" data-w-lang>
-  <button type="button" class="w-lang-trigger" title="<?php echo \Webkernel\View\View::echo(lang('panel.language')); ?>">
-    <span class="w-lang-flag"><?php echo flag_markup($current); ?></span>
-    <span><?php echo \Webkernel\View\View::echo(\function_exists('i18n_catalog_language_label') ? i18n_catalog_language_label($current) : $current); ?></span>
-  </button>
-  <form class="w-lang-panel" method="post" action="/locale" role="menu">
-    <?php echo \Webkernel\Csrf::field(); ?>
-
-    <input type="hidden" name="_back" value="<?php echo \Webkernel\View\View::echo($back); ?>" />
-    <?php foreach($codes as $code): ?>
-      <button type="submit" name="locale" value="<?php echo \Webkernel\View\View::echo($code); ?>" class="<?php echo \Webkernel\View\View::echo($code === $current ? 'w-active' : ''); ?>" role="menuitem">
-        <span class="w-lang-flag"><?php echo flag_markup($code); ?></span>
-        <span><?php echo \Webkernel\View\View::echo(\function_exists('i18n_catalog_language_label') ? i18n_catalog_language_label($code) : $code); ?></span>
+<div class="w-lang w-lang-<?php echo \Webkernel\View\View::echo($context); ?>">
+  <x-webkernel::dropdown :placement="$placement" width="lang">
+    <?php  $this->start_component('components.slot',['name'=>'trigger']); ?>
+      <button type="button" class="w-lang-trigger" title="<?php echo \Webkernel\View\View::echo($tooltip); ?>">
+        <?php if($show_flags): ?>
+          <span class="w-lang-flag"><?php echo flag_markup($current); ?></span>
+        <?php endif; ?>
+        <?php if(! $is_topbar): ?>
+          <span class="w-lang-trigger-label"><?php echo \Webkernel\View\View::echo($current_label); ?></span>
+        <?php endif; ?>
       </button>
-    <?php endforeach; ?>
-  </form>
+    <?php echo $this->render_component(); ?>
+    <?php  $this->start_component('webkernel::dropdown.header',['icon'=>'languages']); ?><?php echo \Webkernel\View\View::echo($available); ?><?php echo $this->render_component(); ?>
+    <form method="post" action="/locale" role="menu">
+      <?php echo \Webkernel\Csrf::field(); ?>
+
+      <input type="hidden" name="_back" value="<?php echo \Webkernel\View\View::echo($back); ?>" />
+      <?php  $this->start_component('webkernel::dropdown.list',['class'=>'w-lang-list']); ?>
+        <?php $__empty_1 = true; foreach($codes as $code): $__empty_1 = false; ?>
+          <?php 
+            $label = \function_exists('i18n_catalog_language_label') ? i18n_catalog_language_label((string) $code) : (string) $code;
+            $on = (string) $code === $current;
+           ?>
+          <?php  $this->start_component('webkernel::dropdown.list.item',['type'=>'submit','name'=>'locale','value'=>'<?php echo \Webkernel\View\View::echo($code); ?>','selected'=>$on,'icon'=>$on ? 'check' : null]); ?>
+            <?php if($show_flags): ?>
+              <span class="w-lang-flag"><?php echo flag_markup((string) $code); ?></span>
+            <?php endif; ?>
+            <span><?php echo \Webkernel\View\View::echo($label); ?></span>
+          <?php echo $this->render_component(); ?>
+        <?php endforeach; if ($__empty_1): ?>
+          <div class="w-lang-empty"><?php echo \Webkernel\View\View::echo($empty); ?></div>
+        <?php endif; ?>
+      <?php echo $this->render_component(); ?>
+    </form>
+  <?php echo $this->render_component(); ?>
 </div>

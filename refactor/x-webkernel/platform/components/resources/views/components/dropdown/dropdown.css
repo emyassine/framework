@@ -15,3 +15,4 @@
 .w-dropdown-panel.w-width-sm { max-width: 24rem; }
 .w-dropdown-panel.w-width-md { max-width: 28rem; }
 .w-dropdown-panel.w-width-lg { max-width: 32rem; }
+.w-dropdown-panel.w-width-lang { width: 18rem; min-width: 18rem; max-width: min(18rem, 92vw); }

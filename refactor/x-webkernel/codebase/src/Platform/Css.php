@@ -102,7 +102,8 @@ final class Css
     {
         $css = \preg_replace('/\/\*.*?\*\//s', '', $css) ?? $css;
         $css = \preg_replace('/\s+/', ' ', $css) ?? $css;
-        $css = \preg_replace('/\s*([{}:;,])\s*/', '$1', $css) ?? $css;
+        $css = \str_replace([' {', '{ ', ' }', '} ', '; '], ['{', '{', '}', '}', ';'], $css);
+        $css = \preg_replace('/\s*,\s*/', ',', $css) ?? $css;
 
         return \trim($css);
     }

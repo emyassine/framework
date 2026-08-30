@@ -4,6 +4,7 @@
   'icon' => null,
   'color' => 'gray',
   'tag' => 'button',
+  'type' => 'button',
   'disabled' => false,
   'selected' => false,
   'badge' => null,
@@ -18,7 +19,7 @@
   <?php if($tag === 'a' && $href && ! $disabled): ?>
     href="<?php echo \Webkernel\View\View::echo($href); ?>"
   <?php endif; ?>
-  <?php if($tag === 'button'): ?> type="button" <?php endif; ?>
+  <?php if($tag === 'button'): ?> type="<?php echo \Webkernel\View\View::echo($type); ?>" <?php endif; ?>
   <?php if($disabled): ?> disabled aria-disabled="true" <?php endif; ?>
   role="menuitem"
   <?php echo \Webkernel\View\View::echo($attributes->class([

@@ -58,21 +58,21 @@
   .w-col {
     grid-column-end: span var(--col-span-lg, var(--col-span-md, var(--col-span-sm, var(--col-span-default, 1))));
     grid-column-start: var(--col-start-lg, var(--col-start-md, var(--col-start-sm, var(--col-start-default, auto))));
-    order: var(--col-order-lg, var(--col-order-md, var(--col-order-sm, var(--col-order-default, 0)));
+    order: var(--col-order-lg, var(--col-order-md, var(--col-order-sm, var(--col-order-default, 0))));
   }
 }
 @media (min-width: 1280px) {
   .w-col {
     grid-column-end: span var(--col-span-xl, var(--col-span-lg, var(--col-span-md, var(--col-span-sm, var(--col-span-default, 1)))));
-    grid-column-start: var(--col-start-xl, var(--col-start-lg, var(--col-start-md, var(--col-start-sm, var(--col-start-default, auto))));
-    order: var(--col-order-xl, var(--col-order-lg, var(--col-order-md, var(--col-order-sm, var(--col-order-default, 0)));
+    grid-column-start: var(--col-start-xl, var(--col-start-lg, var(--col-start-md, var(--col-start-sm, var(--col-start-default, auto)))));
+    order: var(--col-order-xl, var(--col-order-lg, var(--col-order-md, var(--col-order-sm, var(--col-order-default, 0)))));
   }
 }
 @media (min-width: 1536px) {
   .w-col {
     grid-column-end: span var(--col-span-2xl, var(--col-span-xl, var(--col-span-lg, var(--col-span-md, var(--col-span-sm, var(--col-span-default, 1))))));
-    grid-column-start: var(--col-start-2xl, var(--col-start-xl, var(--col-start-lg, var(--col-start-md, var(--col-start-sm, var(--col-start-default, auto))));
-    order: var(--col-order-2xl, var(--col-order-xl, var(--col-order-lg, var(--col-order-md, var(--col-order-sm, var(--col-order-default, 0)));
+    grid-column-start: var(--col-start-2xl, var(--col-start-xl, var(--col-start-lg, var(--col-start-md, var(--col-start-sm, var(--col-start-default, auto))))));
+    order: var(--col-order-2xl, var(--col-order-xl, var(--col-order-lg, var(--col-order-md, var(--col-order-sm, var(--col-order-default, 0))))));
   }
 }
 
@@ -91,7 +91,7 @@
   .w-grid-container > .w-col {
     grid-column-end: span var(--col-span-at-md, var(--col-span-at-sm, var(--col-span-default, 1)));
     grid-column-start: var(--col-start-at-md, var(--col-start-at-sm, var(--col-start-default, auto)));
-    order: var(--col-order-at-md, var(--col-order-at-sm, var(--col-order-default, 0));
+    order: var(--col-order-at-md, var(--col-order-at-sm, var(--col-order-default, 0)));
   }
 }
 @container (min-width: 512px) {
@@ -100,7 +100,7 @@
   .w-grid-container > .w-col {
     grid-column-end: span var(--col-span-at-lg, var(--col-span-at-md, var(--col-span-at-sm, var(--col-span-default, 1))));
     grid-column-start: var(--col-start-at-lg, var(--col-start-at-md, var(--col-start-at-sm, var(--col-start-default, auto))));
-    order: var(--col-order-at-lg, var(--col-order-at-md, var(--col-order-at-sm, var(--col-order-default, 0)));
+    order: var(--col-order-at-lg, var(--col-order-at-md, var(--col-order-at-sm, var(--col-order-default, 0))));
   }
 }
 @container (min-width: 576px) {
@@ -108,8 +108,8 @@
   .w-span-at-xl-full { grid-column: 1 / -1; }
   .w-grid-container > .w-col {
     grid-column-end: span var(--col-span-at-xl, var(--col-span-at-lg, var(--col-span-at-md, var(--col-span-at-sm, var(--col-span-default, 1)))));
-    grid-column-start: var(--col-start-at-xl, var(--col-start-at-lg, var(--col-start-at-md, var(--col-start-at-sm, var(--col-start-default, auto))));
-    order: var(--col-order-at-xl, var(--col-order-at-lg, var(--col-order-at-md, var(--col-order-at-sm, var(--col-order-default, 0)));
+    grid-column-start: var(--col-start-at-xl, var(--col-start-at-lg, var(--col-start-at-md, var(--col-start-at-sm, var(--col-start-default, auto)))));
+    order: var(--col-order-at-xl, var(--col-order-at-lg, var(--col-order-at-md, var(--col-order-at-sm, var(--col-order-default, 0)))));
   }
 }
 @container (min-width: 672px) {
@@ -117,8 +117,8 @@
   .w-span-at-2xl-full { grid-column: 1 / -1; }
   .w-grid-container > .w-col {
     grid-column-end: span var(--col-span-at-2xl, var(--col-span-at-xl, var(--col-span-at-lg, var(--col-span-at-md, var(--col-span-at-sm, var(--col-span-default, 1))))));
-    grid-column-start: var(--col-start-at-2xl, var(--col-start-at-xl, var(--col-start-at-lg, var(--col-start-at-md, var(--col-start-at-sm, var(--col-start-default, auto))));
-    order: var(--col-order-at-2xl, var(--col-order-at-xl, var(--col-order-at-lg, var(--col-order-at-md, var(--col-order-at-sm, var(--col-order-default, 0)));
+    grid-column-start: var(--col-start-at-2xl, var(--col-start-at-xl, var(--col-start-at-lg, var(--col-start-at-md, var(--col-start-at-sm, var(--col-start-default, auto))))));
+    order: var(--col-order-at-2xl, var(--col-order-at-xl, var(--col-order-at-lg, var(--col-order-at-md, var(--col-order-at-sm, var(--col-order-default, 0))))));
   }
 }
 

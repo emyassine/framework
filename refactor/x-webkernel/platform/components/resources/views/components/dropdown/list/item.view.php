@@ -6,6 +6,7 @@
   'icon' => null,
   'color' => 'gray',
   'tag' => 'button',
+  'type' => 'button',
   'disabled' => false,
   'selected' => false,
   'badge' => null,
@@ -19,7 +20,7 @@
   @if ($tag === 'a' && $href && ! $disabled)
     href="{{ $href }}"
   @endif
-  @if ($tag === 'button') type="button" @endif
+  @if ($tag === 'button') type="{{ $type }}" @endif
   @if ($disabled) disabled aria-disabled="true" @endif
   role="menuitem"
   {{ $attributes->class([
