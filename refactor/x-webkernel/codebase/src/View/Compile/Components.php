@@ -21,6 +21,15 @@ final class Components
      */
     public static function compile(string $html): string
     {
+        $html = \preg_replace_callback(
+            '/<x-slot\s+name=(["\'])([^"\']+)\1\s*>/i',
+            static function (array $m): string {
+                return Php::OPEN.' $this->slot('.var_export($m[2], true).'); ?>';
+            },
+            $html,
+        ) ?? $html;
+        $html = (string) \preg_replace('/<\/x-slot>/i', Php::OPEN.' $this->end_slot(); ?>', $html);
+
         $html = self::replace(
             $html,
             '/<(?:x-)?([a-z0-9.-]+)::([a-z0-9.-]+)(\s[^>]*)?(>((?:(?!<\/(?:x-)?\1::\2>).)*)<\/(?:x-)?\1::\2>|\/>)/ms',

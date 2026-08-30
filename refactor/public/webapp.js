@@ -347,7 +347,6 @@ document.addEventListener('click', function (event) {
     start();
   }
 })();
-
 (function () {
   window.toggleUserMenu = function () {
     var el = document.getElementById('w-user-menu');

@@ -136,7 +136,23 @@ final class PanelViewTest extends TestCase
         $this->assertStringContainsString('--primary-50:', $css);
         $this->assertStringContainsString('.w-btn', $css);
         $this->assertStringContainsString('.w-page', $css);
+        $this->assertStringContainsString('.w-sc-tabs', $css);
+        $this->assertStringContainsString('.w-tabs-item', $css);
+        $this->assertSame(\substr_count($css, '('), \substr_count($css, ')'), 'dumped CSS var() parentheses must be balanced');
         $this->assertStringStartsWith('/webapp.css?v=', \Webkernel\Platform\Assets::css_href());
+    }
+
+    /**
+     * @return void
+     */
+    public function test_css_minify_keeps_calc_and_color_mix(): void
+    {
+        $min = \Webkernel\Platform\Css::minify(
+            '.x { top: calc(100% + 0.5rem); box-shadow: var(--w-shadow-sm), 0 0 0 1px color-mix(in srgb, var(--color-zinc-950) 5%, transparent); }',
+        );
+        $this->assertStringContainsString('calc(100% + 0.5rem)', $min);
+        $this->assertStringContainsString('color-mix(in srgb,var(--color-zinc-950) 5%,transparent)', $min);
+        $this->assertStringNotContainsString('calc(100%+0.5rem)', $min);
     }
 
     /**

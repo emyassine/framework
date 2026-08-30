@@ -103,4 +103,20 @@ final class FastI18nTest extends TestCase
         $this->assertStringNotContainsString('<span', $html);
         $this->assertStringContainsString('w-flag-en-', $html);
     }
+
+    /**
+     * @return void
+     */
+    public function test_language_selector_uses_webkernel_dropdown(): void
+    {
+        $html = \Webkernel\View\View::make('webkernel::language-selector')->render();
+        $this->assertStringContainsString('data-w-dropdown', $html);
+        $this->assertStringContainsString('w-lang-trigger', $html);
+        $this->assertStringContainsString('name="locale"', $html);
+        $this->assertStringContainsString('action="/locale"', $html);
+        $this->assertStringContainsString('w-dropdown-header', $html);
+        $this->assertStringContainsString('w-lang-flag', $html);
+        $this->assertStringNotContainsString('fi-dropdown', $html);
+        $this->assertStringNotContainsString('filament', $html);
+    }
 }

@@ -68,7 +68,7 @@
           <x-webkernel::dropdown.list.item
             type="submit"
             name="locale"
-            value="{{ $code }}"
+            :value="$code"
             :selected="$on"
             :icon="$on ? 'check' : null"
           >

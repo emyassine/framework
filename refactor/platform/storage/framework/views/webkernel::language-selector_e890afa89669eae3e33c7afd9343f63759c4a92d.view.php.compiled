@@ -42,7 +42,7 @@
  ?>
 <div class="w-lang w-lang-<?php echo \Webkernel\View\View::echo($context); ?>">
   <x-webkernel::dropdown :placement="$placement" width="lang">
-    <?php  $this->start_component('components.slot',['name'=>'trigger']); ?>
+    <?php  $this->slot('trigger'); ?>
       <button type="button" class="w-lang-trigger" title="<?php echo \Webkernel\View\View::echo($tooltip); ?>">
         <?php if($show_flags): ?>
           <span class="w-lang-flag"><?php echo flag_markup($current); ?></span>
@@ -51,7 +51,7 @@
           <span class="w-lang-trigger-label"><?php echo \Webkernel\View\View::echo($current_label); ?></span>
         <?php endif; ?>
       </button>
-    <?php echo $this->render_component(); ?>
+    <?php  $this->end_slot(); ?>
     <?php  $this->start_component('webkernel::dropdown.header',['icon'=>'languages']); ?><?php echo \Webkernel\View\View::echo($available); ?><?php echo $this->render_component(); ?>
     <form method="post" action="/locale" role="menu">
       <?php echo \Webkernel\Csrf::field(); ?>
@@ -63,7 +63,7 @@
             $label = \function_exists('i18n_catalog_language_label') ? i18n_catalog_language_label((string) $code) : (string) $code;
             $on = (string) $code === $current;
            ?>
-          <?php  $this->start_component('webkernel::dropdown.list.item',['type'=>'submit','name'=>'locale','value'=>'<?php echo \Webkernel\View\View::echo($code); ?>','selected'=>$on,'icon'=>$on ? 'check' : null]); ?>
+          <?php  $this->start_component('webkernel::dropdown.list.item',['type'=>'submit','name'=>'locale','value'=>$code,'selected'=>$on,'icon'=>$on ? 'check' : null]); ?>
             <?php if($show_flags): ?>
               <span class="w-lang-flag"><?php echo flag_markup((string) $code); ?></span>
             <?php endif; ?>
