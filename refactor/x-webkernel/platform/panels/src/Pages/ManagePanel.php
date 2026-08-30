@@ -411,7 +411,8 @@ final class ManagePanel extends Page
                         ->column_span_full(),
                     TextInput::make('analytics_id')->label($this->lang('panel.field.analytics_id', 'Analytics ID'))
                         ->column_span_full(),
-                    Textarea::make('header_css')->label($this->lang('panel.field.header_css', 'Header CSS'))
+                    Textarea::make('header_css')
+                    	->label($this->lang('panel.field.header_css', 'Header CSS'))
                         ->rows(5)
                         ->column_span_full(),
                     Textarea::make('footer_js')->label($this->lang('panel.field.footer_js', 'Footer JS'))

@@ -27,7 +27,7 @@ return array (
       'logo_dark' => '',
       'logo_height' => '2rem',
       'logo_width' => '',
-      'logo_alt' => '',
+      'logo_alt' => 'dsds',
       'color_primary' => '#eb2473',
       'color_secondary' => '#0f172a',
       'color_accent' => '#0ea5e9',
@@ -66,8 +66,8 @@ return array (
         'es' => 
         array (
           'site_title' => '',
-          'meta_description' => '',
-          'keywords' => '',
+          'meta_description' => 'dszds',
+          'keywords' => 'dsds',
         ),
       ),
     ),
