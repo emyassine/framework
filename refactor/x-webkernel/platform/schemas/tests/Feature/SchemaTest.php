@@ -36,8 +36,8 @@ final class SchemaTest extends TestCase
         $this->assertStringContainsString('value="a@b.c"', $edit);
 
         $view = (clone $schema)->mode(SchemaMode::Readonly)->render(['email' => 'a@b.c']);
-        $this->assertStringContainsString('wds-fo-field', $view);
-        $this->assertStringContainsString('wds-readonly', $view);
+        $this->assertStringContainsString('w-fo-field', $view);
+        $this->assertStringContainsString('w-readonly', $view);
         $this->assertStringContainsString('a@b.c', $view);
         $this->assertStringNotContainsString('<input', $view);
     }

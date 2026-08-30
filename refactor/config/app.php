@@ -52,10 +52,6 @@ return [
             ],
         ],
     ],
-    'auth' => [
-        'user' => \Webkernel\Auth\User::class,
-        'login_path' => '/login',
-    ],
     'cache' => [
         'driver' => 'apcu',
         'fallback' => 'redis',

@@ -8,16 +8,16 @@
 namespace Webkernel\Platform\Components;
 
 /**
- * Icon-only control. View: `<x-webkernel::icon-button>`.
+ * Icon-only control. View: `<x-webkernel::button-icon>`.
  */
-final class IconButton extends Component
+final class ButtonIcon extends Component
 {
     /**
      * @return string
      */
     public function view(): string
     {
-        return 'webkernel::icon-button';
+        return 'webkernel::button-icon';
     }
 
     /**
@@ -82,14 +82,15 @@ final class IconButton extends Component
 
     /**
      * @param $tooltip string
+     * @param $placement string
      *
      * @return static
      */
-    public function tooltip(string $tooltip): static
+    public function tooltip(string $tooltip, string $placement = 'top'): static
     {
         $this->props['tooltip'] = $tooltip;
+        $this->props['tooltip_placement'] = $placement;
 
         return $this;
     }
-
 }

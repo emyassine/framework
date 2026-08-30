@@ -37,13 +37,13 @@ final class AttributeBagTest extends TestCase
     public function test_class_merges_conditional_list(): void
     {
         $html = (string) (new AttributeBag(['id' => 'b']))->class([
-            'wds-btn',
-            'wds-outlined' => true,
+            'w-btn',
+            'w-outlined' => true,
             'nope' => false,
         ]);
 
-        $this->assertStringContainsString('wds-btn', $html);
-        $this->assertStringContainsString('wds-outlined', $html);
+        $this->assertStringContainsString('w-btn', $html);
+        $this->assertStringContainsString('w-outlined', $html);
         $this->assertStringNotContainsString('nope', $html);
     }
 

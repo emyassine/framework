@@ -43,4 +43,28 @@ final class TextInput extends Component
 
         return $this;
     }
+
+    /**
+     * @param $hint string
+     *
+     * @return static
+     */
+    public function hint(string $hint): static
+    {
+        $this->props['hint'] = $hint;
+
+        return $this;
+    }
+
+    /**
+     * @param $error string
+     *
+     * @return static
+     */
+    public function error(string $error): static
+    {
+        $this->props['error'] = $error;
+
+        return $this;
+    }
 }

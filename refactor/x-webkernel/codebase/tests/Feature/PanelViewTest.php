@@ -30,21 +30,21 @@ final class PanelViewTest extends TestCase
     {
         $html = (new Dashboard())->render();
 
-        $this->assertStringContainsString('wds-rail', $html);
-        $this->assertStringContainsString('wds-rail-brand', $html);
-        $this->assertStringContainsString('wds-rail-logo-mark', $html);
-        $this->assertStringContainsString('wds-drawer', $html);
-        $this->assertStringContainsString('wds-nav-search', $html);
-        $this->assertStringContainsString('wds-header-heading', $html);
-        $this->assertStringContainsString('/wds.css', $html);
+        $this->assertStringContainsString('w-rail', $html);
+        $this->assertStringContainsString('w-rail-brand', $html);
+        $this->assertStringContainsString('w-rail-logo-mark', $html);
+        $this->assertStringContainsString('w-drawer', $html);
+        $this->assertStringContainsString('w-nav-search', $html);
+        $this->assertStringContainsString('w-header-heading', $html);
+        $this->assertStringContainsString('/webapp.css', $html);
         $this->assertStringContainsString('System Admin Panel', $html);
         $this->assertStringContainsString('href="/billing/invoices"', $html);
-        $this->assertStringContainsString('wds-user-menu', $html);
+        $this->assertStringContainsString('w-user-menu', $html);
         $this->assertStringContainsString('<svg', $html);
         $this->assertStringContainsString('<title>Overview</title>', $html);
         $this->assertStringContainsString('name="description"', $html);
-        $this->assertStringContainsString('wds-breadcrumbs', $html);
-        $this->assertStringContainsString('wds-topbar', $html);
+        $this->assertStringContainsString('w-breadcrumbs', $html);
+        $this->assertStringContainsString('w-topbar', $html);
     }
 
     /**
@@ -62,9 +62,9 @@ final class PanelViewTest extends TestCase
             'slot' => 'hi',
         ])->render();
 
-        $this->assertStringContainsString('wds-page', $html);
+        $this->assertStringContainsString('w-page', $html);
         $this->assertStringContainsString('hi', $html);
-        $this->assertStringContainsString('wds-breadcrumbs', $html);
+        $this->assertStringContainsString('w-breadcrumbs', $html);
         $this->assertStringContainsString('href="/system"', $html);
         $this->assertStringContainsString('Overview', $html);
     }
@@ -102,11 +102,16 @@ final class PanelViewTest extends TestCase
         $css = \Webkernel\Platform\Colors\Color::root_css();
         $this->assertStringContainsString('--primary-50:', $css);
         $this->assertStringContainsString('--primary-950:', $css);
+        $this->assertStringContainsString('--gray-50: var(--color-zinc-50)', $css);
         $this->assertStringContainsString('--color-red-500:', $css);
         $this->assertStringContainsString('--color-mauve-50:', $css);
         $this->assertStringContainsString('--danger-50:', $css);
         $this->assertStringContainsString('--warning-50:', $css);
         $this->assertStringContainsString('--info-50:', $css);
+        $dark = \Webkernel\Platform\Colors\Color::dark_root_css();
+        $this->assertStringContainsString('--gray-50:', $dark);
+        $this->assertStringNotContainsString('--primary-50:', $dark);
+        $this->assertStringNotContainsString('--danger-50:', $dark);
     }
 
     /**
@@ -123,15 +128,15 @@ final class PanelViewTest extends TestCase
     /**
      * @return void
      */
-    public function test_dumped_wds_css_is_linked_and_contains_component_rules(): void
+    public function test_dumped_webapp_css_is_linked_and_contains_component_rules(): void
     {
-        $path = \Webkernel\Platform\Wds::css_path();
+        $path = \Webkernel\Platform\Assets::css_path();
         $this->assertFileExists($path);
         $css = (string) \file_get_contents($path);
         $this->assertStringContainsString('--primary-50:', $css);
-        $this->assertStringContainsString('.wds-btn', $css);
-        $this->assertStringContainsString('.wds-page', $css);
-        $this->assertStringStartsWith('/wds.css?v=', \Webkernel\Platform\Wds::css_href());
+        $this->assertStringContainsString('.w-btn', $css);
+        $this->assertStringContainsString('.w-page', $css);
+        $this->assertStringStartsWith('/webapp.css?v=', \Webkernel\Platform\Assets::css_href());
     }
 
     /**
@@ -141,10 +146,10 @@ final class PanelViewTest extends TestCase
     {
         $html = (new ListInvoices())->render();
         $this->assertStringContainsString('Invoices', $html);
-        $this->assertStringContainsString('wds-rail', $html);
+        $this->assertStringContainsString('w-rail', $html);
         $this->assertStringContainsString('Create invoice', $html);
         $this->assertTrue(
-            \str_contains($html, 'No invoices yet') || \str_contains($html, 'wds-ta-table'),
+            \str_contains($html, 'No invoices yet') || \str_contains($html, 'w-ta-table'),
             'invoices page must render the empty state or the Webkernel table',
         );
     }

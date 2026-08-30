@@ -36,7 +36,7 @@ final class AtomsTest extends TestCase
             ])
             ->render();
 
-        $this->assertStringContainsString('wds-breadcrumbs', $html);
+        $this->assertStringContainsString('w-breadcrumbs', $html);
         $this->assertStringContainsString('href="/system"', $html);
         $this->assertStringContainsString('aria-current="page"', $html);
         $this->assertSame('webkernel::breadcrumbs', Breadcrumbs::make()->view());
@@ -52,11 +52,11 @@ final class AtomsTest extends TestCase
         $empty = EmptyState::make()->heading('None')->icon('receipt')->render();
         $input = Input::make('email')->type('email')->render();
 
-        $this->assertStringContainsString('wds-badge', $badge);
+        $this->assertStringContainsString('w-badge', $badge);
         $this->assertStringContainsString('Paid', $badge);
-        $this->assertStringContainsString('wds-callout', $callout);
-        $this->assertStringContainsString('wds-empty-state', $empty);
-        $this->assertStringContainsString('wds-input', $input);
+        $this->assertStringContainsString('w-callout', $callout);
+        $this->assertStringContainsString('w-empty-state', $empty);
+        $this->assertStringContainsString('w-input', $input);
         $this->assertStringContainsString('type="email"', $input);
     }
 }

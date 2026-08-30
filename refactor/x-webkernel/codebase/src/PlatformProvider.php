@@ -44,6 +44,13 @@ abstract class PlatformProvider
     /** @var list<class-string> */
     public const COMMANDS = [];
 
+    /**
+     * Package config files merged at boot, before app.php.
+     *
+     * @var list<string>
+     */
+    public const CONFIG = [];
+
     /** @var list<class-string> */
     public const PANELS = [];
 

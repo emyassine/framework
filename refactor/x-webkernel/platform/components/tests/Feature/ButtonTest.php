@@ -34,10 +34,11 @@ final class ButtonTest extends TestCase
             ->slot('New')
             ->render(['class' => 'extra']);
 
-        $this->assertStringContainsString('wds-btn', $button);
-        $this->assertStringContainsString('wds-color-danger', $button);
-        $this->assertStringContainsString('wds-size-lg', $button);
-        $this->assertStringContainsString('wds-outlined', $button);
+        $this->assertStringContainsString('w-btn', $button);
+        $this->assertStringContainsString('w-color-danger', $button);
+        $this->assertStringContainsString('w-size-lg', $button);
+        $this->assertStringContainsString('w-outlined', $button);
+        $this->assertStringNotContainsString('title=', $button);
         $this->assertStringContainsString('New', $button);
         $this->assertStringContainsString('extra', $button);
         $this->assertStringContainsString('<button', $button);
@@ -66,5 +67,25 @@ final class ButtonTest extends TestCase
     {
         $props = Button::make()->size(Size::Small)->to_props();
         $this->assertSame('sm', $props['size']);
+    }
+
+    /**
+     * @return void
+     */
+    public function test_tooltip_is_an_html_attribute_not_title(): void
+    {
+        $html = Button::make()->tooltip('Save', 'bottom')->slot('Save')->render();
+        $this->assertStringContainsString('x-tooltip="Save"', $html);
+        $this->assertStringContainsString('x-tooltip-placement="bottom"', $html);
+        $this->assertStringNotContainsString(' title=', $html);
+    }
+
+    /**
+     * @return void
+     */
+    public function test_ghost_wires_the_ghost_class(): void
+    {
+        $html = Button::make()->ghost()->slot('Quiet')->render();
+        $this->assertStringContainsString('w-ghost', $html);
     }
 }

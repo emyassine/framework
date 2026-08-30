@@ -5,6 +5,7 @@
   'color' => 'primary',
   'disabled' => false,
   'form' => null,
+  'ghost' => false,
   'href' => null,
   'icon' => null,
   'icon_position' => 'before',
@@ -13,6 +14,7 @@
   'tag' => 'button',
   'target' => null,
   'tooltip' => null,
+  'tooltip_placement' => 'top',
   'type' => 'button',
 ]; foreach ($__props as $__n => $__d) { if (!isset($$__n)) { $$__n = $__d; } } $attributes = (isset($attributes) && $attributes instanceof \Webkernel\View\AttributeBag ? $attributes : new \Webkernel\View\AttributeBag([]))->except(\array_keys($__props)); unset($__props, $__n, $__d); ?>
 <?php 
@@ -38,12 +40,16 @@
     <?php if($disabled): ?> disabled <?php endif; ?>
   <?php endif; ?>
   <?php if($disabled): ?> aria-disabled="true" <?php endif; ?>
-  <?php if($tooltip): ?> title="<?php echo \Webkernel\View\View::echo($tooltip); ?>" <?php endif; ?>
+  <?php if($tooltip): ?>
+    x-tooltip="<?php echo \Webkernel\View\View::echo($tooltip); ?>"
+    x-tooltip-placement="<?php echo \Webkernel\View\View::echo($tooltip_placement); ?>"
+  <?php endif; ?>
   <?php echo \Webkernel\View\View::echo($attributes->class([
     'w-btn',
     'w-color-'.$color,
     'w-size-'.$size,
     'w-outlined' => $outlined,
+    'w-ghost' => $ghost,
     'w-disabled' => $disabled,
   ])); ?>
 

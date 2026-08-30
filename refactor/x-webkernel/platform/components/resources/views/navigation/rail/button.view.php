@@ -11,9 +11,10 @@
   $attributes = $attributes ?? new \Webkernel\View\AttributeBag([]);
 @endphp
 <li class="w-rail-item{{ $active ? ' w-active' : '' }}">
-<a
+  <a
     href="{{ $href }}"
-    title="{{ $label }}"
+    x-tooltip="{{ $label }}"
+    x-tooltip-placement="right"
     data-w-panel-button
     data-panel-id="{{ $panel_id }}"
     {{ $attributes }}

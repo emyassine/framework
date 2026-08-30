@@ -31,7 +31,7 @@ final class TabsTest extends TestCase
         $panel = TabsPanel::make()->tab('branding')->active()->slot('Body')->render();
         $html = Tabs::make()->label('Settings')->list($item)->slot($panel)->render();
 
-        $this->assertStringContainsString('data-wds-tabs', $html);
+        $this->assertStringContainsString('data-w-tabs', $html);
         $this->assertStringContainsString('role="tablist"', $html);
         $this->assertStringContainsString('data-tab="branding"', $html);
         $this->assertStringContainsString('Branding', $html);

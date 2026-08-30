@@ -1,5 +1,5 @@
 {{--
-  <x-webkernel::icon-button icon="plus" label="Create" />
+  <x-webkernel::button-icon icon="plus" label="Create" />
 --}}
 @props([
   'icon' => null,
@@ -11,6 +11,7 @@
   'type' => 'button',
   'disabled' => false,
   'tooltip' => null,
+  'tooltip_placement' => 'top',
   'badge' => null,
   'badge_color' => 'primary',
 ])
@@ -18,7 +19,7 @@
   $attributes = $attributes ?? new \Webkernel\View\AttributeBag([]);
   $size = $size instanceof \Webkernel\Platform\Components\Size ? $size->value : (string) $size;
   $tag = $tag === 'a' || ($href !== null && $href !== '') ? 'a' : 'button';
-  $title = $tooltip ?? $label;
+  $tip = $tooltip ?? $label;
 @endphp
 <{{ $tag }}
   @if ($tag === 'a' && $href && ! $disabled)
@@ -28,7 +29,10 @@
     type="{{ $type }}"
   @endif
   @if ($disabled) disabled aria-disabled="true" @endif
-  @if ($title) title="{{ $title }}" @endif
+  @if ($tip)
+    x-tooltip="{{ $tip }}"
+    x-tooltip-placement="{{ $tooltip_placement }}"
+  @endif
   @if ($label) aria-label="{{ $label }}" @endif
   {{ $attributes->class([
     'w-icon-btn',

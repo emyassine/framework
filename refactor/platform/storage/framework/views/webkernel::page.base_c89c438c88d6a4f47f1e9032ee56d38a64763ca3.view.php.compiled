@@ -15,6 +15,23 @@
   if ($favicon === null && \function_exists('webkernel_branding_url')) {
     $favicon = webkernel_branding_url('webkernel-favicon');
   }
+  $panel = \function_exists('webapp') ? \webapp()->panel()->matching_path() : null;
+  $panel_id = \is_array($panel) ? (string) ($panel['id'] ?? '') : '';
+  $primary_hex = '';
+  $header_css = '';
+  $footer_js = '';
+  if ($panel_id !== '') {
+    $primary_hex = (string) \Webkernel\Config\Config::get('panels.'.$panel_id.'.color_primary', '');
+    if ($theme === 'dark') {
+      $dark = (string) \Webkernel\Config\Config::get('panels.'.$panel_id.'.color_primary_dark', '');
+      if ($dark !== '') {
+        $primary_hex = $dark;
+      }
+    }
+    $header_css = (string) \Webkernel\Config\Config::get('panels.'.$panel_id.'.header_css', '');
+    $footer_js = (string) \Webkernel\Config\Config::get('panels.'.$panel_id.'.footer_js', '');
+  }
+  $primary_style = \Webkernel\Platform\Colors\Color::panel_inline($primary_hex);
  ?>
 <!DOCTYPE html>
 <html
@@ -22,6 +39,7 @@
   dir="<?php echo \Webkernel\View\View::echo(\function_exists('i18n_direction') ? i18n_direction($lang) : 'ltr'); ?>"
   data-w-theme="<?php echo \Webkernel\View\View::echo($theme); ?>"
   data-w-layout="<?php echo \Webkernel\View\View::echo($layout); ?>"
+  <?php if($primary_style !== ''): ?> style="<?php echo \Webkernel\View\View::echo($primary_style); ?>" <?php endif; ?>
 >
 <head>
   <meta charset="UTF-8" />
@@ -39,13 +57,20 @@
   <title><?php echo \Webkernel\View\View::echo($title); ?></title>
   <meta name="description" content="<?php echo \Webkernel\View\View::echo($description); ?>" />
   <?php  $this->start_component('webkernel::typography',['lang'=>$lang]); ?><?php echo $this->render_component(); ?>
-  <link rel="stylesheet" href="<?php echo \Webkernel\View\View::echo(\Webkernel\Platform\Wds::css_href()); ?>">
+  <link rel="stylesheet" href="<?php echo \Webkernel\View\View::echo(\Webkernel\Platform\Assets::css_href()); ?>">
+  <?php if($header_css !== ''): ?>
+    <style><?php echo $header_css; ?></style>
+  <?php endif; ?>
   <?php echo  $this->stack('styles'); ?>
   <?php echo  $this->stack('head'); ?>
 </head>
 <body>
   <?php echo $slot; ?>
 
+  <script src="<?php echo \Webkernel\View\View::echo(\Webkernel\Platform\Assets::js_href()); ?>"></script>
+  <?php if($footer_js !== ''): ?>
+    <script><?php echo $footer_js; ?></script>
+  <?php endif; ?>
   <?php echo  $this->stack('scripts'); ?>
 </body>
 </html>

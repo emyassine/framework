@@ -1,12 +1,22 @@
 
 <?php  $__props = [
   'name' => '',
+  'label' => null,
   'disabled' => false,
   'inline_prefix' => false,
+  'options' => [],
+  'value' => '',
+  'error' => null,
 ]; foreach ($__props as $__n => $__d) { if (!isset($$__n)) { $$__n = $__d; } } $attributes = (isset($attributes) && $attributes instanceof \Webkernel\View\AttributeBag ? $attributes : new \Webkernel\View\AttributeBag([]))->except(\array_keys($__props)); unset($__props, $__n, $__d); ?>
 <?php 
   $attributes = $attributes ?? new \Webkernel\View\AttributeBag([]);
  ?>
+<?php if($label): ?>
+<p class="w-fo-field<?php echo \Webkernel\View\View::echo($error ? ' w-invalid' : ''); ?>">
+  <label>
+    <?php echo \Webkernel\View\View::echo($label); ?>
+
+<?php endif; ?>
 <select
   name="<?php echo \Webkernel\View\View::echo($name); ?>"
   <?php if($disabled): ?> disabled <?php endif; ?>
@@ -16,6 +26,19 @@
   ])); ?>
 
 >
-  <?php echo $slot; ?>
+  <?php if(\is_array($options) && $options !== []): ?>
+    <?php foreach($options as $opt_value => $opt_label): ?>
+      <option value="<?php echo \Webkernel\View\View::echo($opt_value); ?>" <?php if((string) $opt_value === (string) $value): ?> selected <?php endif; ?>><?php echo \Webkernel\View\View::echo($opt_label); ?></option>
+    <?php endforeach; ?>
+  <?php else: ?>
+    <?php echo $slot; ?>
 
+  <?php endif; ?>
 </select>
+<?php if($label): ?>
+  </label>
+  <?php if($error): ?>
+    <span class="w-field-error"><?php echo \Webkernel\View\View::echo($error); ?></span>
+  <?php endif; ?>
+</p>
+<?php endif; ?>

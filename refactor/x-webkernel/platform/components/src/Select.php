@@ -32,4 +32,27 @@ final class Select extends Component
         return $this;
     }
 
+    /**
+     * @param $options array<string, string>
+     *
+     * @return static
+     */
+    public function options(array $options): static
+    {
+        $this->props['options'] = $options;
+
+        return $this;
+    }
+
+    /**
+     * @param $value string
+     *
+     * @return static
+     */
+    public function value(string $value): static
+    {
+        $this->props['value'] = $value;
+
+        return $this;
+    }
 }

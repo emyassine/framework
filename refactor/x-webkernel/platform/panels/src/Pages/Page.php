@@ -7,6 +7,8 @@
 
 namespace Webkernel\Platform\Pages;
 
+use Webkernel\Platform\Notification;
+use Webkernel\View\Liveview;
 use Webkernel\View\View;
 
 /**
@@ -165,7 +167,6 @@ abstract class Page
     {
         if (! static::can_access()) {
             \http_response_code(403);
-
             return 'Forbidden';
         }
         $body = $slot;
@@ -173,7 +174,10 @@ abstract class Page
             $view = $this->view();
             $body = $view !== '' ? View::make($view, $this->view_data())->render() : '';
         }
-
+        $body = Notification::render().$body;
+        if (Liveview::is_request()) {
+            return $body;
+        }
         return View::make('webkernel::page', [
             'title' => $this->get_title(),
             'header' => $this->get_header(),

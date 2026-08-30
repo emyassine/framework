@@ -12,6 +12,8 @@ use Webkernel\PlatformProvider;
 
 final class AuthProvider extends PlatformProvider
 {
+    public const CONFIG = [__DIR__.'/../config/auth.php'];
+
     public const ROUTES = [__DIR__.'/../routes.php'];
 
     public const VIEWS = [

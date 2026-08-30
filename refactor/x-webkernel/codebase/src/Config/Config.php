@@ -80,7 +80,7 @@ final class Config
     private function do_boot(?string $root = null): self
     {
         $root ??= webapp_path();
-        $tree = [];
+        $tree = self::package_configs($root);
         foreach (['config/platform.php', 'config/app.php'] as $rel) {
             $tree = array_replace_recursive($tree, self::require_array($root.'/'.$rel));
         }
@@ -89,6 +89,36 @@ final class Config
         $this->booted = true;
 
         return $this;
+    }
+
+    /**
+     * @param $root string
+     *
+     * @return array<string, mixed>
+     */
+    private static function package_configs(string $root): array
+    {
+        $file = $root.'/vendor/composer/webkernel_providers.php';
+        if (! \is_file($file)) {
+            return [];
+        }
+        $providers = \function_exists('webkernel_include') ? \webkernel_include($file) : require $file;
+        if (! \is_array($providers)) {
+            return [];
+        }
+        $tree = [];
+        foreach ($providers as $class) {
+            if (! \is_string($class) || ! \class_exists($class) || ! \is_a($class, \Webkernel\PlatformProvider::class, true)) {
+                continue;
+            }
+            foreach ($class::declaration('CONFIG') as $path) {
+                if (\is_string($path) && $path !== '') {
+                    $tree = array_replace_recursive($tree, self::require_array($path));
+                }
+            }
+        }
+
+        return $tree;
     }
 
     private function do_get(string $key, mixed $default = null): mixed

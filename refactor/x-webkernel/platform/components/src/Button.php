@@ -106,6 +106,18 @@ final class Button extends Component
     }
 
     /**
+     * @param $ghost bool
+     *
+     * @return static
+     */
+    public function ghost(bool $ghost = true): static
+    {
+        $this->props['ghost'] = $ghost;
+
+        return $this;
+    }
+
+    /**
      * @param $icon string
      *
      * @return static
@@ -136,9 +148,10 @@ final class Button extends Component
      *
      * @return static
      */
-    public function tooltip(string $tooltip): static
+    public function tooltip(string $tooltip, string $placement = 'top'): static
     {
         $this->props['tooltip'] = $tooltip;
+        $this->props['tooltip_placement'] = $placement;
 
         return $this;
     }

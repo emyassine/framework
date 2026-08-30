@@ -193,7 +193,7 @@ if (! \function_exists('flag_markup')) {
      *
      * @return string
      */
-    function flag_markup(string $code, string $class = 'wds-lang-flag'): string
+    function flag_markup(string $code, string $class = 'w-lang-flag'): string
     {
         $code = \strtolower(\trim($code));
         if ($code === '' || \preg_match('/^[a-z0-9][a-z0-9_-]{0,15}$/', $code) !== 1) {

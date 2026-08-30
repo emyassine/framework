@@ -37,9 +37,9 @@ final class HttpTest extends TestCase
         $_SERVER['REQUEST_URI'] = '/system';
         $html = (string) Route::dispatch();
 
-        $this->assertStringContainsString('wds-rail', $html);
-        $this->assertStringContainsString('wds-page', $html);
-        $this->assertStringContainsString('wds-breadcrumbs', $html);
+        $this->assertStringContainsString('w-rail', $html);
+        $this->assertStringContainsString('w-page', $html);
+        $this->assertStringContainsString('w-breadcrumbs', $html);
         $this->assertStringContainsString('<title>Overview</title>', $html);
         $this->assertStringContainsString('name="description"', $html);
     }

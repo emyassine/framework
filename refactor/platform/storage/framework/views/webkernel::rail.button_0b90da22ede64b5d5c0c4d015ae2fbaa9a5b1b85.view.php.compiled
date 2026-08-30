@@ -11,9 +11,10 @@
   $attributes = $attributes ?? new \Webkernel\View\AttributeBag([]);
  ?>
 <li class="w-rail-item<?php echo \Webkernel\View\View::echo($active ? ' w-active' : ''); ?>">
-<a
+  <a
     href="<?php echo \Webkernel\View\View::echo($href); ?>"
-    title="<?php echo \Webkernel\View\View::echo($label); ?>"
+    x-tooltip="<?php echo \Webkernel\View\View::echo($label); ?>"
+    x-tooltip-placement="right"
     data-w-panel-button
     data-panel-id="<?php echo \Webkernel\View\View::echo($panel_id); ?>"
     <?php echo \Webkernel\View\View::echo($attributes); ?>

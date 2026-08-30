@@ -9,6 +9,7 @@
   'type' => 'button',
   'disabled' => false,
   'tooltip' => null,
+  'tooltip_placement' => 'top',
   'badge' => null,
   'badge_color' => 'primary',
 ]; foreach ($__props as $__n => $__d) { if (!isset($$__n)) { $$__n = $__d; } } $attributes = (isset($attributes) && $attributes instanceof \Webkernel\View\AttributeBag ? $attributes : new \Webkernel\View\AttributeBag([]))->except(\array_keys($__props)); unset($__props, $__n, $__d); ?>
@@ -16,7 +17,7 @@
   $attributes = $attributes ?? new \Webkernel\View\AttributeBag([]);
   $size = $size instanceof \Webkernel\Platform\Components\Size ? $size->value : (string) $size;
   $tag = $tag === 'a' || ($href !== null && $href !== '') ? 'a' : 'button';
-  $title = $tooltip ?? $label;
+  $tip = $tooltip ?? $label;
  ?>
 <<?php echo \Webkernel\View\View::echo($tag); ?>
 
@@ -27,7 +28,10 @@
     type="<?php echo \Webkernel\View\View::echo($type); ?>"
   <?php endif; ?>
   <?php if($disabled): ?> disabled aria-disabled="true" <?php endif; ?>
-  <?php if($title): ?> title="<?php echo \Webkernel\View\View::echo($title); ?>" <?php endif; ?>
+  <?php if($tip): ?>
+    x-tooltip="<?php echo \Webkernel\View\View::echo($tip); ?>"
+    x-tooltip-placement="<?php echo \Webkernel\View\View::echo($tooltip_placement); ?>"
+  <?php endif; ?>
   <?php if($label): ?> aria-label="<?php echo \Webkernel\View\View::echo($label); ?>" <?php endif; ?>
   <?php echo \Webkernel\View\View::echo($attributes->class([
     'w-icon-btn',

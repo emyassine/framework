@@ -9,6 +9,7 @@
   'color' => 'primary',
   'disabled' => false,
   'form' => null,
+  'ghost' => false,
   'href' => null,
   'icon' => null,
   'icon_position' => 'before',
@@ -17,6 +18,7 @@
   'tag' => 'button',
   'target' => null,
   'tooltip' => null,
+  'tooltip_placement' => 'top',
   'type' => 'button',
 ])
 @php
@@ -41,12 +43,16 @@
     @if ($disabled) disabled @endif
   @endif
   @if ($disabled) aria-disabled="true" @endif
-  @if ($tooltip) title="{{ $tooltip }}" @endif
+  @if ($tooltip)
+    x-tooltip="{{ $tooltip }}"
+    x-tooltip-placement="{{ $tooltip_placement }}"
+  @endif
   {{ $attributes->class([
     'w-btn',
     'w-color-'.$color,
     'w-size-'.$size,
     'w-outlined' => $outlined,
+    'w-ghost' => $ghost,
     'w-disabled' => $disabled,
   ]) }}
 >
