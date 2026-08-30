@@ -8,7 +8,7 @@
 namespace Webkernel\Platform\Components;
 
 /**
- * One tab panel. Blade: `<x-webkernel::tabs.panel>`.
+ * One tab panel. View: `<x-webkernel::tabs.panel>`.
  */
 final class TabsPanel extends Component
 {

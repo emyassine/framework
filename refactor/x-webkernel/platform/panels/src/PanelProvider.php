@@ -15,7 +15,7 @@ use Webkernel\Platform\Colors\Color;
  *
  * //> Branding is applied here. Providers do not call apply_platform_config().
  * //> Scope is inferred from the Composer package. Providers do not call scope().
- * //> Chrome on `$panel`: sidebar() drawer, topbar() bar, panel_sidebar() icon rail.
+ * //> Page layout on `$panel`: sidebar() drawer, topbar() bar, panel_sidebar() icon rail.
  *
  * @see Panel
  * @see Panel\Concerns\HasSidebar
@@ -34,7 +34,7 @@ use Webkernel\Platform\Colors\Color;
 abstract class PanelProvider
 {
     /**
-     * Declare the panel. Chrome: `$panel->sidebar()`, `$panel->topbar()`, `$panel->panel_sidebar()`.
+     * Declare the panel. Layout: `$panel->sidebar()`, `$panel->topbar()`, `$panel->panel_sidebar()`.
      *
      * @param $panel Panel
      * @return Panel

@@ -8,7 +8,7 @@
 namespace Webkernel\Platform\Components;
 
 /**
- * Boolean input. Blade: `<x-webkernel::checkbox>`.
+ * Boolean input. View: `<x-webkernel::checkbox>`.
  */
 final class Checkbox extends Component
 {

@@ -8,7 +8,7 @@
 namespace Webkernel\Platform\Components;
 
 /**
- * Text link. Blade: `<x-webkernel::link>`.
+ * Text link. View: `<x-webkernel::link>`.
  */
 final class Link extends Component
 {

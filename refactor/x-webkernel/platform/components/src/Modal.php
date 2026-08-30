@@ -8,7 +8,7 @@
 namespace Webkernel\Platform\Components;
 
 /**
- * Dialog. Blade: `<x-webkernel::modal>`.
+ * Dialog. View: `<x-webkernel::modal>`.
  */
 final class Modal extends Component
 {

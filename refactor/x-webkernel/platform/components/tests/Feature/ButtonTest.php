@@ -24,7 +24,7 @@ final class ButtonTest extends TestCase
     /**
      * @return void
      */
-    public function test_blade_button_supports_color_size_icon_and_attributes(): void
+    public function test_view_button_supports_color_size_icon_and_attributes(): void
     {
         $button = Button::make()
             ->color('danger')

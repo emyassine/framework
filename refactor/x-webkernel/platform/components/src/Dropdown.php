@@ -8,7 +8,7 @@
 namespace Webkernel\Platform\Components;
 
 /**
- * Trigger plus floating panel. Blade: `<x-webkernel::dropdown>`.
+ * Trigger plus floating panel. View: `<x-webkernel::dropdown>`.
  */
 final class Dropdown extends Component
 {

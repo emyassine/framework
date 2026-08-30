@@ -8,7 +8,7 @@
 namespace Webkernel\Platform\Components;
 
 /**
- * Spinner. Blade: `<x-webkernel::loading-indicator>`.
+ * Spinner. View: `<x-webkernel::loading-indicator>`.
  */
 final class LoadingIndicator extends Component
 {

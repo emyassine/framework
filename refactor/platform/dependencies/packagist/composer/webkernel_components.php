@@ -13,7 +13,9 @@ $b = dirname($v, 3); // webapp root
 return [
     'dirs' => [
         $b . '/modules/acme/billing/resources/views/components',
-        $b . '/x-webkernel/platform/components/resources/views',
+        $b . '/x-webkernel/platform/components/resources/views/layout',
+        $b . '/x-webkernel/platform/components/resources/views/navigation',
+        $b . '/x-webkernel/platform/components/resources/views/components',
         $b . '/x-webkernel/platform/i18n/resources/views',
     ],
     'namespaces' => [
@@ -21,7 +23,9 @@ return [
             $b . '/modules/acme/billing/resources/views/components',
         ],
         'webkernel' => [
-            $b . '/x-webkernel/platform/components/resources/views',
+            $b . '/x-webkernel/platform/components/resources/views/layout',
+            $b . '/x-webkernel/platform/components/resources/views/navigation',
+            $b . '/x-webkernel/platform/components/resources/views/components',
             $b . '/x-webkernel/platform/i18n/resources/views',
         ],
     ],

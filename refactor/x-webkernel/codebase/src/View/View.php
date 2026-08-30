@@ -15,7 +15,7 @@ use Webkernel\View\Compile\Mode;
  * Compiled: platform/storage/framework/views/{name}_{hash}.view.php.compiled
  *
  * Namespaced: <x-webkernel::page />, <x-webkernel::page.base />, <x-webkernel::page.simple />.
- * Regions sit beside page: rail, sidebar, topbar, main, aside.
+ * Layout, navigation, and UI atoms are separate View roots.
  */
 final class View implements ComposableContract, \Stringable
 {

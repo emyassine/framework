@@ -38,6 +38,24 @@
 }
 </style>
 @endonce
+@once('wds.tabs.js')
+<script>
+document.addEventListener('click', function (event) {
+  var tab = event.target.closest('[data-wds-tabs] [role="tab"]');
+  if (!tab) return;
+  var root = tab.closest('[data-wds-tabs]');
+  var id = tab.getAttribute('data-tab');
+  root.querySelectorAll('[role="tab"]').forEach(function (other) {
+    var on = other === tab;
+    other.classList.toggle('wds-active', on);
+    other.setAttribute('aria-selected', on ? 'true' : 'false');
+  });
+  root.querySelectorAll('[data-tab-panel]').forEach(function (panel) {
+    panel.hidden = panel.getAttribute('data-tab-panel') !== id;
+  });
+});
+</script>
+@endonce
 <div class="wds-tabs{{ $contained ? ' wds-contained' : '' }}{{ $vertical ? ' wds-vertical' : '' }}" data-wds-tabs>
   <nav class="wds-tabs-bar" role="tablist" aria-label="{{ $label ?? '' }}">
     {!! $list ?? '' !!}

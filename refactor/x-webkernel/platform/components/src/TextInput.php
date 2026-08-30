@@ -8,7 +8,7 @@
 namespace Webkernel\Platform\Components;
 
 /**
- * Text field. Same view for Blade and schema declaration.
+ * Text field. Same view for the tag and schema declaration.
  */
 final class TextInput extends Component
 {

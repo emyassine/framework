@@ -8,7 +8,7 @@
 namespace Webkernel\Platform\Components;
 
 /**
- * Grouped fields. Blade: `<x-webkernel::fieldset>`.
+ * Grouped fields. View: `<x-webkernel::fieldset>`.
  */
 final class Fieldset extends Component
 {

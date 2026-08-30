@@ -8,7 +8,7 @@
 namespace Webkernel\Platform\Components;
 
 /**
- * Clickable button or anchor. Same view for Blade and `Button::make()`.
+ * Clickable button or anchor. Same view for the tag and `Button::make()`.
  */
 final class Button extends Component
 {

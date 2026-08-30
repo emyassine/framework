@@ -41,7 +41,7 @@ trait HasTopbar
     /**
      * @return array{topbar: bool}
      */
-    private function topbar_chrome(): array
+    private function topbar_layout(): array
     {
         return [
             'topbar' => $this->has_topbar,

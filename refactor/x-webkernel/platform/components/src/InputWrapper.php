@@ -8,7 +8,7 @@
 namespace Webkernel\Platform\Components;
 
 /**
- * Ring around an input. Blade: `<x-webkernel::input.wrapper>`.
+ * Ring around an input. View: `<x-webkernel::input.wrapper>`.
  */
 final class InputWrapper extends Component
 {

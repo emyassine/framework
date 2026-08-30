@@ -4,7 +4,7 @@ Durable architecture. Follow on every change in this repository. Clarity first: 
 
 ## Package map
 
-Each Composer package has one job. Do not mix runtime, UI chrome, system admin, and developer tools.
+Each Composer package has one job. Do not mix runtime, UI, system admin, and developer tools.
 
 | Path | Package | Job |
 |---|---|---|
@@ -16,7 +16,7 @@ Each Composer package has one job. Do not mix runtime, UI chrome, system admin, 
 | `refactor/x-webkernel/platform/components` | `webkernel/components` | UI atoms (views + dumpable PHP declarations) |
 | `refactor/x-webkernel/platform/i18n` | `webkernel/i18n` | Locale, catalog, translations |
 | `refactor/x-webkernel/platform/imagery` | `webkernel/imagery` | Icons, brands, pixmaps |
-| `refactor/x-webkernel/platform/panels` | `webkernel/panels` | Panel chrome: Panel, Resource, Page, Table, Wds. Not the System panel. |
+| `refactor/x-webkernel/platform/panels` | `webkernel/panels` | Panel, Resource, Page, Table, Wds. Not the System panel. |
 | `refactor/x-webkernel/platform/schemas` | `webkernel/schemas` | Schema tree for forms and readonly views |
 | `refactor/modules/*/*` | business modules | Domain modules. Module-scoped panels live here. |
 
@@ -38,11 +38,22 @@ Left rail + drawer sit in `x-webkernel::sidebar.group` (`position="left"`). Stat
 
 Valid HTML only. No orphan tags, no duplicate wrappers.
 
-## Components carry their CSS
+## Views carry CSS and JS
 
-- CSS lives with the component (same folder / same view). Do not dump component styles into a distant global sheet as the source of truth.
+- CSS and JS live with the View (same folder / same file). Do not dump them into a distant global sheet or `wds/script`.
 - Prefer inline CSS when the rule is local, using `:root` tokens already provided (`--color-red-50: oklch(…)`, and the semantic palettes `primary`, `gray`, `warning`, `danger`, `info`).
 - Do not invent a second color system.
+- Webkernel has Views. Never say Blade.
+
+## View folders (`webkernel/components`)
+
+Three roots, registered separately so tags stay short (`x-webkernel::page`, not `x-webkernel::layout.page`):
+
+1. `resources/views/layout` — page, page.base, page.simple, main, aside, typography.
+2. `resources/views/navigation` — rail, sidebar, topbar, breadcrumbs, nav-item.
+3. `resources/views/components` — UI atoms (button, input, tabs, …).
+
+PHP classes that render a View use `Concerns\HasMethodMake` (`::make()`). Do not keep a hardcoded class list.
 
 ## Dark mode text
 
@@ -64,15 +75,15 @@ Do not hardcode dump side-effects (IDE helper, extra writers) inside `DumpAutolo
 
 Hidden commands exist and run, but they do not appear in default help.
 
-## Tabs have a view and a class
+## Tabs have a View and a class
 
-`<x-webkernel::tabs>`, `tabs.item`, `tabs.panel` have views AND PHP classes (`Tabs`, `TabsItem`, `TabsPanel`). Same dual-use pattern as Button.
+`<x-webkernel::tabs>`, `tabs.item`, `tabs.panel` have Views AND PHP classes (`Tabs`, `TabsItem`, `TabsPanel`). Same dual-use pattern as Button. `::make()` comes from `HasMethodMake`.
 
 ## No spaghetti
 
 One package, one job. One class, one job. Public API as clear as Laminas and Laravel. No god objects, no cross-package shortcuts, no second tag syntax (`<x-webkernel::…>` only).
 
 
-## Page chrome
+## Page
 
-Only three page components, in `webkernel/components`: `page` (panel chrome), `page.base` (document), `page.simple` (centered). No `layouts/` in codebase. Title and breadcrumbs come from Page::get_header() / get_breadcrumbs().
+Only three page Views, in `webkernel/components` `layout/`: `page` (panel page), `page.base` (document), `page.simple` (centered). No `layouts/` in codebase. Title and breadcrumbs come from Page::get_header() / get_breadcrumbs(). Do not call this "chrome".

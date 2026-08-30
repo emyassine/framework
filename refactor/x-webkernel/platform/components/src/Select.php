@@ -8,7 +8,7 @@
 namespace Webkernel\Platform\Components;
 
 /**
- * Native select. Blade: `<x-webkernel::select>`.
+ * Native select. View: `<x-webkernel::select>`.
  */
 final class Select extends Component
 {

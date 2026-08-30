@@ -121,7 +121,7 @@ final class PanelViewTest extends TestCase
     /**
      * @return void
      */
-    public function test_dumped_wds_css_is_linked_and_contains_chrome(): void
+    public function test_dumped_wds_css_is_linked_and_contains_component_rules(): void
     {
         $path = \Webkernel\Platform\Wds::css_path();
         $this->assertFileExists($path);

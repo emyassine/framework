@@ -8,7 +8,7 @@
 namespace Webkernel\Platform\Components;
 
 /**
- * Status chip. Blade: `<x-webkernel::badge>`.
+ * Status chip. View: `<x-webkernel::badge>`.
  */
 final class Badge extends Component
 {

@@ -15,7 +15,7 @@ use Webkernel\Platform\Panel\Concerns\HasTopbar;
  * Fluent panel declaration. Dump-autoload snapshots this; the request reads the dump.
  *
  * //> Scope is not declared here. Dump infers it from the Composer package.
- * //> Chrome lives in Concerns: sidebar() drawer, topbar() bar, panel_sidebar() icon rail.
+ * //> Page layout lives in Concerns: sidebar() drawer, topbar() bar, panel_sidebar() icon rail.
  *
  * @mixin HasSidebar
  * @mixin HasTopbar
@@ -316,7 +316,7 @@ final class Panel
      *   middleware: list<class-string>,
      *   auth_middleware: list<class-string>,
      *   branding: array<string, mixed>,
-     *   chrome: array<string, mixed>
+     *   layout: array<string, mixed>
      * }
      */
     public function to_array(): array
@@ -349,10 +349,10 @@ final class Panel
                 'colors' => $this->colors,
                 'dark_mode' => $this->dark_mode,
             ],
-            'chrome' => [
-                ...$this->sidebar_chrome(),
-                ...$this->topbar_chrome(),
-                ...$this->panel_sidebar_chrome(),
+            'layout' => [
+                ...$this->sidebar_layout(),
+                ...$this->topbar_layout(),
+                ...$this->panel_sidebar_layout(),
             ],
         ];
     }

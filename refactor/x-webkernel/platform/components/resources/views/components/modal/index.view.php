@@ -84,6 +84,30 @@
 }
 </style>
 @endonce
+@once('wds.modal.js')
+<script>
+(function () {
+  document.addEventListener('click', function (event) {
+    var closer = event.target.closest('[data-wds-modal-close], [data-wds-modal-overlay]');
+    if (closer) {
+      var modal = closer.closest('[data-wds-modal]');
+      if (modal) modal.classList.remove('wds-open');
+    }
+    var trigger = event.target.closest('[data-wds-modal-trigger]');
+    if (trigger) {
+      var opened = trigger.closest('[data-wds-modal]');
+      if (opened) opened.classList.add('wds-open');
+    }
+  });
+  document.addEventListener('keydown', function (event) {
+    if (event.key !== 'Escape') return;
+    document.querySelectorAll('[data-wds-modal].wds-open').forEach(function (modal) {
+      modal.classList.remove('wds-open');
+    });
+  });
+})();
+</script>
+@endonce
 <div
   {{ $attributes->class(['wds-modal', 'wds-slide-over' => $slide_over, 'wds-open' => $open]) }}
   data-wds-modal

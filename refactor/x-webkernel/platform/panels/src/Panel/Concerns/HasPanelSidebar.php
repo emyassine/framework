@@ -64,7 +64,7 @@ trait HasPanelSidebar
     /**
      * @return array{panel_sidebar: bool, panel_sidebar_width: string}
      */
-    private function panel_sidebar_chrome(): array
+    private function panel_sidebar_layout(): array
     {
         return [
             'panel_sidebar' => $this->has_panel_sidebar,

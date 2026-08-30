@@ -8,7 +8,7 @@
 namespace Webkernel\Platform\Components;
 
 /**
- * Tab list plus panels. Same view for Blade and `Tabs::make()`.
+ * Tab list plus panels. Same view for the tag and `Tabs::make()`.
  */
 final class Tabs extends Component
 {

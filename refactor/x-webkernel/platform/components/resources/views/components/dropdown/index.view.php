@@ -32,6 +32,29 @@
 .wds-dropdown-panel.wds-width-lg { max-width: 32rem; }
 </style>
 @endonce
+@once('wds.dropdown.js')
+<script>
+(function () {
+  document.addEventListener('click', function (event) {
+    document.querySelectorAll('[data-wds-dropdown]').forEach(function (box) {
+      if (box.contains(event.target)) {
+        if (event.target.closest('[data-wds-dropdown-trigger]')) {
+          box.classList.toggle('wds-open');
+        }
+        return;
+      }
+      box.classList.remove('wds-open');
+    });
+  });
+  document.addEventListener('keydown', function (event) {
+    if (event.key !== 'Escape') return;
+    document.querySelectorAll('[data-wds-dropdown].wds-open').forEach(function (box) {
+      box.classList.remove('wds-open');
+    });
+  });
+})();
+</script>
+@endonce
 <div {{ $attributes->class('wds-dropdown') }} data-wds-dropdown data-placement="{{ $placement }}">
   <div class="wds-dropdown-trigger" data-wds-dropdown-trigger>
     {!! $trigger ?? '' !!}

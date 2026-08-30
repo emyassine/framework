@@ -8,7 +8,7 @@
 namespace Webkernel\Platform\Components;
 
 /**
- * Trail of page links. Blade: `<x-webkernel::breadcrumbs>`.
+ * Trail of page links. View: `<x-webkernel::breadcrumbs>`.
  */
 final class Breadcrumbs extends Component
 {

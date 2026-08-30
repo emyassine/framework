@@ -8,7 +8,7 @@
 namespace Webkernel\Platform\Components;
 
 /**
- * Card around content. Blade: `<x-webkernel::section>`.
+ * Card around content. View: `<x-webkernel::section>`.
  */
 final class Section extends Component
 {

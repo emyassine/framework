@@ -86,6 +86,7 @@ return array(
     'Webkernel\\Platform\\Components\\Checkbox' => $b . '/x-webkernel/platform/components/src/Checkbox.php',
     'Webkernel\\Platform\\Components\\Component' => $b . '/x-webkernel/platform/components/src/Component.php',
     'Webkernel\\Platform\\Components\\ComponentsProvider' => $b . '/x-webkernel/platform/components/src/ComponentsProvider.php',
+    'Webkernel\\Platform\\Components\\Concerns\\HasMethodMake' => $b . '/x-webkernel/platform/components/src/Concerns/HasMethodMake.php',
     'Webkernel\\Platform\\Components\\Dropdown' => $b . '/x-webkernel/platform/components/src/Dropdown.php',
     'Webkernel\\Platform\\Components\\EmptyState' => $b . '/x-webkernel/platform/components/src/EmptyState.php',
     'Webkernel\\Platform\\Components\\Fieldset' => $b . '/x-webkernel/platform/components/src/Fieldset.php',

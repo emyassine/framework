@@ -8,7 +8,7 @@
 namespace Webkernel\Platform\Components;
 
 /**
- * One tab trigger. Blade: `<x-webkernel::tabs.item>`.
+ * One tab trigger. View: `<x-webkernel::tabs.item>`.
  */
 final class TabsItem extends Component
 {

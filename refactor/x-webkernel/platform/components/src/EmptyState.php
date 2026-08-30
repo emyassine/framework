@@ -8,7 +8,7 @@
 namespace Webkernel\Platform\Components;
 
 /**
- * Placeholder when a list is empty. Blade: `<x-webkernel::empty-state>`.
+ * Placeholder when a list is empty. View: `<x-webkernel::empty-state>`.
  */
 final class EmptyState extends Component
 {

@@ -8,7 +8,7 @@
 namespace Webkernel\Platform\Components;
 
 /**
- * Icon-only control. Blade: `<x-webkernel::icon-button>`.
+ * Icon-only control. View: `<x-webkernel::icon-button>`.
  */
 final class IconButton extends Component
 {

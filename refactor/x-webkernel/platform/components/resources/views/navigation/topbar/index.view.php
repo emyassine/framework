@@ -1,13 +1,15 @@
-
-<?php  $__props = [
+{{--
+  <x-webkernel::topbar :breadcrumbs="$breadcrumbs" />
+--}}
+@props([
   'breadcrumbs' => [],
   'brand' => null,
-]; foreach ($__props as $__n => $__d) { if (!isset($$__n)) { $$__n = $__d; } } $attributes = (isset($attributes) && $attributes instanceof \Webkernel\View\AttributeBag ? $attributes : new \Webkernel\View\AttributeBag([]))->except(\array_keys($__props)); unset($__props, $__n, $__d); ?>
-<?php 
+])
+@php
   $attributes = $attributes ?? new \Webkernel\View\AttributeBag([]);
   $breadcrumbs = \is_array($breadcrumbs) ? $breadcrumbs : [];
- ?>
-<?php if ($this->once('wds.topbar')): ?>
+@endphp
+@once('wds.topbar')
 <style>
 .wds-topbar {
   height: var(--wds-topbar-height);
@@ -53,18 +55,50 @@
   .wds-user-menu-name { display: none; }
 }
 </style>
-<?php endif; ?>
-<header <?php echo \Webkernel\View\View::echo($attributes->class('wds-topbar')); ?>>
-  <?php  $this->start_component('webkernel::icon-button',['icon'=>'menu','label'=>lang('panel.toggle_sidebar'),'size'=>'sm','color'=>'gray','onclick'=>'toggleSidebar()']); ?><?php echo $this->render_component(); ?>
-  <?php  $this->start_component('webkernel::breadcrumbs',['breadcrumbs'=>$breadcrumbs]); ?><?php echo $this->render_component(); ?>
+@endonce
+@once('wds.topbar.js')
+<script>
+(function () {
+  window.toggleTheme = function () {
+    var html = document.documentElement;
+    var next = html.dataset.wdsTheme === 'dark' ? 'light' : 'dark';
+    html.dataset.wdsTheme = next;
+    var sun = document.getElementById('icon-sun');
+    var moon = document.getElementById('icon-moon');
+    if (sun) sun.style.display = next === 'dark' ? 'none' : 'block';
+    if (moon) moon.style.display = next === 'dark' ? 'block' : 'none';
+    localStorage.setItem('wds-theme', next);
+  };
+  window.toggleSidebar = function () {
+    var html = document.documentElement;
+    html.dataset.wdsSidebar = html.dataset.wdsSidebar === 'collapsed' ? 'expanded' : 'collapsed';
+    localStorage.setItem('wds-sidebar', html.dataset.wdsSidebar);
+  };
+  if (document.documentElement.dataset.wdsTheme === 'dark') {
+    var sun = document.getElementById('icon-sun');
+    var moon = document.getElementById('icon-moon');
+    if (sun) sun.style.display = 'none';
+    if (moon) moon.style.display = 'block';
+  }
+})();
+</script>
+@endonce
+<header {{ $attributes->class('wds-topbar') }}>
+  <x-webkernel::icon-button
+    icon="menu"
+    :label="lang('panel.toggle_sidebar')"
+    size="sm"
+    color="gray"
+    onclick="toggleSidebar()"
+  />
+  <x-webkernel::breadcrumbs :breadcrumbs="$breadcrumbs" />
   <div class="wds-topbar-end">
-    <?php  $this->start_component('webkernel::language-selector',[]); ?><?php echo $this->render_component(); ?>
-    <button type="button" class="wds-icon-btn" onclick="toggleTheme()" title="<?php echo \Webkernel\View\View::echo(lang('panel.theme')); ?>" id="theme-btn">
+    <x-webkernel::language-selector />
+    <button type="button" class="wds-icon-btn" onclick="toggleTheme()" title="{{ lang('panel.theme') }}" id="theme-btn">
       <svg id="icon-sun" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="3"/><line x1="8" y1="1" x2="8" y2="3"/><line x1="8" y1="13" x2="8" y2="15"/><line x1="1" y1="8" x2="3" y2="8"/><line x1="13" y1="8" x2="15" y2="8"/><line x1="3.2" y1="3.2" x2="4.6" y2="4.6"/><line x1="11.4" y1="11.4" x2="12.8" y2="12.8"/><line x1="12.8" y1="3.2" x2="11.4" y2="4.6"/><line x1="4.6" y1="11.4" x2="3.2" y2="12.8"/></svg>
       <svg id="icon-moon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" style="display:none;"><path d="M12 10A6 6 0 0 1 6 4a6.003 6 0 0 0 6 9 6 6 0 0 1 0-3z"/></svg>
     </button>
-    <?php echo $this->run_child('webkernel::system.user', ['brand' => $brand]); ?>
-    <?php echo $slot; ?>
-
+    @include('webkernel::system.user', ['brand' => $brand])
+    {!! $slot !!}
   </div>
 </header>

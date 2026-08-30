@@ -25,6 +25,22 @@
 }
 </style>
 <?php endif; ?>
+<?php if ($this->once('wds.user-menu.js')): ?>
+<script>
+(function () {
+  window.toggleUserMenu = function () {
+    var el = document.getElementById('wds-user-menu');
+    if (el) el.classList.toggle('wds-open');
+  };
+  document.addEventListener('click', function (event) {
+    var el = document.getElementById('wds-user-menu');
+    if (el && !el.contains(event.target)) {
+      el.classList.remove('wds-open');
+    }
+  });
+})();
+</script>
+<?php endif; ?>
 <div class="wds-user-menu" id="wds-user-menu">
   <button type="button" class="wds-user-menu-trigger" onclick="toggleUserMenu()" aria-haspopup="menu" aria-expanded="false">
     <span class="wds-avatar"><?php echo \Webkernel\View\View::echo(strtoupper(substr((string) ($brand ?? 'W'), 0, 1))); ?></span>

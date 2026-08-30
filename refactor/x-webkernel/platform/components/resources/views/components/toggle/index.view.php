@@ -19,6 +19,19 @@
 .wds-toggle[aria-checked="true"] i { inset-inline-start: calc(100% - 1.05em - 2px); }
 </style>
 @endonce
+@once('wds.toggle.js')
+<script>
+document.addEventListener('click', function (event) {
+  var btn = event.target.closest('[data-wds-toggle]');
+  if (!btn) return;
+  var on = btn.getAttribute('aria-checked') !== 'true';
+  btn.setAttribute('aria-checked', on ? 'true' : 'false');
+  var wrap = btn.parentElement;
+  var input = wrap ? wrap.querySelector('[data-wds-toggle-input]') : null;
+  if (input) input.checked = on;
+});
+</script>
+@endonce
 <span class="wds-toggle-wrap">
   <input type="hidden" name="{{ $name }}" value="0" />
   <button

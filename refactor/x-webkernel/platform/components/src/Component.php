@@ -7,32 +7,26 @@
 
 namespace Webkernel\Platform\Components;
 
+use Webkernel\Platform\Components\Concerns\HasMethodMake;
 use Webkernel\View\View;
 
 /**
- * Dual-use UI atom: Blade view plus a dumpable PHP declaration.
+ * Dual-use UI atom: View plus a dumpable PHP declaration.
  *
- * //> `<x-webkernel::{name}>` and `::{make}()` render the same `.view.php`.
+ * //> `<x-webkernel::{name}>` and `::make()` render the same `.view.php`.
+ *
+ * @mixin HasMethodMake
+ *
+ * @method static static make(string $name = '')
  */
 abstract class Component
 {
+    use HasMethodMake;
+
     protected string $name = '';
 
     /** @var array<string, mixed> */
     protected array $props = [];
-
-    /**
-     * @param $name string
-     *
-     * @return static
-     */
-    public static function make(string $name = ''): static
-    {
-        $self = new static();
-        $self->name = $name;
-
-        return $self;
-    }
 
     /**
      * @param $label string

@@ -8,7 +8,7 @@
 namespace Webkernel\Platform\Components;
 
 /**
- * Inline notice. Blade: `<x-webkernel::callout>`.
+ * Inline notice. View: `<x-webkernel::callout>`.
  */
 final class Callout extends Component
 {

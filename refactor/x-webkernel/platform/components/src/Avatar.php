@@ -8,7 +8,7 @@
 namespace Webkernel\Platform\Components;
 
 /**
- * Image or initial. Blade: `<x-webkernel::avatar>`.
+ * Image or initial. View: `<x-webkernel::avatar>`.
  */
 final class Avatar extends Component
 {

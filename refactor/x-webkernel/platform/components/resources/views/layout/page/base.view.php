@@ -1,5 +1,5 @@
 {{--
-  Document shell. <x-webkernel::page> and <x-webkernel::page.simple> wrap this.
+  Document. <x-webkernel::page> and <x-webkernel::page.simple> wrap this.
 --}}
 @props([
   'lang' => 'en',
@@ -19,10 +19,10 @@
   }
 @endphp
 @once('wds.page.base.view')
-<style>
-html { font-size: 16px; }
-body { margin: 0; }
-</style>
+  <style>
+  	html { font-size: 16px; }
+  	body { margin: 0; }
+  </style>
 @endonce
 <!DOCTYPE html>
 <html
@@ -34,7 +34,9 @@ body { margin: 0; }
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <script>(function(d){var t=localStorage.getItem('wds-theme');if(t)d.dataset.wdsTheme=t;})(document.documentElement);</script>
+  <script>
+  	(function(d){var t=localStorage.getItem('wds-theme');if(t)d.dataset.wdsTheme=t;})(document.documentElement);
+  </script>
   @if ($csrf)
     {!! \Webkernel\Csrf::meta() !!}
   @endif
@@ -50,7 +52,6 @@ body { margin: 0; }
 </head>
 <body>
   {!! $slot !!}
-  @include('webkernel::wds.script')
   @stack('scripts')
 </body>
 </html>

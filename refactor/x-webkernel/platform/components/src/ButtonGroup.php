@@ -8,7 +8,7 @@
 namespace Webkernel\Platform\Components;
 
 /**
- * Horizontal group of buttons. Blade: `<x-webkernel::button.group>`.
+ * Horizontal group of buttons. View: `<x-webkernel::button.group>`.
  */
 final class ButtonGroup extends Component
 {

@@ -139,7 +139,7 @@ trait HasSidebar
      *   collapsible_navigation_groups: bool
      * }
      */
-    private function sidebar_chrome(): array
+    private function sidebar_layout(): array
     {
         return [
             'sidebar' => $this->has_sidebar,

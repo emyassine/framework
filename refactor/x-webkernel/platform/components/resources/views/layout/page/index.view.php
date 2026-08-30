@@ -1,5 +1,8 @@
-
-<?php  $__props = [
+{{--
+  Panel page. <x-webkernel::page title="Invoices">body</x-webkernel::page>
+  Regions: rail, sidebar, main, aside. Not nested page.* tags.
+--}}
+@props([
   'title' => null,
   'header' => null,
   'description' => null,
@@ -12,8 +15,8 @@
   'brand' => null,
   'favicon' => null,
   'logo' => null,
-]; foreach ($__props as $__n => $__d) { if (!isset($$__n)) { $$__n = $__d; } } $attributes = (isset($attributes) && $attributes instanceof \Webkernel\View\AttributeBag ? $attributes : new \Webkernel\View\AttributeBag([]))->except(\array_keys($__props)); unset($__props, $__n, $__d); ?>
-<?php 
+])
+@php
   $title = (string) ($title ?? '');
   $header = (string) ($header ?? $title);
   $description = $description !== null && $description !== '' ? (string) $description : '';
@@ -31,15 +34,15 @@
   $current_label = \is_array($current) ? (string) ($current['label'] ?? '') : (string) ($brand ?? 'Webkernel');
   $document_title = $title !== '' ? $title : $header;
   $document_description = $description !== '' ? $description : $header;
-  $chrome = \is_array($current) && isset($current['chrome']) && \is_array($current['chrome'])
-      ? $current['chrome']
+  $layout_flags = \is_array($current) && isset($current['layout']) && \is_array($current['layout'])
+      ? $current['layout']
       : [];
-  $has_panel_sidebar = (bool) ($chrome['panel_sidebar'] ?? true);
-  $has_sidebar = (bool) ($chrome['sidebar'] ?? true);
-  $has_topbar = (bool) ($chrome['topbar'] ?? true);
+  $has_panel_sidebar = (bool) ($layout_flags['panel_sidebar'] ?? true);
+  $has_sidebar = (bool) ($layout_flags['sidebar'] ?? true);
+  $has_topbar = (bool) ($layout_flags['topbar'] ?? true);
   $has_left = $has_panel_sidebar || $has_sidebar;
- ?>
-<?php if ($this->once('wds.page.view')): ?>
+@endphp
+@once('wds.page.view')
 <style>
 .wds-layout { display: flex; min-height: 100vh; background: var(--wds-bg); color: var(--wds-text); }
 .wds-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
@@ -52,29 +55,29 @@
   .wds-header-heading { font-size: 1.375rem; }
 }
 </style>
-<?php endif; ?>
-<?php  $this->start_component('webkernel::page.base',['title'=>$document_title,'lang'=>$lang,'theme'=>$theme,'csrf'=>$csrf,'favicon'=>$favicon,'description'=>$document_description,'layout'=>'sidebar']); ?>
+@endonce
+<x-webkernel::page.base :title="$document_title" :lang="$lang" :theme="$theme" :csrf="$csrf" :favicon="$favicon" :description="$document_description" layout="sidebar">
   <script>
   (function(d){var s=localStorage.getItem('wds-sidebar');if(s)d.dataset.wdsSidebar=s;})(document.documentElement);</script>
   <div class="wds-layout" data-wds-sidebar-root>
-    <?php if($has_left): ?>
-      <?php  $this->start_component('webkernel::sidebar.group',['position'=>'left']); ?>
-        <?php if($has_panel_sidebar): ?>
-          <?php  $this->start_component('webkernel::rail',[]); ?>
-            <a class="wds-rail-logo" href="/" title="<?php echo \Webkernel\View\View::echo($brand); ?>">
-              <?php if(!empty($logo)): ?>
-                <img src="<?php echo \Webkernel\View\View::echo($logo); ?>" alt="" width="30" height="30" />
-              <?php else: ?>
+    @if ($has_left)
+      <x-webkernel::sidebar.group position="left">
+        @if ($has_panel_sidebar)
+          <x-webkernel::rail>
+            <a class="wds-rail-logo" href="/" title="{{ $brand }}">
+              @if (!empty($logo))
+                <img src="{{ $logo }}" alt="" width="30" height="30" />
+              @else
                 <span class="wds-logo-icon">
                   <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
                     <circle cx="8" cy="8" r="6"/><path d="M8 2v6l3 3"/>
                   </svg>
                 </span>
-              <?php endif; ?>
+              @endif
             </a>
             <ul class="wds-rail-list">
-              <?php foreach($apps as $app): ?>
-                <?php 
+              @foreach ($apps as $app)
+                @php
                   $app_id = (string) ($app['id'] ?? '');
                   $app_href = (string) ($app['home_url'] ?? $app['href'] ?? '/'.$app_id);
                   $app_label = (string) ($app['label'] ?? \ucfirst($app_id));
@@ -85,45 +88,52 @@
                     $app_shape = 'favicon';
                   }
                   $app_active = $app_id !== '' && $app_id === $current_id;
-                 ?>
-                <?php  $this->start_component('webkernel::rail.button',['panel_id'=>$app_id,'icon'=>$app_icon,'label'=>$app_label,'href'=>$app_href,'active'=>$app_active,'logo'=>$app_logo,'logo_shape'=>$app_shape]); ?><?php echo $this->render_component(); ?>
-              <?php endforeach; ?>
+                @endphp
+                <x-webkernel::rail.button
+                  :panel_id="$app_id"
+                  :icon="$app_icon"
+                  :label="$app_label"
+                  :href="$app_href"
+                  :active="$app_active"
+                  :logo="$app_logo"
+                  :logo_shape="$app_shape"
+                />
+              @endforeach
             </ul>
-          <?php echo $this->render_component(); ?>
-        <?php endif; ?>
+          </x-webkernel::rail>
+        @endif
 
-        <?php if($has_sidebar): ?>
-          <?php  $this->start_component('webkernel::sidebar',[]); ?>
-            <?php  $this->start_component('webkernel::sidebar.header',['title'=>$current_label]); ?><?php echo $this->render_component(); ?>
+        @if ($has_sidebar)
+          <x-webkernel::sidebar>
+            <x-webkernel::sidebar.header :title="$current_label" />
             <div class="wds-drawer-body">
               <ul class="wds-nav-list">
                 <li>
                   <button type="button" class="wds-nav-search" onclick="document.dispatchEvent(new CustomEvent('wds-search'))">
-                    <span class="wds-nav-icon" aria-hidden="true"><?php echo icon('search', 'wds-icon-svg'); ?></span>
-                    <?php echo \Webkernel\View\View::echo(lang('panel.search')); ?>
-
+                    <span class="wds-nav-icon" aria-hidden="true">{!! icon('search', 'wds-icon-svg') !!}</span>
+                    {{ lang('panel.search') }}
                   </button>
                 </li>
-                <?php foreach($groups as $group): ?>
-                  <?php 
+                @foreach ($groups as $group)
+                  @php
                     $group_label = (string) ($group['label'] ?? '');
                     if (\str_starts_with($group_label, 'panel.')) {
                       $group_label = lang($group_label);
                     }
                     $group_icon = (string) ($group['icon'] ?? 'folder');
                     $is_group = $group_label !== '';
-                   ?>
-                  <li class="<?php echo \Webkernel\View\View::echo($is_group ? 'wds-nav-group' : ''); ?>">
-                    <?php if($is_group): ?>
+                  @endphp
+                  <li class="{{ $is_group ? 'wds-nav-group' : '' }}">
+                    @if ($is_group)
                       <details open>
                         <summary class="wds-nav-summary">
-                          <span class="wds-nav-icon" aria-hidden="true"><?php echo icon($group_icon, 'wds-icon-svg'); ?></span>
-                          <span><?php echo \Webkernel\View\View::echo($group_label); ?></span>
-                          <span class="wds-nav-caret"><?php echo icon('chevron-down', 'wds-icon-svg'); ?></span>
+                          <span class="wds-nav-icon" aria-hidden="true">{!! icon($group_icon, 'wds-icon-svg') !!}</span>
+                          <span>{{ $group_label }}</span>
+                          <span class="wds-nav-caret">{!! icon('chevron-down', 'wds-icon-svg') !!}</span>
                         </summary>
                         <ul class="wds-nav-sub">
-                          <?php foreach(($group['items'] ?? []) as $item): ?>
-                            <?php 
+                          @foreach (($group['items'] ?? []) as $item)
+                            @php
                               $item_label = (string) ($item['label'] ?? '');
                               if (\str_starts_with($item_label, 'panel.')) {
                                 $item_label = lang($item_label);
@@ -131,17 +141,22 @@
                               $item_href = (string) ($item['href'] ?? '#');
                               $item_icon = (string) ($item['icon'] ?? 'package');
                               $item_active = $panel_api->href_is_active($item_href);
-                             ?>
+                            @endphp
                             <li>
-                              <?php  $this->start_component('webkernel::sidebar.item',['label'=>$item_label,'href'=>$item_href,'icon'=>$item_icon,'active'=>$item_active]); ?><?php echo $this->render_component(); ?>
+                              <x-webkernel::sidebar.item
+                                :label="$item_label"
+                                :href="$item_href"
+                                :icon="$item_icon"
+                                :active="$item_active"
+                              />
                             </li>
-                          <?php endforeach; ?>
+                          @endforeach
                         </ul>
                       </details>
-                    <?php else: ?>
+                    @else
                       <ul>
-                        <?php foreach(($group['items'] ?? []) as $item): ?>
-                          <?php 
+                        @foreach (($group['items'] ?? []) as $item)
+                          @php
                             $item_label = (string) ($item['label'] ?? '');
                             if (\str_starts_with($item_label, 'panel.')) {
                               $item_label = lang($item_label);
@@ -149,64 +164,65 @@
                             $item_href = (string) ($item['href'] ?? '#');
                             $item_icon = (string) ($item['icon'] ?? 'package');
                             $item_active = $panel_api->href_is_active($item_href);
-                           ?>
+                          @endphp
                           <li>
-                            <?php  $this->start_component('webkernel::sidebar.item',['label'=>$item_label,'href'=>$item_href,'icon'=>$item_icon,'active'=>$item_active]); ?><?php echo $this->render_component(); ?>
+                            <x-webkernel::sidebar.item
+                              :label="$item_label"
+                              :href="$item_href"
+                              :icon="$item_icon"
+                              :active="$item_active"
+                            />
                           </li>
-                        <?php endforeach; ?>
+                        @endforeach
                       </ul>
-                    <?php endif; ?>
+                    @endif
                   </li>
-                <?php endforeach; ?>
+                @endforeach
               </ul>
             </div>
-          <?php echo $this->render_component(); ?>
-        <?php endif; ?>
-      <?php echo $this->render_component(); ?>
-    <?php endif; ?>
+          </x-webkernel::sidebar>
+        @endif
+      </x-webkernel::sidebar.group>
+    @endif
 
-    <?php  $this->start_component('webkernel::main',[]); ?>
-      <?php if($has_topbar): ?>
-        <?php  $this->start_component('webkernel::topbar',['breadcrumbs'=>$breadcrumbs,'brand'=>$brand]); ?>
-          <?php if(isset($topbar) && $topbar !== ''): ?>
-            <?php echo $topbar; ?>
-
-          <?php endif; ?>
-        <?php echo $this->render_component(); ?>
-      <?php endif; ?>
+    <x-webkernel::main>
+      @if ($has_topbar)
+        <x-webkernel::topbar :breadcrumbs="$breadcrumbs" :brand="$brand">
+          @if (isset($topbar) && $topbar !== '')
+            {!! $topbar !!}
+          @endif
+        </x-webkernel::topbar>
+      @endif
       <main class="wds-main">
         <div class="wds-page">
-          <?php if($header !== '' || $description !== '' || $header_actions !== []): ?>
+          @if ($header !== '' || $description !== '' || $header_actions !== [])
             <header class="wds-header">
               <div>
-                <?php if($header !== ''): ?>
-                  <h1 class="wds-header-heading"><?php echo \Webkernel\View\View::echo($header); ?></h1>
-                <?php endif; ?>
-                <?php if($description !== ''): ?>
-                  <p class="wds-header-subheading"><?php echo \Webkernel\View\View::echo($description); ?></p>
-                <?php endif; ?>
+                @if ($header !== '')
+                  <h1 class="wds-header-heading">{{ $header }}</h1>
+                @endif
+                @if ($description !== '')
+                  <p class="wds-header-subheading">{{ $description }}</p>
+                @endif
               </div>
-              <?php if($header_actions !== []): ?>
+              @if ($header_actions !== [])
                 <div class="wds-header-actions">
-                  <?php foreach($header_actions as $action): ?>
-                    <?php echo $action; ?>
-
-                  <?php endforeach; ?>
+                  @foreach ($header_actions as $action)
+                    {!! $action !!}
+                  @endforeach
                 </div>
-              <?php endif; ?>
+              @endif
             </header>
-          <?php endif; ?>
+          @endif
           <div class="wds-page-content">
-            <?php echo $slot; ?>
-
+            {!! $slot !!}
           </div>
         </div>
       </main>
-    <?php echo $this->render_component(); ?>
+    </x-webkernel::main>
 
-    <?php  $this->start_component('webkernel::aside',['position'=>'right','collapsed'=>true]); ?>
-      <?php echo $aside ?? ''; ?>
-
-    <?php echo $this->render_component(); ?>
+    <x-webkernel::aside position="right" collapsed>
+      {!! $aside ?? '' !!}
+    </x-webkernel::aside>
   </div>
-<?php echo $this->render_component(); ?>
+</x-webkernel::page.base>

@@ -47,7 +47,7 @@ return array (
       ),
       'dark_mode' => true,
     ),
-    'chrome' => 
+    'layout' => 
     array (
       'sidebar' => true,
       'sidebar_width' => '20rem',
@@ -133,7 +133,7 @@ return array (
       ),
       'dark_mode' => true,
     ),
-    'chrome' => 
+    'layout' => 
     array (
       'sidebar' => true,
       'sidebar_width' => '20rem',

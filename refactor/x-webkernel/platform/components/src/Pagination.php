@@ -8,7 +8,7 @@
 namespace Webkernel\Platform\Components;
 
 /**
- * Page controls. Blade: `<x-webkernel::pagination>`.
+ * Page controls. View: `<x-webkernel::pagination>`.
  */
 final class Pagination extends Component
 {

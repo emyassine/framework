@@ -1,0 +1,18 @@
+
+<?php  $__props = []; foreach ($__props as $__n => $__d) { if (!isset($$__n)) { $$__n = $__d; } } $attributes = (isset($attributes) && $attributes instanceof \Webkernel\View\AttributeBag ? $attributes : new \Webkernel\View\AttributeBag([]))->except(\array_keys($__props)); unset($__props, $__n, $__d); ?>
+<?php 
+  $attributes = $attributes ?? new \Webkernel\View\AttributeBag([]);
+ ?>
+<?php if ($this->once('wds.btn.group')): ?>
+<style>
+.wds-btn-group { display: inline-flex; align-items: stretch; }
+.wds-btn-group > .wds-btn { border-radius: 0; }
+.wds-btn-group > .wds-btn:first-child { border-top-left-radius: var(--wds-radius); border-bottom-left-radius: var(--wds-radius); }
+.wds-btn-group > .wds-btn:last-child { border-top-right-radius: var(--wds-radius); border-bottom-right-radius: var(--wds-radius); }
+.wds-btn-group > .wds-btn + .wds-btn { margin-inline-start: -1px; }
+</style>
+<?php endif; ?>
+<div <?php echo \Webkernel\View\View::echo($attributes->class('wds-btn-group')); ?>>
+  <?php echo $slot; ?>
+
+</div>

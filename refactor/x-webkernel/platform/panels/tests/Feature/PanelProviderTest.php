@@ -53,15 +53,15 @@ final class PanelProviderTest extends TestCase
         $this->assertTrue($data['default']);
         $this->assertSame('/favicon.ico', $data['branding']['favicon']);
         $this->assertSame('platform', $data['scope']);
-        $this->assertTrue($data['chrome']['sidebar']);
-        $this->assertTrue($data['chrome']['topbar']);
-        $this->assertTrue($data['chrome']['panel_sidebar']);
+        $this->assertTrue($data['layout']['sidebar']);
+        $this->assertTrue($data['layout']['topbar']);
+        $this->assertTrue($data['layout']['panel_sidebar']);
     }
 
     /**
      * @return void
      */
-    public function test_panel_chrome_concerns_are_fluent(): void
+    public function test_panel_layout_concerns_are_fluent(): void
     {
         $data = Panel::make()
             ->id('demo')
@@ -71,10 +71,10 @@ final class PanelProviderTest extends TestCase
             ->sidebar_width('18rem')
             ->to_array();
 
-        $this->assertFalse($data['chrome']['sidebar']);
-        $this->assertFalse($data['chrome']['topbar']);
-        $this->assertFalse($data['chrome']['panel_sidebar']);
-        $this->assertSame('18rem', $data['chrome']['sidebar_width']);
+        $this->assertFalse($data['layout']['sidebar']);
+        $this->assertFalse($data['layout']['topbar']);
+        $this->assertFalse($data['layout']['panel_sidebar']);
+        $this->assertSame('18rem', $data['layout']['sidebar_width']);
     }
 
     /**

@@ -10,51 +10,25 @@ namespace Webkernel\Platform\Components;
 use Webkernel\PlatformProvider;
 
 /**
- * UI atoms. Views live next to their CSS. Page chrome is only page / page.base / page.simple.
+ * UI Views. CSS and JS live next to the View. PHP classes use HasMethodMake.
  *
- * //> Regions are siblings of page, not nested page.* tags: rail, sidebar, topbar, main, aside.
+ * //> Three roots so tags stay `x-webkernel::page`, not `x-webkernel::layout.page`.
  */
 final class ComponentsProvider extends PlatformProvider
 {
     public const VIEWS = [
-        'webkernel' => __DIR__.'/../resources/views',
+        'webkernel' => [
+            __DIR__.'/../resources/views/layout',
+            __DIR__.'/../resources/views/navigation',
+            __DIR__.'/../resources/views/components',
+        ],
     ];
 
     public const COMPONENTS = [
-        'webkernel' => __DIR__.'/../resources/views',
+        'webkernel' => [
+            __DIR__.'/../resources/views/layout',
+            __DIR__.'/../resources/views/navigation',
+            __DIR__.'/../resources/views/components',
+        ],
     ];
-
-    /**
-     * Dual-use atoms: Blade tag plus `::make()`.
-     *
-     * @return list<class-string>
-     */
-    public static function atoms(): array
-    {
-        return [
-            Avatar::class,
-            Badge::class,
-            Breadcrumbs::class,
-            Button::class,
-            ButtonGroup::class,
-            Callout::class,
-            Checkbox::class,
-            Dropdown::class,
-            EmptyState::class,
-            Fieldset::class,
-            IconButton::class,
-            Input::class,
-            InputWrapper::class,
-            Link::class,
-            LoadingIndicator::class,
-            Modal::class,
-            Pagination::class,
-            Section::class,
-            Select::class,
-            Tabs::class,
-            TabsItem::class,
-            TabsPanel::class,
-            TextInput::class,
-        ];
-    }
 }

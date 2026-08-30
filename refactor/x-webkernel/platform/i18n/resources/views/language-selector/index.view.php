@@ -34,6 +34,17 @@
 }
 </style>
 @endonce
+@once('wds.lang.js')
+<script>
+(function () {
+  document.addEventListener('click', function (event) {
+    document.querySelectorAll('[data-wds-lang]').forEach(function (box) {
+      if (!box.contains(event.target)) box.classList.remove('wds-open');
+    });
+  });
+})();
+</script>
+@endonce
 <div class="wds-lang" data-wds-lang>
   <button type="button" class="wds-lang-trigger" onclick="this.parentElement.classList.toggle('wds-open')" title="{{ lang('panel.language') }}">
     <span class="wds-lang-flag">{!! flag_markup($current) !!}</span>

@@ -8,7 +8,7 @@
 namespace Webkernel\Platform\Components;
 
 /**
- * Bare text control. Blade: `<x-webkernel::input>`.
+ * Bare text control. View: `<x-webkernel::input>`.
  */
 final class Input extends Component
 {
