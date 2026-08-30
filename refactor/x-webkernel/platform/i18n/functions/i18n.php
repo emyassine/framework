@@ -186,14 +186,14 @@ if (! \function_exists('i18n_catalog_language_label')) {
 
 if (! \function_exists('flag_markup')) {
     /**
-     * Inline SVG for a language or country mark.
+     * Inline SVG for a language or country mark. Intrinsic 512px size is stripped.
      *
      * @param $code string
      * @param $class string
      *
      * @return string
      */
-    function flag_markup(string $code, string $class = 'w-lang-flag'): string
+    function flag_markup(string $code, string $class = ''): string
     {
         $code = \strtolower(\trim($code));
         if ($code === '' || \preg_match('/^[a-z0-9][a-z0-9_-]{0,15}$/', $code) !== 1) {
@@ -201,6 +201,7 @@ if (! \function_exists('flag_markup')) {
         }
         $candidates = [$code, \explode('-', $code, 2)[0]];
         $svg = '';
+        $used = $code;
         foreach (\array_unique($candidates) as $name) {
             foreach (['language', 'countries'] as $set) {
                 $path = \function_exists('webapp_path')
@@ -211,13 +212,24 @@ if (! \function_exists('flag_markup')) {
                 }
                 $raw = \file_get_contents($path);
                 if (\is_string($raw) && $raw !== '') {
-                    $svg = $raw;
+                    $svg = \trim($raw);
+                    $used = $name;
                     break 2;
                 }
             }
         }
         if ($svg === '') {
             return '';
+        }
+        $svg = \preg_replace('/\s(?:width|height)="[^"]*"/i', '', $svg) ?? $svg;
+        $uid = 'w-flag-'.\preg_replace('/[^a-z0-9]+/', '-', $used);
+        $svg = \preg_replace('/\bid="([^"]+)"/', 'id="'.$uid.'-$1"', $svg) ?? $svg;
+        $svg = \preg_replace('/url\(#([^)]+)\)/', 'url(#'.$uid.'-$1)', $svg) ?? $svg;
+        if (! \str_contains($svg, 'class=')) {
+            $svg = \preg_replace('/<svg\b/i', '<svg class="w-lang-flag-svg"', $svg, 1) ?? $svg;
+        }
+        if ($class === '') {
+            return $svg;
         }
 
         return '<span class="'.\htmlspecialchars($class, \ENT_QUOTES, 'UTF-8').'">'.$svg.'</span>';

@@ -87,4 +87,18 @@ final class FastI18nTest extends TestCase
         $this->assertContains('yo', $codes);
         $this->assertGreaterThan(100, \count($codes));
     }
+
+    /**
+     * @return void
+     */
+    public function test_flag_markup_strips_intrinsic_size(): void
+    {
+        $html = flag_markup('en');
+        $this->assertStringContainsString('<svg', $html);
+        $this->assertStringContainsString('viewBox', $html);
+        $this->assertStringNotContainsString('width="512"', $html);
+        $this->assertStringNotContainsString('height="512"', $html);
+        $this->assertStringNotContainsString('<span', $html);
+        $this->assertStringContainsString('w-flag-en-', $html);
+    }
 }
