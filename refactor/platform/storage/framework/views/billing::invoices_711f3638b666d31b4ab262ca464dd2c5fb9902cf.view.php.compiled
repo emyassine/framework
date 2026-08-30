@@ -1,0 +1,27 @@
+<?php if($invoices === []): ?>
+  <p>No invoices yet.</p>
+<?php else: ?>
+  <?php  $this->start_component('webkernel::table',[]); ?>
+    <?php  $this->start_component('webkernel::table.header',[]); ?>
+      <?php foreach($columns as $column): ?>
+        <?php  $this->start_component('webkernel::table.header-cell',[]); ?><?php echo \Webkernel\View\View::echo($column['label']); ?><?php echo $this->render_component(); ?>
+      <?php endforeach; ?>
+      <?php  $this->start_component('webkernel::table.header-cell',[]); ?><?php echo $this->render_component(); ?>
+    <?php echo $this->render_component(); ?>
+    <?php  $this->start_component('webkernel::table.body',[]); ?>
+      <?php foreach($invoices as $invoice): ?>
+        <?php 
+          $edit_href = '/billing/invoices/'.$invoice->id.'/edit';
+         ?>
+        <?php  $this->start_component('webkernel::table.row',['href'=>$edit_href]); ?>
+          <?php foreach($columns as $column): ?>
+            <?php  $this->start_component('webkernel::table.cell',[]); ?><?php echo \Webkernel\View\View::echo($invoice->{$column['key']}); ?><?php echo $this->render_component(); ?>
+          <?php endforeach; ?>
+          <?php  $this->start_component('webkernel::table.cell',[]); ?>
+            <?php  $this->start_component('webkernel::button',['href'=>'']); ?>id }}/edit" tag="a" size="sm" color="gray">Edit<?php echo $this->render_component(); ?>
+          <?php echo $this->render_component(); ?>
+        <?php echo $this->render_component(); ?>
+      <?php endforeach; ?>
+    <?php echo $this->render_component(); ?>
+  <?php echo $this->render_component(); ?>
+<?php endif; ?>
