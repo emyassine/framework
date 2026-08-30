@@ -24,9 +24,9 @@ final class Pipeline
         foreach (token_get_all($source) as $token) {
             if (is_array($token) && $token[0] === T_INLINE_HTML) {
                 $html = $token[1];
+                $html = Comments::compile($html);
                 $html = Components::compile($html);
                 $html = Statements::compile($html, $state);
-                $html = Comments::compile($html);
                 $html = Echoes::compile($html, $state->echo_format);
                 $out .= $html;
                 continue;

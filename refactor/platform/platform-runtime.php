@@ -53,11 +53,17 @@ return array (
       'header_css' => '',
       'footer_js' => '',
       'session_timeout' => '120',
-      'rtl' => '0',
-      'maintenance' => '0',
+      'rtl' => '1',
+      'maintenance' => '1',
       'i18n' => 
       array (
         'en' => 
+        array (
+          'site_title' => '',
+          'meta_description' => '',
+          'keywords' => '',
+        ),
+        'es' => 
         array (
           'site_title' => '',
           'meta_description' => '',

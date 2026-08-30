@@ -1,6 +1,6 @@
 {{--
   Topbar: icon trigger. user-menu / sidebar: full-width trigger.
-  Panel is <x-webkernel::dropdown>. Locale switch stays POST /locale.
+  Panel is the Webkernel dropdown. Locale switch stays POST /locale.
 --}}
 @props([
   'context' => 'topbar',
@@ -70,12 +70,14 @@
             name="locale"
             :value="$code"
             :selected="$on"
-            :icon="$on ? 'check' : null"
           >
             @if ($show_flags)
               <span class="w-lang-flag">{!! flag_markup((string) $code) !!}</span>
             @endif
             <span>{{ $label }}</span>
+            @if ($on)
+              <x-webkernel::icon name="check" />
+            @endif
           </x-webkernel::dropdown.list.item>
         @empty
           <div class="w-lang-empty">{{ $empty }}</div>

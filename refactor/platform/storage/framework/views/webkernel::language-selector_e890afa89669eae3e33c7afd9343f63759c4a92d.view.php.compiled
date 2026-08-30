@@ -41,7 +41,7 @@
     : $current;
  ?>
 <div class="w-lang w-lang-<?php echo \Webkernel\View\View::echo($context); ?>">
-  <x-webkernel::dropdown :placement="$placement" width="lang">
+  <?php  $this->start_component('webkernel::dropdown',['placement'=>$placement,'width'=>'lang']); ?>
     <?php  $this->slot('trigger'); ?>
       <button type="button" class="w-lang-trigger" title="<?php echo \Webkernel\View\View::echo($tooltip); ?>">
         <?php if($show_flags): ?>
@@ -63,11 +63,14 @@
             $label = \function_exists('i18n_catalog_language_label') ? i18n_catalog_language_label((string) $code) : (string) $code;
             $on = (string) $code === $current;
            ?>
-          <?php  $this->start_component('webkernel::dropdown.list.item',['type'=>'submit','name'=>'locale','value'=>$code,'selected'=>$on,'icon'=>$on ? 'check' : null]); ?>
+          <?php  $this->start_component('webkernel::dropdown.list.item',['type'=>'submit','name'=>'locale','value'=>$code,'selected'=>$on]); ?>
             <?php if($show_flags): ?>
               <span class="w-lang-flag"><?php echo flag_markup((string) $code); ?></span>
             <?php endif; ?>
             <span><?php echo \Webkernel\View\View::echo($label); ?></span>
+            <?php if($on): ?>
+              <span class="w-icon"><svg class="w-icon-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256"><rect width="256" height="256" fill="none"/><polyline points="40 144 96 200 224 72" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="16"/></svg></span>
+            <?php endif; ?>
           <?php echo $this->render_component(); ?>
         <?php endforeach; if ($__empty_1): ?>
           <div class="w-lang-empty"><?php echo \Webkernel\View\View::echo($empty); ?></div>

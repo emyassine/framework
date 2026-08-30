@@ -11,6 +11,7 @@ use PHPUnit\Framework\TestCase;
 use Webkernel\Config\Config;
 use Webkernel\I18n\Catalog;
 use Webkernel\I18n\I18nContext;
+use Webkernel\View\View;
 
 final class FastI18nTest extends TestCase
 {
@@ -109,7 +110,7 @@ final class FastI18nTest extends TestCase
      */
     public function test_language_selector_uses_webkernel_dropdown(): void
     {
-        $html = \Webkernel\View\View::make('webkernel::language-selector')->render();
+        $html = View::make('webkernel::language-selector')->render();
         $this->assertStringContainsString('data-w-dropdown', $html);
         $this->assertStringContainsString('w-lang-trigger', $html);
         $this->assertStringContainsString('name="locale"', $html);
