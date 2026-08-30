@@ -19,6 +19,8 @@
 <p {{ $attributes->class(['w-fo-field', 'w-invalid' => $error]) }}>
   <label>
     {{ $label }}
+    <span class="w-input-wrp{{ $disabled ? ' w-disabled' : '' }}{{ $error ? ' w-invalid' : '' }}">
+      <span class="w-input-wrp-content">
 @endif
 <select
   name="{{ $name }}"
@@ -34,6 +36,8 @@
   @endif
 </select>
 @if ($label)
+      </span>
+    </span>
   </label>
   @if ($error)
     <span class="w-field-error">{{ $error }}</span>

@@ -16,6 +16,8 @@
   <label>
     <?php echo \Webkernel\View\View::echo($label); ?>
 
+    <span class="w-input-wrp<?php echo \Webkernel\View\View::echo($disabled ? ' w-disabled' : ''); ?><?php echo \Webkernel\View\View::echo($error ? ' w-invalid' : ''); ?>">
+      <span class="w-input-wrp-content">
 <?php endif; ?>
 <select
   name="<?php echo \Webkernel\View\View::echo($name); ?>"
@@ -32,6 +34,8 @@
   <?php endif; ?>
 </select>
 <?php if($label): ?>
+      </span>
+    </span>
   </label>
   <?php if($error): ?>
     <span class="w-field-error"><?php echo \Webkernel\View\View::echo($error); ?></span>

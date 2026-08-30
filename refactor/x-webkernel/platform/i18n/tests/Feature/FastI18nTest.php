@@ -98,6 +98,8 @@ final class FastI18nTest extends TestCase
         $this->assertStringContainsString('viewBox', $html);
         $this->assertStringNotContainsString('width="512"', $html);
         $this->assertStringNotContainsString('height="512"', $html);
+        $this->assertStringContainsString('width="16"', $html);
+        $this->assertStringContainsString('height="16"', $html);
         $this->assertStringNotContainsString('<span', $html);
         $this->assertStringContainsString('w-flag-en-', $html);
     }

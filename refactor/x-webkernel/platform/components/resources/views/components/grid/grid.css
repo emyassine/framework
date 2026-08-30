@@ -2,11 +2,13 @@
   display: grid;
   gap: var(--w-grid-gap, 1rem);
   min-width: 0;
+  align-items: start;
   grid-template-columns: repeat(var(--cols-default, 1), minmax(0, 1fr));
 }
 .w-grid.w-dense { --w-grid-gap: 0.5rem; }
 .w-grid.w-no-gap { --w-grid-gap: 0; }
 .w-grid-container { container-type: inline-size; }
+.w-grid > .w-fo-field { margin-bottom: 0; }
 .w-col { min-width: 0; }
 .w-span-full { grid-column: 1 / -1; }
 .w-flex-grow { flex: 1 1 0%; min-width: 0; }

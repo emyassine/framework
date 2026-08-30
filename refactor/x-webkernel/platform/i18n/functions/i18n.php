@@ -225,9 +225,12 @@ if (! \function_exists('flag_markup')) {
         $uid = 'w-flag-'.\preg_replace('/[^a-z0-9]+/', '-', $used);
         $svg = \preg_replace('/\bid="([^"]+)"/', 'id="'.$uid.'-$1"', $svg) ?? $svg;
         $svg = \preg_replace('/url\(#([^)]+)\)/', 'url(#'.$uid.'-$1)', $svg) ?? $svg;
-        if (! \str_contains($svg, 'class=')) {
-            $svg = \preg_replace('/<svg\b/i', '<svg class="w-lang-flag-svg"', $svg, 1) ?? $svg;
-        }
+        $svg = \preg_replace(
+            '/<svg\b/i',
+            '<svg class="w-lang-flag-svg" width="16" height="16"',
+            $svg,
+            1,
+        ) ?? $svg;
         if ($class === '') {
             return $svg;
         }

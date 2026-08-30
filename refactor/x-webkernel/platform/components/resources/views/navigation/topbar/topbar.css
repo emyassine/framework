@@ -10,12 +10,15 @@
   position: sticky;
   top: 0;
   z-index: 40;
+  overflow: visible;
 }
 .w-topbar-end {
   margin-inline-start: auto;
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  overflow: visible;
+  flex-shrink: 0;
 }
 .w-user-menu { position: relative; }
 .w-user-menu-trigger {

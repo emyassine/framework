@@ -4,7 +4,7 @@
   $back = \parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?: '/';
 @endphp
 <div class="w-lang" data-w-lang>
-  <button type="button" class="w-lang-trigger" onclick="this.parentElement.classList.toggle('w-open')" title="{{ lang('panel.language') }}">
+  <button type="button" class="w-lang-trigger" title="{{ lang('panel.language') }}">
     <span class="w-lang-flag">{!! flag_markup($current) !!}</span>
     <span>{{ \function_exists('i18n_catalog_language_label') ? i18n_catalog_language_label($current) : $current }}</span>
   </button>

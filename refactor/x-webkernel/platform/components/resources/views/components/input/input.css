@@ -21,3 +21,9 @@ input[type='datetime-local'].w-input,
 input[type='time'].w-input {
   background: color-mix(in srgb, var(--color-white) 1%, transparent);
 }
+input[type='color'].w-input {
+  width: 2.75rem;
+  height: 1.75rem;
+  padding: 0.15rem;
+  cursor: pointer;
+}

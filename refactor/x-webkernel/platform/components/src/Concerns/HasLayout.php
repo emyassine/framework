@@ -172,7 +172,14 @@ trait HasLayout
      */
     public function column_class(): string
     {
-        $class = ['w-col'];
+        $class = [];
+        $placed = isset($this->props['column_span'])
+            || isset($this->props['column_start'])
+            || isset($this->props['column_order'])
+            || \array_key_exists('grow', $this->props);
+        if ($placed) {
+            $class[] = 'w-col';
+        }
         if (($this->props['grow'] ?? null) === false) {
             $class[] = 'w-flex-nogrow';
         } elseif (($this->props['grow'] ?? null) === true) {
