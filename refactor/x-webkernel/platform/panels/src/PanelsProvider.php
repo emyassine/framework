@@ -11,6 +11,8 @@ use Webkernel\PlatformProvider;
 
 final class PanelsProvider extends PlatformProvider
 {
+    public const ROUTES = [__DIR__.'/../routes.php'];
+
     public const VIEWS = [
         'webkernel' => __DIR__.'/../resources/views',
     ];

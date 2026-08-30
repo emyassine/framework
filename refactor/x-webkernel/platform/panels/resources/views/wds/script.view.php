@@ -31,12 +31,39 @@
   }
   document.addEventListener('click', function (event) {
     const el = document.getElementById('wds-user-menu');
-    if (!el || el.contains(event.target)) {
-      return;
+    if (el && !el.contains(event.target)) {
+      el.classList.remove('wds-open');
     }
-    el.classList.remove('wds-open');
     document.querySelectorAll('[data-wds-lang]').forEach(function (box) {
       if (!box.contains(event.target)) box.classList.remove('wds-open');
+    });
+    document.querySelectorAll('[data-wds-dropdown]').forEach(function (box) {
+      if (box.contains(event.target)) {
+        if (event.target.closest('[data-wds-dropdown-trigger]')) {
+          box.classList.toggle('wds-open');
+        }
+        return;
+      }
+      box.classList.remove('wds-open');
+    });
+    const modalClose = event.target.closest('[data-wds-modal-close], [data-wds-modal-overlay]');
+    if (modalClose) {
+      const modal = modalClose.closest('[data-wds-modal]');
+      if (modal) modal.classList.remove('wds-open');
+    }
+    const modalTrigger = event.target.closest('[data-wds-modal-trigger]');
+    if (modalTrigger) {
+      const modal = modalTrigger.closest('[data-wds-modal]');
+      if (modal) modal.classList.add('wds-open');
+    }
+  });
+  document.addEventListener('keydown', function (event) {
+    if (event.key !== 'Escape') return;
+    document.querySelectorAll('[data-wds-modal].wds-open').forEach(function (modal) {
+      modal.classList.remove('wds-open');
+    });
+    document.querySelectorAll('[data-wds-dropdown].wds-open').forEach(function (box) {
+      box.classList.remove('wds-open');
     });
   });
 

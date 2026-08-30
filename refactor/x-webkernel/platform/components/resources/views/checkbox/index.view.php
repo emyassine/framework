@@ -1,0 +1,67 @@
+{{--
+  <x-webkernel::checkbox name="agree" :checked="true" label="I agree" />
+--}}
+@props([
+  'name' => '',
+  'value' => '1',
+  'checked' => false,
+  'disabled' => false,
+  'valid' => true,
+  'label' => null,
+])
+@php
+  $attributes = $attributes ?? new \Webkernel\View\AttributeBag([]);
+@endphp
+@once('wds.checkbox')
+<style>
+.wds-checkbox-wrap {
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  color: var(--wds-text); font-size: var(--wds-text-sm);
+}
+input[type='checkbox'].wds-checkbox-input {
+  width: 1rem; height: 1rem; appearance: none; border-radius: var(--wds-radius);
+  background: var(--wds-surface); vertical-align: middle;
+  box-shadow: 0 1px 2px color-mix(in srgb, var(--wds-text) 6%, transparent), 0 0 0 1px color-mix(in srgb, var(--wds-text) 10%, transparent);
+  outline: none; flex-shrink: 0;
+}
+input[type='checkbox'].wds-checkbox-input:checked {
+  background: var(--primary-600);
+  box-shadow: none;
+  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg viewBox='0 0 16 16' fill='%23fff' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M12.207 4.793a1 1 0 0 1 0 1.414l-5 5a1 1 0 0 1-1.414 0l-2-2a1 1 0 0 1 1.414-1.414L6.5 9.086l4.293-4.293a1 1 0 0 1 1.414 0z'/%3E%3C/svg%3E");
+  background-size: 100% 100%;
+}
+input[type='checkbox'].wds-checkbox-input:focus-visible {
+  box-shadow: 0 0 0 2px var(--primary-600);
+}
+input[type='checkbox'].wds-checkbox-input:indeterminate {
+  background: var(--primary-600);
+  box-shadow: none;
+  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg viewBox='0 0 16 16' fill='%23fff' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M4.5 6.75a1.25 1.25 0 0 0 0 2.5h7a1.25 1.25 0 0 0 0-2.5h-7z'/%3E%3C/svg%3E");
+  background-size: 100% 100%;
+}
+input[type='checkbox'].wds-checkbox-input.wds-invalid {
+  box-shadow: 0 0 0 1px var(--danger-600);
+}
+input[type='checkbox'].wds-checkbox-input.wds-invalid:checked { background: var(--danger-600); }
+input[type='checkbox'].wds-checkbox-input:disabled {
+  pointer-events: none; background: var(--wds-bg-subtle);
+}
+</style>
+@endonce
+<label class="wds-checkbox-wrap">
+  <input
+    type="checkbox"
+    name="{{ $name }}"
+    value="{{ $value }}"
+    @if ($checked) checked @endif
+    @if ($disabled) disabled @endif
+    {{ $attributes->class([
+      'wds-checkbox-input',
+      'wds-invalid' => ! $valid,
+    ]) }}
+  />
+  @if ($label !== null && $label !== '')
+    <span>{{ $label }}</span>
+  @endif
+  {!! $slot !!}
+</label>

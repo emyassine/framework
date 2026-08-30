@@ -7,13 +7,43 @@
 
 namespace Webkernel\Platform;
 
+use Webkernel\Platform\Panel\Concerns\HasPanelSidebar;
+use Webkernel\Platform\Panel\Concerns\HasSidebar;
+use Webkernel\Platform\Panel\Concerns\HasTopbar;
+
 /**
  * Fluent panel declaration. Dump-autoload snapshots this; the request reads the dump.
  *
  * //> Scope is not declared here. Dump infers it from the Composer package.
+ * //> Chrome lives in Concerns: sidebar() drawer, topbar() bar, panel_sidebar() icon rail.
+ *
+ * @mixin HasSidebar
+ * @mixin HasTopbar
+ * @mixin HasPanelSidebar
+ *
+ * @method self sidebar(bool $enabled = true)
+ * @method bool has_sidebar()
+ * @method self sidebar_width(string $width)
+ * @method string get_sidebar_width()
+ * @method self collapsed_sidebar_width(string $width)
+ * @method string get_collapsed_sidebar_width()
+ * @method self sidebar_collapsible_on_desktop(bool $condition = true)
+ * @method bool is_sidebar_collapsible_on_desktop()
+ * @method self collapsible_navigation_groups(bool $condition = true)
+ * @method bool has_collapsible_navigation_groups()
+ * @method self topbar(bool $enabled = true)
+ * @method bool has_topbar()
+ * @method self panel_sidebar(bool $enabled = true)
+ * @method bool has_panel_sidebar()
+ * @method self panel_sidebar_width(string $width)
+ * @method string get_panel_sidebar_width()
  */
 final class Panel
 {
+    use HasSidebar;
+    use HasTopbar;
+    use HasPanelSidebar;
+
     private string $id = '';
 
     private string $path = '';
@@ -285,7 +315,8 @@ final class Panel
      *   resources: list<class-string>,
      *   middleware: list<class-string>,
      *   auth_middleware: list<class-string>,
-     *   branding: array<string, mixed>
+     *   branding: array<string, mixed>,
+     *   chrome: array<string, mixed>
      * }
      */
     public function to_array(): array
@@ -317,6 +348,11 @@ final class Panel
                 'logo_height' => $this->brand_logo_height,
                 'colors' => $this->colors,
                 'dark_mode' => $this->dark_mode,
+            ],
+            'chrome' => [
+                ...$this->sidebar_chrome(),
+                ...$this->topbar_chrome(),
+                ...$this->panel_sidebar_chrome(),
             ],
         ];
     }

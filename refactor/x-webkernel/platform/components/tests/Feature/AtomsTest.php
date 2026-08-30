@@ -1,0 +1,62 @@
+<?php declare(strict_types=1);
+//> This file is part of Webkernel.
+//> (c) 2025 - 2027 Numerimondes, El Moumen Yassine
+//> Yassine El Moumen <yassine@numerimondes.com> | <platform@webkernelphp.com>
+//> For the full copyright and license information, please view the LICENSE
+//> file that was distributed with this source code.
+
+namespace Webkernel\Platform\Components\Tests\Feature;
+
+use PHPUnit\Framework\TestCase;
+use Webkernel\Config\Config;
+use Webkernel\Platform\Components\Badge;
+use Webkernel\Platform\Components\Breadcrumbs;
+use Webkernel\Platform\Components\Callout;
+use Webkernel\Platform\Components\EmptyState;
+use Webkernel\Platform\Components\Input;
+use Webkernel\View\View;
+
+final class AtomsTest extends TestCase
+{
+    protected function setUp(): void
+    {
+        Config::boot();
+        View::flush();
+    }
+
+    /**
+     * @return void
+     */
+    public function test_breadcrumbs_render_links_and_current(): void
+    {
+        $html = Breadcrumbs::make()
+            ->items([
+                ['label' => 'System', 'href' => '/system'],
+                ['label' => 'Overview', 'href' => ''],
+            ])
+            ->render();
+
+        $this->assertStringContainsString('wds-breadcrumbs', $html);
+        $this->assertStringContainsString('href="/system"', $html);
+        $this->assertStringContainsString('aria-current="page"', $html);
+        $this->assertSame('webkernel::breadcrumbs', Breadcrumbs::make()->view());
+    }
+
+    /**
+     * @return void
+     */
+    public function test_badge_callout_empty_state_and_input_views(): void
+    {
+        $badge = Badge::make()->color('success')->slot('Paid')->render();
+        $callout = Callout::make()->heading('Note')->color('warning')->slot('Body')->render();
+        $empty = EmptyState::make()->heading('None')->icon('receipt')->render();
+        $input = Input::make('email')->type('email')->render();
+
+        $this->assertStringContainsString('wds-badge', $badge);
+        $this->assertStringContainsString('Paid', $badge);
+        $this->assertStringContainsString('wds-callout', $callout);
+        $this->assertStringContainsString('wds-empty-state', $empty);
+        $this->assertStringContainsString('wds-input', $input);
+        $this->assertStringContainsString('type="email"', $input);
+    }
+}

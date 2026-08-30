@@ -12,8 +12,6 @@ use Webkernel\Console\Commands\ServerCommand;
 
 final class CodebaseProvider extends PlatformProvider
 {
-    public const ROUTES = [__DIR__.'/../routes.php'];
-
     public const VIEWS = [
         'webkernel' => __DIR__.'/../resources/views',
     ];

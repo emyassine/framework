@@ -12,7 +12,7 @@ use Webkernel\View\View;
 /**
  * Panel page. Title, subheader, breadcrumbs and header actions come from here.
  *
- * //> Views are the body only. Chrome is <x-webkernel::page>.
+ * //> Views are the body only. Chrome is <x-webkernel::page> (rail, sidebar, topbar, main, aside).
  * //> can_access() is per page. Panel roles/permissions wire this later.
  */
 abstract class Page

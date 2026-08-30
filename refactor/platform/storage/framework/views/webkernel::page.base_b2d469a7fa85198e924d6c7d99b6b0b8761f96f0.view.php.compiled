@@ -42,7 +42,7 @@ body { margin: 0; }
   <?php endif; ?>
   <title><?php echo \Webkernel\View\View::echo($title); ?></title>
   <meta name="description" content="<?php echo \Webkernel\View\View::echo($description); ?>" />
-  <?php  $this->start_component('webkernel::page.typography',['lang'=>$lang]); ?><?php echo $this->render_component(); ?>
+  <?php  $this->start_component('webkernel::typography',['lang'=>$lang]); ?><?php echo $this->render_component(); ?>
   <link rel="stylesheet" href="<?php echo \Webkernel\View\View::echo(\Webkernel\Platform\Wds::css_href()); ?>">
   <?php echo  $this->stack('styles'); ?>
   <?php echo  $this->stack('head'); ?>

@@ -1,0 +1,29 @@
+<?php  $__props = [
+  'title' => '',
+]; foreach ($__props as $__n => $__d) { if (!isset($$__n)) { $$__n = $__d; } } $attributes = (isset($attributes) && $attributes instanceof \Webkernel\View\AttributeBag ? $attributes : new \Webkernel\View\AttributeBag([]))->except(\array_keys($__props)); unset($__props, $__n, $__d); ?>
+<?php if ($this->once('wds.sidebar.header')): ?>
+<style>
+.wds-drawer-header {
+  flex: 0 0 auto;
+  height: 62px;
+  padding: 0 20px;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  box-shadow: color-mix(in srgb, currentColor 15%, transparent) 0 1px 0;
+  color: inherit;
+  overflow: hidden;
+}
+.wds-drawer-title {
+  font-size: 16px;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: inherit;
+}
+</style>
+<?php endif; ?>
+<div class="wds-drawer-header">
+  <span class="wds-drawer-title"><?php echo \Webkernel\View\View::echo($title); ?></span>
+</div>

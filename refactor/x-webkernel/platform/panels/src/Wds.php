@@ -8,9 +8,9 @@
 namespace Webkernel\Platform;
 
 /**
- * Dumped WDS stylesheet. Layouts link this file; request does not inline tokens/shell.
+ * Dumped WDS stylesheet. page.base links this file. Tokens live in wds/tokens.
  *
- * //> Source of truth is `resources/views/wds/*.view.php`. dump-autoload writes public/wds.css.
+ * //> Atom CSS lives on each component view. Dump concatenates those blocks into public/wds.css.
  */
 final class Wds
 {

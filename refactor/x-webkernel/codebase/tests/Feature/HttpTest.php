@@ -22,15 +22,25 @@ final class HttpTest extends TestCase
         Config::boot();
     }
 
-    public function test_home_route_renders_panel_layout(): void
+    public function test_root_route_redirects_to_the_default_panel(): void
     {
         $_SERVER['REQUEST_METHOD'] = 'GET';
         $_SERVER['REQUEST_URI'] = '/';
         $html = (string) Route::dispatch();
 
+        $this->assertSame('', $html);
+    }
+
+    public function test_default_panel_renders_layout(): void
+    {
+        $_SERVER['REQUEST_METHOD'] = 'GET';
+        $_SERVER['REQUEST_URI'] = '/system';
+        $html = (string) Route::dispatch();
+
         $this->assertStringContainsString('wds-rail', $html);
         $this->assertStringContainsString('wds-page', $html);
-        $this->assertStringContainsString('<title>Webkernel</title>', $html);
+        $this->assertStringContainsString('wds-breadcrumbs', $html);
+        $this->assertStringContainsString('<title>Overview</title>', $html);
         $this->assertStringContainsString('name="description"', $html);
     }
 }

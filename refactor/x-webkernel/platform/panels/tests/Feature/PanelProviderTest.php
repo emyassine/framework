@@ -10,6 +10,7 @@ namespace Webkernel\Platform\Tests\Feature;
 use PHPUnit\Framework\TestCase;
 use Webkernel\Composables\PanelComposable;
 use Webkernel\Config\Config;
+use Webkernel\Platform\Panel;
 use Webkernel\Platform\PanelProvider;
 use Webkernel\System\SystemPanelProvider;
 use Webkernel\View\View;
@@ -52,6 +53,28 @@ final class PanelProviderTest extends TestCase
         $this->assertTrue($data['default']);
         $this->assertSame('/favicon.ico', $data['branding']['favicon']);
         $this->assertSame('platform', $data['scope']);
+        $this->assertTrue($data['chrome']['sidebar']);
+        $this->assertTrue($data['chrome']['topbar']);
+        $this->assertTrue($data['chrome']['panel_sidebar']);
+    }
+
+    /**
+     * @return void
+     */
+    public function test_panel_chrome_concerns_are_fluent(): void
+    {
+        $data = Panel::make()
+            ->id('demo')
+            ->sidebar(false)
+            ->topbar(false)
+            ->panel_sidebar(false)
+            ->sidebar_width('18rem')
+            ->to_array();
+
+        $this->assertFalse($data['chrome']['sidebar']);
+        $this->assertFalse($data['chrome']['topbar']);
+        $this->assertFalse($data['chrome']['panel_sidebar']);
+        $this->assertSame('18rem', $data['chrome']['sidebar_width']);
     }
 
     /**

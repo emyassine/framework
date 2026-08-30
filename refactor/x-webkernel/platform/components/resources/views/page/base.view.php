@@ -43,7 +43,7 @@ body { margin: 0; }
   @endif
   <title>{{ $title }}</title>
   <meta name="description" content="{{ $description }}" />
-  <x-webkernel::page.typography :lang="$lang" />
+  <x-webkernel::typography :lang="$lang" />
   <link rel="stylesheet" href="{{ \Webkernel\Platform\Wds::css_href() }}">
   @stack('styles')
   @stack('head')

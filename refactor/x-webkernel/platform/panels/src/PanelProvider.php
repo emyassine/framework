@@ -15,10 +15,27 @@ use Webkernel\Platform\Colors\Color;
  *
  * //> Branding is applied here. Providers do not call apply_platform_config().
  * //> Scope is inferred from the Composer package. Providers do not call scope().
+ * //> Chrome on `$panel`: sidebar() drawer, topbar() bar, panel_sidebar() icon rail.
+ *
+ * @see Panel
+ * @see Panel\Concerns\HasSidebar
+ * @see Panel\Concerns\HasTopbar
+ * @see Panel\Concerns\HasPanelSidebar
+ *
+ * @method Panel sidebar(bool $enabled = true)
+ * @method Panel sidebar_width(string $width)
+ * @method Panel collapsed_sidebar_width(string $width)
+ * @method Panel sidebar_collapsible_on_desktop(bool $condition = true)
+ * @method Panel collapsible_navigation_groups(bool $condition = true)
+ * @method Panel topbar(bool $enabled = true)
+ * @method Panel panel_sidebar(bool $enabled = true)
+ * @method Panel panel_sidebar_width(string $width)
  */
 abstract class PanelProvider
 {
     /**
+     * Declare the panel. Chrome: `$panel->sidebar()`, `$panel->topbar()`, `$panel->panel_sidebar()`.
+     *
      * @param $panel Panel
      * @return Panel
      */

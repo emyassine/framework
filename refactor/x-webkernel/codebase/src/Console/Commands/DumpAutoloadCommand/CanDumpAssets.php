@@ -19,7 +19,7 @@ trait CanDumpAssets
     use _DumpAutoloadCommand;
 
     /** @var list<string> */
-    private const WDS_CSS_ORDER = ['tokens', 'shell', 'simple'];
+    private const WDS_CSS_ORDER = ['tokens'];
 
     /**
      * @param list<array{path: string, package: array<string, mixed>}> $packages
@@ -197,7 +197,7 @@ trait CanDumpAssets
             .self::generated_header()."\n"
             ."//>\n"
             ."//> Generated. Do not edit.\n"
-            ."//> WDS chrome. Source: resources/views/wds/*.view.php\n"
+            ."//> WDS tokens plus component CSS. Source: views/wds/tokens and each component view.\n"
             ."*/\n\n";
         $body = [];
         foreach ($parts as $part) {

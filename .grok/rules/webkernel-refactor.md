@@ -27,14 +27,14 @@ Moves still pending (do them when implementing, not later as afterthoughts):
 
 ## Page layout
 
-Four regions. Do not nest the right aside inside the left group.
+Four regions. Do not nest the right aside inside the left group. These are **not** `page.*` tags.
 
-1. Icon rail — `x-webkernel::page.panels.rail` — narrow left bar, module/panel icons only.
-2. Submenu drawer — `x-webkernel::page.menu.drawer` — collapsible, hover or click, menus of the active panel.
-3. Main content — `x-webkernel::page.main`.
-4. Right aside — `x-webkernel::page.aside` — inspection / widgets, after `page.main`.
+1. Icon rail — `x-webkernel::rail` / `x-webkernel::rail.button` — narrow left bar, module/panel icons only. Panel: `panel_sidebar()`.
+2. Submenu drawer — `x-webkernel::sidebar` / `sidebar.header` / `sidebar.item` — collapsible menus of the active panel. Panel: `sidebar()`.
+3. Main content — `x-webkernel::main`. Top bar inside it: `x-webkernel::topbar` (breadcrumbs via `x-webkernel::breadcrumbs`). Panel: `topbar()`.
+4. Right aside — `x-webkernel::aside` — inspection / widgets, after `main`.
 
-Left rail + drawer sit in `x-webkernel::page.sidebar.group` (`position="left"`). State is Alpine (`active_panel`, `drawer_open`): `@mouseenter` opens the matching drawer, `@click` toggles it.
+Left rail + drawer sit in `x-webkernel::sidebar.group` (`position="left"`). State is `data-wds-sidebar` on `<html>`.
 
 Valid HTML only. No orphan tags, no duplicate wrappers.
 

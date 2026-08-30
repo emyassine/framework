@@ -41,17 +41,30 @@ final class PanelViewTest extends TestCase
         $this->assertStringContainsString('<svg', $html);
         $this->assertStringContainsString('<title>Overview</title>', $html);
         $this->assertStringContainsString('name="description"', $html);
+        $this->assertStringContainsString('wds-breadcrumbs', $html);
+        $this->assertStringContainsString('wds-topbar', $html);
     }
 
     /**
      * @return void
      */
-    public function test_page_component_renders_slot(): void
+    public function test_page_component_renders_slot_and_breadcrumbs(): void
     {
-        $html = View::make('webkernel::pages.home')->render();
+        $html = View::make('webkernel::page', [
+            'title' => 'X',
+            'header' => 'X',
+            'breadcrumbs' => [
+                ['label' => 'System', 'href' => '/system'],
+                ['label' => 'Overview', 'href' => ''],
+            ],
+            'slot' => 'hi',
+        ])->render();
 
         $this->assertStringContainsString('wds-page', $html);
-        $this->assertStringContainsString('Platform is working', $html);
+        $this->assertStringContainsString('hi', $html);
+        $this->assertStringContainsString('wds-breadcrumbs', $html);
+        $this->assertStringContainsString('href="/system"', $html);
+        $this->assertStringContainsString('Overview', $html);
     }
 
     /**

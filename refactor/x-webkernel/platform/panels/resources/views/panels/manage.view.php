@@ -1,3 +1,44 @@
+@once('wds.form-row')
+<style>
+.wds-form-row {
+  display: grid;
+  grid-template-columns: max(12em, 26%) 1fr;
+  gap: 1.25em;
+  padding: 1.15em 1.25em;
+  border-bottom: 1px solid var(--wds-border);
+  align-items: start;
+  color: var(--wds-text);
+}
+.wds-form-row:last-child { border-bottom: 0; }
+.wds-form-row > label { font-weight: 500; padding-top: 0.45em; }
+.wds-form-row input[type="text"],
+.wds-form-row input[type="url"],
+.wds-form-row input[type="email"],
+.wds-form-row input[type="number"],
+.wds-form-row input[type="color"],
+.wds-form-row select,
+.wds-form-row textarea {
+  max-width: 32em; width: 100%; font: inherit; color: var(--wds-text);
+  background: var(--wds-surface); border: 1px solid var(--wds-border-strong);
+  border-radius: var(--wds-radius); padding: 0.55em 0.8em;
+}
+.wds-form-row textarea { min-height: 6em; font-family: var(--wds-font-mono); font-size: 12px; }
+.wds-form-hint { display: block; margin-top: 0.35em; font-size: 12px; color: var(--wds-text-muted); }
+.wds-form-actions {
+  position: sticky; bottom: 0; padding: 1em 1.25em;
+  background: var(--wds-surface); border-top: 1px solid var(--wds-border);
+}
+.wds-flash {
+  padding: 0.8em 1em; border-radius: var(--wds-radius);
+  background: color-mix(in srgb, var(--primary-600) 12%, transparent);
+  color: var(--wds-text);
+}
+@media (max-width: 720px) {
+  .wds-form-row { grid-template-columns: 1fr; gap: 0.4em; }
+  .wds-form-row > label { padding-top: 0; }
+}
+</style>
+@endonce
 @php
   $v = $values ?? [];
   $g = static fn (string $key, string $default = '') => (string) ($v[$key] ?? $default);

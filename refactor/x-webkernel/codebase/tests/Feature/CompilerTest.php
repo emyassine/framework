@@ -70,7 +70,7 @@ final class CompilerTest extends TestCase
     {
         $compiler = new Compiler(new Directives(), '\\'.View::class.'::echo(%s)');
         $php = $compiler->compile_string(
-            '<x-webkernel::page.panel.button :panel_id="$app_id" :logo_shape="$shape" />'
+            '<x-webkernel::rail.button :panel_id="$app_id" :logo_shape="$shape" />'
         );
 
         $this->assertStringContainsString("'panel_id'=>\$app_id", $php);
