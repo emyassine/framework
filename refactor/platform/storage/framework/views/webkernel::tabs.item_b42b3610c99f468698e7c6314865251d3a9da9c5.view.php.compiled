@@ -17,6 +17,7 @@
 <button
   type="button"
   <?php echo \Webkernel\View\View::echo($attributes->class(['w-tabs-item', 'w-active' => $active])->merge([
+    'id' => 'tab-'.$tab,
     'role' => 'tab',
     'aria-selected' => $active ? 'true' : 'false',
     'data-tab' => $tab,

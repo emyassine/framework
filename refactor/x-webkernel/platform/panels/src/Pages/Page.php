@@ -7,7 +7,9 @@
 
 namespace Webkernel\Platform\Pages;
 
+use Webkernel\Platform\Components\Action;
 use Webkernel\Platform\Notification;
+use Webkernel\Platform\Schemas\Schema;
 use Webkernel\View\Liveview;
 use Webkernel\View\View;
 
@@ -103,9 +105,17 @@ abstract class Page
     }
 
     /**
-     * @return list<string>
+     * @return list<Action|string>
      */
     public function get_header_actions(): array
+    {
+        return [];
+    }
+
+    /**
+     * @return list<Action>
+     */
+    public function get_footer_actions(): array
     {
         return [];
     }
@@ -170,19 +180,25 @@ abstract class Page
             return 'Forbidden';
         }
         $body = $slot;
+        $data = $body === null ? $this->view_data() : [];
         if ($body === null) {
             $view = $this->view();
-            $body = $view !== '' ? View::make($view, $this->view_data())->render() : '';
+            $body = $view !== '' ? View::make($view, $data)->html() : $this->render_schema($data);
         }
         $body = Notification::render().$body;
         if (Liveview::is_request()) {
             return $body;
         }
+        $header_actions = [];
+        foreach ($this->get_header_actions() as $action) {
+            $header_actions[] = $action instanceof Action ? $action->render() : (string) $action;
+        }
+
         return View::make('webkernel::page', [
             'title' => $this->get_title(),
             'header' => $this->get_header(),
             'description' => $this->get_subheader(),
-            'header_actions' => $this->get_header_actions(),
+            'header_actions' => $header_actions,
             'breadcrumbs' => $this->get_breadcrumbs(),
             'slot' => $body,
         ])->render();
@@ -204,5 +220,20 @@ abstract class Page
         $spaced = \preg_replace('/([a-z0-9])([A-Z])/', '$1 $2', $short);
 
         return \is_string($spaced) ? $spaced : $short;
+    }
+
+    /**
+     * @param $data array<string, mixed>
+     *
+     * @return string
+     */
+    private function render_schema(array $data): string
+    {
+        $schema = $data['schema'] ?? null;
+        if ($schema instanceof Schema) {
+            return $schema->to_html();
+        }
+
+        return '';
     }
 }

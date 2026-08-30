@@ -178,6 +178,19 @@ final class Tabs extends Component
     }
 
     /**
+     * @return list<\Webkernel\Platform\Schemas\Schema>
+     */
+    public function nested_schemas(): array
+    {
+        $out = [];
+        foreach ($this->child_tabs as $tab) {
+            $out[] = $tab->child_schema();
+        }
+
+        return $out;
+    }
+
+    /**
      * @param $extra array<string, mixed>
      *
      * @return string
@@ -221,12 +234,15 @@ final class Tabs extends Component
                 if ($mode instanceof SchemaMode) {
                     $schema->mode($mode);
                 }
-                $panels .= TabsPanel::make()
+                $panel = TabsPanel::make()
                     ->tab($id)
                     ->active($is_active)
-                    ->columns($tab->get_columns())
-                    ->slot($schema->render($state, $errors))
-                    ->render();
+                    ->slot($schema->render_tree($state, $errors));
+                $cols = $tab->get_columns();
+                if ($cols !== null) {
+                    $panel->columns($cols);
+                }
+                $panels .= $panel->render();
             }
             $extra['list'] = $list;
             $extra['slot'] = $panels;

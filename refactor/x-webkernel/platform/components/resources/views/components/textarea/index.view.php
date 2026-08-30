@@ -15,24 +15,24 @@
   'error' => null,
 ])
 @php
+  $attributes = $attributes ?? new \Webkernel\View\AttributeBag([]);
   $rows = \is_numeric($rows) ? (int) $rows : 2;
   if ($rows < 1) {
     $rows = 2;
   }
-  $initial_height = (($rows) * 1.5) + 0.75;
 @endphp
 @if ($mode === 'readonly')
-  <div class="w-fo-field w-readonly">
+  <div {{ $attributes->class(['w-fo-field', 'w-readonly']) }}>
     <dt>{{ $label ?? $name }}</dt>
     <dd>{{ $value }}</dd>
   </div>
 @else
-  <p class="w-fo-field w-fo-textarea-wrp{{ $error ? ' w-invalid' : '' }}">
+  <p {{ $attributes->class(['w-fo-field', 'w-fo-textarea-wrp', 'w-invalid' => $error]) }}>
     <label>
       {{ $label ?? $name }}
       <span class="w-input-wrp{{ $disabled ? ' w-disabled' : '' }}{{ $error ? ' w-invalid' : '' }}">
         <span class="w-input-wrp-content">
-          <span class="w-fo-textarea{{ $autosize ? ' w-autosizable' : '' }}" style="height: {{ $initial_height }}rem" data-w-textarea>
+          <span class="w-fo-textarea{{ $autosize ? ' w-autosizable' : '' }}" style="--w-rows: {{ $rows }}" data-w-textarea>
             <textarea
               class="w-input"
               name="{{ $name }}"

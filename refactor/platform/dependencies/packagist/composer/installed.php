@@ -3,7 +3,7 @@
         'name' => 'webkernel/webkernel',
         'pretty_version' => 'dev-main',
         'version' => 'dev-main',
-        'reference' => '6807124d81c4e2b94e094992f1580f09a241bece',
+        'reference' => 'd79f150ff6bc5de09e38454b6e31308cbb4e79ff',
         'type' => 'project',
         'install_path' => __DIR__ . '/../../../../',
         'aliases' => array(),
@@ -63,6 +63,15 @@
             'install_path' => __DIR__ . '/../phar-io/version',
             'aliases' => array(),
             'dev_requirement' => true,
+        ),
+        'phpmailer/phpmailer' => array(
+            'pretty_version' => 'v6.12.0',
+            'version' => '6.12.0.0',
+            'reference' => 'd1ac35d784bf9f5e61b424901d5a014967f15b12',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../phpmailer/phpmailer',
+            'aliases' => array(),
+            'dev_requirement' => false,
         ),
         'phpunit/php-code-coverage' => array(
             'pretty_version' => '11.0.12',
@@ -355,7 +364,7 @@
         'webkernel/codebase' => array(
             'pretty_version' => '0.12.0',
             'version' => '0.12.0.0',
-            'reference' => '5cc94a3397012e5a27e1b8f347882070f4ce4560',
+            'reference' => '60a3e71a48d1423c2288f91f6834d2e5da8a6ea9',
             'type' => 'library',
             'install_path' => __DIR__ . '/../webkernel/codebase',
             'aliases' => array(),
@@ -427,7 +436,7 @@
         'webkernel/panels' => array(
             'pretty_version' => '0.12.0',
             'version' => '0.12.0.0',
-            'reference' => '6d7f7460df6150b3cbb157766ec9655659e8f51a',
+            'reference' => '9528d81edd116bc659d49368ace4d47c9d822680',
             'type' => 'webkernel-stdlib',
             'install_path' => __DIR__ . '/../webkernel/panels',
             'aliases' => array(),
@@ -463,7 +472,7 @@
         'webkernel/webkernel' => array(
             'pretty_version' => 'dev-main',
             'version' => 'dev-main',
-            'reference' => '6807124d81c4e2b94e094992f1580f09a241bece',
+            'reference' => 'd79f150ff6bc5de09e38454b6e31308cbb4e79ff',
             'type' => 'project',
             'install_path' => __DIR__ . '/../../../../',
             'aliases' => array(),

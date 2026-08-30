@@ -1,18 +1,2 @@
-<div id="w-manage">
-  <form
-    method="post"
-    action="<?php echo \Webkernel\View\View::echo($action); ?>"
-    hx-post="<?php echo \Webkernel\View\View::echo($action); ?>"
-    hx-target="#w-manage"
-    hx-swap="outerHTML"
-  >
-    <?php echo \Webkernel\Csrf::field(); ?>
+<?php echo $schema; ?>
 
-    <input type="hidden" name="edit_locale" value="<?php echo \Webkernel\View\View::echo($edit_locale); ?>" />
-    <?php echo $schema; ?>
-
-    <div class="w-form-actions">
-      <?php  $this->start_component('webkernel::button',['type'=>'submit','color'=>'primary']); ?><?php echo \Webkernel\View\View::echo(\function_exists('lang') ? lang('panel.save') : 'Save'); ?><?php echo $this->render_component(); ?>
-    </div>
-  </form>
-</div>

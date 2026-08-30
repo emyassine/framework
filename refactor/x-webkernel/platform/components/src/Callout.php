@@ -10,7 +10,7 @@ namespace Webkernel\Platform\Components;
 /**
  * Inline notice. View: `<x-webkernel::callout>`.
  */
-final class Callout extends Component
+final class Callout extends LayoutComponent
 {
     /**
      * @return string

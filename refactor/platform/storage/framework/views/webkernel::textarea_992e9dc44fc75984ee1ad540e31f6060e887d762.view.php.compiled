@@ -13,25 +13,25 @@
   'error' => null,
 ]; foreach ($__props as $__n => $__d) { if (!isset($$__n)) { $$__n = $__d; } } $attributes = (isset($attributes) && $attributes instanceof \Webkernel\View\AttributeBag ? $attributes : new \Webkernel\View\AttributeBag([]))->except(\array_keys($__props)); unset($__props, $__n, $__d); ?>
 <?php 
+  $attributes = $attributes ?? new \Webkernel\View\AttributeBag([]);
   $rows = \is_numeric($rows) ? (int) $rows : 2;
   if ($rows < 1) {
     $rows = 2;
   }
-  $initial_height = (($rows) * 1.5) + 0.75;
  ?>
 <?php if($mode === 'readonly'): ?>
-  <div class="w-fo-field w-readonly">
+  <div <?php echo \Webkernel\View\View::echo($attributes->class(['w-fo-field', 'w-readonly'])); ?>>
     <dt><?php echo \Webkernel\View\View::echo($label ?? $name); ?></dt>
     <dd><?php echo \Webkernel\View\View::echo($value); ?></dd>
   </div>
 <?php else: ?>
-  <p class="w-fo-field w-fo-textarea-wrp<?php echo \Webkernel\View\View::echo($error ? ' w-invalid' : ''); ?>">
+  <p <?php echo \Webkernel\View\View::echo($attributes->class(['w-fo-field', 'w-fo-textarea-wrp', 'w-invalid' => $error])); ?>>
     <label>
       <?php echo \Webkernel\View\View::echo($label ?? $name); ?>
 
       <span class="w-input-wrp<?php echo \Webkernel\View\View::echo($disabled ? ' w-disabled' : ''); ?><?php echo \Webkernel\View\View::echo($error ? ' w-invalid' : ''); ?>">
         <span class="w-input-wrp-content">
-          <span class="w-fo-textarea<?php echo \Webkernel\View\View::echo($autosize ? ' w-autosizable' : ''); ?>" style="height: <?php echo \Webkernel\View\View::echo($initial_height); ?>rem" data-w-textarea>
+          <span class="w-fo-textarea<?php echo \Webkernel\View\View::echo($autosize ? ' w-autosizable' : ''); ?>" style="--w-rows: <?php echo \Webkernel\View\View::echo($rows); ?>" data-w-textarea>
             <textarea
               class="w-input"
               name="<?php echo \Webkernel\View\View::echo($name); ?>"

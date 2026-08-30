@@ -45,16 +45,29 @@ final class TabsPanel extends Component
     }
 
     /**
-     * @param $columns int|null
+     * @param $columns int|array<string, int>|null
      *
      * @return static
      */
-    public function columns(?int $columns): static
+    public function columns(int|array|null $columns): static
     {
         if ($columns !== null) {
             $this->props['columns'] = $columns;
         }
 
         return $this;
+    }
+
+    /**
+     * @param $extra array<string, mixed>
+     *
+     * @return string
+     */
+    public function render(array $extra = []): string
+    {
+        $extra['grid_class'] = $this->grid_class();
+        $extra['grid_style'] = $this->grid_style();
+
+        return parent::render($extra);
     }
 }

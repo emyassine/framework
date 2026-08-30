@@ -8,10 +8,26 @@
 namespace Webkernel\Platform\Components;
 
 /**
- * Card around content. View: `<x-webkernel::section>`.
+ * Card around a nested schema. View: `<x-webkernel::section>`.
  */
-final class Section extends Component
+final class Section extends LayoutComponent
 {
+    /**
+     * @param $heading string
+     *
+     * @return static
+     */
+    public static function make(string $heading = ''): static
+    {
+        $self = new static();
+        $self->name = $heading;
+        if ($heading !== '') {
+            $self->props['heading'] = $heading;
+        }
+
+        return $self;
+    }
+
     /**
      * @return string
      */
@@ -79,5 +95,4 @@ final class Section extends Component
 
         return $this;
     }
-
 }

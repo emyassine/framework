@@ -10,7 +10,10 @@ namespace Webkernel\Platform\Pages;
 use Webkernel\Config\Config;
 use Webkernel\Csrf;
 use Webkernel\I18n\I18nContext;
+use Webkernel\Platform\Components\Action;
 use Webkernel\Platform\Components\Checkbox;
+use Webkernel\Platform\Components\Grid;
+use Webkernel\Platform\Components\Section;
 use Webkernel\Platform\Components\Select;
 use Webkernel\Platform\Components\Tab;
 use Webkernel\Platform\Components\Tabs;
@@ -23,7 +26,7 @@ use Webkernel\View\Liveview;
 /**
  * Injected into every panel. App owner edits branding, locale, legal, and system keys.
  *
- * //> Fields live on this class. The view renders Schema + a save button.
+ * //> The page View only echoes Schema. Form, CSRF, grid, and actions come from Schema.
  */
 final class ManagePanel extends Page
 {
@@ -107,6 +110,19 @@ final class ManagePanel extends Page
     }
 
     /**
+     * @return list<Action>
+     */
+    public function get_footer_actions(): array
+    {
+        return [
+            Action::make('save')
+                ->label($this->lang('panel.save', 'Save'))
+                ->color('primary')
+                ->submit(),
+        ];
+    }
+
+    /**
      * @return string
      */
     public function view(): string
@@ -175,8 +191,13 @@ final class ManagePanel extends Page
             'values' => $values,
             'edit_locale' => $edit_locale,
             'errors' => $this->errors,
-            'schema' => $this->schema($values)->render($values, $this->errors),
-            'action' => $action,
+            'schema' => $this->schema($values)
+                ->form($action)
+                ->autosave()
+                ->state($values)
+                ->errors($this->errors)
+                ->hidden(['edit_locale' => $edit_locale])
+                ->footer_actions($this->get_footer_actions()),
         ];
     }
 
@@ -295,29 +316,43 @@ final class ManagePanel extends Page
     private function branding_schema(): Schema
     {
         return Schema::make()->components([
-            TextInput::make('name')->label($this->lang('panel.field.name', 'Name')),
-            TextInput::make('site_title')->label($this->lang('panel.field.site_title', 'Site title')),
-            TextInput::make('meta_description')->label($this->lang('panel.field.meta_description', 'Meta description')),
-            TextInput::make('keywords')->label($this->lang('panel.field.keywords', 'Keywords')),
-            TextInput::make('favicon')->label($this->lang('panel.field.favicon', 'Favicon'))->type('url'),
-            TextInput::make('og_image')->label($this->lang('panel.field.og_image', 'Open Graph image'))->type('url'),
-            TextInput::make('logo_light')->label($this->lang('panel.field.logo_light', 'Logo (light)'))->type('url'),
-            TextInput::make('logo_dark')->label($this->lang('panel.field.logo_dark', 'Logo (dark)'))->type('url'),
-            TextInput::make('logo_height')->label($this->lang('panel.field.logo_height', 'Logo height')),
-            TextInput::make('logo_width')->label($this->lang('panel.field.logo_width', 'Logo width')),
-            TextInput::make('logo_alt')->label($this->lang('panel.field.logo_alt', 'Logo alt')),
-            Select::make('logo_shape')->label($this->lang('panel.field.logo_shape', 'Logo shape'))->options([
-                'favicon' => 'Favicon',
-                'round' => 'Round',
-                'square' => 'Square',
-                'responsive' => 'Responsive',
-            ]),
-            TextInput::make('color_primary')->label($this->lang('panel.field.primary', 'Primary'))->type('color'),
-            TextInput::make('color_secondary')->label($this->lang('panel.field.secondary', 'Secondary'))->type('color'),
-            TextInput::make('color_accent')->label($this->lang('panel.field.accent', 'Accent'))->type('color'),
-            TextInput::make('color_primary_dark')->label($this->lang('panel.field.primary', 'Primary').' (dark)')->type('color'),
-            TextInput::make('color_secondary_dark')->label($this->lang('panel.field.secondary', 'Secondary').' (dark)')->type('color'),
-            TextInput::make('color_accent_dark')->label($this->lang('panel.field.accent', 'Accent').' (dark)')->type('color'),
+            Section::make($this->lang('panel.section.identity', 'Identity'))
+                ->columns(2)
+                ->schema([
+                    TextInput::make('name')->label($this->lang('panel.field.name', 'Name')),
+                    TextInput::make('site_title')->label($this->lang('panel.field.site_title', 'Site title')),
+                    TextInput::make('meta_description')->label($this->lang('panel.field.meta_description', 'Meta description'))
+                        ->column_span_full(),
+                    TextInput::make('keywords')->label($this->lang('panel.field.keywords', 'Keywords'))
+                        ->column_span_full(),
+                    TextInput::make('favicon')->label($this->lang('panel.field.favicon', 'Favicon'))->type('url'),
+                    TextInput::make('og_image')->label($this->lang('panel.field.og_image', 'Open Graph image'))->type('url'),
+                ]),
+            Section::make($this->lang('panel.section.logo', 'Logo'))
+                ->columns(2)
+                ->schema([
+                    TextInput::make('logo_light')->label($this->lang('panel.field.logo_light', 'Logo (light)'))->type('url'),
+                    TextInput::make('logo_dark')->label($this->lang('panel.field.logo_dark', 'Logo (dark)'))->type('url'),
+                    TextInput::make('logo_height')->label($this->lang('panel.field.logo_height', 'Logo height')),
+                    TextInput::make('logo_width')->label($this->lang('panel.field.logo_width', 'Logo width')),
+                    TextInput::make('logo_alt')->label($this->lang('panel.field.logo_alt', 'Logo alt')),
+                    Select::make('logo_shape')->label($this->lang('panel.field.logo_shape', 'Logo shape'))->options([
+                        'favicon' => 'Favicon',
+                        'round' => 'Round',
+                        'square' => 'Square',
+                        'responsive' => 'Responsive',
+                    ]),
+                ]),
+            Section::make($this->lang('panel.section.colors', 'Colors'))
+                ->columns(['default' => 1, 'md' => 2, 'xl' => 3])
+                ->schema([
+                    TextInput::make('color_primary')->label($this->lang('panel.field.primary', 'Primary'))->type('color'),
+                    TextInput::make('color_secondary')->label($this->lang('panel.field.secondary', 'Secondary'))->type('color'),
+                    TextInput::make('color_accent')->label($this->lang('panel.field.accent', 'Accent'))->type('color'),
+                    TextInput::make('color_primary_dark')->label($this->lang('panel.field.primary', 'Primary').' (dark)')->type('color'),
+                    TextInput::make('color_secondary_dark')->label($this->lang('panel.field.secondary', 'Secondary').' (dark)')->type('color'),
+                    TextInput::make('color_accent_dark')->label($this->lang('panel.field.accent', 'Accent').' (dark)')->type('color'),
+                ]),
         ]);
     }
 
@@ -327,14 +362,16 @@ final class ManagePanel extends Page
     private function locale_schema(): Schema
     {
         return Schema::make()->components([
-            TextInput::make('locale')->label($this->lang('panel.field.locale', 'Locale')),
-            TextInput::make('allowed_locales')->label($this->lang('panel.field.allowed_locales', 'Allowed locales'))
-                ->hint($this->lang('panel.field.allowed_locales_hint', '')),
-            Checkbox::make('rtl')->label($this->lang('panel.field.rtl', 'RTL')),
-            TextInput::make('timezone')->label($this->lang('panel.field.timezone', 'Timezone')),
-            TextInput::make('date_format')->label($this->lang('panel.field.date_format', 'Date format')),
-            TextInput::make('time_format')->label($this->lang('panel.field.time_format', 'Time format')),
-            TextInput::make('currency')->label($this->lang('panel.field.currency', 'Currency')),
+            Grid::make()->columns(2)->schema([
+                TextInput::make('locale')->label($this->lang('panel.field.locale', 'Locale')),
+                TextInput::make('allowed_locales')->label($this->lang('panel.field.allowed_locales', 'Allowed locales'))
+                    ->hint($this->lang('panel.field.allowed_locales_hint', '')),
+                Checkbox::make('rtl')->label($this->lang('panel.field.rtl', 'RTL')),
+                TextInput::make('timezone')->label($this->lang('panel.field.timezone', 'Timezone')),
+                TextInput::make('date_format')->label($this->lang('panel.field.date_format', 'Date format')),
+                TextInput::make('time_format')->label($this->lang('panel.field.time_format', 'Time format')),
+                TextInput::make('currency')->label($this->lang('panel.field.currency', 'Currency')),
+            ]),
         ]);
     }
 
@@ -344,14 +381,17 @@ final class ManagePanel extends Page
     private function legal_schema(): Schema
     {
         return Schema::make()->components([
-            TextInput::make('support_email')->label($this->lang('panel.field.support_email', 'Support email'))->type('email'),
-            TextInput::make('help_url')->label($this->lang('panel.field.help_url', 'Help URL'))->type('url'),
-            TextInput::make('terms_url')->label($this->lang('panel.field.terms_url', 'Terms URL'))->type('url'),
-            TextInput::make('privacy_url')->label($this->lang('panel.field.privacy_url', 'Privacy URL'))->type('url'),
-            TextInput::make('copyright')->label($this->lang('panel.field.copyright', 'Copyright')),
-            TextInput::make('social_twitter')->label($this->lang('panel.field.social_twitter', 'Twitter')),
-            TextInput::make('social_github')->label($this->lang('panel.field.social_github', 'GitHub')),
-            TextInput::make('social_facebook')->label($this->lang('panel.field.social_facebook', 'Facebook')),
+            Grid::make()->columns(2)->schema([
+                TextInput::make('support_email')->label($this->lang('panel.field.support_email', 'Support email'))->type('email'),
+                TextInput::make('help_url')->label($this->lang('panel.field.help_url', 'Help URL'))->type('url'),
+                TextInput::make('terms_url')->label($this->lang('panel.field.terms_url', 'Terms URL'))->type('url'),
+                TextInput::make('privacy_url')->label($this->lang('panel.field.privacy_url', 'Privacy URL'))->type('url'),
+                TextInput::make('copyright')->label($this->lang('panel.field.copyright', 'Copyright'))
+                    ->column_span_full(),
+                TextInput::make('social_twitter')->label($this->lang('panel.field.social_twitter', 'Twitter')),
+                TextInput::make('social_github')->label($this->lang('panel.field.social_github', 'GitHub')),
+                TextInput::make('social_facebook')->label($this->lang('panel.field.social_facebook', 'Facebook')),
+            ]),
         ]);
     }
 
@@ -361,12 +401,23 @@ final class ManagePanel extends Page
     private function system_schema(): Schema
     {
         return Schema::make()->components([
-            Checkbox::make('maintenance')->label($this->lang('panel.field.maintenance', 'Maintenance')),
-            Textarea::make('maintenance_message')->label($this->lang('panel.field.maintenance_message', 'Maintenance message'))->rows(3),
-            TextInput::make('analytics_id')->label($this->lang('panel.field.analytics_id', 'Analytics ID')),
-            Textarea::make('header_css')->label($this->lang('panel.field.header_css', 'Header CSS'))->rows(5),
-            Textarea::make('footer_js')->label($this->lang('panel.field.footer_js', 'Footer JS'))->rows(5),
-            TextInput::make('session_timeout')->label($this->lang('panel.field.session_timeout', 'Session timeout'))->type('number'),
+            Section::make($this->lang('panel.section.system', 'System'))
+                ->columns(2)
+                ->schema([
+                    Checkbox::make('maintenance')->label($this->lang('panel.field.maintenance', 'Maintenance')),
+                    TextInput::make('session_timeout')->label($this->lang('panel.field.session_timeout', 'Session timeout'))->type('number'),
+                    Textarea::make('maintenance_message')->label($this->lang('panel.field.maintenance_message', 'Maintenance message'))
+                        ->rows(3)
+                        ->column_span_full(),
+                    TextInput::make('analytics_id')->label($this->lang('panel.field.analytics_id', 'Analytics ID'))
+                        ->column_span_full(),
+                    Textarea::make('header_css')->label($this->lang('panel.field.header_css', 'Header CSS'))
+                        ->rows(5)
+                        ->column_span_full(),
+                    Textarea::make('footer_js')->label($this->lang('panel.field.footer_js', 'Footer JS'))
+                        ->rows(5)
+                        ->column_span_full(),
+                ]),
         ]);
     }
 

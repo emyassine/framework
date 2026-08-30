@@ -12,7 +12,7 @@
   $attributes = $attributes ?? new \Webkernel\View\AttributeBag([]);
  ?>
 <?php if($label): ?>
-<p class="w-fo-field<?php echo \Webkernel\View\View::echo($error ? ' w-invalid' : ''); ?>">
+<p <?php echo \Webkernel\View\View::echo($attributes->class(['w-fo-field', 'w-invalid' => $error])); ?>>
   <label>
     <?php echo \Webkernel\View\View::echo($label); ?>
 
@@ -20,11 +20,7 @@
 <select
   name="<?php echo \Webkernel\View\View::echo($name); ?>"
   <?php if($disabled): ?> disabled <?php endif; ?>
-  <?php echo \Webkernel\View\View::echo($attributes->class([
-    'w-select-input',
-    'w-select-input-has-inline-prefix' => $inline_prefix,
-  ])); ?>
-
+  class="w-select-input<?php echo \Webkernel\View\View::echo($inline_prefix ? ' w-select-input-has-inline-prefix' : ''); ?>"
 >
   <?php if(\is_array($options) && $options !== []): ?>
     <?php foreach($options as $opt_value => $opt_label): ?>

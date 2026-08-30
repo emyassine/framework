@@ -13,17 +13,14 @@
   $attributes = $attributes ?? new \Webkernel\View\AttributeBag([]);
   $slot = $slot ?? '';
 @endphp
-<label class="w-checkbox-wrap">
+<label {{ $attributes->class(['w-checkbox-wrap']) }}>
   <input
     type="checkbox"
     name="{{ $name }}"
     value="{{ $value }}"
     @if ($checked) checked @endif
     @if ($disabled) disabled @endif
-    {{ $attributes->class([
-      'w-checkbox-input',
-      'w-invalid' => ! $valid,
-    ]) }}
+    class="w-checkbox-input{{ $valid ? '' : ' w-invalid' }}"
   />
   @if ($label !== null && $label !== '')
     <span>{{ $label }}</span>

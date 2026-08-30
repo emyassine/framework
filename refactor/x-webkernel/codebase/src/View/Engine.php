@@ -115,6 +115,34 @@ final class Engine
     }
 
     /**
+     * Render one View as HTML without resetting engine state.
+     *
+     * @param $view string
+     * @param $variables array<string, mixed>
+     *
+     * @return string
+     */
+    public function html(string $view, array $variables = []): string
+    {
+        $backup = $this->variables;
+        $this->variables = $this->variables_global === []
+            ? $variables
+            : array_merge($this->variables_global, $variables);
+        ob_start();
+        try {
+            $this->include_view($view);
+        } catch (\Throwable $e) {
+            ob_get_clean();
+            $this->variables = $backup;
+            throw $e;
+        }
+        $html = (string) ob_get_clean();
+        $this->variables = $backup;
+
+        return $html;
+    }
+
+    /**
      * @param array<string, mixed> $variables
      */
     public function run_child(string $view, array $variables = []): string

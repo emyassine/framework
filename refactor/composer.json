@@ -93,6 +93,7 @@
 	    "psr/http-message": "^1.0 || ^2.0",
 	    "psr/log": "^3.0",
 	    "psr/simple-cache": "^3.0",
+	    "phpmailer/phpmailer": "^6.10",
 	    "webkernel/auth": "^0.12.0",
 	    "webkernel/codebase": "^0.12.0",
 	    "webkernel/database": "^0.12.0",

@@ -6,6 +6,8 @@
   'contained' => true,
   'label_hidden' => false,
   'required' => false,
+  'grid_class' => '',
+  'grid_style' => '',
 ])
 @php
   $attributes = $attributes ?? new \Webkernel\View\AttributeBag([]);
@@ -20,5 +22,7 @@
       {{ $label }}@if ($required)<sup class="w-fieldset-label-required">*</sup>@endif
     </legend>
   @endif
-  {!! $slot !!}
+  <div class="{{ $grid_class !== '' ? $grid_class : '' }}"@if ($grid_style !== '') style="{{ $grid_style }}"@endif>
+    {!! $slot !!}
+  </div>
 </fieldset>

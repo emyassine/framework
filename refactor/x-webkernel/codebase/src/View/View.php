@@ -205,6 +205,9 @@ final class View implements ComposableContract, \Stringable
      */
     public static function echo(mixed $value): string
     {
+        if ($value instanceof Htmlable) {
+            return $value->to_html();
+        }
         if ($value instanceof Js || $value instanceof AttributeBag) {
             return (string) $value;
         }
@@ -249,6 +252,23 @@ final class View implements ComposableContract, \Stringable
         }
 
         return self::engine()->run($this->name, $this->data);
+    }
+
+    /**
+     * Nested View. Does not reset sections or re-run stack substitution.
+     *
+     * @param $template string|null
+     * @param $data array<string, mixed>
+     *
+     * @return string
+     */
+    public function html(?string $template = null, array $data = []): string
+    {
+        if ($template !== null) {
+            return self::engine()->html($template, $data);
+        }
+
+        return self::engine()->html($this->name, $this->data);
     }
 
     /**

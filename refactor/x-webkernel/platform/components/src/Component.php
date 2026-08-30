@@ -7,7 +7,9 @@
 
 namespace Webkernel\Platform\Components;
 
+use Webkernel\Platform\Components\Concerns\HasLayout;
 use Webkernel\Platform\Components\Concerns\HasMethodMake;
+use Webkernel\View\AttributeBag;
 use Webkernel\View\View;
 
 /**
@@ -16,11 +18,13 @@ use Webkernel\View\View;
  * //> `<x-webkernel::{name}>` and `::make()` render the same `.view.php`.
  *
  * @mixin HasMethodMake
+ * @mixin HasLayout
  *
  * @method static static make(string $name = '')
  */
 abstract class Component
 {
+    use HasLayout;
     use HasMethodMake;
 
     protected string $name = '';
@@ -88,10 +92,14 @@ abstract class Component
         if (! \array_key_exists('slot', $data)) {
             $data['slot'] = '';
         }
-        if (! isset($data['attributes']) || ! $data['attributes'] instanceof \Webkernel\View\AttributeBag) {
-            $data['attributes'] = new \Webkernel\View\AttributeBag($data);
+        if (! isset($data['attributes']) || ! $data['attributes'] instanceof AttributeBag) {
+            $bag = $this->extra_attribute_bag();
+            if (isset($extra['class']) && \is_string($extra['class']) && $extra['class'] !== '') {
+                $bag['class'] = \trim((string) ($bag['class'] ?? '').' '.$extra['class']);
+            }
+            $data['attributes'] = new AttributeBag($bag);
         }
 
-        return View::make($this->view(), $data)->render();
+        return View::make($this->view(), $data)->html();
     }
 }

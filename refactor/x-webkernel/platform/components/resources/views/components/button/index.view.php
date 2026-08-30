@@ -11,6 +11,7 @@
   'form' => null,
   'ghost' => false,
   'href' => null,
+  'name' => '',
   'icon' => null,
   'icon_position' => 'before',
   'outlined' => false,
@@ -20,6 +21,7 @@
   'tooltip' => null,
   'tooltip_placement' => 'top',
   'type' => 'button',
+  'value' => null,
 ])
 @php
   $tag = $tag === 'a' || ($href !== null && $href !== '') ? 'a' : 'button';
@@ -39,6 +41,8 @@
   @endif
   @if ($tag === 'button')
     type="{{ $type }}"
+    @if ($name !== '' && $name !== null) name="{{ $name }}" @endif
+    @if ($value !== null && $value !== '') value="{{ $value }}" @endif
     @if ($form) form="{{ $form }}" @endif
     @if ($disabled) disabled @endif
   @endif

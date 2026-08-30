@@ -11,18 +11,14 @@
   $attributes = $attributes ?? new \Webkernel\View\AttributeBag([]);
   $slot = $slot ?? '';
  ?>
-<label class="w-checkbox-wrap">
+<label <?php echo \Webkernel\View\View::echo($attributes->class(['w-checkbox-wrap'])); ?>>
   <input
     type="checkbox"
     name="<?php echo \Webkernel\View\View::echo($name); ?>"
     value="<?php echo \Webkernel\View\View::echo($value); ?>"
     <?php if($checked): ?> checked <?php endif; ?>
     <?php if($disabled): ?> disabled <?php endif; ?>
-    <?php echo \Webkernel\View\View::echo($attributes->class([
-      'w-checkbox-input',
-      'w-invalid' => ! $valid,
-    ])); ?>
-
+    class="w-checkbox-input<?php echo \Webkernel\View\View::echo($valid ? '' : ' w-invalid'); ?>"
   />
   <?php if($label !== null && $label !== ''): ?>
     <span><?php echo \Webkernel\View\View::echo($label); ?></span>

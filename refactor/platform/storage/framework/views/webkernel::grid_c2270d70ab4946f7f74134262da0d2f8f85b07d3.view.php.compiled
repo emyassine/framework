@@ -1,0 +1,17 @@
+
+<?php  $__props = [
+  'dense' => false,
+  'gap' => true,
+  'grid_container' => false,
+  'grid_class' => '',
+  'grid_style' => '',
+]; foreach ($__props as $__n => $__d) { if (!isset($$__n)) { $$__n = $__d; } } $attributes = (isset($attributes) && $attributes instanceof \Webkernel\View\AttributeBag ? $attributes : new \Webkernel\View\AttributeBag([]))->except(\array_keys($__props)); unset($__props, $__n, $__d); ?>
+<?php 
+  $attributes = $attributes ?? new \Webkernel\View\AttributeBag([]);
+  $class = \trim(($grid_class !== '' ? $grid_class : 'w-grid').($dense && ! \str_contains((string) $grid_class, 'w-dense') ? ' w-dense' : '').(! $gap && ! \str_contains((string) $grid_class, 'w-no-gap') ? ' w-no-gap' : '').($grid_container && ! \str_contains((string) $grid_class, 'w-grid-container') ? ' w-grid-container' : ''));
+  $style = \trim((string) $attributes->get('style').' '.$grid_style);
+ ?>
+<div <?php echo \Webkernel\View\View::echo($attributes->class([$class])->merge($style !== '' ? ['style' => $style] : [])); ?>>
+  <?php echo $slot; ?>
+
+</div>

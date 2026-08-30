@@ -10,13 +10,16 @@
   'hint' => null,
   'error' => null,
 ])
+@php
+  $attributes = $attributes ?? new \Webkernel\View\AttributeBag([]);
+@endphp
 @if ($mode === 'readonly')
-  <div class="w-fo-field w-readonly">
+  <div {{ $attributes->class(['w-fo-field', 'w-readonly']) }}>
     <dt>{{ $label ?? $name }}</dt>
     <dd>{{ $value }}</dd>
   </div>
 @else
-  <p class="w-fo-field{{ $error ? ' w-invalid' : '' }}">
+  <p {{ $attributes->class(['w-fo-field', 'w-invalid' => $error]) }}>
     <label>
       {{ $label ?? $name }}
       <span class="w-input-wrp{{ $error ? ' w-invalid' : '' }}">

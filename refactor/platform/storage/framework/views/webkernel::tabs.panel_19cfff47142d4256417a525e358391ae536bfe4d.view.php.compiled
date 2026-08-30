@@ -2,19 +2,21 @@
   'tab' => '',
   'active' => false,
   'columns' => null,
+  'grid_class' => '',
+  'grid_style' => '',
 ]; foreach ($__props as $__n => $__d) { if (!isset($$__n)) { $$__n = $__d; } } $attributes = (isset($attributes) && $attributes instanceof \Webkernel\View\AttributeBag ? $attributes : new \Webkernel\View\AttributeBag([]))->except(\array_keys($__props)); unset($__props, $__n, $__d); ?>
 <?php 
   $attributes = $attributes ?? new \Webkernel\View\AttributeBag([]);
-  $cols = \is_int($columns) && $columns > 1 ? $columns : null;
+  $grid = \is_string($grid_class) ? \trim($grid_class) : '';
+  $style = \trim((string) $attributes->get('style').' '.$grid_style);
  ?>
 <section
-  <?php echo \Webkernel\View\View::echo($attributes->class(['w-sc-tabs-tab', 'w-active' => $active])->merge([
+  <?php echo \Webkernel\View\View::echo($attributes->class(['w-sc-tabs-tab', 'w-active' => $active, $grid => $grid !== ''])->merge([
     'role' => 'tabpanel',
     'data-tab-panel' => $tab,
-    'aria-labelledby' => $tab,
-  ])); ?>
+    'aria-labelledby' => 'tab-'.$tab,
+  ] + ($style !== '' ? ['style' => $style] : []))); ?>
 
-  <?php if($cols): ?> style="--w-cols: <?php echo \Webkernel\View\View::echo($cols); ?>" <?php endif; ?>
 >
   <?php echo $slot; ?>
 

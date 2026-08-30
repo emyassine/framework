@@ -4,6 +4,8 @@
   'contained' => true,
   'label_hidden' => false,
   'required' => false,
+  'grid_class' => '',
+  'grid_style' => '',
 ]; foreach ($__props as $__n => $__d) { if (!isset($$__n)) { $$__n = $__d; } } $attributes = (isset($attributes) && $attributes instanceof \Webkernel\View\AttributeBag ? $attributes : new \Webkernel\View\AttributeBag([]))->except(\array_keys($__props)); unset($__props, $__n, $__d); ?>
 <?php 
   $attributes = $attributes ?? new \Webkernel\View\AttributeBag([]);
@@ -18,6 +20,8 @@
       <?php echo \Webkernel\View\View::echo($label); ?><?php if($required): ?><sup class="w-fieldset-label-required">*</sup><?php endif; ?>
     </legend>
   <?php endif; ?>
-  <?php echo $slot; ?>
+  <div class="<?php echo \Webkernel\View\View::echo($grid_class !== '' ? $grid_class : ''); ?>"<?php if($grid_style !== ''): ?> style="<?php echo \Webkernel\View\View::echo($grid_style); ?>"<?php endif; ?>>
+    <?php echo $slot; ?>
 
+  </div>
 </fieldset>

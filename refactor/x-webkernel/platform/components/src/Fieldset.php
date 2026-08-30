@@ -8,10 +8,27 @@
 namespace Webkernel\Platform\Components;
 
 /**
- * Grouped fields. View: `<x-webkernel::fieldset>`.
+ * Grouped fields. View: `<x-webkernel::fieldset>`. Default two columns from `lg`.
  */
-final class Fieldset extends Component
+final class Fieldset extends LayoutComponent
 {
+    /**
+     * @param $label string
+     *
+     * @return static
+     */
+    public static function make(string $label = ''): static
+    {
+        $self = new static();
+        $self->name = $label;
+        $self->columns(2);
+        if ($label !== '') {
+            $self->props['label'] = $label;
+        }
+
+        return $self;
+    }
+
     /**
      * @return string
      */
@@ -43,5 +60,4 @@ final class Fieldset extends Component
 
         return $this;
     }
-
 }

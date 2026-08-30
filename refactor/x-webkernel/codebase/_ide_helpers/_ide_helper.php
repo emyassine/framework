@@ -5,7 +5,7 @@
 //> For the full copyright and license information, please view the LICENSE
 //> file that was distributed with this source code.
 //> Generated. Do not edit.
-//> hash: ef6f068a8120dc37
+//> hash: f445e1b764036dcf
 
 namespace Acme\Billing {
     if (false) {
@@ -233,6 +233,17 @@ namespace DeepCopy\TypeFilter {
 namespace DeepCopy\TypeMatcher {
     if (false) {
         class TypeMatcher {}
+    }
+}
+namespace PHPMailer\PHPMailer {
+    if (false) {
+        class DSNConfigurator {}
+        class Exception {}
+        class OAuth {}
+        interface OAuthTokenProvider {}
+        class PHPMailer {}
+        class POP3 {}
+        class SMTP {}
     }
 }
 namespace PHPUnit\Event\Application {

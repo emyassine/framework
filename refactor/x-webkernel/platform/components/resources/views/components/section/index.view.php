@@ -9,6 +9,8 @@
   'contained' => true,
   'compact' => false,
   'icon' => null,
+  'grid_class' => '',
+  'grid_style' => '',
 ])
 @php
   $attributes = $attributes ?? new \Webkernel\View\AttributeBag([]);
@@ -30,7 +32,7 @@
     </header>
   @endif
   <div class="w-section-content-ctn">
-    <div class="w-section-body">
+    <div class="w-section-body{{ $grid_class !== '' ? ' '.$grid_class : '' }}"@if ($grid_style !== '') style="{{ $grid_style }}"@endif>
       {!! $slot !!}
     </div>
   </div>

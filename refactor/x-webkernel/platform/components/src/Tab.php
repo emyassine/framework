@@ -121,11 +121,11 @@ final class Tab extends Component
     }
 
     /**
-     * @param $columns int
+     * @param $columns int|array<string, int>
      *
      * @return static
      */
-    public function columns(int $columns): static
+    public function columns(int|array $columns): static
     {
         $this->props['columns'] = $columns;
 
@@ -240,13 +240,19 @@ final class Tab extends Component
     }
 
     /**
-     * @return int|null
+     * @return int|array<string, int>|null
      */
-    public function get_columns(): ?int
+    public function get_columns(): int|array|null
     {
         $columns = $this->props['columns'] ?? null;
+        if (\is_int($columns) && $columns > 0) {
+            return $columns;
+        }
+        if (\is_array($columns) && $columns !== []) {
+            return $columns;
+        }
 
-        return \is_int($columns) && $columns > 0 ? $columns : null;
+        return null;
     }
 
     /**

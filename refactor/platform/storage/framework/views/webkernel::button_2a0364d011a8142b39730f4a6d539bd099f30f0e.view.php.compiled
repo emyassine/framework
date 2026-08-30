@@ -7,6 +7,7 @@
   'form' => null,
   'ghost' => false,
   'href' => null,
+  'name' => '',
   'icon' => null,
   'icon_position' => 'before',
   'outlined' => false,
@@ -16,6 +17,7 @@
   'tooltip' => null,
   'tooltip_placement' => 'top',
   'type' => 'button',
+  'value' => null,
 ]; foreach ($__props as $__n => $__d) { if (!isset($$__n)) { $$__n = $__d; } } $attributes = (isset($attributes) && $attributes instanceof \Webkernel\View\AttributeBag ? $attributes : new \Webkernel\View\AttributeBag([]))->except(\array_keys($__props)); unset($__props, $__n, $__d); ?>
 <?php 
   $tag = $tag === 'a' || ($href !== null && $href !== '') ? 'a' : 'button';
@@ -36,6 +38,8 @@
   <?php endif; ?>
   <?php if($tag === 'button'): ?>
     type="<?php echo \Webkernel\View\View::echo($type); ?>"
+    <?php if($name !== '' && $name !== null): ?> name="<?php echo \Webkernel\View\View::echo($name); ?>" <?php endif; ?>
+    <?php if($value !== null && $value !== ''): ?> value="<?php echo \Webkernel\View\View::echo($value); ?>" <?php endif; ?>
     <?php if($form): ?> form="<?php echo \Webkernel\View\View::echo($form); ?>" <?php endif; ?>
     <?php if($disabled): ?> disabled <?php endif; ?>
   <?php endif; ?>

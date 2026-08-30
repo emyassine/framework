@@ -8,13 +8,16 @@
   'hint' => null,
   'error' => null,
 ]; foreach ($__props as $__n => $__d) { if (!isset($$__n)) { $$__n = $__d; } } $attributes = (isset($attributes) && $attributes instanceof \Webkernel\View\AttributeBag ? $attributes : new \Webkernel\View\AttributeBag([]))->except(\array_keys($__props)); unset($__props, $__n, $__d); ?>
+<?php 
+  $attributes = $attributes ?? new \Webkernel\View\AttributeBag([]);
+ ?>
 <?php if($mode === 'readonly'): ?>
-  <div class="w-fo-field w-readonly">
+  <div <?php echo \Webkernel\View\View::echo($attributes->class(['w-fo-field', 'w-readonly'])); ?>>
     <dt><?php echo \Webkernel\View\View::echo($label ?? $name); ?></dt>
     <dd><?php echo \Webkernel\View\View::echo($value); ?></dd>
   </div>
 <?php else: ?>
-  <p class="w-fo-field<?php echo \Webkernel\View\View::echo($error ? ' w-invalid' : ''); ?>">
+  <p <?php echo \Webkernel\View\View::echo($attributes->class(['w-fo-field', 'w-invalid' => $error])); ?>>
     <label>
       <?php echo \Webkernel\View\View::echo($label ?? $name); ?>
 

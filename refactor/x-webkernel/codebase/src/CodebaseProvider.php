@@ -16,5 +16,7 @@ final class CodebaseProvider extends PlatformProvider
         'webkernel' => __DIR__.'/../resources/views',
     ];
 
+    public const CONFIG = [__DIR__.'/../config/mail.php'];
+
     public const COMMANDS = [DumpAutoloadCommand::class, ServerCommand::class];
 }

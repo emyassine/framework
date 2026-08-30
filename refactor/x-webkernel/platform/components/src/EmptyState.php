@@ -10,7 +10,7 @@ namespace Webkernel\Platform\Components;
 /**
  * Placeholder when a list is empty. View: `<x-webkernel::empty-state>`.
  */
-final class EmptyState extends Component
+final class EmptyState extends LayoutComponent
 {
     /**
      * @return string

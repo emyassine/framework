@@ -10,6 +10,7 @@ namespace Webkernel\Platform\Tests\Feature;
 use PHPUnit\Framework\TestCase;
 use Webkernel\Composables\PanelComposable;
 use Webkernel\Config\Config;
+use Webkernel\Platform\Pages\ManagePanel;
 use Webkernel\Platform\Panel;
 use Webkernel\Platform\PanelProvider;
 use Webkernel\System\SystemPanelProvider;
@@ -100,5 +101,29 @@ final class PanelProviderTest extends TestCase
         $this->assertSame('Overview', $by_id['system']['navigation'][0]['items'][0]['label']);
         $this->assertSame('/system', $by_id['system']['navigation'][0]['items'][0]['href']);
         $this->assertSame('/billing/invoices', $by_id['billing']['navigation'][0]['items'][0]['href']);
+    }
+
+    /**
+     * @return void
+     */
+    public function test_manage_view_is_schema_only(): void
+    {
+        $src = (string) \file_get_contents(\dirname(__DIR__, 2).'/resources/views/panels/manage.view.php');
+        $this->assertStringContainsString('{!! $schema !!}', $src);
+        $this->assertStringNotContainsString('<form', $src);
+        $this->assertStringNotContainsString('Csrf', $src);
+
+        $html = (string) (new ManagePanel())->schema([])
+            ->form('/manage')
+            ->footer_actions((new ManagePanel())->get_footer_actions())
+            ->render(['name' => 'Acme']);
+
+        $this->assertStringContainsString('id="w-schema"', $html);
+        $this->assertStringContainsString('name="_token"', $html);
+        $this->assertStringContainsString('w-section', $html);
+        $this->assertStringContainsString('w-grid', $html);
+        $this->assertStringContainsString('type="submit"', $html);
+        $this->assertStringContainsString('name="name"', $html);
+        $this->assertStringContainsString('value="Acme"', $html);
     }
 }
