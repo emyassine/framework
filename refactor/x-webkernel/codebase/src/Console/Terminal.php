@@ -367,6 +367,11 @@ final class Terminal implements ComposableContract
         \fwrite(STDERR, '  '.self::badge('ERROR', '41', '97').' '.self::RED.$msg.self::RESET."\n");
     }
 
+    public function line(): void
+    {
+        \fwrite(STDERR, "\n");
+    }
+
     public function alert(string $msg): void
     {
         $this->note($msg, 'ALERT');

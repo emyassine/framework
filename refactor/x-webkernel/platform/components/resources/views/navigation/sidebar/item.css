@@ -1,0 +1,36 @@
+.w-menu-element, .w-nav-link {
+  margin: 0;
+  padding: 0.55em 0.9em;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  color: inherit;
+  font-weight: 500;
+  border-radius: var(--w-radius);
+  text-align: start;
+}
+.w-menu-element:hover, .w-nav-link:hover {
+  background: color-mix(in srgb, currentColor 8%, transparent);
+}
+.w-menu-element.w-active, .w-nav-link.w-active, .w-nav-link[aria-current="page"] {
+  background: var(--w-surface);
+  color: var(--primary-600);
+}
+[data-w-theme="dark"] .w-menu-element.w-active,
+[data-w-theme="dark"] .w-nav-link.w-active {
+  background: color-mix(in srgb, var(--primary-600) 16%, transparent);
+  color: var(--primary-400);
+}
+.w-nav-icon {
+  flex: 0 0 1.3em;
+  text-align: center;
+  margin-inline-end: 0.8em;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.w-nav-icon .w-icon, .w-nav-icon svg { opacity: 0.55; }
+.w-menu-element:hover .w-nav-icon .w-icon,
+.w-menu-element.w-active .w-nav-icon .w-icon,
+.w-nav-link:hover .w-nav-icon svg,
+.w-nav-link.w-active .w-nav-icon svg { opacity: 1; }

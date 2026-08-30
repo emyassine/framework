@@ -7,19 +7,14 @@
 <?php 
   $attributes = $attributes ?? new \Webkernel\View\AttributeBag([]);
  ?>
-<?php if ($this->once('wds.pagination.item')): ?>
-<style>
-.wds-pagination-item-btn:disabled { pointer-events: none; }
-</style>
-<?php endif; ?>
 <li <?php echo \Webkernel\View\View::echo($attributes->class([
-  'wds-pagination-item',
-  'wds-disabled' => $disabled,
-  'wds-active' => $active,
+  'w-pagination-item',
+  'w-disabled' => $disabled,
+  'w-active' => $active,
 ])); ?>>
   <button
     type="button"
-    class="wds-pagination-item-btn"
+    class="w-pagination-item-btn"
     <?php if($active): ?> aria-current="page" <?php endif; ?>
     <?php if($disabled): ?> disabled aria-hidden="true" <?php endif; ?>
   >
@@ -27,7 +22,7 @@
       <?php  $this->start_component('webkernel::icon',['name'=>$icon]); ?><?php echo $this->render_component(); ?>
     <?php endif; ?>
     <?php if($label !== null && $label !== ''): ?>
-      <span class="wds-pagination-item-label"><?php echo \Webkernel\View\View::echo($label); ?></span>
+      <span class="w-pagination-item-label"><?php echo \Webkernel\View\View::echo($label); ?></span>
     <?php endif; ?>
   </button>
 </li>

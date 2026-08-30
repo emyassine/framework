@@ -1,0 +1,15 @@
+.w-fo-field { margin: 0 0 0.75rem; color: var(--w-text); }
+.w-fo-field > label,
+.w-fo-field > span {
+  display: flex; flex-direction: column; gap: 0.375rem;
+  font-size: var(--w-text-sm); font-weight: 500; color: var(--w-text);
+}
+.w-fo-field.w-readonly {
+  display: grid; grid-template-columns: 8rem 1fr; gap: 0.5rem;
+  font-size: var(--w-text-sm);
+}
+.w-fo-field.w-readonly dt { color: var(--w-text-muted); font-weight: 500; }
+.w-fo-field.w-readonly dd { margin: 0; color: var(--w-text); }
+@media (max-width: 640px) {
+  .w-fo-field.w-readonly { grid-template-columns: 1fr; }
+}

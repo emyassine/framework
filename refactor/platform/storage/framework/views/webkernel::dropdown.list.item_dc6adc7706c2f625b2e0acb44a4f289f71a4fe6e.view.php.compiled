@@ -13,26 +13,6 @@
   $attributes = $attributes ?? new \Webkernel\View\AttributeBag([]);
   $tag = $tag === 'a' || ($href !== null && $href !== '') ? 'a' : 'button';
  ?>
-<?php if ($this->once('wds.dropdown.list.item')): ?>
-<style>
-.wds-dropdown-list-item {
-  display: flex; width: 100%; align-items: center; gap: 0.5rem;
-  overflow: hidden; border-radius: var(--wds-radius);
-  padding: 0.5rem; font-size: var(--wds-text-sm); white-space: nowrap;
-  color: var(--wds-text); text-align: start; outline: none; user-select: none;
-}
-.wds-dropdown-list-item:not(.wds-disabled):hover,
-.wds-dropdown-list-item:not(.wds-disabled):focus-visible,
-.wds-dropdown-list-item.wds-selected { background: var(--wds-bg-subtle); }
-.wds-dropdown-list-item.wds-disabled { opacity: 0.7; pointer-events: none; cursor: default; }
-.wds-dropdown-list-item > .wds-icon { color: var(--wds-text-faint); }
-.wds-dropdown-list-item-label { flex: 1; overflow: hidden; text-overflow: ellipsis; text-align: start; color: var(--wds-text); }
-.wds-dropdown-list-item.wds-color-danger { color: var(--danger-700); }
-.wds-dropdown-list-item.wds-color-danger > .wds-icon { color: var(--danger-500); }
-.wds-dropdown-list-item.wds-color-danger:not(.wds-disabled):hover { background: var(--danger-50); }
-a.wds-dropdown-list-item { text-decoration: none; color: inherit; }
-</style>
-<?php endif; ?>
 <<?php echo \Webkernel\View\View::echo($tag); ?>
 
   <?php if($tag === 'a' && $href && ! $disabled): ?>
@@ -42,17 +22,17 @@ a.wds-dropdown-list-item { text-decoration: none; color: inherit; }
   <?php if($disabled): ?> disabled aria-disabled="true" <?php endif; ?>
   role="menuitem"
   <?php echo \Webkernel\View\View::echo($attributes->class([
-    'wds-dropdown-list-item',
-    'wds-color-'.$color => $color !== 'gray',
-    'wds-disabled' => $disabled,
-    'wds-selected' => $selected,
+    'w-dropdown-list-item',
+    'w-color-'.$color => $color !== 'gray',
+    'w-disabled' => $disabled,
+    'w-selected' => $selected,
   ])); ?>
 
 >
   <?php if($icon): ?>
     <?php  $this->start_component('webkernel::icon',['name'=>$icon]); ?><?php echo $this->render_component(); ?>
   <?php endif; ?>
-  <span class="wds-dropdown-list-item-label"><?php echo $slot; ?></span>
+  <span class="w-dropdown-list-item-label"><?php echo $slot; ?></span>
   <?php if($badge !== null && $badge !== ''): ?>
     <?php  $this->start_component('webkernel::badge',['color'=>$badge_color,'size'=>'sm']); ?><?php echo \Webkernel\View\View::echo($badge); ?><?php echo $this->render_component(); ?>
   <?php endif; ?>

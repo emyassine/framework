@@ -1,0 +1,30 @@
+.w-rail-item { width: 100%; display: flex; justify-content: center; }
+.w-rail-item > a,
+.w-rail-item > button {
+  display: grid;
+  place-content: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: var(--w-radius);
+  color: var(--w-text-muted);
+  background: transparent;
+  position: relative;
+  text-decoration: none;
+  transition: background var(--w-transition), color var(--w-transition), box-shadow var(--w-transition);
+}
+.w-rail-item > a:hover,
+.w-rail-item > button:hover {
+  color: var(--w-text);
+  background: var(--w-surface-2);
+}
+.w-rail-item.w-active > a,
+.w-rail-item.w-active > button {
+  color: var(--primary-600);
+  background: transparent;
+  box-shadow: 0 0 0 1.5px var(--primary-600);
+}
+.w-rail-item svg { width: 1.05rem; height: 1.05rem; stroke: currentColor; fill: none; stroke-width: 1.75; }
+.w-rail-item img { width: 1.25rem; height: 1.25rem; display: block; object-fit: contain; }
+.w-rail-item .w-nav-logo--round img,
+.w-rail-item .w-nav-logo--square img { border-radius: var(--w-radius); object-fit: cover; width: 1.75rem; height: 1.75rem; }
+.w-rail-item .w-nav-logo--favicon img { width: 1.05rem; height: 1.05rem; object-fit: contain; }

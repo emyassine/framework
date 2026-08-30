@@ -1,0 +1,17 @@
+.w-dropdown { position: relative; display: inline-flex; }
+.w-dropdown-trigger { display: flex; cursor: pointer; }
+.w-dropdown-panel {
+  display: none;
+  position: absolute; z-index: 20;
+  min-width: 14rem; width: max-content; max-width: min(20rem, calc(100vw - 2rem));
+  border-radius: var(--w-radius-lg);
+  background: var(--w-surface);
+  box-shadow: 0 10px 15px -3px color-mix(in srgb, var(--w-text) 10%, transparent), 0 0 0 1px color-mix(in srgb, var(--w-text) 5%, transparent);
+  inset-inline-end: 0; top: calc(100% + 0.5rem);
+}
+.w-dropdown.w-open > .w-dropdown-panel { display: block; }
+.w-dropdown-panel.w-scrollable { overflow-y: auto; max-height: min(20rem, 70vh); }
+.w-dropdown-panel.w-width-xs { max-width: 20rem; }
+.w-dropdown-panel.w-width-sm { max-width: 24rem; }
+.w-dropdown-panel.w-width-md { max-width: 28rem; }
+.w-dropdown-panel.w-width-lg { max-width: 32rem; }

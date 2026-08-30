@@ -1,0 +1,25 @@
+.w-tabs { display: flex; flex-direction: column; gap: 1.25rem; color: var(--w-text); }
+.w-tabs.w-vertical { flex-direction: row; align-items: stretch; gap: 1rem; }
+.w-tabs-bar {
+  display: flex; gap: 0.25rem; border-bottom: 1px solid var(--w-border);
+}
+.w-tabs.w-vertical .w-tabs-bar {
+  flex-direction: column; border-bottom: 0; border-inline-end: 1px solid var(--w-border);
+}
+.w-tabs.w-contained {
+  background: var(--w-surface);
+  border: 1px solid var(--w-border);
+  border-radius: var(--w-radius);
+  gap: 0;
+  overflow: hidden;
+}
+.w-tabs.w-contained .w-tabs-bar {
+  border-bottom-color: var(--w-border);
+  padding: 0.35rem;
+  gap: 0.15rem;
+  background: var(--w-bg-subtle);
+}
+.w-tabs.w-contained.w-vertical .w-tabs-bar {
+  border-bottom: 0;
+  border-inline-end: 1px solid var(--w-border);
+}

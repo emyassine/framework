@@ -1,0 +1,24 @@
+.w-tooltip {
+  position: fixed;
+  z-index: 80;
+  max-width: 16rem;
+  padding: 0.3rem 0.55rem;
+  border-radius: var(--w-radius);
+  background: var(--color-zinc-900);
+  color: var(--color-zinc-50);
+  font-size: var(--w-text-xs);
+  line-height: 1.3;
+  pointer-events: none;
+  opacity: 0;
+  transform: translateY(2px);
+  transition: opacity 120ms ease, transform 120ms ease;
+  box-shadow: var(--w-shadow-md);
+}
+.w-tooltip.w-open {
+  opacity: 1;
+  transform: none;
+}
+[data-w-theme="dark"] .w-tooltip {
+  background: var(--color-zinc-100);
+  color: var(--color-zinc-950);
+}

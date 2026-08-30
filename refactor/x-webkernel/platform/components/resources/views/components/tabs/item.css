@@ -1,0 +1,42 @@
+.w-tabs-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4em;
+  padding: 0.7em 1em;
+  font-weight: 550;
+  font-size: 13px;
+  color: var(--w-text-muted);
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  border-radius: 4px 4px 0 0;
+  background: transparent;
+}
+.w-tabs-item:hover { color: var(--w-text); }
+.w-tabs-item.w-active,
+.w-tabs-item[aria-selected="true"] {
+  color: var(--w-text);
+  border-bottom-color: var(--primary-600);
+}
+.w-tabs.w-vertical .w-tabs-item {
+  border-bottom: 0;
+  border-inline-end: 2px solid transparent;
+  margin-bottom: 0;
+  margin-inline-end: -1px;
+  border-radius: 4px 0 0 4px;
+}
+.w-tabs.w-vertical .w-tabs-item.w-active,
+.w-tabs.w-vertical .w-tabs-item[aria-selected="true"] {
+  border-inline-end-color: var(--primary-600);
+}
+.w-tabs.w-contained .w-tabs-item {
+  border-radius: var(--w-radius);
+  margin-bottom: 0;
+  border-bottom-width: 0;
+}
+.w-tabs.w-contained .w-tabs-item.w-active,
+.w-tabs.w-contained .w-tabs-item[aria-selected="true"] {
+  background: var(--primary-50);
+  color: var(--primary-700);
+  border-bottom-color: transparent;
+}
+.w-tabs-item .w-icon { font-size: 1em; }

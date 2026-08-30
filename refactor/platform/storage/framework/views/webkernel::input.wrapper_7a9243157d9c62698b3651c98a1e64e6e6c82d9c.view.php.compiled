@@ -14,57 +14,26 @@
   $has_prefix = ($prefix !== null && $prefix !== '') || ($prefix_icon !== null && $prefix_icon !== '');
   $has_suffix = ($suffix !== null && $suffix !== '') || ($suffix_icon !== null && $suffix_icon !== '');
  ?>
-<?php if ($this->once('wds.input-wrp')): ?>
-<style>
-.wds-input-wrp {
-  display: flex; border-radius: var(--wds-radius-lg);
-  background: var(--wds-surface);
-  box-shadow: 0 1px 2px color-mix(in srgb, var(--wds-text) 6%, transparent), 0 0 0 1px color-mix(in srgb, var(--wds-text) 10%, transparent);
-  transition: box-shadow var(--wds-transition);
-}
-.wds-input-wrp:not(.wds-disabled):focus-within {
-  box-shadow: 0 0 0 2px var(--primary-600);
-}
-.wds-input-wrp.wds-invalid { box-shadow: 0 0 0 1px var(--danger-600); }
-.wds-input-wrp.wds-invalid:not(.wds-disabled):focus-within { box-shadow: 0 0 0 2px var(--danger-600); }
-.wds-input-wrp.wds-disabled { background: var(--wds-bg-subtle); }
-.wds-input-wrp-prefix, .wds-input-wrp-suffix {
-  display: flex; align-items: center; gap: 0.75rem; color: var(--wds-text-faint);
-}
-.wds-input-wrp-prefix { padding-inline-start: 0.75rem; }
-.wds-input-wrp-prefix.wds-inline { padding-inline-end: 0.5rem; }
-.wds-input-wrp-prefix:not(.wds-inline) {
-  border-inline-end: 1px solid var(--wds-border); padding-inline-end: 0.75rem;
-}
-.wds-input-wrp-suffix { padding-inline-end: 0.75rem; }
-.wds-input-wrp-suffix.wds-inline { padding-inline-start: 0.5rem; }
-.wds-input-wrp-suffix:not(.wds-inline) {
-  border-inline-start: 1px solid var(--wds-border); padding-inline-start: 0.75rem;
-}
-.wds-input-wrp-content { min-width: 0; flex: 1; }
-.wds-input-wrp-label { font-size: var(--wds-text-sm); white-space: nowrap; color: var(--wds-text-muted); }
-</style>
-<?php endif; ?>
 <div <?php echo \Webkernel\View\View::echo($attributes->class([
-  'wds-input-wrp',
-  'wds-disabled' => $disabled,
-  'wds-invalid' => ! $valid,
+  'w-input-wrp',
+  'w-disabled' => $disabled,
+  'w-invalid' => ! $valid,
 ])); ?>>
   <?php if($has_prefix): ?>
-    <div class="wds-input-wrp-prefix<?php echo \Webkernel\View\View::echo($inline_prefix ? ' wds-inline' : ''); ?>">
+    <div class="w-input-wrp-prefix<?php echo \Webkernel\View\View::echo($inline_prefix ? ' w-inline' : ''); ?>">
       <?php if($prefix_icon): ?>
         <?php  $this->start_component('webkernel::icon',['name'=>$prefix_icon]); ?><?php echo $this->render_component(); ?>
       <?php endif; ?>
       <?php if($prefix !== null && $prefix !== ''): ?>
-        <span class="wds-input-wrp-label"><?php echo \Webkernel\View\View::echo($prefix); ?></span>
+        <span class="w-input-wrp-label"><?php echo \Webkernel\View\View::echo($prefix); ?></span>
       <?php endif; ?>
     </div>
   <?php endif; ?>
-  <div class="wds-input-wrp-content"><?php echo $slot; ?></div>
+  <div class="w-input-wrp-content"><?php echo $slot; ?></div>
   <?php if($has_suffix): ?>
-    <div class="wds-input-wrp-suffix<?php echo \Webkernel\View\View::echo($inline_suffix ? ' wds-inline' : ''); ?>">
+    <div class="w-input-wrp-suffix<?php echo \Webkernel\View\View::echo($inline_suffix ? ' w-inline' : ''); ?>">
       <?php if($suffix !== null && $suffix !== ''): ?>
-        <span class="wds-input-wrp-label"><?php echo \Webkernel\View\View::echo($suffix); ?></span>
+        <span class="w-input-wrp-label"><?php echo \Webkernel\View\View::echo($suffix); ?></span>
       <?php endif; ?>
       <?php if($suffix_icon): ?>
         <?php  $this->start_component('webkernel::icon',['name'=>$suffix_icon]); ?><?php echo $this->render_component(); ?>

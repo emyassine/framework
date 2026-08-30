@@ -1,0 +1,15 @@
+.w-avatar {
+  width: 36px; height: 36px;
+  border-radius: var(--w-radius-full);
+  background: var(--primary-200);
+  color: var(--primary-800);
+  font-size: 0.75rem;
+  font-weight: 700;
+  display: grid;
+  place-content: center;
+  flex-shrink: 0;
+  object-fit: cover;
+}
+.w-avatar.w-circular { border-radius: 9999px; }
+.w-avatar.w-size-sm { width: 24px; height: 24px; font-size: 0.65rem; }
+.w-avatar.w-size-lg { width: 48px; height: 48px; }

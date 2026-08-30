@@ -3,45 +3,16 @@
   'checked' => false,
   'label' => null,
 ]; foreach ($__props as $__n => $__d) { if (!isset($$__n)) { $$__n = $__d; } } $attributes = (isset($attributes) && $attributes instanceof \Webkernel\View\AttributeBag ? $attributes : new \Webkernel\View\AttributeBag([]))->except(\array_keys($__props)); unset($__props, $__n, $__d); ?>
-<?php if ($this->once('wds.toggle')): ?>
-<style>
-.wds-toggle-wrap { display: inline-flex; align-items: center; gap: 0.6em; color: var(--wds-text); }
-.wds-toggle {
-  width: 2.6em; height: 1.45em; border-radius: 999px; background: var(--wds-border-strong);
-  position: relative; flex: 0 0 auto;
-}
-.wds-toggle[aria-checked="true"] { background: var(--primary-600); }
-.wds-toggle i {
-  position: absolute; top: 2px; inset-inline-start: 2px;
-  width: 1.05em; height: 1.05em; border-radius: 999px; background: var(--color-white);
-  transition: inset-inline-start 0.15s ease;
-}
-.wds-toggle[aria-checked="true"] i { inset-inline-start: calc(100% - 1.05em - 2px); }
-</style>
-<?php endif; ?>
-<?php if ($this->once('wds.toggle.js')): ?>
-<script>
-document.addEventListener('click', function (event) {
-  var btn = event.target.closest('[data-wds-toggle]');
-  if (!btn) return;
-  var on = btn.getAttribute('aria-checked') !== 'true';
-  btn.setAttribute('aria-checked', on ? 'true' : 'false');
-  var wrap = btn.parentElement;
-  var input = wrap ? wrap.querySelector('[data-wds-toggle-input]') : null;
-  if (input) input.checked = on;
-});
-</script>
-<?php endif; ?>
-<span class="wds-toggle-wrap">
+<span class="w-toggle-wrap">
   <input type="hidden" name="<?php echo \Webkernel\View\View::echo($name); ?>" value="0" />
   <button
     type="button"
-    class="wds-toggle"
+    class="w-toggle"
     role="switch"
     aria-checked="<?php echo \Webkernel\View\View::echo($checked ? 'true' : 'false'); ?>"
-    data-wds-toggle
+    data-w-toggle
   ><i></i></button>
-  <input type="checkbox" name="<?php echo \Webkernel\View\View::echo($name); ?>" value="1" <?php echo \Webkernel\View\View::echo($checked ? 'checked' : ''); ?> hidden data-wds-toggle-input />
+  <input type="checkbox" name="<?php echo \Webkernel\View\View::echo($name); ?>" value="1" <?php echo \Webkernel\View\View::echo($checked ? 'checked' : ''); ?> hidden data-w-toggle-input />
   <?php if($label): ?>
     <span><?php echo \Webkernel\View\View::echo($label); ?></span>
   <?php endif; ?>

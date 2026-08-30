@@ -1,0 +1,24 @@
+select.w-select-input {
+  display: block; width: 100%; appearance: none;
+  border: none; background-color: transparent;
+  padding: 0.375rem 2rem 0.375rem 0.75rem;
+  font: inherit; font-size: var(--w-text-sm); line-height: 1.5;
+  color: var(--w-text); text-align: start;
+  outline: none;
+  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3E%3C/svg%3E");
+  background-position: right 0.5rem center;
+  background-repeat: no-repeat;
+  background-size: 1.5em 1.5em;
+}
+[dir="rtl"] select.w-select-input {
+  padding: 0.375rem 0.75rem 0.375rem 2rem;
+  background-position: left 0.5rem center;
+}
+select.w-select-input:disabled { color: var(--w-text-muted); }
+select.w-select-input.w-select-input-has-inline-prefix { padding-inline-start: 0; }
+select.w-select-input option, select.w-select-input optgroup {
+  background: var(--w-surface); color: var(--w-text);
+}
+@supports (-webkit-touch-callout: none) {
+  select.w-select-input { font-size: 1rem; }
+}

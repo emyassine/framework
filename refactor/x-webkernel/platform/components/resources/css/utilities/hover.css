@@ -1,0 +1,16 @@
+[hover] {
+  transition: background var(--w-utility-duration) var(--w-utility-ease),
+    border-color var(--w-utility-duration) var(--w-utility-ease),
+    color var(--w-utility-duration) var(--w-utility-ease),
+    transform var(--w-utility-duration) var(--w-utility-ease);
+}
+@media (hover: hover) {
+  [hover~="bg-primary"]:hover { background: var(--primary-100); }
+  [hover~="primary-border"]:hover { border-color: var(--primary-500); }
+  [hover~="lift"]:hover { transform: translateY(var(--w-elevate-y)); }
+  [hover~="lift-sm"]:hover { transform: translateY(var(--w-elevate-y-sm)); }
+  [hover~="press"]:hover { transform: translateY(1px); }
+  [hover~="scale"]:hover { transform: scale(1.02); }
+  [hover-bg]:hover { background: var(--hover-bg); }
+  [hover-border]:hover { border-color: var(--hover-border, var(--w-hover-border-color)); }
+}

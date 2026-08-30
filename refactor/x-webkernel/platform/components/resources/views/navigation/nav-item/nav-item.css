@@ -1,0 +1,13 @@
+.w-sidebar-item {
+  display: flex;
+  align-items: center;
+  gap: 0.6em;
+  padding: 0.65em 1.3em;
+  width: 100%;
+  color: var(--w-text);
+  font-weight: 500;
+  border-radius: var(--w-radius);
+}
+.w-sidebar-item:hover { background: var(--w-bg-subtle); }
+.w-sidebar-item.w-active { background: var(--primary-600); color: var(--color-white); }
+.w-sidebar-item-label { min-width: 0; }

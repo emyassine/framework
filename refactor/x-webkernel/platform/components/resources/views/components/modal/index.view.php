@@ -18,7 +18,7 @@
 ])
 @php
   $attributes = $attributes ?? new \Webkernel\View\AttributeBag([]);
-  $id = $id !== null && $id !== '' ? (string) $id : 'wds-modal';
+  $id = $id !== null && $id !== '' ? (string) $id : 'w-modal';
   $has_heading = $heading !== null && $heading !== '';
   $has_description = $description !== null && $description !== '';
   $has_icon = $icon !== null && $icon !== '';
@@ -26,126 +26,44 @@
   $has_footer = isset($footer) && $footer !== '';
   $open_attr = $open ? 'true' : 'false';
 @endphp
-@once('wds.modal')
-<style>
-.wds-modal { outline: none; }
-.wds-modal-trigger { display: flex; }
-.wds-modal-close-overlay {
-  position: fixed; inset: 0; z-index: 40;
-  background: color-mix(in srgb, var(--gray-950) 50%, transparent);
-}
-.wds-modal-window-ctn {
-  position: fixed; inset: 0; z-index: 40;
-  display: grid; min-height: 100%;
-  grid-template-rows: 1fr auto 1fr;
-  justify-items: center; padding: 1rem;
-}
-.wds-modal-window {
-  position: relative; grid-row-start: 2;
-  display: flex; width: 100%; flex-direction: column;
-  background: var(--wds-surface);
-  box-shadow: 0 20px 25px -5px color-mix(in srgb, var(--wds-text) 10%, transparent), 0 0 0 1px color-mix(in srgb, var(--wds-text) 5%, transparent);
-  outline: none; border-radius: 0.75rem;
-  color: var(--wds-text);
-}
-.wds-modal-header { display: flex; padding: 1.5rem 1.5rem 0; gap: 1.25rem; align-items: flex-start; }
-.wds-modal-heading { font-size: var(--wds-text-md); line-height: 1.5; font-weight: 600; color: var(--wds-text); }
-.wds-modal-description { margin-top: 0.5rem; font-size: var(--wds-text-sm); color: var(--wds-text-muted); }
-.wds-modal-content { display: flex; flex-direction: column; gap: 1rem; padding: 1.5rem; }
-.wds-modal-footer { width: 100%; padding: 0 1.5rem 1.5rem; }
-.wds-modal-footer-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 0.75rem; }
-.wds-modal-close-btn { position: absolute; inset-inline-end: 1rem; top: 1rem; }
-.wds-modal-icon {
-  border-radius: 9999px; background: var(--wds-bg-subtle); padding: 0.5rem;
-}
-.wds-modal-icon .wds-icon { color: var(--wds-text-muted); font-size: 1.25rem; }
-.wds-modal-icon.wds-color-primary { background: var(--primary-100); }
-.wds-modal-icon.wds-color-primary .wds-icon { color: var(--primary-600); }
-.wds-modal-icon.wds-color-danger { background: var(--danger-100); }
-.wds-modal-icon.wds-color-danger .wds-icon { color: var(--danger-600); }
-.wds-modal-window.wds-width-xs { max-width: 20rem; }
-.wds-modal-window.wds-width-sm { max-width: 24rem; }
-.wds-modal-window.wds-width-md { max-width: 28rem; }
-.wds-modal-window.wds-width-lg { max-width: 32rem; }
-.wds-modal-window.wds-width-xl { max-width: 36rem; }
-.wds-modal-window.wds-width-2xl { max-width: 42rem; }
-.wds-modal:not(.wds-open) > .wds-modal-close-overlay,
-.wds-modal:not(.wds-open) > .wds-modal-window-ctn { display: none; }
-.wds-modal.wds-slide-over > .wds-modal-window-ctn { padding: 0; grid-template-rows: 1fr; }
-.wds-modal.wds-slide-over .wds-modal-window {
-  margin-inline-start: auto; height: 100dvh; max-width: 28rem;
-  border-radius: 0; overflow-y: auto;
-}
-.wds-modal.wds-slide-over .wds-modal-footer { margin-top: auto; }
-@media (max-width: 640px) {
-  .wds-modal-window-ctn { padding: 0; align-items: end; }
-  .wds-modal-window { max-width: 100%; border-radius: 0.75rem 0.75rem 0 0; }
-  .wds-modal.wds-slide-over .wds-modal-window { max-width: 100%; }
-}
-</style>
-@endonce
-@once('wds.modal.js')
-<script>
-(function () {
-  document.addEventListener('click', function (event) {
-    var closer = event.target.closest('[data-wds-modal-close], [data-wds-modal-overlay]');
-    if (closer) {
-      var modal = closer.closest('[data-wds-modal]');
-      if (modal) modal.classList.remove('wds-open');
-    }
-    var trigger = event.target.closest('[data-wds-modal-trigger]');
-    if (trigger) {
-      var opened = trigger.closest('[data-wds-modal]');
-      if (opened) opened.classList.add('wds-open');
-    }
-  });
-  document.addEventListener('keydown', function (event) {
-    if (event.key !== 'Escape') return;
-    document.querySelectorAll('[data-wds-modal].wds-open').forEach(function (modal) {
-      modal.classList.remove('wds-open');
-    });
-  });
-})();
-</script>
-@endonce
 <div
-  {{ $attributes->class(['wds-modal', 'wds-slide-over' => $slide_over, 'wds-open' => $open]) }}
-  data-wds-modal
+  {{ $attributes->class(['w-modal', 'w-slide-over' => $slide_over, 'w-open' => $open]) }}
+  data-w-modal
   data-modal-id="{{ $id }}"
   data-open="{{ $open_attr }}"
 >
   @if ($has_trigger)
-    <div class="wds-modal-trigger" data-wds-modal-trigger>
+    <div class="w-modal-trigger" data-w-modal-trigger>
       {!! $trigger !!}
     </div>
   @endif
-  <div class="wds-modal-close-overlay" data-wds-modal-overlay></div>
-  <div class="wds-modal-window-ctn">
-    <div class="wds-modal-window wds-width-{{ $width }}" role="dialog" aria-modal="true" aria-labelledby="{{ $id }}-heading">
+  <div class="w-modal-close-overlay" data-w-modal-overlay></div>
+  <div class="w-modal-window-ctn">
+    <div class="w-modal-window w-width-{{ $width }}" role="dialog" aria-modal="true" aria-labelledby="{{ $id }}-heading">
       @if ($close_button)
-        <div class="wds-modal-close-btn">
-          <x-webkernel::icon-button icon="x" :label="lang('panel.close')" size="sm" color="gray" data-wds-modal-close />
+        <div class="w-modal-close-btn">
+          <x-webkernel::icon-button icon="x" :label="lang('panel.close')" size="sm" color="gray" data-w-modal-close />
         </div>
       @endif
       @if ($has_heading || $has_icon)
-        <div class="wds-modal-header">
+        <div class="w-modal-header">
           @if ($has_icon)
-            <span class="wds-modal-icon wds-color-{{ $icon_color }}" aria-hidden="true"><x-webkernel::icon :name="$icon" /></span>
+            <span class="w-modal-icon w-color-{{ $icon_color }}" aria-hidden="true"><x-webkernel::icon :name="$icon" /></span>
           @endif
           <div>
             @if ($has_heading)
-              <h2 class="wds-modal-heading" id="{{ $id }}-heading">{{ $heading }}</h2>
+              <h2 class="w-modal-heading" id="{{ $id }}-heading">{{ $heading }}</h2>
             @endif
             @if ($has_description)
-              <p class="wds-modal-description">{{ $description }}</p>
+              <p class="w-modal-description">{{ $description }}</p>
             @endif
           </div>
         </div>
       @endif
-      <div class="wds-modal-content">{!! $slot !!}</div>
+      <div class="w-modal-content">{!! $slot !!}</div>
       @if ($has_footer)
-        <div class="wds-modal-footer">
-          <div class="wds-modal-footer-actions">{!! $footer !!}</div>
+        <div class="w-modal-footer">
+          <div class="w-modal-footer-actions">{!! $footer !!}</div>
         </div>
       @endif
     </div>

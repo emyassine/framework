@@ -5,21 +5,8 @@
 <?php 
   $attributes = $attributes ?? new \Webkernel\View\AttributeBag([]);
  ?>
-<?php if ($this->once('wds.aside')): ?>
-<style>
-.wds-aside {
-  flex: 0 0 var(--wds-aside-width, 20rem);
-  min-width: 0;
-  background: var(--wds-surface);
-  color: var(--wds-text);
-  border-inline-start: 1px solid var(--wds-border);
-  padding: 1.25rem;
-}
-.wds-aside[data-collapsed="1"] { display: none; }
-</style>
-<?php endif; ?>
 <aside
-  <?php echo \Webkernel\View\View::echo($attributes->class('wds-aside')); ?>
+  <?php echo \Webkernel\View\View::echo($attributes->class('w-aside')); ?>
 
   data-position="<?php echo \Webkernel\View\View::echo($position); ?>"
   data-collapsed="<?php echo \Webkernel\View\View::echo($collapsed ? '1' : '0'); ?>"

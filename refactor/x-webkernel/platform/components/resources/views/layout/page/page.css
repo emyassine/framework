@@ -1,0 +1,10 @@
+.w-layout { display: flex; min-height: 100vh; background: var(--w-bg); color: var(--w-text); }
+.w-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
+.w-header-heading { font-size: 1.625rem; font-weight: 500; letter-spacing: -0.02em; line-height: 1.2; color: var(--w-text); }
+.w-header-subheading { margin-top: 0.25rem; font-size: var(--w-text-sm); color: var(--w-text-muted); }
+.w-header-actions { display: flex; align-items: center; gap: 0.5rem; flex-shrink: 0; flex-wrap: wrap; }
+.w-page { display: flex; flex-direction: column; gap: 1.25rem; color: var(--w-text); }
+.w-page-content { min-width: 0; color: var(--w-text); }
+@media (max-width: 640px) {
+  .w-header-heading { font-size: 1.375rem; }
+}

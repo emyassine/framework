@@ -1,0 +1,86 @@
+.w-rail {
+  width: var(--w-rail-width);
+  flex: 0 0 var(--w-rail-width);
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: var(--w-rail-bg);
+  color: var(--w-text);
+  border-inline-end: 1px solid var(--w-border);
+  transition: background var(--w-transition);
+}
+.w-rail-brand {
+  width: 100%;
+  height: var(--w-topbar-height);
+  min-height: 2.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.w-rail-logo { display: grid; place-content: center; text-decoration: none; color: inherit; }
+.w-rail-logo-mark {
+  display: grid;
+  place-content: center;
+  padding: 0.35rem;
+  border-radius: var(--w-radius);
+}
+.w-rail-logo-mark img { width: 1.25rem; height: 1.25rem; object-fit: contain; display: block; }
+.w-logo-icon {
+  width: 1.25rem;
+  height: 1.25rem;
+  border-radius: var(--w-radius);
+  background: var(--primary-600);
+  color: var(--color-white);
+  display: grid;
+  place-content: center;
+}
+.w-rail-account {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0;
+  border-block: 1px solid var(--w-border);
+  flex-shrink: 0;
+}
+.w-rail-avatar-btn {
+  width: 2rem;
+  height: 2rem;
+  border-radius: var(--w-radius);
+  display: grid;
+  place-content: center;
+  color: var(--w-text-muted);
+  background: transparent;
+  text-decoration: none;
+  transition: background var(--w-transition), color var(--w-transition), box-shadow var(--w-transition);
+}
+.w-rail-avatar-btn:hover { background: var(--w-surface-2); color: var(--w-text); }
+.w-rail-avatar-btn .w-icon,
+.w-rail-avatar-btn svg { width: 1rem; height: 1rem; }
+.w-rail-list {
+  flex: 1;
+  width: 100%;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.5rem 0 1rem;
+}
+@media (max-width: 979px) {
+  .w-rail { display: none; }
+  [data-w-sidebar="expanded"] .w-rail {
+    display: flex;
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    inset-inline-start: 0;
+    z-index: 80;
+    background: var(--w-surface);
+    box-shadow: var(--w-shadow-md);
+  }
+}

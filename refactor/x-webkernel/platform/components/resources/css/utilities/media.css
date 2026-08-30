@@ -1,0 +1,12 @@
+@media (max-width: 767px) {
+  [mobile~="hide"] { display: none !important; }
+}
+@media (min-width: 768px) and (max-width: 1023px) {
+  [tablet~="hide"] { display: none !important; }
+}
+@media (min-width: 1024px) {
+  [desktop~="hide"] { display: none !important; }
+}
+@media (min-width: 768px) {
+  [mobile~="only"] { display: none !important; }
+}

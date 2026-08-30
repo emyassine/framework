@@ -140,7 +140,7 @@ final readonly class DumpAutoloadCommand
             $this->icons_dump($providers, $panels),
         );
         $this->dump_typography();
-        $this->dump_wds_css($providers);
+        \Webkernel\Platform\Assets::dump($providers);
         $this->dump_flags();
         $this->strip_dev_autoload_files($composer_dir);
         $this->ensure_path_helpers();
@@ -149,8 +149,10 @@ final readonly class DumpAutoloadCommand
         $this->run_dump_hooks($packages, $classmap, $vendor_dir);
 
         $io = $this->terminal();
+        $io->line();
         $io->success('wrote composer/'.self::BOOT_BASENAME.' (instance '.$instance_id.')');
-
+        $io->line();
+        $io->note('Took ' . number_format((\hrtime(true) - START_REQUEST) / 1e6, 2) . ' ms');
         return ExitCode::SUCCESS;
     }
 

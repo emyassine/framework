@@ -16,24 +16,18 @@
     $favicon = webkernel_branding_url('webkernel-favicon');
   }
  ?>
-<?php if ($this->once('wds.page.base.view')): ?>
-  <style>
-  	html { font-size: 16px; }
-  	body { margin: 0; }
-  </style>
-<?php endif; ?>
 <!DOCTYPE html>
 <html
   lang="<?php echo \Webkernel\View\View::echo($lang); ?>"
   dir="<?php echo \Webkernel\View\View::echo(\function_exists('i18n_direction') ? i18n_direction($lang) : 'ltr'); ?>"
-  data-wds-theme="<?php echo \Webkernel\View\View::echo($theme); ?>"
-  data-wds-layout="<?php echo \Webkernel\View\View::echo($layout); ?>"
+  data-w-theme="<?php echo \Webkernel\View\View::echo($theme); ?>"
+  data-w-layout="<?php echo \Webkernel\View\View::echo($layout); ?>"
 >
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <script>
-  	(function(d){var t=localStorage.getItem('wds-theme');if(t)d.dataset.wdsTheme=t;})(document.documentElement);
+  	(function(d){var t=localStorage.getItem('w-theme');if(t)d.dataset.wTheme=t;})(document.documentElement);
   </script>
   <?php if($csrf): ?>
     <?php echo \Webkernel\Csrf::meta(); ?>

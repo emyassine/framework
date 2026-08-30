@@ -39,35 +39,21 @@
   $has_topbar = (bool) ($layout_flags['topbar'] ?? true);
   $has_left = $has_panel_sidebar || $has_sidebar;
  ?>
-<?php if ($this->once('wds.page.view')): ?>
-<style>
-.wds-layout { display: flex; min-height: 100vh; background: var(--wds-bg); color: var(--wds-text); }
-.wds-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
-.wds-header-heading { font-size: 1.625rem; font-weight: 500; letter-spacing: -0.02em; line-height: 1.2; color: var(--wds-text); }
-.wds-header-subheading { margin-top: 0.25rem; font-size: var(--wds-text-sm); color: var(--wds-text-muted); }
-.wds-header-actions { display: flex; align-items: center; gap: 0.5rem; flex-shrink: 0; flex-wrap: wrap; }
-.wds-page { display: flex; flex-direction: column; gap: 1.25rem; color: var(--wds-text); }
-.wds-page-content { min-width: 0; color: var(--wds-text); }
-@media (max-width: 640px) {
-  .wds-header-heading { font-size: 1.375rem; }
-}
-</style>
-<?php endif; ?>
 <?php  $this->start_component('webkernel::page.base',['title'=>$document_title,'lang'=>$lang,'theme'=>$theme,'csrf'=>$csrf,'favicon'=>$favicon,'description'=>$document_description,'layout'=>'sidebar']); ?>
   <script>
-  (function(d){var s=localStorage.getItem('wds-sidebar');if(s)d.dataset.wdsSidebar=s;})(document.documentElement);</script>
-  <div class="wds-layout" data-wds-sidebar-root>
+  (function(d){var s=localStorage.getItem('w-sidebar');if(s)d.dataset.wSidebar=s;})(document.documentElement);</script>
+  <div class="w-layout" data-w-sidebar-root>
     <?php if($has_left): ?>
       <?php  $this->start_component('webkernel::sidebar.group',['position'=>'left']); ?>
         <?php if($has_panel_sidebar): ?>
           <?php  $this->start_component('webkernel::rail',[]); ?>
-            <div class="wds-rail-brand">
-              <a class="wds-rail-logo" href="/" title="<?php echo \Webkernel\View\View::echo($brand); ?>">
-                <span class="wds-rail-logo-mark">
+            <div class="w-rail-brand">
+              <a class="w-rail-logo" href="/" title="<?php echo \Webkernel\View\View::echo($brand); ?>">
+                <span class="w-rail-logo-mark">
                   <?php if(!empty($logo)): ?>
                     <img src="<?php echo \Webkernel\View\View::echo($logo); ?>" alt="" width="24" height="24" />
                   <?php else: ?>
-                    <span class="wds-logo-icon">
+                    <span class="w-logo-icon">
                       <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
                         <circle cx="8" cy="8" r="6"/><path d="M8 2v6l3 3"/>
                       </svg>
@@ -77,8 +63,8 @@
               </a>
             </div>
             <?php if (\function_exists('auth') && auth()->check()): ?>
-              <div class="wds-rail-account">
-                <a class="wds-rail-avatar-btn" href="/system" title="<?php echo \Webkernel\View\View::echo(lang('panel.profile')); ?>">
+              <div class="w-rail-account">
+                <a class="w-rail-avatar-btn" href="/system" title="<?php echo \Webkernel\View\View::echo(lang('panel.profile')); ?>">
                   <span class="wds-icon"><svg class="wds-icon-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
   <path d="M16 2v2"/>
   <path d="M7 22v-2a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v2"/>
@@ -89,7 +75,7 @@
                 </a>
               </div>
             <?php endif; ?>
-            <ul class="wds-rail-list">
+            <ul class="w-rail-list">
               <?php foreach($apps as $app): ?>
                 <?php 
                   $app_id = (string) ($app['id'] ?? '');
@@ -112,11 +98,11 @@
         <?php if($has_sidebar): ?>
           <?php  $this->start_component('webkernel::sidebar',[]); ?>
             <?php  $this->start_component('webkernel::sidebar.header',['title'=>$current_label]); ?><?php echo $this->render_component(); ?>
-            <div class="wds-drawer-body">
-              <ul class="wds-nav-list">
+            <div class="w-drawer-body">
+              <ul class="w-nav-list">
                 <li>
-                  <button type="button" class="wds-nav-search" onclick="document.dispatchEvent(new CustomEvent('wds-search'))">
-                    <span class="wds-nav-icon" aria-hidden="true"><?php echo icon('search', 'wds-icon-svg'); ?></span>
+                  <button type="button" class="w-nav-search" onclick="document.dispatchEvent(new CustomEvent('w-search'))">
+                    <span class="w-nav-icon" aria-hidden="true"><?php echo icon('search', 'w-icon-svg'); ?></span>
                     <?php echo \Webkernel\View\View::echo(lang('panel.search')); ?>
 
                   </button>
@@ -130,15 +116,15 @@
                     $group_icon = (string) ($group['icon'] ?? 'folder');
                     $is_group = $group_label !== '';
                    ?>
-                  <li class="<?php echo \Webkernel\View\View::echo($is_group ? 'wds-nav-group' : ''); ?>">
+                  <li class="<?php echo \Webkernel\View\View::echo($is_group ? 'w-nav-group' : ''); ?>">
                     <?php if($is_group): ?>
                       <details open>
-                        <summary class="wds-nav-summary">
-                          <span class="wds-nav-icon" aria-hidden="true"><?php echo icon($group_icon, 'wds-icon-svg'); ?></span>
+                        <summary class="w-nav-summary">
+                          <span class="w-nav-icon" aria-hidden="true"><?php echo icon($group_icon, 'w-icon-svg'); ?></span>
                           <span><?php echo \Webkernel\View\View::echo($group_label); ?></span>
-                          <span class="wds-nav-caret"><?php echo icon('chevron-down', 'wds-icon-svg'); ?></span>
+                          <span class="w-nav-caret"><?php echo icon('chevron-down', 'w-icon-svg'); ?></span>
                         </summary>
-                        <ul class="wds-nav-sub">
+                        <ul class="w-nav-sub">
                           <?php foreach(($group['items'] ?? []) as $item): ?>
                             <?php 
                               $item_label = (string) ($item['label'] ?? '');
@@ -191,20 +177,20 @@
           <?php endif; ?>
         <?php echo $this->render_component(); ?>
       <?php endif; ?>
-      <main class="wds-main">
-        <div class="wds-page">
+      <main class="w-main">
+        <div class="w-page">
           <?php if($header !== '' || $description !== '' || $header_actions !== []): ?>
-            <header class="wds-header">
+            <header class="w-header">
               <div>
                 <?php if($header !== ''): ?>
-                  <h1 class="wds-header-heading"><?php echo \Webkernel\View\View::echo($header); ?></h1>
+                  <h1 class="w-header-heading"><?php echo \Webkernel\View\View::echo($header); ?></h1>
                 <?php endif; ?>
                 <?php if($description !== ''): ?>
-                  <p class="wds-header-subheading"><?php echo \Webkernel\View\View::echo($description); ?></p>
+                  <p class="w-header-subheading"><?php echo \Webkernel\View\View::echo($description); ?></p>
                 <?php endif; ?>
               </div>
               <?php if($header_actions !== []): ?>
-                <div class="wds-header-actions">
+                <div class="w-header-actions">
                   <?php foreach($header_actions as $action): ?>
                     <?php echo $action; ?>
 
@@ -213,7 +199,7 @@
               <?php endif; ?>
             </header>
           <?php endif; ?>
-          <div class="wds-page-content">
+          <div class="w-page-content">
             <?php echo $slot; ?>
 
           </div>

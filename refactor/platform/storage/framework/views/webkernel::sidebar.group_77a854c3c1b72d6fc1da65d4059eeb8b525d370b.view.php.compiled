@@ -4,20 +4,7 @@
 <?php 
   $attributes = $attributes ?? new \Webkernel\View\AttributeBag([]);
  ?>
-<?php if ($this->once('wds.sidebar.group')): ?>
-<style>
-.wds-sidebar-group {
-  display: flex;
-  flex: 0 0 auto;
-  position: sticky;
-  top: 0;
-  height: 100vh;
-  height: 100dvh;
-  z-index: 50;
-}
-</style>
-<?php endif; ?>
-<div <?php echo \Webkernel\View\View::echo($attributes->class('wds-sidebar-group')); ?> data-position="<?php echo \Webkernel\View\View::echo($position); ?>">
+<div <?php echo \Webkernel\View\View::echo($attributes->class('w-sidebar-group')); ?> data-position="<?php echo \Webkernel\View\View::echo($position); ?>">
   <?php echo $slot; ?>
 
 </div>

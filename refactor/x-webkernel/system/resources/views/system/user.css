@@ -1,0 +1,26 @@
+.w-user-menu { position: relative; }
+.w-user-menu-trigger {
+  display: flex; align-items: center; gap: 0.5em;
+  padding: 0 10px; min-height: 40px; border-radius: 4px;
+  color: var(--w-text);
+}
+.w-user-menu-trigger:hover { background: var(--w-bg-subtle); }
+.w-user-menu-name { font-size: 13px; font-weight: 600; white-space: nowrap; }
+.w-user-menu-chevron { width: 14px; height: 14px; color: var(--w-text-muted); opacity: 0.5; }
+.w-user-menu-panel {
+  display: none; position: absolute; inset-inline-end: 0; top: calc(100% + 0.5rem);
+  min-width: 180px; background: var(--w-surface); border: 1px solid var(--w-border);
+  border-radius: 8px; padding: 4px; z-index: 60;
+}
+.w-user-menu.w-open .w-user-menu-panel { display: flex; flex-direction: column; }
+.w-user-menu-panel a,
+.w-user-menu-panel button {
+  display: flex; align-items: center; gap: 0.5rem; padding: 0.6em 0.9em;
+  border-radius: 4px; color: var(--w-text-muted); font-size: 13px; font-weight: 500;
+  width: 100%; background: none; border: none; cursor: pointer; font: inherit; text-align: start;
+}
+.w-user-menu-panel a:hover,
+.w-user-menu-panel button:hover { background: var(--w-bg-subtle); color: var(--w-text); }
+@media (max-width: 640px) {
+  .w-user-menu-name { display: none; }
+}

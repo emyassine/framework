@@ -1,0 +1,31 @@
+[appear] {
+  opacity: 0;
+  max-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  pointer-events: none;
+  transition: opacity var(--w-utility-duration) var(--w-utility-ease),
+    max-width var(--w-utility-duration) var(--w-utility-ease);
+}
+[group]:is(:hover, :focus-within) > [appear],
+[group]:is(:hover, :focus-within) [appear] {
+  opacity: 1;
+  max-width: 16rem;
+  pointer-events: auto;
+}
+@media (max-width: 767px) {
+  [appear][mobile~="tooltip"],
+  [mobile~="tooltip"] {
+    position: absolute;
+    inset-inline-start: 100%;
+    top: 50%;
+    translate: 0.5rem -50%;
+    max-width: none;
+    padding: 0.25rem 0.5rem;
+    border-radius: var(--w-radius);
+    background: var(--w-surface);
+    color: var(--w-text);
+    box-shadow: var(--w-shadow-md);
+    z-index: 40;
+  }
+}

@@ -42,35 +42,21 @@
   $has_topbar = (bool) ($layout_flags['topbar'] ?? true);
   $has_left = $has_panel_sidebar || $has_sidebar;
 @endphp
-@once('wds.page.view')
-<style>
-.wds-layout { display: flex; min-height: 100vh; background: var(--wds-bg); color: var(--wds-text); }
-.wds-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
-.wds-header-heading { font-size: 1.625rem; font-weight: 500; letter-spacing: -0.02em; line-height: 1.2; color: var(--wds-text); }
-.wds-header-subheading { margin-top: 0.25rem; font-size: var(--wds-text-sm); color: var(--wds-text-muted); }
-.wds-header-actions { display: flex; align-items: center; gap: 0.5rem; flex-shrink: 0; flex-wrap: wrap; }
-.wds-page { display: flex; flex-direction: column; gap: 1.25rem; color: var(--wds-text); }
-.wds-page-content { min-width: 0; color: var(--wds-text); }
-@media (max-width: 640px) {
-  .wds-header-heading { font-size: 1.375rem; }
-}
-</style>
-@endonce
 <x-webkernel::page.base :title="$document_title" :lang="$lang" :theme="$theme" :csrf="$csrf" :favicon="$favicon" :description="$document_description" layout="sidebar">
   <script>
-  (function(d){var s=localStorage.getItem('wds-sidebar');if(s)d.dataset.wdsSidebar=s;})(document.documentElement);</script>
-  <div class="wds-layout" data-wds-sidebar-root>
+  (function(d){var s=localStorage.getItem('w-sidebar');if(s)d.dataset.wSidebar=s;})(document.documentElement);</script>
+  <div class="w-layout" data-w-sidebar-root>
     @if ($has_left)
       <x-webkernel::sidebar.group position="left">
         @if ($has_panel_sidebar)
           <x-webkernel::rail>
-            <div class="wds-rail-brand">
-              <a class="wds-rail-logo" href="/" title="{{ $brand }}">
-                <span class="wds-rail-logo-mark">
+            <div class="w-rail-brand">
+              <a class="w-rail-logo" href="/" title="{{ $brand }}">
+                <span class="w-rail-logo-mark">
                   @if (!empty($logo))
                     <img src="{{ $logo }}" alt="" width="24" height="24" />
                   @else
-                    <span class="wds-logo-icon">
+                    <span class="w-logo-icon">
                       <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
                         <circle cx="8" cy="8" r="6"/><path d="M8 2v6l3 3"/>
                       </svg>
@@ -80,13 +66,13 @@
               </a>
             </div>
             @auth
-              <div class="wds-rail-account">
-                <a class="wds-rail-avatar-btn" href="/system" title="{{ lang('panel.profile') }}">
+              <div class="w-rail-account">
+                <a class="w-rail-avatar-btn" href="/system" title="{{ lang('panel.profile') }}">
                   <x-webkernel::icon name="contact" />
                 </a>
               </div>
             @endauth
-            <ul class="wds-rail-list">
+            <ul class="w-rail-list">
               @foreach ($apps as $app)
                 @php
                   $app_id = (string) ($app['id'] ?? '');
@@ -117,11 +103,11 @@
         @if ($has_sidebar)
           <x-webkernel::sidebar>
             <x-webkernel::sidebar.header :title="$current_label" />
-            <div class="wds-drawer-body">
-              <ul class="wds-nav-list">
+            <div class="w-drawer-body">
+              <ul class="w-nav-list">
                 <li>
-                  <button type="button" class="wds-nav-search" onclick="document.dispatchEvent(new CustomEvent('wds-search'))">
-                    <span class="wds-nav-icon" aria-hidden="true">{!! icon('search', 'wds-icon-svg') !!}</span>
+                  <button type="button" class="w-nav-search" onclick="document.dispatchEvent(new CustomEvent('w-search'))">
+                    <span class="w-nav-icon" aria-hidden="true">{!! icon('search', 'w-icon-svg') !!}</span>
                     {{ lang('panel.search') }}
                   </button>
                 </li>
@@ -134,15 +120,15 @@
                     $group_icon = (string) ($group['icon'] ?? 'folder');
                     $is_group = $group_label !== '';
                   @endphp
-                  <li class="{{ $is_group ? 'wds-nav-group' : '' }}">
+                  <li class="{{ $is_group ? 'w-nav-group' : '' }}">
                     @if ($is_group)
                       <details open>
-                        <summary class="wds-nav-summary">
-                          <span class="wds-nav-icon" aria-hidden="true">{!! icon($group_icon, 'wds-icon-svg') !!}</span>
+                        <summary class="w-nav-summary">
+                          <span class="w-nav-icon" aria-hidden="true">{!! icon($group_icon, 'w-icon-svg') !!}</span>
                           <span>{{ $group_label }}</span>
-                          <span class="wds-nav-caret">{!! icon('chevron-down', 'wds-icon-svg') !!}</span>
+                          <span class="w-nav-caret">{!! icon('chevron-down', 'w-icon-svg') !!}</span>
                         </summary>
-                        <ul class="wds-nav-sub">
+                        <ul class="w-nav-sub">
                           @foreach (($group['items'] ?? []) as $item)
                             @php
                               $item_label = (string) ($item['label'] ?? '');
@@ -204,20 +190,20 @@
           @endif
         </x-webkernel::topbar>
       @endif
-      <main class="wds-main">
-        <div class="wds-page">
+      <main class="w-main">
+        <div class="w-page">
           @if ($header !== '' || $description !== '' || $header_actions !== [])
-            <header class="wds-header">
+            <header class="w-header">
               <div>
                 @if ($header !== '')
-                  <h1 class="wds-header-heading">{{ $header }}</h1>
+                  <h1 class="w-header-heading">{{ $header }}</h1>
                 @endif
                 @if ($description !== '')
-                  <p class="wds-header-subheading">{{ $description }}</p>
+                  <p class="w-header-subheading">{{ $description }}</p>
                 @endif
               </div>
               @if ($header_actions !== [])
-                <div class="wds-header-actions">
+                <div class="w-header-actions">
                   @foreach ($header_actions as $action)
                     {!! $action !!}
                   @endforeach
@@ -225,7 +211,7 @@
               @endif
             </header>
           @endif
-          <div class="wds-page-content">
+          <div class="w-page-content">
             {!! $slot !!}
           </div>
         </div>

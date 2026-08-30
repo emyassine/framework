@@ -1,0 +1,22 @@
+.w-simple {
+  width: 100%;
+  max-width: 28rem;
+  padding: 1.5rem;
+  margin: 0 auto;
+  color: var(--w-text);
+}
+.w-simple-card {
+  background: var(--w-surface);
+  border: 1px solid var(--w-border);
+  border-radius: var(--w-radius);
+  padding: 2rem 1.75rem;
+  color: var(--w-text);
+}
+[data-w-layout="simple"] body {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--w-bg);
+  color: var(--w-text);
+}
