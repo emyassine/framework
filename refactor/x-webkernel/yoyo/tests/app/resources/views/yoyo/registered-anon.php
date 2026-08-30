@@ -1,1 +1,0 @@
-<div id="registered-anon"></div>

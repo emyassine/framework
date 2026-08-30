@@ -14,6 +14,7 @@ use Webkernel\Platform\Components\Breadcrumbs;
 use Webkernel\Platform\Components\Callout;
 use Webkernel\Platform\Components\EmptyState;
 use Webkernel\Platform\Components\Input;
+use Webkernel\Platform\Components\Textarea;
 use Webkernel\View\View;
 
 final class AtomsTest extends TestCase
@@ -58,5 +59,21 @@ final class AtomsTest extends TestCase
         $this->assertStringContainsString('w-empty-state', $empty);
         $this->assertStringContainsString('w-input', $input);
         $this->assertStringContainsString('type="email"', $input);
+    }
+
+    /**
+     * @return void
+     */
+    public function test_textarea_matches_filament_structure(): void
+    {
+        $html = Textarea::make('body')->label('Body')->rows(4)->value('Hello')->render();
+
+        $this->assertStringContainsString('w-fo-textarea', $html);
+        $this->assertStringContainsString('w-fo-textarea-wrp', $html);
+        $this->assertStringContainsString('<textarea', $html);
+        $this->assertStringContainsString('name="body"', $html);
+        $this->assertStringContainsString('Hello', $html);
+        $this->assertStringContainsString('rows="4"', $html);
+        $this->assertSame('webkernel::textarea', Textarea::make()->view());
     }
 }

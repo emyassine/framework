@@ -1,3 +1,1 @@
-.w-tabs-panel { color: var(--w-text); min-width: 0; }
-.w-tabs-panel[hidden] { display: none; }
-.w-tabs.w-contained .w-tabs-panel { padding: 0.75rem; }
+.w-sc-tabs-tab { color: var(--w-text); min-width: 0; }

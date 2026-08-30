@@ -19,13 +19,9 @@
   <p class="w-fo-field{{ $error ? ' w-invalid' : '' }}">
     <label>
       {{ $label ?? $name }}
-      <span class="w-input-wrp">
+      <span class="w-input-wrp{{ $error ? ' w-invalid' : '' }}">
         <span class="w-input-wrp-content">
-          @if ($type === 'textarea')
-            <textarea class="w-input" name="{{ $name }}" rows="5">{{ $value }}</textarea>
-          @else
-            <input class="w-input" type="{{ $type }}" name="{{ $name }}" value="{{ $value }}" />
-          @endif
+          <input class="w-input" type="{{ $type }}" name="{{ $name }}" value="{{ $value }}" />
         </span>
       </span>
     </label>

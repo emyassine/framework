@@ -2,18 +2,39 @@
   'tab' => '',
   'active' => false,
   'icon' => null,
+  'icon_position' => 'before',
+  'badge' => null,
+  'badge_color' => 'primary',
+  'defer_badge' => false,
 ]; foreach ($__props as $__n => $__d) { if (!isset($$__n)) { $$__n = $__d; } } $attributes = (isset($attributes) && $attributes instanceof \Webkernel\View\AttributeBag ? $attributes : new \Webkernel\View\AttributeBag([]))->except(\array_keys($__props)); unset($__props, $__n, $__d); ?>
+<?php 
+  $attributes = $attributes ?? new \Webkernel\View\AttributeBag([]);
+  $position = $icon_position instanceof \Webkernel\Platform\Components\IconPosition
+    ? $icon_position->value
+    : (string) $icon_position;
+  $has_badge = $badge !== null && $badge !== '';
+ ?>
 <button
   type="button"
-  class="w-tabs-item<?php echo \Webkernel\View\View::echo($active ? ' w-active' : ''); ?>"
-  role="tab"
-  aria-selected="<?php echo \Webkernel\View\View::echo($active ? 'true' : 'false'); ?>"
-  data-tab="<?php echo \Webkernel\View\View::echo($tab); ?>"
+  <?php echo \Webkernel\View\View::echo($attributes->class(['w-tabs-item', 'w-active' => $active])->merge([
+    'role' => 'tab',
+    'aria-selected' => $active ? 'true' : 'false',
+    'data-tab' => $tab,
+  ])); ?>
+
 >
-  <span style="display: inline-flex; align-items: center; gap: 8px;">
-    <?php if(!empty($icon)): ?>
-      <?php  $this->start_component('webkernel::icon',['name'=>$icon]); ?><?php echo $this->render_component(); ?>
-    <?php endif; ?>
-    <span><?php echo \Webkernel\View\View::echo($slot); ?></span>
-  </span>
+  <?php if(!empty($icon) && $position !== 'after'): ?>
+    <?php  $this->start_component('webkernel::icon',['name'=>$icon]); ?><?php echo $this->render_component(); ?>
+  <?php endif; ?>
+  <span class="w-tabs-item-label"><?php echo \Webkernel\View\View::echo($slot); ?></span>
+  <?php if(!empty($icon) && $position === 'after'): ?>
+    <?php  $this->start_component('webkernel::icon',['name'=>$icon]); ?><?php echo $this->render_component(); ?>
+  <?php endif; ?>
+  <?php if($has_badge && ! $defer_badge): ?>
+    <?php  $this->start_component('webkernel::badge',['color'=>$badge_color,'size'=>'sm']); ?><?php echo \Webkernel\View\View::echo($badge); ?><?php echo $this->render_component(); ?>
+  <?php elseif($defer_badge): ?>
+    <span class="w-tabs-item-badge-placeholder">
+      <?php  $this->start_component('webkernel::loading-indicator',['size'=>'sm']); ?><?php echo $this->render_component(); ?>
+    </span>
+  <?php endif; ?>
 </button>

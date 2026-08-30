@@ -12,7 +12,9 @@ use Webkernel\Csrf;
 use Webkernel\I18n\I18nContext;
 use Webkernel\Platform\Components\Checkbox;
 use Webkernel\Platform\Components\Select;
+use Webkernel\Platform\Components\Tab;
 use Webkernel\Platform\Components\Tabs;
+use Webkernel\Platform\Components\Textarea;
 use Webkernel\Platform\Components\TextInput;
 use Webkernel\Platform\Notification;
 use Webkernel\Platform\Schemas\Schema;
@@ -120,32 +122,22 @@ final class ManagePanel extends Page
     public function schema(array $state): Schema
     {
         return Schema::make()->components([
-            Tabs::make()->contained()->tabs([
-                [
-                    'id' => 'branding',
-                    'label' => $this->lang('panel.tab.branding', 'Branding'),
-                    'icon' => 'palette',
-                    'schema' => $this->branding_schema(),
-                ],
-                [
-                    'id' => 'locale',
-                    'label' => $this->lang('panel.tab.locale', 'Locale'),
-                    'icon' => 'languages',
-                    'schema' => $this->locale_schema(),
-                ],
-                [
-                    'id' => 'legal',
-                    'label' => $this->lang('panel.tab.legal', 'Legal'),
-                    'icon' => 'scale',
-                    'schema' => $this->legal_schema(),
-                ],
-                [
-                    'id' => 'system',
-                    'label' => $this->lang('panel.tab.system', 'System'),
-                    'icon' => 'settings',
-                    'schema' => $this->system_schema(),
-                ],
-            ]),
+            Tabs::make()
+                ->contained()
+                ->tabs([
+                    Tab::make($this->lang('panel.tab.branding', 'Branding'))
+                        ->icon('palette')
+                        ->schema($this->branding_schema()),
+                    Tab::make($this->lang('panel.tab.locale', 'Locale'))
+                        ->icon('languages')
+                        ->schema($this->locale_schema()),
+                    Tab::make($this->lang('panel.tab.legal', 'Legal'))
+                        ->icon('scale')
+                        ->schema($this->legal_schema()),
+                    Tab::make($this->lang('panel.tab.system', 'System'))
+                        ->icon('settings')
+                        ->schema($this->system_schema()),
+                ]),
         ]);
     }
 
@@ -370,10 +362,10 @@ final class ManagePanel extends Page
     {
         return Schema::make()->components([
             Checkbox::make('maintenance')->label($this->lang('panel.field.maintenance', 'Maintenance')),
-            TextInput::make('maintenance_message')->label($this->lang('panel.field.maintenance_message', 'Maintenance message'))->type('textarea'),
+            Textarea::make('maintenance_message')->label($this->lang('panel.field.maintenance_message', 'Maintenance message'))->rows(3),
             TextInput::make('analytics_id')->label($this->lang('panel.field.analytics_id', 'Analytics ID')),
-            TextInput::make('header_css')->label($this->lang('panel.field.header_css', 'Header CSS'))->type('textarea'),
-            TextInput::make('footer_js')->label($this->lang('panel.field.footer_js', 'Footer JS'))->type('textarea'),
+            Textarea::make('header_css')->label($this->lang('panel.field.header_css', 'Header CSS'))->rows(5),
+            Textarea::make('footer_js')->label($this->lang('panel.field.footer_js', 'Footer JS'))->rows(5),
             TextInput::make('session_timeout')->label($this->lang('panel.field.session_timeout', 'Session timeout'))->type('number'),
         ]);
     }

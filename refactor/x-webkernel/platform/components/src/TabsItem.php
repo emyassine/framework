@@ -55,4 +55,54 @@ final class TabsItem extends Component
 
         return $this;
     }
+
+    /**
+     * @param $position IconPosition|string
+     *
+     * @return static
+     */
+    public function icon_position(IconPosition|string $position): static
+    {
+        $this->props['icon_position'] = $position instanceof IconPosition
+            ? $position->value
+            : $position;
+
+        return $this;
+    }
+
+    /**
+     * @param $badge string
+     *
+     * @return static
+     */
+    public function badge(string $badge): static
+    {
+        $this->props['badge'] = $badge;
+
+        return $this;
+    }
+
+    /**
+     * @param $color string
+     *
+     * @return static
+     */
+    public function badge_color(string $color): static
+    {
+        $this->props['badge_color'] = $color;
+
+        return $this;
+    }
+
+    /**
+     * @param $deferred bool
+     *
+     * @return static
+     */
+    public function defer_badge(bool $deferred = true): static
+    {
+        $this->props['defer_badge'] = $deferred;
+
+        return $this;
+    }
 }

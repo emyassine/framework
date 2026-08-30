@@ -1,8 +1,12 @@
 .w-input-wrp {
-  display: flex; border-radius: var(--w-radius-lg);
+  display: flex; border-radius: 0.5rem;
   background: var(--w-surface);
-  box-shadow: 0 1px 2px color-mix(in srgb, var(--w-text) 6%, transparent), 0 0 0 1px color-mix(in srgb, var(--w-text) 10%, transparent);
-  transition: box-shadow var(--w-transition);
+  box-shadow: 0 1px 2px color-mix(in srgb, var(--color-zinc-950) 6%, transparent), 0 0 0 1px color-mix(in srgb, var(--color-zinc-950) 10%, transparent);
+  transition: box-shadow 75ms ease;
+}
+[data-w-theme="dark"] .w-input-wrp {
+  background: color-mix(in srgb, var(--color-white) 5%, transparent);
+  box-shadow: 0 1px 2px color-mix(in srgb, black 30%, transparent), 0 0 0 1px color-mix(in srgb, var(--color-white) 20%, transparent);
 }
 .w-input-wrp:not(.w-disabled):focus-within {
   box-shadow: 0 0 0 2px var(--primary-600);

@@ -1,8 +1,21 @@
 <?php  $__props = [
   'tab' => '',
   'active' => false,
+  'columns' => null,
 ]; foreach ($__props as $__n => $__d) { if (!isset($$__n)) { $$__n = $__d; } } $attributes = (isset($attributes) && $attributes instanceof \Webkernel\View\AttributeBag ? $attributes : new \Webkernel\View\AttributeBag([]))->except(\array_keys($__props)); unset($__props, $__n, $__d); ?>
-<section class="w-tabs-panel" role="tabpanel" data-tab-panel="<?php echo \Webkernel\View\View::echo($tab); ?>" <?php if(! $active): ?> hidden <?php endif; ?>>
+<?php 
+  $attributes = $attributes ?? new \Webkernel\View\AttributeBag([]);
+  $cols = \is_int($columns) && $columns > 1 ? $columns : null;
+ ?>
+<section
+  <?php echo \Webkernel\View\View::echo($attributes->class(['w-sc-tabs-tab', 'w-active' => $active])->merge([
+    'role' => 'tabpanel',
+    'data-tab-panel' => $tab,
+    'aria-labelledby' => $tab,
+  ])); ?>
+
+  <?php if($cols): ?> style="--w-cols: <?php echo \Webkernel\View\View::echo($cols); ?>" <?php endif; ?>
+>
   <?php echo $slot; ?>
 
 </section>

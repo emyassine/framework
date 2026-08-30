@@ -1,2 +1,0 @@
-<p id="computed-cache"><?php $this->test_count;
-echo $this->test_count; ?></p>

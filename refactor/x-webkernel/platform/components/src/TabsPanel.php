@@ -43,4 +43,18 @@ final class TabsPanel extends Component
 
         return $this;
     }
+
+    /**
+     * @param $columns int|null
+     *
+     * @return static
+     */
+    public function columns(?int $columns): static
+    {
+        if ($columns !== null) {
+            $this->props['columns'] = $columns;
+        }
+
+        return $this;
+    }
 }

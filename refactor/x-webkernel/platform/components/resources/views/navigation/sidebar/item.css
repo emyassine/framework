@@ -1,36 +1,88 @@
-.w-menu-element, .w-nav-link {
+.w-menu-element, .w-nav-link, .w-sidebar-item {
   margin: 0;
-  padding: 0.55em 0.9em;
+  padding: 0.5rem 0.5rem;
   width: 100%;
   display: flex;
   align-items: center;
-  color: inherit;
+  gap: 0.75rem;
+  color: var(--w-text);
   font-weight: 500;
-  border-radius: var(--w-radius);
+  font-size: var(--w-text-sm);
+  border-radius: 0.5rem;
   text-align: start;
+  outline: none;
+  transition: background-color 75ms ease, color 75ms ease;
 }
-.w-menu-element:hover, .w-nav-link:hover {
-  background: color-mix(in srgb, currentColor 8%, transparent);
+.w-menu-element:hover, .w-nav-link:hover, .w-sidebar-item:hover,
+.w-menu-element:focus-visible, .w-nav-link:focus-visible, .w-sidebar-item:focus-visible {
+  background: var(--w-bg-subtle);
 }
-.w-menu-element.w-active, .w-nav-link.w-active, .w-nav-link[aria-current="page"] {
-  background: var(--w-surface);
-  color: var(--primary-600);
+[data-w-theme="dark"] .w-menu-element:hover,
+[data-w-theme="dark"] .w-nav-link:hover,
+[data-w-theme="dark"] .w-sidebar-item:hover,
+[data-w-theme="dark"] .w-menu-element:focus-visible,
+[data-w-theme="dark"] .w-nav-link:focus-visible,
+[data-w-theme="dark"] .w-sidebar-item:focus-visible {
+  background: color-mix(in srgb, var(--color-white) 5%, transparent);
+}
+.w-menu-element.w-active, .w-nav-link.w-active, .w-nav-link[aria-current="page"], .w-sidebar-item.w-active {
+  background: var(--w-bg-subtle);
 }
 [data-w-theme="dark"] .w-menu-element.w-active,
-[data-w-theme="dark"] .w-nav-link.w-active {
-  background: color-mix(in srgb, var(--primary-600) 16%, transparent);
+[data-w-theme="dark"] .w-nav-link.w-active,
+[data-w-theme="dark"] .w-sidebar-item.w-active {
+  background: color-mix(in srgb, var(--color-white) 5%, transparent);
+}
+.w-sidebar-item-label, .w-menu-element > span:not(.w-nav-icon), .w-nav-link > span:not(.w-nav-icon) {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--color-zinc-700);
+}
+[data-w-theme="dark"] .w-sidebar-item-label,
+[data-w-theme="dark"] .w-menu-element > span:not(.w-nav-icon),
+[data-w-theme="dark"] .w-nav-link > span:not(.w-nav-icon) {
+  color: var(--color-zinc-200);
+}
+.w-menu-element.w-active .w-sidebar-item-label,
+.w-menu-element.w-active > span:not(.w-nav-icon),
+.w-nav-link.w-active .w-sidebar-item-label,
+.w-nav-link.w-active > span:not(.w-nav-icon),
+.w-nav-link[aria-current="page"] > span:not(.w-nav-icon),
+.w-sidebar-item.w-active .w-sidebar-item-label {
+  color: var(--primary-700);
+}
+[data-w-theme="dark"] .w-menu-element.w-active .w-sidebar-item-label,
+[data-w-theme="dark"] .w-menu-element.w-active > span:not(.w-nav-icon),
+[data-w-theme="dark"] .w-nav-link.w-active .w-sidebar-item-label,
+[data-w-theme="dark"] .w-nav-link.w-active > span:not(.w-nav-icon),
+[data-w-theme="dark"] .w-sidebar-item.w-active .w-sidebar-item-label {
   color: var(--primary-400);
 }
-.w-nav-icon {
-  flex: 0 0 1.3em;
-  text-align: center;
-  margin-inline-end: 0.8em;
+.w-nav-icon, .w-sidebar-item > .w-icon, .w-menu-element > .w-icon {
+  flex: 0 0 1.5rem;
+  width: 1.5rem;
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  color: var(--color-zinc-400);
 }
-.w-nav-icon .w-icon, .w-nav-icon svg { opacity: 0.55; }
-.w-menu-element:hover .w-nav-icon .w-icon,
-.w-menu-element.w-active .w-nav-icon .w-icon,
-.w-nav-link:hover .w-nav-icon svg,
-.w-nav-link.w-active .w-nav-icon svg { opacity: 1; }
+[data-w-theme="dark"] .w-nav-icon,
+[data-w-theme="dark"] .w-sidebar-item > .w-icon,
+[data-w-theme="dark"] .w-menu-element > .w-icon {
+  color: var(--color-zinc-500);
+}
+.w-menu-element.w-active .w-nav-icon,
+.w-menu-element.w-active > .w-icon,
+.w-nav-link.w-active .w-nav-icon,
+.w-sidebar-item.w-active > .w-icon {
+  color: var(--primary-700);
+}
+[data-w-theme="dark"] .w-menu-element.w-active .w-nav-icon,
+[data-w-theme="dark"] .w-menu-element.w-active > .w-icon,
+[data-w-theme="dark"] .w-nav-link.w-active .w-nav-icon,
+[data-w-theme="dark"] .w-sidebar-item.w-active > .w-icon {
+  color: var(--primary-400);
+}

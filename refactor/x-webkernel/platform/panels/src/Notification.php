@@ -10,22 +10,35 @@ namespace Webkernel\Platform;
 use Webkernel\View\View;
 
 /**
- * Session flash toast. Not a database notification.
+ * Session flash notification. Same structure as Filament's toast stack.
  */
 final class Notification
 {
     public const BAG = '_w_notifications';
 
+    private string $id = '';
+
     private string $title = '';
+
+    private string $body = '';
 
     private string $status = 'info';
 
+    private string $icon = '';
+
+    private int|string $duration = 6000;
+
     /**
+     * @param $id string|null
+     *
      * @return self
      */
-    public static function make(): self
+    public static function make(?string $id = null): self
     {
-        return new self();
+        $self = new self();
+        $self->id = $id ?? \bin2hex(\random_bytes(8));
+
+        return $self;
     }
 
     /**
@@ -38,6 +51,60 @@ final class Notification
         $this->title = $title;
 
         return $this;
+    }
+
+    /**
+     * @param $body string
+     *
+     * @return self
+     */
+    public function body(string $body): self
+    {
+        $this->body = $body;
+
+        return $this;
+    }
+
+    /**
+     * @param $icon string
+     *
+     * @return self
+     */
+    public function icon(string $icon): self
+    {
+        $this->icon = $icon;
+
+        return $this;
+    }
+
+    /**
+     * @param $duration int|string
+     *
+     * @return self
+     */
+    public function duration(int|string $duration): self
+    {
+        $this->duration = $duration;
+
+        return $this;
+    }
+
+    /**
+     * @param $seconds float
+     *
+     * @return self
+     */
+    public function seconds(float $seconds): self
+    {
+        return $this->duration((int) ($seconds * 1000));
+    }
+
+    /**
+     * @return self
+     */
+    public function persistent(): self
+    {
+        return $this->duration('persistent');
     }
 
     /**
@@ -61,19 +128,48 @@ final class Notification
     }
 
     /**
-     * @return void
+     * @return self
      */
-    public function send(): void
+    public function warning(): self
+    {
+        $this->status = 'warning';
+
+        return $this;
+    }
+
+    /**
+     * @return self
+     */
+    public function info(): self
+    {
+        $this->status = 'info';
+
+        return $this;
+    }
+
+    /**
+     * @return self
+     */
+    public function send(): self
     {
         self::boot_session();
         if (! isset($_SESSION[self::BAG]) || ! \is_array($_SESSION[self::BAG])) {
             $_SESSION[self::BAG] = [];
         }
-        $_SESSION[self::BAG][] = ['title' => $this->title, 'status' => $this->status];
+        $_SESSION[self::BAG][] = [
+            'id' => $this->id,
+            'title' => $this->title,
+            'body' => $this->body,
+            'status' => $this->status,
+            'icon' => $this->icon,
+            'duration' => $this->duration,
+        ];
+
+        return $this;
     }
 
     /**
-     * @return list<array{title: string, status: string}>
+     * @return list<array{id: string, title: string, body: string, status: string, icon: string, duration: int|string}>
      */
     public static function pull(): array
     {
@@ -89,8 +185,14 @@ final class Notification
                 continue;
             }
             $out[] = [
+                'id' => (string) ($row['id'] ?? ''),
                 'title' => (string) ($row['title'] ?? ''),
+                'body' => (string) ($row['body'] ?? ''),
                 'status' => (string) ($row['status'] ?? 'info'),
+                'icon' => (string) ($row['icon'] ?? ''),
+                'duration' => \is_int($row['duration'] ?? null) || \is_string($row['duration'] ?? null)
+                    ? $row['duration']
+                    : 6000,
             ];
         }
 
@@ -102,12 +204,16 @@ final class Notification
      */
     public static function render(): string
     {
-        $html = '';
-        foreach (self::pull() as $item) {
-            $html .= View::make('webkernel::toast', $item)->render();
+        $items = self::pull();
+        if ($items === []) {
+            return '';
+        }
+        $slot = '';
+        foreach ($items as $item) {
+            $slot .= View::make('webkernel::notifications.notification', $item)->render();
         }
 
-        return $html;
+        return View::make('webkernel::notifications', ['slot' => $slot])->render();
     }
 
     /**

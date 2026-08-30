@@ -8,10 +8,9 @@
 namespace Webkernel\View;
 
 /**
- * HTMX fragment door. Server-side HTML swap, not a second view engine.
+ * HTMX fragment door. View renders HTML; this class detects a fragment request.
  *
- * //> Network/swap is HTMX. Local UI (drawer, password, tooltip) is dumped JS.
- * //> Yoyo Blade/Twig/Phalcon adapters are not taken. Page and Schema stay the renderer.
+ * //> Network/swap is HTMX. Page and Schema stay the renderer. Local UI is dumped JS.
  */
 final class Liveview
 {

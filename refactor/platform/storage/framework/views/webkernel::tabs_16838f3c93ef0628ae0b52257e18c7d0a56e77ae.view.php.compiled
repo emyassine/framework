@@ -1,13 +1,58 @@
 
 <?php  $__props = [
   'label' => null,
-  'contained' => false,
+  'contained' => true,
   'vertical' => false,
+  'scrollable' => true,
+  'persist_tab' => false,
+  'persist_query' => null,
+  'id' => null,
+  'key' => null,
+  'tab_keys' => [],
 ]; foreach ($__props as $__n => $__d) { if (!isset($$__n)) { $$__n = $__d; } } $attributes = (isset($attributes) && $attributes instanceof \Webkernel\View\AttributeBag ? $attributes : new \Webkernel\View\AttributeBag([]))->except(\array_keys($__props)); unset($__props, $__n, $__d); ?>
-<div class="w-tabs<?php echo \Webkernel\View\View::echo($contained ? ' w-contained' : ''); ?><?php echo \Webkernel\View\View::echo($vertical ? ' w-vertical' : ''); ?>" data-w-tabs>
-  <nav class="w-tabs-bar" role="tablist" aria-label="<?php echo \Webkernel\View\View::echo($label ?? ''); ?>">
+<?php 
+  $attributes = $attributes ?? new \Webkernel\View\AttributeBag([]);
+ ?>
+<div
+  <?php echo \Webkernel\View\View::echo($attributes->class([
+    'w-sc-tabs',
+    'w-contained' => $contained,
+    'w-vertical' => $vertical,
+  ])); ?>
+
+  data-w-tabs
+  <?php if($id): ?> id="<?php echo \Webkernel\View\View::echo($id); ?>" data-tabs-id="<?php echo \Webkernel\View\View::echo($id); ?>" <?php endif; ?>
+  <?php if($key): ?> data-tabs-key="<?php echo \Webkernel\View\View::echo($key); ?>" <?php endif; ?>
+  <?php if($persist_tab && $id): ?> data-persist-tab="<?php echo \Webkernel\View\View::echo($id); ?>" <?php endif; ?>
+  <?php if($persist_query): ?> data-persist-query="<?php echo \Webkernel\View\View::echo($persist_query); ?>" <?php endif; ?>
+  data-scrollable="<?php echo \Webkernel\View\View::echo($scrollable ? 'true' : 'false'); ?>"
+>
+  <?php if(\is_array($tab_keys) && $tab_keys !== []): ?>
+    <input type="hidden" value="<?php echo \Webkernel\View\View::echo(\htmlspecialchars(\json_encode(\array_values($tab_keys), JSON_UNESCAPED_UNICODE), ENT_QUOTES)); ?>" data-w-tabs-data />
+  <?php endif; ?>
+  <nav
+    class="w-tabs<?php echo \Webkernel\View\View::echo($contained ? ' w-contained' : ''); ?><?php echo \Webkernel\View\View::echo($vertical ? ' w-vertical' : ''); ?><?php echo \Webkernel\View\View::echo($scrollable ? '' : ' w-not-scrollable'); ?>"
+    role="tablist"
+    aria-label="<?php echo \Webkernel\View\View::echo($label ?? ''); ?>"
+  >
     <?php echo $list ?? ''; ?>
 
+    <?php if(! $scrollable): ?>
+      <div class="w-dropdown w-tabs-overflow" data-w-dropdown data-w-tabs-overflow hidden>
+        <div class="w-dropdown-trigger" data-w-dropdown-trigger>
+          <button type="button" class="w-tabs-item" data-w-tabs-more role="tab" aria-selected="false">
+            <span class="w-tabs-item-label"><span class="w-icon"><svg class="w-icon-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <circle cx="12" cy="12" r="1"/>
+  <circle cx="19" cy="12" r="1"/>
+  <circle cx="5" cy="12" r="1"/>
+</svg></span></span>
+          </button>
+        </div>
+        <div class="w-dropdown-panel" data-w-dropdown-panel>
+          <div class="w-dropdown-list" data-w-tabs-overflow-list></div>
+        </div>
+      </div>
+    <?php endif; ?>
   </nav>
   <?php echo $slot; ?>
 

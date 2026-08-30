@@ -18,13 +18,9 @@
     <label>
       <?php echo \Webkernel\View\View::echo($label ?? $name); ?>
 
-      <span class="w-input-wrp">
+      <span class="w-input-wrp<?php echo \Webkernel\View\View::echo($error ? ' w-invalid' : ''); ?>">
         <span class="w-input-wrp-content">
-          <?php if($type === 'textarea'): ?>
-            <textarea class="w-input" name="<?php echo \Webkernel\View\View::echo($name); ?>" rows="5"><?php echo \Webkernel\View\View::echo($value); ?></textarea>
-          <?php else: ?>
-            <input class="w-input" type="<?php echo \Webkernel\View\View::echo($type); ?>" name="<?php echo \Webkernel\View\View::echo($name); ?>" value="<?php echo \Webkernel\View\View::echo($value); ?>" />
-          <?php endif; ?>
+          <input class="w-input" type="<?php echo \Webkernel\View\View::echo($type); ?>" name="<?php echo \Webkernel\View\View::echo($name); ?>" value="<?php echo \Webkernel\View\View::echo($value); ?>" />
         </span>
       </span>
     </label>
