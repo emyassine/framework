@@ -1,0 +1,33 @@
+{
+    "$schema": "https://getcomposer.org/schema.json",
+    "name": "webkernel/models",
+    "description": "Webkernel models: Active Record on webkernel/database.",
+    "version": "0.12.0",
+    "type": "webkernel-stdlib",
+    "license": "proprietary",
+    "require": {
+        "php": ">=8.5",
+        "webkernel/database": "^0.12.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Webkernel\\Models\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Webkernel\\Models\\Tests\\": "tests/"
+        }
+    },
+    "extra": {
+        "webkernel": {
+            "package_repo": "git@github.com:webkernelphp/models.git",
+            "production": true,
+            "provider": "Webkernel\\Models\\ModelsProvider",
+            "prefix": "models"
+        }
+    },
+    "config": {
+        "sort-packages": true
+    }
+}

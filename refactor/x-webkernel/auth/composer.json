@@ -1,0 +1,35 @@
+{
+    "$schema": "https://getcomposer.org/schema.json",
+    "name": "webkernel/auth",
+    "description": "Webkernel authentication: session guard, User model, login.",
+    "version": "0.12.0",
+    "type": "webkernel-stdlib",
+    "license": "proprietary",
+    "require": {
+        "php": ">=8.5",
+        "webkernel/codebase": "^0.12.0",
+        "webkernel/components": "^0.12.0",
+        "webkernel/models": "^0.12.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Webkernel\\Auth\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Webkernel\\Auth\\Tests\\": "tests/"
+        }
+    },
+    "extra": {
+        "webkernel": {
+            "package_repo": "git@github.com:webkernelphp/auth.git",
+            "production": true,
+            "provider": "Webkernel\\Auth\\AuthProvider",
+            "prefix": "auth"
+        }
+    },
+    "config": {
+        "sort-packages": true
+    }
+}

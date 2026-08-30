@@ -66,6 +66,17 @@ final class CompilerTest extends TestCase
     /**
      * @return void
      */
+    public function test_auth_and_guest_directives_compile(): void
+    {
+        $compiler = new Compiler(new Directives(), '\\'.View::class.'::echo(%s)');
+        $php = $compiler->compile_string("@auth()\nIN\n@endauth");
+        $this->assertStringContainsString("function_exists('auth') && auth()->check()", $php);
+        $this->assertStringContainsString('endif;', $php);
+    }
+
+    /**
+     * @return void
+     */
     public function test_component_bound_attributes_keep_underscores(): void
     {
         $compiler = new Compiler(new Directives(), '\\'.View::class.'::echo(%s)');

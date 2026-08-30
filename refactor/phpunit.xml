@@ -28,6 +28,15 @@
         <testsuite name="system">
             <directory>x-webkernel/system/tests</directory>
         </testsuite>
+        <testsuite name="database">
+            <directory>x-webkernel/database/tests</directory>
+        </testsuite>
+        <testsuite name="models">
+            <directory>x-webkernel/models/tests</directory>
+        </testsuite>
+        <testsuite name="auth">
+            <directory>x-webkernel/auth/tests</directory>
+        </testsuite>
     </testsuites>
     <source>
         <include>
@@ -40,6 +49,9 @@
             <directory>x-webkernel/platform/panels/src</directory>
             <directory>x-webkernel/system/src</directory>
             <directory>x-webkernel/devtools/src</directory>
+            <directory>x-webkernel/database/src</directory>
+            <directory>x-webkernel/models/src</directory>
+            <directory>x-webkernel/auth/src</directory>
             <directory>modules</directory>
         </include>
     </source>

@@ -9,6 +9,9 @@ Each Composer package has one job. Do not mix runtime, UI, system admin, and dev
 | Path | Package | Job |
 |---|---|---|
 | `refactor/x-webkernel/codebase` | `webkernel/codebase` | Runtime: config, route, view, console, HTTP door |
+| `refactor/x-webkernel/database` | `webkernel/database` | Connections, query, schema, migrations. Drivers: sqlite, mysql, pgsql. ClickHouse later. |
+| `refactor/x-webkernel/models` | `webkernel/models` | Active Record on `webkernel/database` |
+| `refactor/x-webkernel/auth` | `webkernel/auth` | Session guard, User, login. Not the System panel. |
 | `refactor/x-webkernel/lifecycle` | `webkernel/lifecycle` | Composer plugin and install paths |
 | `refactor/x-webkernel/devtools` | `webkernel/devtools` | Developer tools (IDE helper, dump hooks). Not production runtime. |
 | `refactor/x-webkernel/system` | `webkernel/system` | System admin panel and its resources |

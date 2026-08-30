@@ -7,13 +7,20 @@
 
 namespace Webkernel\Platform\Http\Middleware;
 
+use Webkernel\Auth\Http\Middleware\Authenticate as AuthAuthenticate;
+
 /**
- * First-cut auth. Always continues. Real session check is spec H.
+ * Panel alias. The check lives in webkernel/auth.
  */
 final class Authenticate
 {
+    /**
+     * @param $next callable(): mixed
+     *
+     * @return mixed
+     */
     public function handle(callable $next): mixed
     {
-        return $next();
+        return (new AuthAuthenticate())->handle($next);
     }
 }

@@ -27,12 +27,34 @@ return [
         'sidebar_customizable' => true,
     ],
     'database' => [
-        'driver' => 'mysql',
-        'host' => '127.0.0.1',
-        'port' => 3306,
-        'database' => 'webkernel',
-        'username' => 'root',
-        'password' => '',
+        'default' => 'sqlite',
+        'connections' => [
+            'sqlite' => [
+                'driver' => 'sqlite',
+                'database' => 'platform/storage/database.sqlite',
+            ],
+            'mysql' => [
+                'driver' => 'mysql',
+                'host' => '127.0.0.1',
+                'port' => 3306,
+                'database' => 'webkernel',
+                'username' => 'root',
+                'password' => '',
+                'charset' => 'utf8mb4',
+            ],
+            'pgsql' => [
+                'driver' => 'pgsql',
+                'host' => '127.0.0.1',
+                'port' => 5432,
+                'database' => 'webkernel',
+                'username' => 'webkernel',
+                'password' => '',
+            ],
+        ],
+    ],
+    'auth' => [
+        'user' => \Webkernel\Auth\User::class,
+        'login_path' => '/login',
     ],
     'cache' => [
         'driver' => 'apcu',

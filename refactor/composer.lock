@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "6c068e370471de329b169a7638f92788",
+    "content-hash": "66f414e318c536c65d2d783ea9541f6a",
     "packages": [
         {
             "name": "acme/billing",
@@ -593,6 +593,48 @@
             "time": "2021-10-29T13:26:27+00:00"
         },
         {
+            "name": "webkernel/auth",
+            "version": "0.12.0",
+            "dist": {
+                "type": "path",
+                "url": "x-webkernel/auth",
+                "reference": "9f43b17fd9bef68801ce56739c63e4b6eced1267"
+            },
+            "require": {
+                "php": ">=8.5",
+                "webkernel/codebase": "^0.12.0",
+                "webkernel/components": "^0.12.0",
+                "webkernel/models": "^0.12.0"
+            },
+            "type": "webkernel-stdlib",
+            "extra": {
+                "webkernel": {
+                    "package_repo": "git@github.com:webkernelphp/auth.git",
+                    "production": true,
+                    "provider": "Webkernel\\Auth\\AuthProvider",
+                    "prefix": "auth"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Webkernel\\Auth\\": "src/"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "Webkernel\\Auth\\Tests\\": "tests/"
+                }
+            },
+            "license": [
+                "proprietary"
+            ],
+            "description": "Webkernel authentication: session guard, User model, login.",
+            "transport-options": {
+                "symlink": true,
+                "relative": true
+            }
+        },
+        {
             "name": "webkernel/codebase",
             "version": "0.12.0",
             "dist": {
@@ -677,6 +719,47 @@
                 "proprietary"
             ],
             "description": "Webkernel UI atoms: views plus dumpable PHP declarations.",
+            "transport-options": {
+                "symlink": true,
+                "relative": true
+            }
+        },
+        {
+            "name": "webkernel/database",
+            "version": "0.12.0",
+            "dist": {
+                "type": "path",
+                "url": "x-webkernel/database",
+                "reference": "65cb5ac936f87495396af6065db5e8772fb60f50"
+            },
+            "require": {
+                "ext-pdo": "*",
+                "php": ">=8.5",
+                "webkernel/codebase": "^0.12.0"
+            },
+            "type": "webkernel-stdlib",
+            "extra": {
+                "webkernel": {
+                    "package_repo": "git@github.com:webkernelphp/database.git",
+                    "production": true,
+                    "provider": "Webkernel\\Database\\DatabaseProvider",
+                    "prefix": "database"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Webkernel\\Database\\": "src/"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "Webkernel\\Database\\Tests\\": "tests/"
+                }
+            },
+            "license": [
+                "proprietary"
+            ],
+            "description": "Webkernel database: connections, query, schema, migrations. Drivers: sqlite, mysql, pgsql. ClickHouse later.",
             "transport-options": {
                 "symlink": true,
                 "relative": true
@@ -824,15 +907,56 @@
             }
         },
         {
+            "name": "webkernel/models",
+            "version": "0.12.0",
+            "dist": {
+                "type": "path",
+                "url": "x-webkernel/models",
+                "reference": "f5672f1c5ed5764d897d4ec3a9559582e50225e8"
+            },
+            "require": {
+                "php": ">=8.5",
+                "webkernel/database": "^0.12.0"
+            },
+            "type": "webkernel-stdlib",
+            "extra": {
+                "webkernel": {
+                    "package_repo": "git@github.com:webkernelphp/models.git",
+                    "production": true,
+                    "provider": "Webkernel\\Models\\ModelsProvider",
+                    "prefix": "models"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Webkernel\\Models\\": "src/"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "Webkernel\\Models\\Tests\\": "tests/"
+                }
+            },
+            "license": [
+                "proprietary"
+            ],
+            "description": "Webkernel models: Active Record on webkernel/database.",
+            "transport-options": {
+                "symlink": true,
+                "relative": true
+            }
+        },
+        {
             "name": "webkernel/panels",
             "version": "0.12.0",
             "dist": {
                 "type": "path",
                 "url": "x-webkernel/platform/panels",
-                "reference": "60bdb252f3310a9f2af0f52c25a2d06837fa6d18"
+                "reference": "6d7f7460df6150b3cbb157766ec9655659e8f51a"
             },
             "require": {
                 "php": ">=8.5",
+                "webkernel/auth": "^0.12.0",
                 "webkernel/codebase": "^0.12.0",
                 "webkernel/components": "^0.12.0",
                 "webkernel/schemas": "^0.12.0"
@@ -859,7 +983,7 @@
             "license": [
                 "proprietary"
             ],
-            "description": "Webkernel admin chrome: Panel, Resource, Page, Table, Wds.",
+            "description": "Webkernel admin: Panel, Resource, Page, Table, Wds.",
             "transport-options": {
                 "symlink": true,
                 "relative": true
@@ -939,10 +1063,11 @@
             "dist": {
                 "type": "path",
                 "url": "x-webkernel/system",
-                "reference": "fa84aea6d919c966a78d9f63e0ec2c6b25567d7e"
+                "reference": "2e32a483cf997442a95ab11c795da4043697c96c"
             },
             "require": {
                 "php": ">=8.5",
+                "webkernel/auth": "^0.12.0",
                 "webkernel/codebase": "^0.12.0",
                 "webkernel/panels": "^0.12.0"
             },

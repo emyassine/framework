@@ -19,7 +19,7 @@ trait HasPanelSidebar
 {
     private bool $has_panel_sidebar = true;
 
-    private string $panel_sidebar_width = '60px';
+    private string $panel_sidebar_width = '4rem';
 
     /**
      * Show or hide the panel icon rail.

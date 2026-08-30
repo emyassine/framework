@@ -48,6 +48,13 @@ abstract class PlatformProvider
     public const PANELS = [];
 
     /**
+     * Migration directories. `webkernel migrate` discovers these from providers.
+     *
+     * @var list<string>
+     */
+    public const MIGRATIONS = [];
+
+    /**
      * @return list<mixed>
      */
     public static function declaration(string $constant): array

@@ -15,11 +15,14 @@
   border-radius: 8px; padding: 4px; z-index: 60;
 }
 .wds-user-menu.wds-open .wds-user-menu-panel { display: flex; flex-direction: column; }
-.wds-user-menu-panel a {
+.wds-user-menu-panel a,
+.wds-user-menu-panel button {
   display: flex; align-items: center; gap: 0.5rem; padding: 0.6em 0.9em;
   border-radius: 4px; color: var(--wds-text-muted); font-size: 13px; font-weight: 500;
+  width: 100%; background: none; border: none; cursor: pointer; font: inherit; text-align: start;
 }
-.wds-user-menu-panel a:hover { background: var(--wds-bg-subtle); color: var(--wds-text); }
+.wds-user-menu-panel a:hover,
+.wds-user-menu-panel button:hover { background: var(--wds-bg-subtle); color: var(--wds-text); }
 @media (max-width: 640px) {
   .wds-user-menu-name { display: none; }
 }
@@ -54,9 +57,12 @@
       <span class="wds-icon">{!! icon('circle-user', 'wds-icon-svg') !!}</span>
       {{ lang('panel.profile') }}
     </a>
-    <a href="/" role="menuitem">
-      <span class="wds-icon">{!! icon('log-out', 'wds-icon-svg') !!}</span>
-      {{ lang('panel.sign_out') }}
-    </a>
+    <form method="post" action="/logout" role="none">
+      @csrf
+      <button type="submit" role="menuitem">
+        <span class="wds-icon">{!! icon('log-out', 'wds-icon-svg') !!}</span>
+        {{ lang('panel.sign_out') }}
+      </button>
+    </form>
   </div>
 </div>

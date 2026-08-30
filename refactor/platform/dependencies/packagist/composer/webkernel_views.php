@@ -13,6 +13,7 @@ $b = dirname($v, 3); // webapp root
 return [
     'dirs' => [
         $b . '/modules/acme/billing/resources/views',
+        $b . '/x-webkernel/auth/resources/views',
         $b . '/x-webkernel/codebase/resources/views',
         $b . '/x-webkernel/platform/components/resources/views/layout',
         $b . '/x-webkernel/platform/components/resources/views/navigation',
@@ -26,6 +27,7 @@ return [
             $b . '/modules/acme/billing/resources/views',
         ],
         'webkernel' => [
+            $b . '/x-webkernel/auth/resources/views',
             $b . '/x-webkernel/codebase/resources/views',
             $b . '/x-webkernel/platform/components/resources/views/layout',
             $b . '/x-webkernel/platform/components/resources/views/navigation',

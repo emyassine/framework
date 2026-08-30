@@ -8,8 +8,10 @@
 //> Generated. Do not edit.
 
 return [
+    'auth' => \Webkernel\Auth\Auth::class,
     'config' => \Webkernel\Composables\ConfigComposable::class,
     'console' => \Webkernel\Console\Dispatcher::class,
+    'database' => \Webkernel\Database\Database::class,
     'panel' => \Webkernel\Composables\PanelComposable::class,
     'performance' => \Webkernel\Performance\Performance::class,
     'route' => \Webkernel\Route\Route::class,

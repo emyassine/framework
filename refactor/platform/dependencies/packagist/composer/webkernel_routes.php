@@ -11,6 +11,7 @@ $v = dirname(__DIR__); // vendor_dir
 $b = dirname($v, 3); // webapp root
 
 return [
+    $b . '/x-webkernel/auth/routes.php',
     $b . '/x-webkernel/platform/i18n/routes.php',
     $b . '/x-webkernel/platform/imagery/routes.php',
     $b . '/x-webkernel/platform/panels/routes.php',

@@ -17,10 +17,10 @@
   }
  ?>
 <?php if ($this->once('wds.page.base.view')): ?>
-<style>
-html { font-size: 16px; }
-body { margin: 0; }
-</style>
+  <style>
+  	html { font-size: 16px; }
+  	body { margin: 0; }
+  </style>
 <?php endif; ?>
 <!DOCTYPE html>
 <html
@@ -32,7 +32,9 @@ body { margin: 0; }
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <script>(function(d){var t=localStorage.getItem('wds-theme');if(t)d.dataset.wdsTheme=t;})(document.documentElement);</script>
+  <script>
+  	(function(d){var t=localStorage.getItem('wds-theme');if(t)d.dataset.wdsTheme=t;})(document.documentElement);
+  </script>
   <?php if($csrf): ?>
     <?php echo \Webkernel\Csrf::meta(); ?>
 

@@ -9,11 +9,14 @@
 
 return [
     \Acme\Billing\BillingProvider::class,
+    \Webkernel\Auth\AuthProvider::class,
     \Webkernel\CodebaseProvider::class,
     \Webkernel\Platform\Components\ComponentsProvider::class,
+    \Webkernel\Database\DatabaseProvider::class,
     \Webkernel\DevTools\DevToolsProvider::class,
     \Webkernel\I18n\I18nProvider::class,
     \Webkernel\Imagery\ImageryProvider::class,
+    \Webkernel\Models\ModelsProvider::class,
     \Webkernel\Platform\PanelsProvider::class,
     \Webkernel\System\SystemProvider::class,
 ];

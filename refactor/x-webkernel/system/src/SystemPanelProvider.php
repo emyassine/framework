@@ -7,7 +7,7 @@
 
 namespace Webkernel\System;
 
-use Webkernel\Platform\Http\Middleware\Authenticate;
+use Webkernel\Auth\Http\Middleware\Authenticate;
 use Webkernel\Platform\Panel;
 use Webkernel\Platform\PanelProvider;
 use Webkernel\System\Pages\Dashboard;

@@ -22,6 +22,8 @@ class ComposerStaticInitcc6f492cc5d64cb7f09b9024726d6929
             'Webkernel\\Platform\\Components\\Tests\\' => 36,
             'Webkernel\\Platform\\Components\\' => 30,
             'Webkernel\\Platform\\' => 19,
+            'Webkernel\\Models\\Tests\\' => 23,
+            'Webkernel\\Models\\' => 17,
             'Webkernel\\Lifecycle\\Tests\\' => 26,
             'Webkernel\\Lifecycle\\' => 20,
             'Webkernel\\Imagery\\Tests\\' => 24,
@@ -30,6 +32,10 @@ class ComposerStaticInitcc6f492cc5d64cb7f09b9024726d6929
             'Webkernel\\I18n\\' => 15,
             'Webkernel\\DevTools\\Tests\\' => 25,
             'Webkernel\\DevTools\\' => 19,
+            'Webkernel\\Database\\Tests\\' => 25,
+            'Webkernel\\Database\\' => 19,
+            'Webkernel\\Auth\\Tests\\' => 21,
+            'Webkernel\\Auth\\' => 15,
             'Webkernel\\' => 10,
         ),
         'P' =>
@@ -98,6 +104,14 @@ class ComposerStaticInitcc6f492cc5d64cb7f09b9024726d6929
         array (
             0 => __DIR__ . '/..' . '/webkernel/panels/src',
         ),
+        'Webkernel\\Models\\Tests\\' =>
+        array (
+            0 => __DIR__ . '/../../../..' . '/x-webkernel/models/tests',
+        ),
+        'Webkernel\\Models\\' =>
+        array (
+            0 => __DIR__ . '/..' . '/webkernel/models/src',
+        ),
         'Webkernel\\Lifecycle\\Tests\\' =>
         array (
             0 => __DIR__ . '/../../../..' . '/x-webkernel/lifecycle/tests',
@@ -129,6 +143,22 @@ class ComposerStaticInitcc6f492cc5d64cb7f09b9024726d6929
         'Webkernel\\DevTools\\' =>
         array (
             0 => __DIR__ . '/..' . '/webkernel/devtools/src',
+        ),
+        'Webkernel\\Database\\Tests\\' =>
+        array (
+            0 => __DIR__ . '/../../../..' . '/x-webkernel/database/tests',
+        ),
+        'Webkernel\\Database\\' =>
+        array (
+            0 => __DIR__ . '/..' . '/webkernel/database/src',
+        ),
+        'Webkernel\\Auth\\Tests\\' =>
+        array (
+            0 => __DIR__ . '/../../../..' . '/x-webkernel/auth/tests',
+        ),
+        'Webkernel\\Auth\\' =>
+        array (
+            0 => __DIR__ . '/..' . '/webkernel/auth/src',
         ),
         'Webkernel\\' =>
         array (
@@ -1847,6 +1877,16 @@ class ComposerStaticInitcc6f492cc5d64cb7f09b9024726d6929
         'TheSeer\\Tokenizer\\TokenCollectionException' => __DIR__ . '/..' . '/theseer/tokenizer/src/TokenCollectionException.php',
         'TheSeer\\Tokenizer\\Tokenizer' => __DIR__ . '/..' . '/theseer/tokenizer/src/Tokenizer.php',
         'TheSeer\\Tokenizer\\XMLSerializer' => __DIR__ . '/..' . '/theseer/tokenizer/src/XMLSerializer.php',
+        'Webkernel\\Auth\\Auth' => __DIR__ . '/..' . '/webkernel/auth/src/Auth.php',
+        'Webkernel\\Auth\\AuthProvider' => __DIR__ . '/..' . '/webkernel/auth/src/AuthProvider.php',
+        'Webkernel\\Auth\\Console\\UserCreateCommand' => __DIR__ . '/..' . '/webkernel/auth/src/Console/UserCreateCommand.php',
+        'Webkernel\\Auth\\Hash' => __DIR__ . '/..' . '/webkernel/auth/src/Hash.php',
+        'Webkernel\\Auth\\Http\\LoginController' => __DIR__ . '/..' . '/webkernel/auth/src/Http/LoginController.php',
+        'Webkernel\\Auth\\Http\\LogoutController' => __DIR__ . '/..' . '/webkernel/auth/src/Http/LogoutController.php',
+        'Webkernel\\Auth\\Http\\Middleware\\Authenticate' => __DIR__ . '/..' . '/webkernel/auth/src/Http/Middleware/Authenticate.php',
+        'Webkernel\\Auth\\Session' => __DIR__ . '/..' . '/webkernel/auth/src/Session.php',
+        'Webkernel\\Auth\\Tests\\Feature\\AuthTest' => __DIR__ . '/../../../..' . '/x-webkernel/auth/tests/Feature/AuthTest.php',
+        'Webkernel\\Auth\\User' => __DIR__ . '/..' . '/webkernel/auth/src/User.php',
         'Webkernel\\CodebaseProvider' => __DIR__ . '/..' . '/webkernel/codebase/src/CodebaseProvider.php',
         'Webkernel\\Composables\\ComposableContract' => __DIR__ . '/..' . '/webkernel/codebase/src/Composables/ComposableContract.php',
         'Webkernel\\Composables\\ConfigComposable' => __DIR__ . '/..' . '/webkernel/codebase/src/Composables/ConfigComposable.php',
@@ -1878,6 +1918,17 @@ class ComposerStaticInitcc6f492cc5d64cb7f09b9024726d6929
         'Webkernel\\Console\\Prompt' => __DIR__ . '/..' . '/webkernel/codebase/src/Console/Prompt.php',
         'Webkernel\\Console\\Terminal' => __DIR__ . '/..' . '/webkernel/codebase/src/Console/Terminal.php',
         'Webkernel\\Csrf' => __DIR__ . '/..' . '/webkernel/codebase/src/Csrf.php',
+        'Webkernel\\Database\\Blueprint' => __DIR__ . '/..' . '/webkernel/database/src/Blueprint.php',
+        'Webkernel\\Database\\Connection' => __DIR__ . '/..' . '/webkernel/database/src/Connection.php',
+        'Webkernel\\Database\\Console\\MigrateCommand' => __DIR__ . '/..' . '/webkernel/database/src/Console/MigrateCommand.php',
+        'Webkernel\\Database\\Database' => __DIR__ . '/..' . '/webkernel/database/src/Database.php',
+        'Webkernel\\Database\\DatabaseProvider' => __DIR__ . '/..' . '/webkernel/database/src/DatabaseProvider.php',
+        'Webkernel\\Database\\Driver' => __DIR__ . '/..' . '/webkernel/database/src/Driver.php',
+        'Webkernel\\Database\\Migration' => __DIR__ . '/..' . '/webkernel/database/src/Migration.php',
+        'Webkernel\\Database\\Migrator' => __DIR__ . '/..' . '/webkernel/database/src/Migrator.php',
+        'Webkernel\\Database\\Query' => __DIR__ . '/..' . '/webkernel/database/src/Query.php',
+        'Webkernel\\Database\\Schema' => __DIR__ . '/..' . '/webkernel/database/src/Schema.php',
+        'Webkernel\\Database\\Tests\\Feature\\DatabaseTest' => __DIR__ . '/../../../..' . '/x-webkernel/database/tests/Feature/DatabaseTest.php',
         'Webkernel\\DevTools\\DevToolsProvider' => __DIR__ . '/..' . '/webkernel/devtools/src/DevToolsProvider.php',
         'Webkernel\\DevTools\\IdeHelper' => __DIR__ . '/..' . '/webkernel/devtools/src/IdeHelper.php',
         'Webkernel\\Http' => __DIR__ . '/..' . '/webkernel/codebase/src/Http.php',
@@ -1902,6 +1953,9 @@ class ComposerStaticInitcc6f492cc5d64cb7f09b9024726d6929
         'Webkernel\\Lifecycle\\Installer\\LCPackageType' => __DIR__ . '/..' . '/webkernel/lifecycle/Lifecycle/Installer/LCPackageType.php',
         'Webkernel\\Lifecycle\\LCInstaller' => __DIR__ . '/..' . '/webkernel/lifecycle/Lifecycle/LCInstaller.php',
         'Webkernel\\Lifecycle\\Tests\\Feature\\LCHookDispatcherTest' => __DIR__ . '/../../../..' . '/x-webkernel/lifecycle/tests/Feature/LCHookDispatcherTest.php',
+        'Webkernel\\Models\\Model' => __DIR__ . '/..' . '/webkernel/models/src/Model.php',
+        'Webkernel\\Models\\ModelsProvider' => __DIR__ . '/..' . '/webkernel/models/src/ModelsProvider.php',
+        'Webkernel\\Models\\Tests\\Feature\\ModelTest' => __DIR__ . '/../../../..' . '/x-webkernel/models/tests/Feature/ModelTest.php',
         'Webkernel\\Paths\\Package' => __DIR__ . '/..' . '/webkernel/codebase/src/Paths/Package.php',
         'Webkernel\\Performance\\Performance' => __DIR__ . '/..' . '/webkernel/codebase/src/Performance/Performance.php',
         'Webkernel\\Performance\\Status' => __DIR__ . '/..' . '/webkernel/codebase/src/Performance/Status.php',
@@ -1916,6 +1970,7 @@ class ComposerStaticInitcc6f492cc5d64cb7f09b9024726d6929
         'Webkernel\\Platform\\Components\\Checkbox' => __DIR__ . '/..' . '/webkernel/components/src/Checkbox.php',
         'Webkernel\\Platform\\Components\\Component' => __DIR__ . '/..' . '/webkernel/components/src/Component.php',
         'Webkernel\\Platform\\Components\\ComponentsProvider' => __DIR__ . '/..' . '/webkernel/components/src/ComponentsProvider.php',
+        'Webkernel\\Platform\\Components\\Concerns\\HasMethodMake' => __DIR__ . '/..' . '/webkernel/components/src/Concerns/HasMethodMake.php',
         'Webkernel\\Platform\\Components\\Dropdown' => __DIR__ . '/..' . '/webkernel/components/src/Dropdown.php',
         'Webkernel\\Platform\\Components\\EmptyState' => __DIR__ . '/..' . '/webkernel/components/src/EmptyState.php',
         'Webkernel\\Platform\\Components\\Fieldset' => __DIR__ . '/..' . '/webkernel/components/src/Fieldset.php',

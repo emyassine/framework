@@ -18,6 +18,9 @@ final class Http
     public static function run(): void
     {
         Config::boot();
+        if (\class_exists(\Webkernel\Auth\Auth::class, true)) {
+            \Webkernel\Auth\Auth::boot();
+        }
         if (\class_exists(\Webkernel\I18n\I18nContext::class, false)) {
             \Webkernel\I18n\I18nContext::flush();
         }

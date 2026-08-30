@@ -7,7 +7,7 @@
 {!! \Webkernel\Platform\Colors\Color::root_css() !!}
 
   --wds-topbar-height: 50px;
-  --wds-rail-width: 60px;
+  --wds-rail-width: 4rem;
   --wds-nav-width: clamp(280px, 16vw, 340px);
   --wds-nav-width-collapsed: 0px;
   --wds-aside-width: 20rem;
@@ -34,7 +34,7 @@
   --wds-text-muted: var(--gray-600);
   --wds-text-faint: var(--gray-500);
 
-  --wds-rail-bg: var(--color-gray-950);
+  --wds-rail-bg: var(--wds-surface);
   --wds-nav-bg: var(--color-gray-900);
   --wds-nav-text: var(--color-gray-400);
 }

@@ -56,7 +56,7 @@ return array (
       'collapsible_navigation_groups' => true,
       'topbar' => true,
       'panel_sidebar' => true,
-      'panel_sidebar_width' => '60px',
+      'panel_sidebar_width' => '4rem',
     ),
     'provider' => 'Acme\\Billing\\Presentation\\BillingPanelProvider',
     'package_provider' => 'Acme\\Billing\\BillingProvider',
@@ -119,7 +119,7 @@ return array (
     ),
     'auth_middleware' => 
     array (
-      0 => 'Webkernel\\Platform\\Http\\Middleware\\Authenticate',
+      0 => 'Webkernel\\Auth\\Http\\Middleware\\Authenticate',
     ),
     'branding' => 
     array (
@@ -142,7 +142,7 @@ return array (
       'collapsible_navigation_groups' => true,
       'topbar' => true,
       'panel_sidebar' => true,
-      'panel_sidebar_width' => '60px',
+      'panel_sidebar_width' => '4rem',
     ),
     'provider' => 'Webkernel\\System\\SystemPanelProvider',
     'package_provider' => 'Webkernel\\System\\SystemProvider',

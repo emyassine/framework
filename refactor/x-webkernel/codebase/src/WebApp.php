@@ -19,6 +19,8 @@ use Webkernel\Config\Config;
  * @method \Webkernel\Composables\PanelComposable panel()
  * @method \Webkernel\Console\Terminal terminal()
  * @method \Webkernel\Console\Dispatcher console()
+ * @method \Webkernel\Database\Database database()
+ * @method \Webkernel\Auth\Auth auth()
  */
 final class WebApp
 {

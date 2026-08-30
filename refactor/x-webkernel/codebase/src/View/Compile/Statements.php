@@ -103,6 +103,10 @@ final class Statements
             },
             'endonce' => static fn (string $_): string => Php::OPEN.'endif; ?>',
             'csrf' => static fn (string $_): string => Php::echo('\\Webkernel\\Csrf::field()'),
+            'auth' => static fn (string $_): string => Php::OPEN.'if (\\function_exists(\'auth\') && auth()->check()): ?>',
+            'endauth' => static fn (string $_): string => Php::OPEN.'endif; ?>',
+            'guest' => static fn (string $_): string => Php::OPEN.'if (! \\function_exists(\'auth\') || ! auth()->check()): ?>',
+            'endguest' => static fn (string $_): string => Php::OPEN.'endif; ?>',
             'slot' => static fn (string $e): string => Php::OPEN.' $this->slot'.$e.'; ?>',
             'endslot' => static fn (string $_): string => Php::OPEN.' $this->end_slot(); ?>',
             'props' => static function (string $e): string {

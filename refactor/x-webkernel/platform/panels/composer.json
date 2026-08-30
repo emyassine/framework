@@ -7,6 +7,7 @@
     "license": "proprietary",
     "require": {
         "php": ">=8.5",
+        "webkernel/auth": "^0.12.0",
         "webkernel/codebase": "^0.12.0",
         "webkernel/components": "^0.12.0",
         "webkernel/schemas": "^0.12.0"

@@ -8,6 +8,8 @@
 //> Generated. Do not edit.
 
 return [
+    \Webkernel\Auth\Console\UserCreateCommand::class,
     \Webkernel\Console\Commands\DumpAutoloadCommand::class,
     \Webkernel\Console\Commands\ServerCommand::class,
+    \Webkernel\Database\Console\MigrateCommand::class,
 ];

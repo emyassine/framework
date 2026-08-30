@@ -31,6 +31,8 @@ final class PanelViewTest extends TestCase
         $html = (new Dashboard())->render();
 
         $this->assertStringContainsString('wds-rail', $html);
+        $this->assertStringContainsString('wds-rail-brand', $html);
+        $this->assertStringContainsString('wds-rail-logo-mark', $html);
         $this->assertStringContainsString('wds-drawer', $html);
         $this->assertStringContainsString('wds-nav-search', $html);
         $this->assertStringContainsString('wds-header-heading', $html);
