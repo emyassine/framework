@@ -7,10 +7,10 @@
 
 namespace Webkernel\Platform\Pages;
 
+use Webkernel\Liveview\Liveview;
 use Webkernel\Platform\Components\Action;
 use Webkernel\Platform\Notification;
 use Webkernel\Platform\Schemas\Schema;
-use Webkernel\View\Liveview;
 use Webkernel\View\View;
 
 /**

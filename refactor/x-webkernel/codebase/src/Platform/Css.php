@@ -10,7 +10,6 @@ namespace Webkernel\Platform;
 use FilesystemIterator;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
-use Webkernel\Console\Commands\DumpAutoloadCommand\_DumpAutoloadCommand;
 use Webkernel\Platform\Colors\Color;
 
 /**
@@ -34,7 +33,7 @@ final class Css
             return;
         }
         $header = "/*\n"
-            ._DumpAutoloadCommand::generated_header()."\n"
+            .GeneratedFileHeader::header()."\n"
             ."//>\n"
             ."//> Generated. Do not edit.\n"
             ."//> Palettes plus package CSS. Source: resources/css, html-attributes, colocated view CSS.\n"

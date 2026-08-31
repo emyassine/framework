@@ -7,8 +7,6 @@
 
 namespace Webkernel\Platform;
 
-use Webkernel\Console\Commands\DumpAutoloadCommand\_DumpAutoloadCommand;
-
 /**
  * Gathers package JS and writes public/webapp.js.
  *
@@ -30,7 +28,7 @@ final class Js
             return;
         }
         $header = "/*\n"
-            ._DumpAutoloadCommand::generated_header()."\n"
+            .GeneratedFileHeader::header()."\n"
             ."//>\n"
             ."//> Generated. Do not edit.\n"
             ."//> Package JS. Source: html-attributes, colocated view JS, resources/js.\n"

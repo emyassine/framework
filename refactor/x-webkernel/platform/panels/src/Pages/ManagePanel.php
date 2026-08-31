@@ -17,11 +17,11 @@ use Webkernel\Platform\Components\Section;
 use Webkernel\Platform\Components\Select;
 use Webkernel\Platform\Components\Tab;
 use Webkernel\Platform\Components\Tabs;
+use Webkernel\Liveview\Liveview;
 use Webkernel\Platform\Components\Textarea;
 use Webkernel\Platform\Components\TextInput;
 use Webkernel\Platform\Notification;
 use Webkernel\Platform\Schemas\Schema;
-use Webkernel\View\Liveview;
 
 /**
  * Injected into every panel. App owner edits branding, locale, legal, and system keys.
