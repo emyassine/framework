@@ -54,14 +54,7 @@
         },
         {
             "type": "path",
-            "url": "modules/*/*",
-            "options": {
-                "symlink": true
-            }
-        },
-        {
-            "type": "path",
-            "url": "x-modules/*/*",
+            "url": "x-modules/*",
             "options": {
                 "symlink": true
             }
