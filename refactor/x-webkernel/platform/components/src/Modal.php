@@ -6,11 +6,12 @@
 //> file that was distributed with this source code.
 
 namespace Webkernel\Platform\Components;
+use Webkernel\Component\StaticComponent;
 
 /**
  * Dialog. View: `<x-webkernel::modal>`.
  */
-final class Modal extends Component
+final class Modal extends \Webkernel\Component\StaticComponent
 {
     /**
      * @return string

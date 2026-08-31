@@ -6,11 +6,12 @@
 //> file that was distributed with this source code.
 
 namespace Webkernel\Platform\Components;
+use Webkernel\Component\StaticComponent;
 
 /**
  * Horizontal group of buttons. View: `<x-webkernel::button.group>`.
  */
-final class ButtonGroup extends Component
+final class ButtonGroup extends \Webkernel\Component\StaticComponent
 {
     /**
      * @return string

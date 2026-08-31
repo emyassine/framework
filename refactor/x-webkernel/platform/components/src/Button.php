@@ -6,11 +6,12 @@
 //> file that was distributed with this source code.
 
 namespace Webkernel\Platform\Components;
+use Webkernel\Component\StaticComponent;
 
 /**
  * Clickable button or anchor. Same view for the tag and `Button::make()`.
  */
-final class Button extends Component
+final class Button extends \Webkernel\Component\StaticComponent
 {
     /**
      * @return string

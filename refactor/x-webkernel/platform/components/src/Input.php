@@ -6,11 +6,12 @@
 //> file that was distributed with this source code.
 
 namespace Webkernel\Platform\Components;
+use Webkernel\Component\StaticComponent;
 
 /**
  * Bare text control. View: `<x-webkernel::input>`.
  */
-final class Input extends Component
+final class Input extends \Webkernel\Component\StaticComponent
 {
     /**
      * @return string

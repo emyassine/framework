@@ -6,13 +6,14 @@
 //> file that was distributed with this source code.
 
 namespace Webkernel\Platform\Components;
+use Webkernel\Component\StaticComponent;
 
 use Webkernel\Platform\Components\Concerns\HasChildSchema;
 
 /**
  * One wizard step. Used inside `Wizard::schema()`.
  */
-final class WizardStep extends Component
+final class WizardStep extends \Webkernel\Component\StaticComponent
 {
     use HasChildSchema;
 

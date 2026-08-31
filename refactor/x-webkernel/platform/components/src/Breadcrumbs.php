@@ -6,11 +6,12 @@
 //> file that was distributed with this source code.
 
 namespace Webkernel\Platform\Components;
+use Webkernel\Component\StaticComponent;
 
 /**
  * Trail of page links. View: `<x-webkernel::breadcrumbs>`.
  */
-final class Breadcrumbs extends Component
+final class Breadcrumbs extends \Webkernel\Component\StaticComponent
 {
     /**
      * @return string

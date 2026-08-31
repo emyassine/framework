@@ -6,6 +6,7 @@
 //> file that was distributed with this source code.
 
 namespace Webkernel\Platform\Components;
+use Webkernel\Component\StaticComponent;
 
 use Closure;
 use Webkernel\Platform\Schemas\Schema;
@@ -16,7 +17,7 @@ use Webkernel\Platform\Schemas\SchemaMode;
  *
  * //> First argument of `make()` is the label, same as Filament `Tabs::make()`.
  */
-final class Tabs extends Component
+final class Tabs extends \Webkernel\Component\StaticComponent
 {
     /** @var list<Tab> */
     private array $child_tabs = [];

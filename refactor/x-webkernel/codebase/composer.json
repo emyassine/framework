@@ -27,7 +27,26 @@
         "phpmailer/phpmailer": "^6.10",
         "psr/log": "^3.0",
         "psr/simple-cache": "^3.0",
-        "webkernel/lifecycle": "^0.12.0"
+        "webkernel/lifecycle": "^0.12.0",
+        "webkernel/i18n": "^0.12.0",
+        "webkernel/imagery": "^0.12.0",
+        "webkernel/components": "^0.12.0",
+        "webkernel/schemas": "^0.12.0",
+        "webkernel/panels": "^0.12.0",
+		    "webkernel/database": "^0.12.0",
+		    "webkernel/models": "^0.12.0",
+		    "webkernel/platform": "^0.12.0",
+		    "ext-dom": "*",
+		    "ext-fileinfo": "*",
+		    "ext-intl": "*",
+		    "ext-libxml": "*",
+		    "ext-mbstring": "*",
+		    "ext-pdo": "*",
+		    "ext-readline": "*",
+		    "ext-simplexml": "*",
+		    "psr/http-client": "^1.0",
+		    "psr/http-factory": "^1.0",
+		    "webkernel/auth": "^0.12.0"
     },
     "extra": {
         "webkernel": {

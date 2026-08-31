@@ -6,11 +6,12 @@
 //> file that was distributed with this source code.
 
 namespace Webkernel\Platform\Components;
+use Webkernel\Component\StaticComponent;
 
 /**
  * Multiline field. Same view for the tag and schema declaration.
  */
-final class Textarea extends Component
+final class Textarea extends \Webkernel\Component\StaticComponent
 {
     /**
      * @return string

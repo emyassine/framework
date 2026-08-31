@@ -6,11 +6,12 @@
 //> file that was distributed with this source code.
 
 namespace Webkernel\Platform\Components;
+use Webkernel\Component\StaticComponent;
 
 /**
  * Spinner. View: `<x-webkernel::loading-indicator>`.
  */
-final class LoadingIndicator extends Component
+final class LoadingIndicator extends \Webkernel\Component\StaticComponent
 {
     /**
      * @return string

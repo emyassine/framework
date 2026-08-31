@@ -6,11 +6,12 @@
 //> file that was distributed with this source code.
 
 namespace Webkernel\Platform\Components;
+use Webkernel\Component\StaticComponent;
 
 /**
  * One tab panel. View: `<x-webkernel::tabs.panel>`.
  */
-final class TabsPanel extends Component
+final class TabsPanel extends \Webkernel\Component\StaticComponent
 {
     /**
      * @return string

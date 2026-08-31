@@ -6,11 +6,12 @@
 //> file that was distributed with this source code.
 
 namespace Webkernel\Platform\Components;
+use Webkernel\Component\StaticComponent;
 
 /**
  * Text link. View: `<x-webkernel::link>`.
  */
-final class Link extends Component
+final class Link extends \Webkernel\Component\StaticComponent
 {
     /**
      * @return string

@@ -6,11 +6,12 @@
 //> file that was distributed with this source code.
 
 namespace Webkernel\Platform\Components;
+use Webkernel\Component\StaticComponent;
 
 /**
  * SVG mark. View: `<x-webkernel::icon>`.
  */
-final class Icon extends Component
+final class Icon extends \Webkernel\Component\StaticComponent
 {
     /**
      * @return string

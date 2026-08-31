@@ -6,11 +6,12 @@
 //> file that was distributed with this source code.
 
 namespace Webkernel\Platform\Components;
+use Webkernel\Component\StaticComponent;
 
 /**
  * Ring around an input. View: `<x-webkernel::input.wrapper>`.
  */
-final class InputWrapper extends Component
+final class InputWrapper extends \Webkernel\Component\StaticComponent
 {
     /**
      * @return string

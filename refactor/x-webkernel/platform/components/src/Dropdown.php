@@ -6,11 +6,12 @@
 //> file that was distributed with this source code.
 
 namespace Webkernel\Platform\Components;
+use Webkernel\Component\StaticComponent;
 
 /**
  * Trigger plus floating panel. View: `<x-webkernel::dropdown>`.
  */
-final class Dropdown extends Component
+final class Dropdown extends \Webkernel\Component\StaticComponent
 {
     /**
      * @return string

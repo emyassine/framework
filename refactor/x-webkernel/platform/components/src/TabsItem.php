@@ -6,11 +6,12 @@
 //> file that was distributed with this source code.
 
 namespace Webkernel\Platform\Components;
+use Webkernel\Component\StaticComponent;
 
 /**
  * One tab trigger. View: `<x-webkernel::tabs.item>`.
  */
-final class TabsItem extends Component
+final class TabsItem extends \Webkernel\Component\StaticComponent
 {
     /**
      * @return string

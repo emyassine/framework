@@ -6,6 +6,7 @@
 //> file that was distributed with this source code.
 
 namespace Webkernel\Platform\Components;
+use Webkernel\Component\StaticComponent;
 
 use Webkernel\Platform\Schemas\Schema;
 use Webkernel\Platform\Schemas\SchemaMode;
@@ -15,7 +16,7 @@ use Webkernel\Platform\Schemas\SchemaMode;
  *
  * //> Client steps only. Per-step server validation is not wired.
  */
-final class Wizard extends Component
+final class Wizard extends \Webkernel\Component\StaticComponent
 {
     /** @var list<WizardStep> */
     private array $steps = [];

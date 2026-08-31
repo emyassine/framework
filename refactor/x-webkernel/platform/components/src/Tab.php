@@ -6,6 +6,7 @@
 //> file that was distributed with this source code.
 
 namespace Webkernel\Platform\Components;
+use Webkernel\Component\StaticComponent;
 
 use Closure;
 use Webkernel\Platform\Schemas\Schema;
@@ -15,7 +16,7 @@ use Webkernel\Platform\Schemas\Schema;
  *
  * //> First argument of `make()` is the label, same as Filament `Tab::make()`.
  */
-final class Tab extends Component
+final class Tab extends \Webkernel\Component\StaticComponent
 {
     private Schema $child;
 

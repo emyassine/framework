@@ -6,11 +6,12 @@
 //> file that was distributed with this source code.
 
 namespace Webkernel\Platform\Components;
+use Webkernel\Component\StaticComponent;
 
 /**
  * Boolean input. View: `<x-webkernel::checkbox>`.
  */
-final class Checkbox extends Component
+final class Checkbox extends \Webkernel\Component\StaticComponent
 {
     /**
      * @return string

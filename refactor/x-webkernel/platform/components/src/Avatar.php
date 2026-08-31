@@ -6,11 +6,12 @@
 //> file that was distributed with this source code.
 
 namespace Webkernel\Platform\Components;
+use Webkernel\Component\StaticComponent;
 
 /**
  * Image or initial. ViewView: `<x-webkernel::avatar>`.
  */
-final class Avatar extends Component
+final class Avatar extends \Webkernel\Component\StaticComponent
 {
     /**
      * @return string

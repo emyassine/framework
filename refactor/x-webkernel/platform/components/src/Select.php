@@ -6,11 +6,12 @@
 //> file that was distributed with this source code.
 
 namespace Webkernel\Platform\Components;
+use Webkernel\Component\StaticComponent;
 
 /**
  * Native select. View: `<x-webkernel::select>`.
  */
-final class Select extends Component
+final class Select extends \Webkernel\Component\StaticComponent
 {
     /**
      * @return string

@@ -6,11 +6,12 @@
 //> file that was distributed with this source code.
 
 namespace Webkernel\Platform\Components;
+use Webkernel\Component\StaticComponent;
 
 /**
  * Status chip. View: `<x-webkernel::badge>`.
  */
-final class Badge extends Component
+final class Badge extends \Webkernel\Component\StaticComponent
 {
     /**
      * @return string

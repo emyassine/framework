@@ -6,11 +6,12 @@
 //> file that was distributed with this source code.
 
 namespace Webkernel\Platform\Components;
+use Webkernel\Component\StaticComponent;
 
 /**
  * Icon-only control. View: `<x-webkernel::button-icon>`.
  */
-final class ButtonIcon extends Component
+final class ButtonIcon extends \Webkernel\Component\StaticComponent
 {
     /**
      * @return string
