@@ -1732,7 +1732,6 @@ return array(
     'Webkernel\\Database\\Migrator' => $vendorDir . '/webkernel/database/src/Migrator.php',
     'Webkernel\\Database\\Query' => $vendorDir . '/webkernel/database/src/Query.php',
     'Webkernel\\Database\\Schema' => $vendorDir . '/webkernel/database/src/Schema.php',
-    'Webkernel\\Database\\Tests\\Feature\\DatabaseTest' => $baseDir . '/x-webkernel/database/tests/Feature/DatabaseTest.php',
     'Webkernel\\DevTools\\DevToolsProvider' => $vendorDir . '/webkernel/devtools/src/DevToolsProvider.php',
     'Webkernel\\DevTools\\IdeHelper' => $vendorDir . '/webkernel/devtools/src/IdeHelper.php',
     'Webkernel\\Http' => $vendorDir . '/webkernel/codebase/src/Http.php',

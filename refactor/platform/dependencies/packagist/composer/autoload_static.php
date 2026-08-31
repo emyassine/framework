@@ -13,28 +13,16 @@ class ComposerStaticInitcc6f492cc5d64cb7f09b9024726d6929
     public static $prefixLengthsPsr4 = array (
         'W' =>
         array (
-            'Webkernel\\Tests\\' => 16,
-            'Webkernel\\System\\Tests\\' => 23,
-            'Webkernel\\Platform\\Tests\\' => 25,
-            'Webkernel\\Platform\\Schemas\\Tests\\' => 33,
             'Webkernel\\Platform\\Schemas\\' => 27,
-            'Webkernel\\Platform\\Components\\Tests\\' => 36,
             'Webkernel\\Platform\\Components\\' => 30,
             'Webkernel\\Platform\\Actions\\' => 27,
             'Webkernel\\Platform\\' => 19,
-            'Webkernel\\Models\\Tests\\' => 23,
             'Webkernel\\Models\\' => 17,
-            'Webkernel\\Lifecycle\\Tests\\' => 26,
             'Webkernel\\Lifecycle\\' => 20,
-            'Webkernel\\Imagery\\Tests\\' => 24,
             'Webkernel\\Imagery\\' => 18,
-            'Webkernel\\I18n\\Tests\\' => 21,
             'Webkernel\\I18n\\' => 15,
-            'Webkernel\\DevTools\\Tests\\' => 25,
             'Webkernel\\DevTools\\' => 19,
-            'Webkernel\\Database\\Tests\\' => 25,
             'Webkernel\\Database\\' => 19,
-            'Webkernel\\Auth\\Tests\\' => 21,
             'Webkernel\\Auth\\' => 15,
             'Webkernel\\' => 10,
         ),
@@ -49,10 +37,6 @@ class ComposerStaticInitcc6f492cc5d64cb7f09b9024726d6929
             'Psr\\Cache\\' => 10,
             'PhpParser\\' => 10,
             'PHPMailer\\PHPMailer\\' => 20,
-        ),
-        'M' =>
-        array (
-            'Modules\\' => 8,
         ),
         'D' =>
         array (
@@ -69,29 +53,9 @@ class ComposerStaticInitcc6f492cc5d64cb7f09b9024726d6929
     );
 
     public static $prefixDirsPsr4 = array (
-        'Webkernel\\Tests\\' =>
-        array (
-            0 => __DIR__ . '/../../../..' . '/x-webkernel/codebase/tests',
-        ),
-        'Webkernel\\System\\Tests\\' =>
-        array (
-            0 => __DIR__ . '/../../../..' . '/x-webkernel/system/tests',
-        ),
-        'Webkernel\\Platform\\Tests\\' =>
-        array (
-            0 => __DIR__ . '/../../../..' . '/x-webkernel/platform/panels/tests',
-        ),
-        'Webkernel\\Platform\\Schemas\\Tests\\' =>
-        array (
-            0 => __DIR__ . '/../../../..' . '/x-webkernel/platform/schemas/tests',
-        ),
         'Webkernel\\Platform\\Schemas\\' =>
         array (
             0 => __DIR__ . '/..' . '/webkernel/schemas/src',
-        ),
-        'Webkernel\\Platform\\Components\\Tests\\' =>
-        array (
-            0 => __DIR__ . '/../../../..' . '/x-webkernel/platform/components/tests',
         ),
         'Webkernel\\Platform\\Components\\' =>
         array (
@@ -105,57 +69,29 @@ class ComposerStaticInitcc6f492cc5d64cb7f09b9024726d6929
         array (
             0 => __DIR__ . '/..' . '/webkernel/panels/src',
         ),
-        'Webkernel\\Models\\Tests\\' =>
-        array (
-            0 => __DIR__ . '/../../../..' . '/x-webkernel/models/tests',
-        ),
         'Webkernel\\Models\\' =>
         array (
             0 => __DIR__ . '/..' . '/webkernel/models/src',
-        ),
-        'Webkernel\\Lifecycle\\Tests\\' =>
-        array (
-            0 => __DIR__ . '/../../../..' . '/x-webkernel/lifecycle/tests',
         ),
         'Webkernel\\Lifecycle\\' =>
         array (
             0 => __DIR__ . '/..' . '/webkernel/lifecycle/Lifecycle',
         ),
-        'Webkernel\\Imagery\\Tests\\' =>
-        array (
-            0 => __DIR__ . '/../../../..' . '/x-webkernel/platform/imagery/tests',
-        ),
         'Webkernel\\Imagery\\' =>
         array (
             0 => __DIR__ . '/..' . '/webkernel/imagery/src',
-        ),
-        'Webkernel\\I18n\\Tests\\' =>
-        array (
-            0 => __DIR__ . '/../../../..' . '/x-webkernel/platform/i18n/tests',
         ),
         'Webkernel\\I18n\\' =>
         array (
             0 => __DIR__ . '/..' . '/webkernel/i18n/src',
         ),
-        'Webkernel\\DevTools\\Tests\\' =>
-        array (
-            0 => __DIR__ . '/../../../..' . '/x-webkernel/devtools/tests',
-        ),
         'Webkernel\\DevTools\\' =>
         array (
             0 => __DIR__ . '/..' . '/webkernel/devtools/src',
         ),
-        'Webkernel\\Database\\Tests\\' =>
-        array (
-            0 => __DIR__ . '/../../../..' . '/x-webkernel/database/tests',
-        ),
         'Webkernel\\Database\\' =>
         array (
             0 => __DIR__ . '/..' . '/webkernel/database/src',
-        ),
-        'Webkernel\\Auth\\Tests\\' =>
-        array (
-            0 => __DIR__ . '/../../../..' . '/x-webkernel/auth/tests',
         ),
         'Webkernel\\Auth\\' =>
         array (
@@ -201,10 +137,6 @@ class ComposerStaticInitcc6f492cc5d64cb7f09b9024726d6929
         'PHPMailer\\PHPMailer\\' =>
         array (
             0 => __DIR__ . '/..' . '/phpmailer/phpmailer/src',
-        ),
-        'Modules\\' =>
-        array (
-            0 => __DIR__ . '/../../../..' . '/modules',
         ),
         'DeepCopy\\' =>
         array (
@@ -1947,7 +1879,6 @@ class ComposerStaticInitcc6f492cc5d64cb7f09b9024726d6929
         'Webkernel\\Database\\Migrator' => __DIR__ . '/..' . '/webkernel/database/src/Migrator.php',
         'Webkernel\\Database\\Query' => __DIR__ . '/..' . '/webkernel/database/src/Query.php',
         'Webkernel\\Database\\Schema' => __DIR__ . '/..' . '/webkernel/database/src/Schema.php',
-        'Webkernel\\Database\\Tests\\Feature\\DatabaseTest' => __DIR__ . '/../../../..' . '/x-webkernel/database/tests/Feature/DatabaseTest.php',
         'Webkernel\\DevTools\\DevToolsProvider' => __DIR__ . '/..' . '/webkernel/devtools/src/DevToolsProvider.php',
         'Webkernel\\DevTools\\IdeHelper' => __DIR__ . '/..' . '/webkernel/devtools/src/IdeHelper.php',
         'Webkernel\\Http' => __DIR__ . '/..' . '/webkernel/codebase/src/Http.php',
