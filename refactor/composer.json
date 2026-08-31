@@ -9,27 +9,6 @@
             "email": "platform@webkernelphp.com"
         }
     ],
-    "autoload": {
-        "psr-4": {
-            "Modules\\": "modules/"
-        }
-    },
-    "autoload-dev": {
-        "psr-4": {
-            "Webkernel\\Tests\\": "x-webkernel/codebase/tests/",
-            "Webkernel\\Imagery\\Tests\\": "x-webkernel/platform/imagery/tests/",
-            "Webkernel\\I18n\\Tests\\": "x-webkernel/platform/i18n/tests/",
-            "Webkernel\\Lifecycle\\Tests\\": "x-webkernel/lifecycle/tests/",
-            "Webkernel\\Platform\\Components\\Tests\\": "x-webkernel/platform/components/tests/",
-            "Webkernel\\Platform\\Schemas\\Tests\\": "x-webkernel/platform/schemas/tests/",
-            "Webkernel\\Platform\\Tests\\": "x-webkernel/platform/panels/tests/",
-            "Webkernel\\System\\Tests\\": "x-webkernel/system/tests/",
-            "Webkernel\\DevTools\\Tests\\": "x-webkernel/devtools/tests/",
-            "Webkernel\\Database\\Tests\\": "x-webkernel/database/tests/",
-            "Webkernel\\Models\\Tests\\": "x-webkernel/models/tests/",
-            "Webkernel\\Auth\\Tests\\": "x-webkernel/auth/tests/"
-        }
-    },
     "minimum-stability": "stable",
     "prefer-stable": true,
     "config": {
@@ -54,7 +33,7 @@
         },
         {
             "type": "path",
-            "url": "x-modules/*",
+            "url": "x-modules/*/*",
             "options": {
                 "symlink": true
             }

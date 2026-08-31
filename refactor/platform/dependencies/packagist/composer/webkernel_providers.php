@@ -18,5 +18,4 @@ return [
     \Webkernel\Imagery\ImageryProvider::class,
     \Webkernel\Models\ModelsProvider::class,
     \Webkernel\Platform\PanelsProvider::class,
-    \Webkernel\System\SystemProvider::class,
 ];

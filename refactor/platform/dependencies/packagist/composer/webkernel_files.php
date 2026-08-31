@@ -11,16 +11,16 @@ $v = dirname(__DIR__); // vendor_dir
 $b = dirname($v, 3); // webapp root
 
 $files = [
-    $b . '/x-webkernel/auth/functions/auth.php',
-    $b . '/x-webkernel/codebase/functions/paths.php',
-    $b . '/x-webkernel/codebase/functions/route.php',
-    $b . '/x-webkernel/codebase/functions/terminal.php',
-    $b . '/x-webkernel/codebase/functions/view.php',
-    $b . '/x-webkernel/codebase/functions/webapp.php',
+    $b . '/x-webkernel/_codebase/functions/paths.php',
+    $b . '/x-webkernel/_codebase/functions/route.php',
+    $b . '/x-webkernel/_codebase/functions/terminal.php',
+    $b . '/x-webkernel/_codebase/functions/view.php',
+    $b . '/x-webkernel/_codebase/functions/webapp.php',
+    $b . '/x-webkernel/authorization/functions/auth.php',
     $b . '/x-webkernel/database/functions/database.php',
-    $b . '/x-webkernel/platform/i18n/functions/i18n.php',
-    $b . '/x-webkernel/platform/imagery/functions/branding.php',
-    $b . '/x-webkernel/platform/imagery/functions/icon.php',
+    $b . '/x-webkernel/i18n/functions/i18n.php',
+    $b . '/x-webkernel/imagery/functions/branding.php',
+    $b . '/x-webkernel/imagery/functions/icon.php',
 ];
 
 foreach ($files as $file) {

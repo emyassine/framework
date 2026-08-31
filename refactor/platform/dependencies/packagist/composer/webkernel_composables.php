@@ -14,6 +14,7 @@ return [
     'database' => \Webkernel\Database\Database::class,
     'panel' => \Webkernel\Composables\PanelComposable::class,
     'performance' => \Webkernel\Performance\Performance::class,
+    'request' => \Webkernel\Composables\RequestComposable::class,
     'route' => \Webkernel\Route\Route::class,
     'terminal' => \Webkernel\Console\Terminal::class,
     'view' => \Webkernel\View\View::class,

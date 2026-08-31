@@ -12,31 +12,27 @@ $b = dirname($v, 3); // webapp root
 
 return [
     'dirs' => [
-        $b . '/modules/acme/billing/resources/views',
-        $b . '/x-webkernel/auth/resources/views',
-        $b . '/x-webkernel/codebase/resources/views',
-        $b . '/x-webkernel/platform/components/resources/views/layout',
-        $b . '/x-webkernel/platform/components/resources/views/navigation',
-        $b . '/x-webkernel/platform/components/resources/views/components',
-        $b . '/x-webkernel/platform/i18n/resources/views',
-        $b . '/x-webkernel/platform/panels/resources/views',
-        $b . '/x-webkernel/system/resources/views',
+        $b . '/x-modules/acme/billing/resources/views',
+        $b . '/x-webkernel/authorization/resources/views',
+        $b . '/x-webkernel/_codebase/resources/views',
+        $b . '/x-webkernel/platform-components/resources/views/layout',
+        $b . '/x-webkernel/platform-components/resources/views/navigation',
+        $b . '/x-webkernel/platform-components/resources/views/components',
+        $b . '/x-webkernel/i18n/resources/views',
+        $b . '/x-webkernel/platform-panels/resources/views',
     ],
     'namespaces' => [
         'billing' => [
-            $b . '/modules/acme/billing/resources/views',
+            $b . '/x-modules/acme/billing/resources/views',
         ],
         'webkernel' => [
-            $b . '/x-webkernel/auth/resources/views',
-            $b . '/x-webkernel/codebase/resources/views',
-            $b . '/x-webkernel/platform/components/resources/views/layout',
-            $b . '/x-webkernel/platform/components/resources/views/navigation',
-            $b . '/x-webkernel/platform/components/resources/views/components',
-            $b . '/x-webkernel/platform/i18n/resources/views',
-            $b . '/x-webkernel/platform/panels/resources/views',
-        ],
-        'webkernel-system' => [
-            $b . '/x-webkernel/system/resources/views',
+            $b . '/x-webkernel/authorization/resources/views',
+            $b . '/x-webkernel/_codebase/resources/views',
+            $b . '/x-webkernel/platform-components/resources/views/layout',
+            $b . '/x-webkernel/platform-components/resources/views/navigation',
+            $b . '/x-webkernel/platform-components/resources/views/components',
+            $b . '/x-webkernel/i18n/resources/views',
+            $b . '/x-webkernel/platform-panels/resources/views',
         ],
     ],
 ];
