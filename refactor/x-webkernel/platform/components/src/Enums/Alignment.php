@@ -5,10 +5,14 @@
 //> For the full copyright and license information, please view the LICENSE
 //> file that was distributed with this source code.
 
-namespace Webkernel\Platform\Components;
+namespace Webkernel\Platform\Components\Enums;
 
-enum IconPosition: string
+enum Alignment: string
 {
-    case Before = 'before';
-    case After = 'after';
+    case Start = 'start';
+    case Center = 'center';
+    case End = 'end';
+    case Between = 'between';
+    case Left = 'left';
+    case Right = 'right';
 }

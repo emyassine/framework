@@ -5,14 +5,13 @@
 //> For the full copyright and license information, please view the LICENSE
 //> file that was distributed with this source code.
 
-namespace Webkernel\Platform\Components;
+namespace Webkernel\Platform\Components\Enums;
 
-enum Alignment: string
+enum Size: string
 {
-    case Start = 'start';
-    case Center = 'center';
-    case End = 'end';
-    case Between = 'between';
-    case Left = 'left';
-    case Right = 'right';
+    case ExtraSmall = 'xs';
+    case Small = 'sm';
+    case Medium = 'md';
+    case Large = 'lg';
+    case ExtraLarge = 'xl';
 }

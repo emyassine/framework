@@ -6,14 +6,14 @@
 //> file that was distributed with this source code.
 
 namespace Webkernel\Platform\Schemas;
+use Webkernel\Component\Component;
 
 use Webkernel\Platform\Components\Concerns\HasChildSchema;
 use Webkernel\Platform\Schemas\SchemaMode;
-use Webkernel\Platform\Components\Component;
 /**
  * Layout atom with a nested schema. Grid, Section, Fieldset, Flex share this.
  */
-abstract class LayoutComponent extends Component
+abstract class LayoutComponent extends \Webkernel\Component\Component
 {
     use HasChildSchema;
 

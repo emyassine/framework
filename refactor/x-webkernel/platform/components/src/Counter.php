@@ -6,7 +6,6 @@
 //> file that was distributed with this source code.
 
 namespace Webkernel\Platform\Components;
-
 use Webkernel\Component\ReactiveComponent;
 
 /**

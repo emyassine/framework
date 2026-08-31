@@ -6,12 +6,13 @@
 //> file that was distributed with this source code.
 
 namespace Webkernel\Platform\Components;
-use Webkernel\Platform\Schemas\LayoutComponent;
+use Webkernel\Component\StaticComponent;
+use Webkernel\Component\StaticComponent;
 
 /**
  * Placeholder when a list is empty. View: `<x-webkernel::empty-state>`.
  */
-final class EmptyState extends \Webkernel\Platform\Schemas\LayoutComponent
+final class EmptyState extends StaticComponent
 {
     /**
      * @return string

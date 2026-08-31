@@ -5,13 +5,10 @@
 //> For the full copyright and license information, please view the LICENSE
 //> file that was distributed with this source code.
 
-namespace Webkernel\Platform\Components;
+namespace Webkernel\Platform\Components\Enums;
 
-enum Size: string
+enum IconPosition: string
 {
-    case ExtraSmall = 'xs';
-    case Small = 'sm';
-    case Medium = 'md';
-    case Large = 'lg';
-    case ExtraLarge = 'xl';
+    case Before = 'before';
+    case After = 'after';
 }

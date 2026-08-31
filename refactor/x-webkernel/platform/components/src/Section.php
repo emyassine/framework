@@ -5,12 +5,13 @@
 //> For the full copyright and license information, please view the LICENSE
 //> file that was distributed with this source code.
 
-namespace Webkernel\Platform\Schemas;
+namespace Webkernel\Platform\Components;
+use Webkernel\Component\StaticComponent;
 
 /**
  * Card around a nested schema. View: `<x-webkernel::section>`.
  */
-final class Section extends LayoutComponent
+final class Section extends StaticComponent
 {
     /**
      * @param $heading string
