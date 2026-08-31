@@ -23,6 +23,7 @@
     "extra": {
         "webkernel": {
             "package_repo": "git@github.com:webkernelphp/notifications.git",
+            "provider": "Webkernel\\Platform\\Notifications\\Providers\\NotificationsProvider",
             "production": true,
             "prefix": "notifications"
         }

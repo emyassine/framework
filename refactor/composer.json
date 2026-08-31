@@ -54,14 +54,7 @@
         },
         {
             "type": "path",
-            "url": "x-webkernel/platform/*",
-            "options": {
-                "symlink": true
-            }
-        },
-        {
-            "type": "path",
-            "url": "modules/*/*",
+            "url": "x-modules/*/*",
             "options": {
                 "symlink": true
             }
