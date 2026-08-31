@@ -7,13 +7,23 @@
 
 namespace Webkernel\Platform\Components\Enums;
 
-enum Alignment: string
+enum FontWeight: string
 {
-    case Start = 'start';
-    case Center = 'center';
-    case End = 'end';
-    case Between = 'between';
-    case Left = 'left';
-    case Right = 'right';
-    case Justify = 'justify';
+    case Thin = 'thin';
+
+    case ExtraLight = 'extralight';
+
+    case Light = 'light';
+
+    case Normal = 'normal';
+
+    case Medium = 'medium';
+
+    case SemiBold = 'semibold';
+
+    case Bold = 'bold';
+
+    case ExtraBold = 'extrabold';
+
+    case Black = 'black';
 }

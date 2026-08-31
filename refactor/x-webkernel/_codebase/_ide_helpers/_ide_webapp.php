@@ -17,6 +17,7 @@ if (false) {
      * @method \Webkernel\Database\Database database()
      * @method \Webkernel\Composables\PanelComposable panel(?string $id = null)
      * @method \Webkernel\Performance\Performance performance()
+     * @method \Webkernel\Composables\RequestComposable request()
      * @method \Webkernel\Route\Route route()
      * @method \Webkernel\Console\Terminal terminal()
      * @method \Webkernel\View\View view(?string $template = null, array $data = [])

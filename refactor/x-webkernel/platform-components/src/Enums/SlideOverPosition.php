@@ -7,13 +7,9 @@
 
 namespace Webkernel\Platform\Components\Enums;
 
-enum Alignment: string
+enum SlideOverPosition: string
 {
     case Start = 'start';
-    case Center = 'center';
+
     case End = 'end';
-    case Between = 'between';
-    case Left = 'left';
-    case Right = 'right';
-    case Justify = 'justify';
 }

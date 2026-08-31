@@ -7,13 +7,22 @@
 
 namespace Webkernel\Platform\Components\Enums;
 
-enum Alignment: string
+enum IconSize: string
 {
-    case Start = 'start';
-    case Center = 'center';
-    case End = 'end';
-    case Between = 'between';
-    case Left = 'left';
-    case Right = 'right';
-    case Justify = 'justify';
+    case ExtraSmall = 'xs';
+
+    case Small = 'sm';
+
+    case Medium = 'md';
+
+    case Large = 'lg';
+
+    case ExtraLarge = 'xl';
+
+    case TwoExtraLarge = '2xl';
+
+    /**
+     * @deprecated Use `TwoExtraLarge` instead.
+     */
+    public const ExtraExtraLarge = self::TwoExtraLarge;
 }

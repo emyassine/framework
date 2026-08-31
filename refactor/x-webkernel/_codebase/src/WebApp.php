@@ -17,6 +17,7 @@ use Webkernel\Config\Config;
  * @method \Webkernel\View\View view()
  * @method \Webkernel\Route\Route route()
  * @method \Webkernel\Composables\PanelComposable panel()
+ * @method \Webkernel\Composables\RequestComposable request()
  * @method \Webkernel\Console\Terminal terminal()
  * @method \Webkernel\Console\Dispatcher console()
  * @method \Webkernel\Database\Database database()
