@@ -6,11 +6,12 @@
 //> file that was distributed with this source code.
 
 namespace Webkernel\Platform\Components;
+use Webkernel\Platform\Schemas\LayoutComponent;
 
 /**
  * Row of Action buttons inside a schema.
  */
-final class Actions extends LayoutComponent
+final class Actions extends \Webkernel\Platform\Schemas\LayoutComponent
 {
     /** @var list<Action> */
     private array $actions = [];

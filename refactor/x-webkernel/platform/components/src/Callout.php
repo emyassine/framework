@@ -6,11 +6,12 @@
 //> file that was distributed with this source code.
 
 namespace Webkernel\Platform\Components;
+use Webkernel\Platform\Schemas\LayoutComponent;
 
 /**
  * Inline notice. View: `<x-webkernel::callout>`.
  */
-final class Callout extends LayoutComponent
+final class Callout extends \Webkernel\Platform\Schemas\LayoutComponent
 {
     /**
      * @return string

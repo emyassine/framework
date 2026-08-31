@@ -6,6 +6,7 @@
 //> file that was distributed with this source code.
 
 namespace Webkernel\Platform\Components;
+use Webkernel\Component\StaticComponent;
 
 use Closure;
 use Webkernel\View\Htmlable;
@@ -15,7 +16,7 @@ use Webkernel\View\Htmlable;
  *
  * //> Modal confirmation is not wired. Upgrade when an action needs a confirm dialog.
  */
-final class Action extends Component implements Htmlable, \Stringable
+final class Action extends \Webkernel\Component\StaticComponent implements Htmlable, \Stringable
 {
     private mixed $callback = null;
 

@@ -9,11 +9,11 @@ namespace Webkernel\Platform\Schemas;
 
 use Webkernel\Platform\Components\Concerns\HasChildSchema;
 use Webkernel\Platform\Schemas\SchemaMode;
-
+use Webkernel\Platform\Components\Component;
 /**
  * Layout atom with a nested schema. Grid, Section, Fieldset, Flex share this.
  */
-abstract class LayoutComponent extends \Webkernel\Platform\Components\Component
+abstract class LayoutComponent extends Component
 {
     use HasChildSchema;
 
