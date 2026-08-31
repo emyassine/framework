@@ -23,7 +23,7 @@
         "webkernel": {
             "package_repo": "git@github.com:webkernelphp/components.git",
             "production": true,
-            "provider": "Webkernel\\Platform\\Components\\ComponentsProvider",
+            "provider": "Webkernel\\Platform\\Components\\Providers\\ComponentsProvider",
             "prefix": "webkernel"
         }
     },

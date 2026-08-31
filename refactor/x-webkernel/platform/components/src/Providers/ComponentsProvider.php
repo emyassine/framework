@@ -5,7 +5,7 @@
 //> For the full copyright and license information, please view the LICENSE
 //> file that was distributed with this source code.
 
-namespace Webkernel\Platform\Components;
+namespace Webkernel\Platform\Components\Providers;
 
 use Webkernel\PlatformProvider;
 
@@ -18,17 +18,17 @@ final class ComponentsProvider extends PlatformProvider
 {
     public const VIEWS = [
         'webkernel' => [
-            __DIR__.'/../resources/views/layout',
-            __DIR__.'/../resources/views/navigation',
-            __DIR__.'/../resources/views/components',
+            __DIR__.'/../../resources/views/layout',
+            __DIR__.'/../../resources/views/navigation',
+            __DIR__.'/../../resources/views/components',
         ],
     ];
 
     public const COMPONENTS = [
         'webkernel' => [
-            __DIR__.'/../resources/views/layout',
-            __DIR__.'/../resources/views/navigation',
-            __DIR__.'/../resources/views/components',
+            __DIR__.'/../../resources/views/layout',
+            __DIR__.'/../../resources/views/navigation',
+            __DIR__.'/../../resources/views/components',
         ],
     ];
 }

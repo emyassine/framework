@@ -2651,7 +2651,7 @@
             "dist": {
                 "type": "path",
                 "url": "x-webkernel/platform/components",
-                "reference": "32427587e6f2f78c52e49a61bf0564cf12157f85"
+                "reference": "8c22ba944e4e6c26011225e9860e1e30c45b0c18"
             },
             "require": {
                 "php": ">=8.5",
@@ -2662,7 +2662,7 @@
                 "webkernel": {
                     "package_repo": "git@github.com:webkernelphp/components.git",
                     "production": true,
-                    "provider": "Webkernel\\Platform\\Components\\ComponentsProvider",
+                    "provider": "Webkernel\\Platform\\Components\\Providers\\ComponentsProvider",
                     "prefix": "webkernel"
                 }
             },

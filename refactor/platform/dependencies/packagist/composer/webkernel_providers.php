@@ -11,7 +11,7 @@ return [
     \Acme\Billing\BillingProvider::class,
     \Webkernel\Auth\AuthProvider::class,
     \Webkernel\CodebaseProvider::class,
-    \Webkernel\Platform\Components\ComponentsProvider::class,
+    \Webkernel\Platform\Components\Providers\ComponentsProvider::class,
     \Webkernel\Database\DatabaseProvider::class,
     \Webkernel\DevTools\DevToolsProvider::class,
     \Webkernel\I18n\I18nProvider::class,
