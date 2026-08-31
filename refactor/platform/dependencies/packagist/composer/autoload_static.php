@@ -8,6 +8,8 @@ class ComposerStaticInitcc6f492cc5d64cb7f09b9024726d6929
 {
     public static $files = array (
         'b3937b7fa35431fe0895577483870c74' => __DIR__ . '/..' . '/webkernel/codebase/namespacer.php',
+        '6124b4c8570aa390c21fafd04a26c69f' => __DIR__ . '/..' . '/myclabs/deep-copy/src/DeepCopy/deep_copy.php',
+        'ec07570ca5a812141189b1fa81503674' => __DIR__ . '/..' . '/phpunit/phpunit/src/Framework/Assert/Functions.php',
     );
 
     public static $prefixLengthsPsr4 = array (
@@ -16,31 +18,18 @@ class ComposerStaticInitcc6f492cc5d64cb7f09b9024726d6929
             'Webkernel\\Tests\\' => 16,
             'Webkernel\\System\\Tests\\' => 23,
             'Webkernel\\System\\' => 17,
-            'Webkernel\\Platform\\Widgets\\' => 27,
             'Webkernel\\Platform\\Tests\\' => 25,
-            'Webkernel\\Platform\\Tables\\' => 26,
             'Webkernel\\Platform\\Schemas\\Tests\\' => 33,
-            'Webkernel\\Platform\\Schemas\\' => 27,
-            'Webkernel\\Platform\\Notifications\\' => 33,
-            'Webkernel\\Platform\\Forms\\' => 25,
             'Webkernel\\Platform\\Components\\Tests\\' => 36,
-            'Webkernel\\Platform\\Components\\' => 30,
-            'Webkernel\\Platform\\Actions\\' => 27,
-            'Webkernel\\Platform\\' => 19,
             'Webkernel\\Models\\Tests\\' => 23,
-            'Webkernel\\Models\\' => 17,
             'Webkernel\\Lifecycle\\Tests\\' => 26,
-            'Webkernel\\Lifecycle\\' => 20,
             'Webkernel\\Imagery\\Tests\\' => 24,
-            'Webkernel\\Imagery\\' => 18,
             'Webkernel\\I18n\\Tests\\' => 21,
-            'Webkernel\\I18n\\' => 15,
             'Webkernel\\DevTools\\Tests\\' => 25,
             'Webkernel\\DevTools\\' => 19,
             'Webkernel\\Database\\Tests\\' => 25,
             'Webkernel\\Database\\' => 19,
             'Webkernel\\Auth\\Tests\\' => 21,
-            'Webkernel\\Auth\\' => 15,
             'Webkernel\\' => 10,
         ),
         'P' =>
@@ -67,10 +56,6 @@ class ComposerStaticInitcc6f492cc5d64cb7f09b9024726d6929
         array (
             'Composer\\Installers\\' => 20,
         ),
-        'A' =>
-        array (
-            'Acme\\Billing\\' => 13,
-        ),
     );
 
     public static $prefixDirsPsr4 = array (
@@ -86,81 +71,33 @@ class ComposerStaticInitcc6f492cc5d64cb7f09b9024726d6929
         array (
             0 => __DIR__ . '/..' . '/webkernel/system/src',
         ),
-        'Webkernel\\Platform\\Widgets\\' =>
-        array (
-            0 => __DIR__ . '/..' . '/webkernel/widgets/src',
-        ),
         'Webkernel\\Platform\\Tests\\' =>
         array (
             0 => __DIR__ . '/../../../..' . '/x-webkernel/platform/panels/tests',
-        ),
-        'Webkernel\\Platform\\Tables\\' =>
-        array (
-            0 => __DIR__ . '/..' . '/webkernel/tables/src',
         ),
         'Webkernel\\Platform\\Schemas\\Tests\\' =>
         array (
             0 => __DIR__ . '/../../../..' . '/x-webkernel/platform/schemas/tests',
         ),
-        'Webkernel\\Platform\\Schemas\\' =>
-        array (
-            0 => __DIR__ . '/..' . '/webkernel/schemas/src',
-        ),
-        'Webkernel\\Platform\\Notifications\\' =>
-        array (
-            0 => __DIR__ . '/..' . '/webkernel/notifications/src',
-        ),
-        'Webkernel\\Platform\\Forms\\' =>
-        array (
-            0 => __DIR__ . '/..' . '/webkernel/forms/src',
-        ),
         'Webkernel\\Platform\\Components\\Tests\\' =>
         array (
             0 => __DIR__ . '/../../../..' . '/x-webkernel/platform/components/tests',
-        ),
-        'Webkernel\\Platform\\Components\\' =>
-        array (
-            0 => __DIR__ . '/..' . '/webkernel/components/src',
-        ),
-        'Webkernel\\Platform\\Actions\\' =>
-        array (
-            0 => __DIR__ . '/..' . '/webkernel/actions/src',
-        ),
-        'Webkernel\\Platform\\' =>
-        array (
-            0 => __DIR__ . '/..' . '/webkernel/panels/src',
         ),
         'Webkernel\\Models\\Tests\\' =>
         array (
             0 => __DIR__ . '/../../../..' . '/x-webkernel/models/tests',
         ),
-        'Webkernel\\Models\\' =>
-        array (
-            0 => __DIR__ . '/..' . '/webkernel/models/src',
-        ),
         'Webkernel\\Lifecycle\\Tests\\' =>
         array (
             0 => __DIR__ . '/../../../..' . '/x-webkernel/lifecycle/tests',
-        ),
-        'Webkernel\\Lifecycle\\' =>
-        array (
-            0 => __DIR__ . '/..' . '/webkernel/lifecycle/Lifecycle',
         ),
         'Webkernel\\Imagery\\Tests\\' =>
         array (
             0 => __DIR__ . '/../../../..' . '/x-webkernel/platform/imagery/tests',
         ),
-        'Webkernel\\Imagery\\' =>
-        array (
-            0 => __DIR__ . '/..' . '/webkernel/imagery/src',
-        ),
         'Webkernel\\I18n\\Tests\\' =>
         array (
             0 => __DIR__ . '/../../../..' . '/x-webkernel/platform/i18n/tests',
-        ),
-        'Webkernel\\I18n\\' =>
-        array (
-            0 => __DIR__ . '/..' . '/webkernel/i18n/src',
         ),
         'Webkernel\\DevTools\\Tests\\' =>
         array (
@@ -181,10 +118,6 @@ class ComposerStaticInitcc6f492cc5d64cb7f09b9024726d6929
         'Webkernel\\Auth\\Tests\\' =>
         array (
             0 => __DIR__ . '/../../../..' . '/x-webkernel/auth/tests',
-        ),
-        'Webkernel\\Auth\\' =>
-        array (
-            0 => __DIR__ . '/..' . '/webkernel/auth/src',
         ),
         'Webkernel\\' =>
         array (
@@ -239,23 +172,9 @@ class ComposerStaticInitcc6f492cc5d64cb7f09b9024726d6929
         array (
             0 => __DIR__ . '/..' . '/composer/installers/src/Composer/Installers',
         ),
-        'Acme\\Billing\\' =>
-        array (
-            0 => __DIR__ . '/../../../..' . '/modules/acme/billing/src',
-        ),
     );
 
     public static $classMap = array (
-        'Acme\\Billing\\BillingProvider' => __DIR__ . '/../../../..' . '/modules/acme/billing/src/BillingProvider.php',
-        'Acme\\Billing\\Domain\\Invoice' => __DIR__ . '/../../../..' . '/modules/acme/billing/src/Domain/Invoice.php',
-        'Acme\\Billing\\Infrastructure\\InvoiceStore' => __DIR__ . '/../../../..' . '/modules/acme/billing/src/Infrastructure/InvoiceStore.php',
-        'Acme\\Billing\\Presentation\\BillingPanelProvider' => __DIR__ . '/../../../..' . '/modules/acme/billing/src/Presentation/BillingPanelProvider.php',
-        'Acme\\Billing\\Presentation\\Resources\\Invoices\\InvoiceResource' => __DIR__ . '/../../../..' . '/modules/acme/billing/src/Presentation/Resources/Invoices/InvoiceResource.php',
-        'Acme\\Billing\\Presentation\\Resources\\Invoices\\Pages\\CreateInvoice' => __DIR__ . '/../../../..' . '/modules/acme/billing/src/Presentation/Resources/Invoices/Pages/CreateInvoice.php',
-        'Acme\\Billing\\Presentation\\Resources\\Invoices\\Pages\\EditInvoice' => __DIR__ . '/../../../..' . '/modules/acme/billing/src/Presentation/Resources/Invoices/Pages/EditInvoice.php',
-        'Acme\\Billing\\Presentation\\Resources\\Invoices\\Pages\\ListInvoices' => __DIR__ . '/../../../..' . '/modules/acme/billing/src/Presentation/Resources/Invoices/Pages/ListInvoices.php',
-        'Acme\\Billing\\Presentation\\Resources\\Invoices\\Schemas\\InvoiceForm' => __DIR__ . '/../../../..' . '/modules/acme/billing/src/Presentation/Resources/Invoices/Schemas/InvoiceForm.php',
-        'Acme\\Billing\\Presentation\\Resources\\Invoices\\Tables\\InvoicesTable' => __DIR__ . '/../../../..' . '/modules/acme/billing/src/Presentation/Resources/Invoices/Tables/InvoicesTable.php',
         'Composer\\InstalledVersions' => __DIR__ . '/..' . '/composer/InstalledVersions.php',
         'Composer\\Installers\\AglInstaller' => __DIR__ . '/..' . '/composer/installers/src/Composer/Installers/AglInstaller.php',
         'Composer\\Installers\\AkauntingInstaller' => __DIR__ . '/..' . '/composer/installers/src/Composer/Installers/AkauntingInstaller.php',
@@ -1914,16 +1833,6 @@ class ComposerStaticInitcc6f492cc5d64cb7f09b9024726d6929
         'TheSeer\\Tokenizer\\TokenCollectionException' => __DIR__ . '/..' . '/theseer/tokenizer/src/TokenCollectionException.php',
         'TheSeer\\Tokenizer\\Tokenizer' => __DIR__ . '/..' . '/theseer/tokenizer/src/Tokenizer.php',
         'TheSeer\\Tokenizer\\XMLSerializer' => __DIR__ . '/..' . '/theseer/tokenizer/src/XMLSerializer.php',
-        'Webkernel\\Auth\\Auth' => __DIR__ . '/..' . '/webkernel/auth/src/Auth.php',
-        'Webkernel\\Auth\\AuthProvider' => __DIR__ . '/..' . '/webkernel/auth/src/AuthProvider.php',
-        'Webkernel\\Auth\\Console\\UserCreateCommand' => __DIR__ . '/..' . '/webkernel/auth/src/Console/UserCreateCommand.php',
-        'Webkernel\\Auth\\Hash' => __DIR__ . '/..' . '/webkernel/auth/src/Hash.php',
-        'Webkernel\\Auth\\Http\\LoginController' => __DIR__ . '/..' . '/webkernel/auth/src/Http/LoginController.php',
-        'Webkernel\\Auth\\Http\\LogoutController' => __DIR__ . '/..' . '/webkernel/auth/src/Http/LogoutController.php',
-        'Webkernel\\Auth\\Http\\Middleware\\Authenticate' => __DIR__ . '/..' . '/webkernel/auth/src/Http/Middleware/Authenticate.php',
-        'Webkernel\\Auth\\Session' => __DIR__ . '/..' . '/webkernel/auth/src/Session.php',
-        'Webkernel\\Auth\\Tests\\Feature\\AuthTest' => __DIR__ . '/../../../..' . '/x-webkernel/auth/tests/Feature/AuthTest.php',
-        'Webkernel\\Auth\\User' => __DIR__ . '/..' . '/webkernel/auth/src/User.php',
         'Webkernel\\CodebaseProvider' => __DIR__ . '/..' . '/webkernel/codebase/src/CodebaseProvider.php',
         'Webkernel\\Communication\\Mail' => __DIR__ . '/..' . '/webkernel/codebase/src/Communication/Mail.php',
         'Webkernel\\Component\\Component' => __DIR__ . '/..' . '/webkernel/codebase/src/Component/Component.php',
@@ -1935,6 +1844,7 @@ class ComposerStaticInitcc6f492cc5d64cb7f09b9024726d6929
         'Webkernel\\Composables\\ComposableContract' => __DIR__ . '/..' . '/webkernel/codebase/src/Composables/ComposableContract.php',
         'Webkernel\\Composables\\ConfigComposable' => __DIR__ . '/..' . '/webkernel/codebase/src/Composables/ConfigComposable.php',
         'Webkernel\\Composables\\PanelComposable' => __DIR__ . '/..' . '/webkernel/codebase/src/Composables/PanelComposable.php',
+        'Webkernel\\Composables\\RequestComposable' => __DIR__ . '/..' . '/webkernel/codebase/src/Composables/RequestComposable.php',
         'Webkernel\\Config\\Config' => __DIR__ . '/..' . '/webkernel/codebase/src/Config/Config.php',
         'Webkernel\\Config\\ConfigWriter' => __DIR__ . '/..' . '/webkernel/codebase/src/Config/ConfigWriter.php',
         'Webkernel\\Console' => __DIR__ . '/..' . '/webkernel/codebase/src/Console.php',
@@ -1976,27 +1886,7 @@ class ComposerStaticInitcc6f492cc5d64cb7f09b9024726d6929
         'Webkernel\\DevTools\\DevToolsProvider' => __DIR__ . '/..' . '/webkernel/devtools/src/DevToolsProvider.php',
         'Webkernel\\DevTools\\IdeHelper' => __DIR__ . '/..' . '/webkernel/devtools/src/IdeHelper.php',
         'Webkernel\\Http' => __DIR__ . '/..' . '/webkernel/codebase/src/Http.php',
-        'Webkernel\\I18n\\Catalog' => __DIR__ . '/..' . '/webkernel/i18n/src/Catalog.php',
-        'Webkernel\\I18n\\Http\\SwitchLocale' => __DIR__ . '/..' . '/webkernel/i18n/src/Http/SwitchLocale.php',
-        'Webkernel\\I18n\\I18nContext' => __DIR__ . '/..' . '/webkernel/i18n/src/I18nContext.php',
-        'Webkernel\\I18n\\I18nProvider' => __DIR__ . '/..' . '/webkernel/i18n/src/I18nProvider.php',
-        'Webkernel\\I18n\\Support\\LocaleDirection' => __DIR__ . '/..' . '/webkernel/i18n/src/Support/LocaleDirection.php',
-        'Webkernel\\I18n\\Support\\TranslatedValue' => __DIR__ . '/..' . '/webkernel/i18n/src/Support/TranslatedValue.php',
-        'Webkernel\\I18n\\Tests\\Feature\\FastI18nTest' => __DIR__ . '/../../../..' . '/x-webkernel/platform/i18n/tests/Feature/FastI18nTest.php',
-        'Webkernel\\Imagery\\Branding' => __DIR__ . '/..' . '/webkernel/imagery/src/Branding.php',
-        'Webkernel\\Imagery\\Http\\Controllers\\BrandingController' => __DIR__ . '/..' . '/webkernel/imagery/src/Http/Controllers/BrandingController.php',
-        'Webkernel\\Imagery\\Icon' => __DIR__ . '/..' . '/webkernel/imagery/src/Icon.php',
-        'Webkernel\\Imagery\\ImageryProvider' => __DIR__ . '/..' . '/webkernel/imagery/src/ImageryProvider.php',
-        'Webkernel\\Imagery\\Tests\\Feature\\BrandingTest' => __DIR__ . '/../../../..' . '/x-webkernel/platform/imagery/tests/Feature/BrandingTest.php',
         'Webkernel\\Instance\\InstanceId' => __DIR__ . '/..' . '/webkernel/codebase/src/Instance/InstanceId.php',
-        'Webkernel\\Lifecycle\\ComposerScripts' => __DIR__ . '/..' . '/webkernel/lifecycle/Lifecycle/ComposerScripts.php',
-        'Webkernel\\Lifecycle\\Hook\\LCHook' => __DIR__ . '/..' . '/webkernel/lifecycle/Lifecycle/Hook/LCHook.php',
-        'Webkernel\\Lifecycle\\Hook\\LCHookDispatcher' => __DIR__ . '/..' . '/webkernel/lifecycle/Lifecycle/Hook/LCHookDispatcher.php',
-        'Webkernel\\Lifecycle\\Installer\\LCBaseInstaller' => __DIR__ . '/..' . '/webkernel/lifecycle/Lifecycle/Installer/LCBaseInstaller.php',
-        'Webkernel\\Lifecycle\\Installer\\LCInstallerLocations' => __DIR__ . '/..' . '/webkernel/lifecycle/Lifecycle/Installer/LCInstallerLocations.php',
-        'Webkernel\\Lifecycle\\Installer\\LCPackageType' => __DIR__ . '/..' . '/webkernel/lifecycle/Lifecycle/Installer/LCPackageType.php',
-        'Webkernel\\Lifecycle\\LCInstaller' => __DIR__ . '/..' . '/webkernel/lifecycle/Lifecycle/LCInstaller.php',
-        'Webkernel\\Lifecycle\\Tests\\Feature\\LCHookDispatcherTest' => __DIR__ . '/../../../..' . '/x-webkernel/lifecycle/tests/Feature/LCHookDispatcherTest.php',
         'Webkernel\\Liveview\\Extensions\\DefaultExtensions' => __DIR__ . '/..' . '/webkernel/codebase/src/Liveview/Extensions/DefaultExtensions.php',
         'Webkernel\\Liveview\\Extensions\\DownloadExtension' => __DIR__ . '/..' . '/webkernel/codebase/src/Liveview/Extensions/DownloadExtension.php',
         'Webkernel\\Liveview\\Extensions\\Extension' => __DIR__ . '/..' . '/webkernel/codebase/src/Liveview/Extensions/Extension.php',
@@ -2007,102 +1897,15 @@ class ComposerStaticInitcc6f492cc5d64cb7f09b9024726d6929
         'Webkernel\\Liveview\\Extensions\\WebsocketExtension' => __DIR__ . '/..' . '/webkernel/codebase/src/Liveview/Extensions/WebsocketExtension.php',
         'Webkernel\\Liveview\\Liveview' => __DIR__ . '/..' . '/webkernel/codebase/src/Liveview/Liveview.php',
         'Webkernel\\Liveview\\ResponseHelper' => __DIR__ . '/..' . '/webkernel/codebase/src/Liveview/ResponseHelper.php',
-        'Webkernel\\Models\\Model' => __DIR__ . '/..' . '/webkernel/models/src/Model.php',
-        'Webkernel\\Models\\ModelsProvider' => __DIR__ . '/..' . '/webkernel/models/src/ModelsProvider.php',
-        'Webkernel\\Models\\Tests\\Feature\\ModelTest' => __DIR__ . '/../../../..' . '/x-webkernel/models/tests/Feature/ModelTest.php',
         'Webkernel\\Paths\\Package' => __DIR__ . '/..' . '/webkernel/codebase/src/Paths/Package.php',
         'Webkernel\\Performance\\Performance' => __DIR__ . '/..' . '/webkernel/codebase/src/Performance/Performance.php',
         'Webkernel\\Performance\\Status' => __DIR__ . '/..' . '/webkernel/codebase/src/Performance/Status.php',
         'Webkernel\\PlatformProvider' => __DIR__ . '/..' . '/webkernel/codebase/src/PlatformProvider.php',
-        'Webkernel\\Platform\\Actions\\Action' => __DIR__ . '/..' . '/webkernel/actions/src/Action.php',
-        'Webkernel\\Platform\\Actions\\ActionGroup' => __DIR__ . '/..' . '/webkernel/actions/src/ActionGroup.php',
-        'Webkernel\\Platform\\Actions\\Actions' => __DIR__ . '/..' . '/webkernel/actions/src/Actions.php',
-        'Webkernel\\Platform\\Actions\\Concerns\\CanOpenModal' => __DIR__ . '/..' . '/webkernel/actions/src/Concerns/CanOpenModal.php',
-        'Webkernel\\Platform\\Actions\\CreateAction' => __DIR__ . '/..' . '/webkernel/actions/src/CreateAction.php',
-        'Webkernel\\Platform\\Actions\\DeleteAction' => __DIR__ . '/..' . '/webkernel/actions/src/DeleteAction.php',
-        'Webkernel\\Platform\\Actions\\EditAction' => __DIR__ . '/..' . '/webkernel/actions/src/EditAction.php',
-        'Webkernel\\Platform\\Actions\\ExportAction' => __DIR__ . '/..' . '/webkernel/actions/src/ExportAction.php',
-        'Webkernel\\Platform\\Actions\\ForceDeleteAction' => __DIR__ . '/..' . '/webkernel/actions/src/ForceDeleteAction.php',
-        'Webkernel\\Platform\\Actions\\ImportAction' => __DIR__ . '/..' . '/webkernel/actions/src/ImportAction.php',
-        'Webkernel\\Platform\\Actions\\ReplicateAction' => __DIR__ . '/..' . '/webkernel/actions/src/ReplicateAction.php',
-        'Webkernel\\Platform\\Actions\\RestoreAction' => __DIR__ . '/..' . '/webkernel/actions/src/RestoreAction.php',
-        'Webkernel\\Platform\\Actions\\ViewAction' => __DIR__ . '/..' . '/webkernel/actions/src/ViewAction.php',
         'Webkernel\\Platform\\Assets' => __DIR__ . '/..' . '/webkernel/codebase/src/Platform/Assets.php',
         'Webkernel\\Platform\\Colors\\Color' => __DIR__ . '/..' . '/webkernel/codebase/src/Platform/Colors/Color.php',
-        'Webkernel\\Platform\\Components\\Avatar' => __DIR__ . '/..' . '/webkernel/components/src/Avatar.php',
-        'Webkernel\\Platform\\Components\\Badge' => __DIR__ . '/..' . '/webkernel/components/src/Badge.php',
-        'Webkernel\\Platform\\Components\\Breadcrumbs' => __DIR__ . '/..' . '/webkernel/components/src/Breadcrumbs.php',
-        'Webkernel\\Platform\\Components\\Button' => __DIR__ . '/..' . '/webkernel/components/src/Button.php',
-        'Webkernel\\Platform\\Components\\ButtonGroup' => __DIR__ . '/..' . '/webkernel/components/src/ButtonGroup.php',
-        'Webkernel\\Platform\\Components\\ButtonIcon' => __DIR__ . '/..' . '/webkernel/components/src/ButtonIcon.php',
-        'Webkernel\\Platform\\Components\\Callout' => __DIR__ . '/..' . '/webkernel/components/src/Callout.php',
-        'Webkernel\\Platform\\Components\\Checkbox' => __DIR__ . '/..' . '/webkernel/components/src/Checkbox.php',
-        'Webkernel\\Platform\\Components\\Concerns\\HasAlignment' => __DIR__ . '/..' . '/webkernel/components/src/Concerns/HasAlignment.php',
-        'Webkernel\\Platform\\Components\\Concerns\\HasChildSchema' => __DIR__ . '/..' . '/webkernel/components/src/Concerns/HasChildSchema.php',
-        'Webkernel\\Platform\\Components\\Concerns\\HasIcon' => __DIR__ . '/..' . '/webkernel/components/src/Concerns/HasIcon.php',
-        'Webkernel\\Platform\\Components\\Concerns\\HasIconPosition' => __DIR__ . '/..' . '/webkernel/components/src/Concerns/HasIconPosition.php',
-        'Webkernel\\Platform\\Components\\Concerns\\HasLayout' => __DIR__ . '/..' . '/webkernel/components/src/Concerns/HasLayout.php',
-        'Webkernel\\Platform\\Components\\Concerns\\HasMethodMake' => __DIR__ . '/..' . '/webkernel/components/src/Concerns/HasMethodMake.php',
-        'Webkernel\\Platform\\Components\\Concerns\\HasPrefix' => __DIR__ . '/..' . '/webkernel/components/src/Concerns/HasPrefix.php',
-        'Webkernel\\Platform\\Components\\Concerns\\HasPrefixIcon' => __DIR__ . '/..' . '/webkernel/components/src/Concerns/HasPrefixIcon.php',
-        'Webkernel\\Platform\\Components\\Concerns\\HasSize' => __DIR__ . '/..' . '/webkernel/components/src/Concerns/HasSize.php',
-        'Webkernel\\Platform\\Components\\Concerns\\HasSuffix' => __DIR__ . '/..' . '/webkernel/components/src/Concerns/HasSuffix.php',
-        'Webkernel\\Platform\\Components\\Concerns\\HasSuffixIcon' => __DIR__ . '/..' . '/webkernel/components/src/Concerns/HasSuffixIcon.php',
-        'Webkernel\\Platform\\Components\\Concerns\\HasVerticalAlignment' => __DIR__ . '/..' . '/webkernel/components/src/Concerns/HasVerticalAlignment.php',
-        'Webkernel\\Platform\\Components\\Counter' => __DIR__ . '/..' . '/webkernel/components/src/Counter.php',
-        'Webkernel\\Platform\\Components\\Dropdown' => __DIR__ . '/..' . '/webkernel/components/src/Dropdown.php',
-        'Webkernel\\Platform\\Components\\EmptyState' => __DIR__ . '/..' . '/webkernel/components/src/EmptyState.php',
-        'Webkernel\\Platform\\Components\\Enums\\Alignment' => __DIR__ . '/..' . '/webkernel/components/src/Enums/Alignment.php',
-        'Webkernel\\Platform\\Components\\Enums\\IconPosition' => __DIR__ . '/..' . '/webkernel/components/src/Enums/IconPosition.php',
-        'Webkernel\\Platform\\Components\\Enums\\Size' => __DIR__ . '/..' . '/webkernel/components/src/Enums/Size.php',
-        'Webkernel\\Platform\\Components\\Enums\\VerticalAlignment' => __DIR__ . '/..' . '/webkernel/components/src/Enums/VerticalAlignment.php',
-        'Webkernel\\Platform\\Components\\Icon' => __DIR__ . '/..' . '/webkernel/components/src/Icon.php',
-        'Webkernel\\Platform\\Components\\Input' => __DIR__ . '/..' . '/webkernel/components/src/Input.php',
-        'Webkernel\\Platform\\Components\\InputWrapper' => __DIR__ . '/..' . '/webkernel/components/src/InputWrapper.php',
-        'Webkernel\\Platform\\Components\\Link' => __DIR__ . '/..' . '/webkernel/components/src/Link.php',
-        'Webkernel\\Platform\\Components\\LoadingIndicator' => __DIR__ . '/..' . '/webkernel/components/src/LoadingIndicator.php',
-        'Webkernel\\Platform\\Components\\Modal' => __DIR__ . '/..' . '/webkernel/components/src/Modal.php',
-        'Webkernel\\Platform\\Components\\Pagination' => __DIR__ . '/..' . '/webkernel/components/src/Pagination.php',
-        'Webkernel\\Platform\\Components\\Providers\\ComponentsProvider' => __DIR__ . '/..' . '/webkernel/components/src/Providers/ComponentsProvider.php',
-        'Webkernel\\Platform\\Components\\Section' => __DIR__ . '/..' . '/webkernel/components/src/Section.php',
-        'Webkernel\\Platform\\Components\\Select' => __DIR__ . '/..' . '/webkernel/components/src/Select.php',
-        'Webkernel\\Platform\\Components\\Tab' => __DIR__ . '/..' . '/webkernel/components/src/Tab.php',
-        'Webkernel\\Platform\\Components\\Tabs' => __DIR__ . '/..' . '/webkernel/components/src/Tabs.php',
-        'Webkernel\\Platform\\Components\\TabsItem' => __DIR__ . '/..' . '/webkernel/components/src/TabsItem.php',
-        'Webkernel\\Platform\\Components\\TabsPanel' => __DIR__ . '/..' . '/webkernel/components/src/TabsPanel.php',
-        'Webkernel\\Platform\\Components\\Tests\\Feature\\AtomsTest' => __DIR__ . '/../../../..' . '/x-webkernel/platform/components/tests/Feature/AtomsTest.php',
-        'Webkernel\\Platform\\Components\\Tests\\Feature\\ButtonTest' => __DIR__ . '/../../../..' . '/x-webkernel/platform/components/tests/Feature/ButtonTest.php',
-        'Webkernel\\Platform\\Components\\Tests\\Feature\\LayoutTest' => __DIR__ . '/../../../..' . '/x-webkernel/platform/components/tests/Feature/LayoutTest.php',
-        'Webkernel\\Platform\\Components\\Tests\\Feature\\TabsTest' => __DIR__ . '/../../../..' . '/x-webkernel/platform/components/tests/Feature/TabsTest.php',
-        'Webkernel\\Platform\\Components\\TextInput' => __DIR__ . '/..' . '/webkernel/components/src/TextInput.php',
-        'Webkernel\\Platform\\Components\\Textarea' => __DIR__ . '/..' . '/webkernel/components/src/Textarea.php',
-        'Webkernel\\Platform\\Components\\Wizard' => __DIR__ . '/..' . '/webkernel/components/src/Wizard.php',
-        'Webkernel\\Platform\\Components\\WizardStep' => __DIR__ . '/..' . '/webkernel/components/src/WizardStep.php',
         'Webkernel\\Platform\\Css' => __DIR__ . '/..' . '/webkernel/codebase/src/Platform/Css.php',
         'Webkernel\\Platform\\GeneratedFileHeader' => __DIR__ . '/..' . '/webkernel/codebase/src/Platform/GeneratedFileHeader.php',
-        'Webkernel\\Platform\\Http\\Middleware\\Authenticate' => __DIR__ . '/..' . '/webkernel/panels/src/Http/Middleware/Authenticate.php',
         'Webkernel\\Platform\\Js' => __DIR__ . '/..' . '/webkernel/codebase/src/Platform/Js.php',
-        'Webkernel\\Platform\\Notification' => __DIR__ . '/..' . '/webkernel/panels/src/Notification.php',
-        'Webkernel\\Platform\\Pages\\Dashboard' => __DIR__ . '/..' . '/webkernel/panels/src/Pages/Dashboard.php',
-        'Webkernel\\Platform\\Pages\\ManagePanel' => __DIR__ . '/..' . '/webkernel/panels/src/Pages/ManagePanel.php',
-        'Webkernel\\Platform\\Pages\\Page' => __DIR__ . '/..' . '/webkernel/panels/src/Pages/Page.php',
-        'Webkernel\\Platform\\Pages\\PanelHome' => __DIR__ . '/..' . '/webkernel/panels/src/Pages/PanelHome.php',
-        'Webkernel\\Platform\\Panel' => __DIR__ . '/..' . '/webkernel/panels/src/Panel.php',
-        'Webkernel\\Platform\\PanelProvider' => __DIR__ . '/..' . '/webkernel/panels/src/PanelProvider.php',
-        'Webkernel\\Platform\\Panel\\Concerns\\HasPanelSidebar' => __DIR__ . '/..' . '/webkernel/panels/src/Panel/Concerns/HasPanelSidebar.php',
-        'Webkernel\\Platform\\Panel\\Concerns\\HasSidebar' => __DIR__ . '/..' . '/webkernel/panels/src/Panel/Concerns/HasSidebar.php',
-        'Webkernel\\Platform\\Panel\\Concerns\\HasTopbar' => __DIR__ . '/..' . '/webkernel/panels/src/Panel/Concerns/HasTopbar.php',
-        'Webkernel\\Platform\\PanelsProvider' => __DIR__ . '/..' . '/webkernel/panels/src/PanelsProvider.php',
-        'Webkernel\\Platform\\Resources\\Resource' => __DIR__ . '/..' . '/webkernel/panels/src/Resources/Resource.php',
-        'Webkernel\\Platform\\Schemas\\Enums\\SchemaMode' => __DIR__ . '/..' . '/webkernel/schemas/src/Enums/SchemaMode.php',
-        'Webkernel\\Platform\\Schemas\\Fieldset' => __DIR__ . '/..' . '/webkernel/schemas/src/Fieldset.php',
-        'Webkernel\\Platform\\Schemas\\Flex' => __DIR__ . '/..' . '/webkernel/schemas/src/Flex.php',
-        'Webkernel\\Platform\\Schemas\\Grid' => __DIR__ . '/..' . '/webkernel/schemas/src/Grid.php',
-        'Webkernel\\Platform\\Schemas\\LayoutComponent' => __DIR__ . '/..' . '/webkernel/schemas/src/LayoutComponent.php',
-        'Webkernel\\Platform\\Schemas\\Schema' => __DIR__ . '/..' . '/webkernel/schemas/src/Schema.php',
-        'Webkernel\\Platform\\Schemas\\Tests\\Feature\\SchemaTest' => __DIR__ . '/../../../..' . '/x-webkernel/platform/schemas/tests/Feature/SchemaTest.php',
-        'Webkernel\\Platform\\Tables\\Table' => __DIR__ . '/..' . '/webkernel/panels/src/Tables/Table.php',
-        'Webkernel\\Platform\\Tests\\Feature\\PanelProviderTest' => __DIR__ . '/../../../..' . '/x-webkernel/platform/panels/tests/Feature/PanelProviderTest.php',
         'Webkernel\\Route\\Action\\RedirectAction' => __DIR__ . '/..' . '/webkernel/codebase/src/Route/Action/RedirectAction.php',
         'Webkernel\\Route\\Action\\ViewAction' => __DIR__ . '/..' . '/webkernel/codebase/src/Route/Action/ViewAction.php',
         'Webkernel\\Route\\Binding' => __DIR__ . '/..' . '/webkernel/codebase/src/Route/Binding.php',
@@ -2122,16 +1925,6 @@ class ComposerStaticInitcc6f492cc5d64cb7f09b9024726d6929
         'Webkernel\\System\\Pages\\Dashboard' => __DIR__ . '/..' . '/webkernel/system/src/Pages/Dashboard.php',
         'Webkernel\\System\\SystemPanelProvider' => __DIR__ . '/..' . '/webkernel/system/src/SystemPanelProvider.php',
         'Webkernel\\System\\SystemProvider' => __DIR__ . '/..' . '/webkernel/system/src/SystemProvider.php',
-        'Webkernel\\Tests\\Feature\\AttributeBagTest' => __DIR__ . '/../../../..' . '/x-webkernel/codebase/tests/Feature/AttributeBagTest.php',
-        'Webkernel\\Tests\\Feature\\AttributionTest' => __DIR__ . '/../../../..' . '/x-webkernel/codebase/tests/Feature/AttributionTest.php',
-        'Webkernel\\Tests\\Feature\\CompilerTest' => __DIR__ . '/../../../..' . '/x-webkernel/codebase/tests/Feature/CompilerTest.php',
-        'Webkernel\\Tests\\Feature\\ConfigTest' => __DIR__ . '/../../../..' . '/x-webkernel/codebase/tests/Feature/ConfigTest.php',
-        'Webkernel\\Tests\\Feature\\HttpTest' => __DIR__ . '/../../../..' . '/x-webkernel/codebase/tests/Feature/HttpTest.php',
-        'Webkernel\\Tests\\Feature\\IncludeClockTest' => __DIR__ . '/../../../..' . '/x-webkernel/codebase/tests/Feature/IncludeClockTest.php',
-        'Webkernel\\Tests\\Feature\\MailTest' => __DIR__ . '/../../../..' . '/x-webkernel/codebase/tests/Feature/MailTest.php',
-        'Webkernel\\Tests\\Feature\\PanelViewTest' => __DIR__ . '/../../../..' . '/x-webkernel/codebase/tests/Feature/PanelViewTest.php',
-        'Webkernel\\Tests\\Feature\\RouteCacheTest' => __DIR__ . '/../../../..' . '/x-webkernel/codebase/tests/Feature/RouteCacheTest.php',
-        'Webkernel\\Tests\\Feature\\TypographyTest' => __DIR__ . '/../../../..' . '/x-webkernel/codebase/tests/Feature/TypographyTest.php',
         'Webkernel\\Typography\\TypographySystem' => __DIR__ . '/..' . '/webkernel/codebase/src/Typography/TypographySystem.php',
         'Webkernel\\View\\AttributeBag' => __DIR__ . '/..' . '/webkernel/codebase/src/View/AttributeBag.php',
         'Webkernel\\View\\Compile\\Comments' => __DIR__ . '/..' . '/webkernel/codebase/src/View/Compile/Comments.php',
