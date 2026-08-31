@@ -5,7 +5,7 @@
 //> For the full copyright and license information, please view the LICENSE
 //> file that was distributed with this source code.
 
-namespace Webkernel\Liveview\Concerns;
+namespace Webkernel\Component\Concerns;
 
 /**
  * Trait for managing component props.
@@ -30,19 +30,7 @@ trait HasProps
     }
 
     /**
-     * Get a prop value.
-     *
-     * @param string $key
-     * @param mixed $default
-     * @return mixed
-     */
-    public function get_prop(string $key, mixed $default = null): mixed
-    {
-        return $this->props[$key] ?? $default;
-    }
-
-    /**
-     * Set a prop value.
+     * Set a single prop value.
      *
      * @param string $key
      * @param mixed $value
@@ -55,11 +43,33 @@ trait HasProps
     }
 
     /**
+     * Get a prop value.
+     *
+     * @param string $key
+     * @param mixed $default
+     * @return mixed
+     */
+    public function get_prop(string $key, mixed $default = null): mixed
+    {
+        return $this->props[$key] ?? $default;
+    }
+
+    /**
      * Get all props.
      *
      * @return array<string, mixed>
      */
     public function get_props(): array
+    {
+        return $this->props;
+    }
+
+    /**
+     * Get props as array for view.
+     *
+     * @return array<string, mixed>
+     */
+    protected function props_to_array(): array
     {
         return $this->props;
     }

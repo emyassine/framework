@@ -37,6 +37,9 @@
     </div>
   </div>
   <button type="button" class="w-icon-btn w-no-notification-close-btn" data-w-notification-close aria-label="Close" title="Close">
-    <?php  $this->start_component('webkernel::icon',['name'=>'x']); ?><?php echo $this->render_component(); ?>
+    <span class="w-icon"><svg class="w-icon-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M18 6 6 18"/>
+  <path d="m6 6 12 12"/>
+</svg></span>
   </button>
 </div>

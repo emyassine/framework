@@ -5,19 +5,20 @@
 //> For the full copyright and license information, please view the LICENSE
 //> file that was distributed with this source code.
 
-namespace Webkernel\Liveview;
+namespace Webkernel\Component;
 
-use Webkernel\View\View;
+use Webkernel\Liveview\Liveview;
+use Webkernel\Liveview\ResponseHelper;
 
 /**
- * Base class for Liveview components (HTMX-powered reactive components).
+ * Base class for reactive Liveview components.
  *
- * //> Inspired by Laravel Livewire and Yoyo. Components can handle requests,
- * //> maintain state, and return HTML that can be swapped via HTMX.
+ * //> Reactive components maintain state and handle HTMX requests.
+ * //> Used for: Counter, Form, Wizard, etc.
+ * //> Extends Component with state management, hydration, and HTMX helpers.
  */
-abstract class Component
+abstract class ReactiveComponent extends Component
 {
-    use Concerns\HasProps;
     use Concerns\HasActions;
     use Concerns\HasLifecycleHooks;
 
@@ -25,11 +26,6 @@ abstract class Component
      * The component's unique ID.
      */
     public string $id;
-
-    /**
-     * @var array<string, mixed>
-     */
-    protected array $query = [];
 
     /**
      * @var array<string, mixed>
@@ -42,7 +38,7 @@ abstract class Component
     public function __construct()
     {
         $this->id = $this->generate_id();
-        $this->boot();
+        parent::__construct();
     }
 
     /**
@@ -52,37 +48,7 @@ abstract class Component
      */
     protected function generate_id(): string
     {
-        return 'lw-'.bin2hex(random_bytes(8));
-    }
-
-    /**
-     * Boot the component. Override this to set up initial state.
-     *
-     * @return void
-     */
-    protected function boot(): void
-    {
-        // Override in child classes
-    }
-
-    /**
-     * The view to render for this component.
-     *
-     * @return string
-     */
-    abstract public function view(): string;
-
-    /**
-     * Render the component to HTML.
-     *
-     * @param array<string, mixed> $extra_data
-     * @return string
-     */
-    public function render(array $extra_data = []): string
-    {
-        $data = array_merge($this->all(), $extra_data);
-
-        return View::make($this->view(), $data)->html();
+        return 'liveview-'.bin2hex(random_bytes(8));
     }
 
     /**
@@ -90,11 +56,12 @@ abstract class Component
      *
      * @return array<string, mixed>
      */
-    public function all(): array
+    public function to_props(): array
     {
         return array_merge([
             'id' => $this->id,
-        ], $this->props, $this->state);
+            'name' => $this->name,
+        ], parent::get_props(), $this->state);
     }
 
     /**
@@ -106,10 +73,14 @@ abstract class Component
      */
     public function handle(string $action, array $params = []): string
     {
+        $this->before_action($action, $params);
+
         // Call the action if it exists
         if (method_exists($this, $action)) {
             $this->$action(...$params);
         }
+
+        $this->after_action($action, $params);
 
         // Return the rendered component
         return $this->render();
@@ -123,9 +94,13 @@ abstract class Component
      */
     public function hydrate(array $data): static
     {
+        $this->on_hydrate($data);
+
         foreach ($data as $key => $value) {
             if (property_exists($this, $key)) {
                 $this->$key = $value;
+            } else {
+                $this->state[$key] = $value;
             }
         }
 
@@ -139,7 +114,9 @@ abstract class Component
      */
     public function dehydrate(): array
     {
-        return $this->all();
+        $this->on_dehydrate();
+
+        return $this->to_props();
     }
 
     /**
@@ -165,6 +142,18 @@ abstract class Component
     }
 
     /**
+     * Emit an event without sending (for batching).
+     *
+     * @param string $event
+     * @param mixed $data
+     * @return ResponseHelper
+     */
+    public function with_emit(string $event, mixed $data = null): ResponseHelper
+    {
+        return Liveview::response()->trigger($event, $data);
+    }
+
+    /**
      * Redirect to a URL.
      *
      * @param string $url
@@ -186,6 +175,16 @@ abstract class Component
     }
 
     /**
+     * Get the ResponseHelper for building custom responses.
+     *
+     * @return ResponseHelper
+     */
+    public function response(): ResponseHelper
+    {
+        return Liveview::response();
+    }
+
+    /**
      * Magic method to handle property access.
      *
      * @param string $name
@@ -198,17 +197,8 @@ abstract class Component
             return $this->state[$name];
         }
 
-        // Check props
-        if (isset($this->props[$name])) {
-            return $this->props[$name];
-        }
-
-        // Check query params
-        if (isset($this->query[$name])) {
-            return $this->query[$name];
-        }
-
-        throw new \RuntimeException("Property [{$name}] does not exist on component [".static::class."].");
+        // Check parent props
+        return parent::get_prop($name);
     }
 
     /**
@@ -232,8 +222,6 @@ abstract class Component
      */
     public function __isset(string $name): bool
     {
-        return isset($this->state[$name])
-            || isset($this->props[$name])
-            || isset($this->query[$name]);
+        return isset($this->state[$name]) || parent::__isset($name);
     }
 }

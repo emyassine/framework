@@ -5,7 +5,7 @@
 //> For the full copyright and license information, please view the LICENSE
 //> file that was distributed with this source code.
 
-namespace Webkernel\Liveview\Concerns;
+namespace Webkernel\Component\Concerns;
 
 /**
  * Trait for managing component actions.
@@ -37,7 +37,7 @@ trait HasActions
     public function reset(): static
     {
         foreach (get_object_vars($this) as $key => $value) {
-            if ($key !== 'id' && !str_starts_with($key, 'props')) {
+            if ($key !== 'id' && $key !== 'name' && !str_starts_with($key, 'props')) {
                 unset($this->$key);
             }
         }
@@ -53,7 +53,7 @@ trait HasActions
      */
     public function reset_property(string $property): static
     {
-        if (property_exists($this, $property) && $property !== 'id') {
+        if (property_exists($this, $property) && $property !== 'id' && $property !== 'name') {
             unset($this->$property);
         }
 

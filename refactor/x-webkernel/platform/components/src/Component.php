@@ -7,33 +7,28 @@
 
 namespace Webkernel\Platform\Components;
 
+use Webkernel\Component\Component as BaseComponent;
 use Webkernel\Platform\Components\Concerns\HasLayout;
 use Webkernel\Platform\Components\Concerns\HasMethodMake;
-use Webkernel\View\AttributeBag;
-use Webkernel\View\View;
 
 /**
  * Dual-use UI atom: View plus a dumpable PHP declaration.
  *
  * //> `<x-webkernel::{name}>` and `::make()` render the same `.view.php`.
+ * //> This extends the base Component with platform-specific features (layout, make).
  *
  * @mixin HasMethodMake
  * @mixin HasLayout
  *
  * @method static static make(string $name = '')
  */
-abstract class Component
+abstract class Component extends BaseComponent
 {
     use HasLayout;
     use HasMethodMake;
 
-    protected string $name = '';
-
-    /** @var array<string, mixed> */
-    protected array $props = [];
-
     /**
-     * @param $label string
+     * @param string $label
      *
      * @return static
      */
@@ -45,33 +40,9 @@ abstract class Component
     }
 
     /**
-     * @return string
-     */
-    abstract public function view(): string;
-
-    /**
-     * @return array<string, mixed>
-     */
-    public function to_props(): array
-    {
-        return \array_merge(['name' => $this->name], $this->props);
-    }
-
-    /**
-     * @return array{component: class-string, view: string, props: array<string, mixed>}
-     */
-    public function to_array(): array
-    {
-        return [
-            'component' => static::class,
-            'view' => $this->view(),
-            'props' => $this->to_props(),
-        ];
-    }
-
-    /**
-     * @param $html string
+     * Set a slot content.
      *
+     * @param string $html
      * @return static
      */
     public function slot(string $html): static
@@ -82,24 +53,16 @@ abstract class Component
     }
 
     /**
-     * @param $extra array<string, mixed>
+     * Get the component declaration for dumping.
      *
-     * @return string
+     * @return array{component: class-string, view: string, props: array<string, mixed>}
      */
-    public function render(array $extra = []): string
+    public function to_array(): array
     {
-        $data = \array_merge($this->to_props(), $extra);
-        if (! \array_key_exists('slot', $data)) {
-            $data['slot'] = '';
-        }
-        if (! isset($data['attributes']) || ! $data['attributes'] instanceof AttributeBag) {
-            $bag = $this->extra_attribute_bag();
-            if (isset($extra['class']) && \is_string($extra['class']) && $extra['class'] !== '') {
-                $bag['class'] = \trim((string) ($bag['class'] ?? '').' '.$extra['class']);
-            }
-            $data['attributes'] = new AttributeBag($bag);
-        }
-
-        return View::make($this->view(), $data)->html();
+        return [
+            'component' => static::class,
+            'view' => $this->view(),
+            'props' => $this->to_props(),
+        ];
     }
 }
