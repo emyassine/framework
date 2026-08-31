@@ -23,9 +23,6 @@
       "composer/installers": true,
       "php-http/discovery": true,
       "webkernel/lifecycle": true
-    },
-    "platform": {
-      "php": ">=8.5"
     }
   },
   "repositories": [
