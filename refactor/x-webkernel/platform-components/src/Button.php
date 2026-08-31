@@ -1,0 +1,181 @@
+<?php declare(strict_types=1);
+//> This file is part of Webkernel.
+//> (c) 2025 - 2027 Numerimondes, El Moumen Yassine
+//> Yassine El Moumen <yassine@numerimondes.com> | <platform@webkernelphp.com>
+//> For the full copyright and license information, please view the LICENSE
+//> file that was distributed with this source code.
+
+namespace Webkernel\Platform\Components;
+
+use Webkernel\Component\StaticComponent;
+use Webkernel\Platform\Components\Concerns\HasIcon;
+use Webkernel\Platform\Components\Concerns\HasIconPosition;
+use Webkernel\Platform\Components\Concerns\HasSize;
+use Webkernel\Platform\Components\Concerns\HasMethodMake;
+
+/**
+ * Clickable button or anchor. Same view for the tag and `Button::make()`.
+ */
+final class Button extends StaticComponent
+{
+    use HasMethodMake;
+
+    use HasIcon;
+    use HasIconPosition;
+    use HasSize;
+
+    /**
+     * @return string
+     */
+    public function view(): string
+    {
+        return 'webkernel::button';
+    }
+
+    /**
+     * @param $type string
+     *
+     * @return static
+     */
+    public function type(string $type): static
+    {
+        $this->props['type'] = $type;
+
+        return $this;
+    }
+
+    /**
+     * @param $tag 'button'|'a'
+     *
+     * @return static
+     */
+    public function tag(string $tag): static
+    {
+        $this->props['tag'] = $tag;
+
+        return $this;
+    }
+
+    /**
+     * @param $href string
+     *
+     * @return static
+     */
+    public function href(string $href): static
+    {
+        $this->props['href'] = $href;
+        $this->props['tag'] = 'a';
+
+        return $this;
+    }
+
+    /**
+     * @param $target string
+     *
+     * @return static
+     */
+    public function target(string $target): static
+    {
+        $this->props['target'] = $target;
+
+        return $this;
+    }
+
+    /**
+     * @param $color string
+     *
+     * @return static
+     */
+    public function color(string $color): static
+    {
+        $this->props['color'] = $color;
+
+        return $this;
+    }
+
+    /**
+     * @param $outlined bool
+     *
+     * @return static
+     */
+    public function outlined(bool $outlined = true): static
+    {
+        $this->props['outlined'] = $outlined;
+
+        return $this;
+    }
+
+    /**
+     * @param $ghost bool
+     *
+     * @return static
+     */
+    public function ghost(bool $ghost = true): static
+    {
+        $this->props['ghost'] = $ghost;
+
+        return $this;
+    }
+
+    /**
+     * @param $tooltip string
+     * @param $placement string
+     *
+     * @return static
+     */
+    public function tooltip(string $tooltip, string $placement = 'top'): static
+    {
+        $this->props['tooltip'] = $tooltip;
+        $this->props['tooltip_placement'] = $placement;
+
+        return $this;
+    }
+
+    /**
+     * @param $disabled bool
+     *
+     * @return static
+     */
+    public function disabled(bool $disabled = true): static
+    {
+        $this->props['disabled'] = $disabled;
+
+        return $this;
+    }
+
+    /**
+     * @param $badge string
+     *
+     * @return static
+     */
+    public function badge(string $badge): static
+    {
+        $this->props['badge'] = $badge;
+
+        return $this;
+    }
+
+    /**
+     * @param $color string
+     *
+     * @return static
+     */
+    public function badge_color(string $color): static
+    {
+        $this->props['badge_color'] = $color;
+
+        return $this;
+    }
+
+    /**
+     * @param $form string
+     *
+     * @return static
+     */
+    public function form(string $form): static
+    {
+        $this->props['form'] = $form;
+
+        return $this;
+    }
+}

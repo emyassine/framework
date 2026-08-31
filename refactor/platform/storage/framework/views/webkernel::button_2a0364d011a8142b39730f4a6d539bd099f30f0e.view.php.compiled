@@ -21,8 +21,8 @@
 ]; foreach ($__props as $__n => $__d) { if (!isset($$__n)) { $$__n = $__d; } } $attributes = (isset($attributes) && $attributes instanceof \Webkernel\View\AttributeBag ? $attributes : new \Webkernel\View\AttributeBag([]))->except(\array_keys($__props)); unset($__props, $__n, $__d); ?>
 <?php 
   $tag = $tag === 'a' || ($href !== null && $href !== '') ? 'a' : 'button';
-  $size = $size instanceof \Webkernel\Platform\Components\Size ? $size->value : (string) $size;
-  $icon_position = $icon_position instanceof \Webkernel\Platform\Components\IconPosition
+  $size = $size instanceof \Webkernel\Platform\Components\Enums\Size ? $size->value : (string) $size;
+  $icon_position = $icon_position instanceof \Webkernel\Platform\Components\Enums\IconPosition
       ? $icon_position->value
       : (string) $icon_position;
   $attributes = $attributes ?? new \Webkernel\View\AttributeBag([]);

@@ -284,6 +284,11 @@ Not: `/** Use this to send HTMX-specific headers from your components. */`
 | `refactor/x-webkernel/system` | `webkernel/system` | System admin panel and its resources |
 | `refactor/x-webkernel/platform` | `webkernel/platform` | Metapackage only |
 | `refactor/x-webkernel/platform/components` | `webkernel/components` | UI atoms |
+| `refactor/x-webkernel/platform/actions` | `webkernel/actions` | Action, ActionGroup, modals, CRUD actions |
+| `refactor/x-webkernel/platform/forms` | `webkernel/forms` | Form fields on schemas |
+| `refactor/x-webkernel/platform/tables` | `webkernel/tables` | List columns, filters, bulk actions |
+| `refactor/x-webkernel/platform/widgets` | `webkernel/widgets` | Dashboard and page widgets |
+| `refactor/x-webkernel/platform/notifications` | `webkernel/notifications` | Flash and in-app notifications |
 | `refactor/x-webkernel/platform/i18n` | `webkernel/i18n` | Locale, catalog, translations |
 | `refactor/x-webkernel/platform/imagery` | `webkernel/imagery` | Icons, brands, pixmaps |
 | `refactor/x-webkernel/platform/panels` | `webkernel/panels` | Panel, Resource, Page, Table, Wds. Not System. |

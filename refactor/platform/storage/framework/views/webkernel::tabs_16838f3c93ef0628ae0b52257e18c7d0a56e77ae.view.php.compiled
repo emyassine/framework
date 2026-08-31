@@ -47,11 +47,7 @@
       <div class="w-dropdown w-tabs-overflow" data-w-dropdown data-w-tabs-overflow hidden>
         <div class="w-dropdown-trigger" data-w-dropdown-trigger>
           <button type="button" class="w-tabs-item" data-w-tabs-more role="tab" aria-selected="false">
-            <span class="w-tabs-item-label"><span class="w-icon"><svg class="w-icon-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-  <circle cx="12" cy="12" r="1"/>
-  <circle cx="19" cy="12" r="1"/>
-  <circle cx="5" cy="12" r="1"/>
-</svg></span></span>
+            <span class="w-tabs-item-label"><?php  $this->start_component('webkernel::icon',['name'=>'ellipsis']); ?><?php echo $this->render_component(); ?></span>
           </button>
         </div>
         <div class="w-dropdown-panel" data-w-dropdown-panel>

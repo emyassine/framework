@@ -41,6 +41,10 @@ use Webkernel\Config\ConfigWriter;
     private string $webapp_path;
     private string $config_path;
 
+    // versionning
+
+    public function version(): string { return '0.12.0'; return $this;}
+
     // Entry point (fluent so callers can chain if needed) -------------------
 
     public function fast_boot(string $webapp_path): static
