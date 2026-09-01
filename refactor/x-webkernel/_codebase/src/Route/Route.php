@@ -526,7 +526,16 @@ final class Route implements ComposableContract
         $rows = [];
         foreach ($this->bindings as $binding) {
             $methods = $binding->methods();
-            $order = ['GET' => 0, 'HEAD' => 1, 'QUERY' => 2, 'POST' => 3, 'PUT' => 4, 'PATCH' => 5, 'DELETE' => 6, 'OPTIONS' => 7];
+            $order = [
+            	'GET' => 0,
+            	'HEAD' => 1,
+            	'QUERY' => 2,
+            	'POST' => 3,
+            	'PUT' => 4,
+            	'PATCH' => 5,
+            	'DELETE' => 6,
+            	'OPTIONS' => 7
+            ];
             usort($methods, static fn (string $a, string $b): int => ($order[$a] ?? 99) <=> ($order[$b] ?? 99));
             $rows[] = [
                 'methods' => $methods,

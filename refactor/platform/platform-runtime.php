@@ -19,7 +19,7 @@ return array (
     'system' => 
     array (
       'logo' => '',
-      'logo_shape' => 'round',
+      'logo_shape' => 'favicon',
       'name' => 'System',
       'favicon' => '',
       'og_image' => '',
@@ -53,15 +53,15 @@ return array (
       'header_css' => '',
       'footer_js' => '',
       'session_timeout' => '120',
-      'rtl' => '1',
-      'maintenance' => '1',
+      'rtl' => '0',
+      'maintenance' => '0',
       'i18n' => 
       array (
         'en' => 
         array (
           'site_title' => '',
-          'meta_description' => '',
-          'keywords' => '',
+          'meta_description' => 'dsd',
+          'keywords' => 'dsds',
         ),
         'es' => 
         array (
