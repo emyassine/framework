@@ -7,7 +7,12 @@
 
 namespace Webkernel\Route;
 
+use Psr\Http\Message\ServerRequestInterface;
+
 use Webkernel\Composables\ComposableContract;
+
+use Webkernel\Request;
+
 use Webkernel\Route\Action\RedirectAction;
 use Webkernel\Route\Action\ViewAction;
 use Webkernel\Route\Compile\Cache;
@@ -252,9 +257,14 @@ final class Route implements ComposableContract
         }
     }
 
-    public static function dispatch(\Psr\Http\Message\ServerRequestInterface|string|null $method = null, ?string $uri = null, ?string $host = null): mixed
+    public static function dispatch(
+    	ServerRequestInterface|Request|string|null $method = null, ?string $uri = null, ?string $host = null
+    ): mixed
     {
-        if ($method instanceof \Psr\Http\Message\ServerRequestInterface) {
+        if ($method instanceof \Webkernel\Request) {
+            return self::dispatch($method->method(), $method->path(), $method->host());
+        }
+        if ($method instanceof ServerRequestInterface) {
             $request = $method;
 
             return self::dispatch($request->getMethod(), $request->getUri()->getPath(), $request->getUri()->getHost());

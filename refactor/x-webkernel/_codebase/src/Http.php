@@ -9,6 +9,7 @@ namespace Webkernel;
 
 use Webkernel\Config\Config;
 use Webkernel\Route\Route;
+use Webkernel\Request as HttpRequest;
 
 /**
  * HTTP door. Autoload is already done by fast-boot.php.
@@ -25,14 +26,19 @@ final class Http
             \Webkernel\I18n\I18nContext::flush();
         }
         self::maybe_compress();
-        $out = Route::dispatch();
-        if ($out instanceof \Stringable || \is_scalar($out) || $out === null) {
-            echo (string) $out;
+        HttpRequest::capture();
+        try {
+            $out = Route::dispatch(HttpRequest::current());
+            if ($out instanceof \Stringable || \is_scalar($out) || $out === null) {
+                echo (string) $out;
 
-            return;
+                return;
+            }
+
+            echo '';
+        } finally {
+            HttpRequest::flush();
         }
-
-        echo '';
     }
 
     /**
