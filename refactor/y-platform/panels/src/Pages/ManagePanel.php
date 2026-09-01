@@ -197,7 +197,7 @@ final class ManagePanel extends Page
                 ->state($values)
                 ->errors($this->errors)
                 ->hidden(['edit_locale' => $edit_locale])
-                ->footer_actions($this->get_footer_actions()),
+                ->header_actions($this->get_footer_actions()),
         ];
     }
 
