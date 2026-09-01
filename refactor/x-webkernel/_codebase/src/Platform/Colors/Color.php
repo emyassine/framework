@@ -476,7 +476,8 @@ final class Color
      */
     public static function dark_root_css(): string
     {
-        return self::inverted_alias('gray', 'zinc');
+    	return '';
+        //return self::inverted_alias('gray', 'zinc');
     }
 
     /**
@@ -582,7 +583,7 @@ final class Color
         ];
         $css = '';
         foreach ($invert as $stop => $from) {
-            $css .= '--'.$alias.'-'.$stop.': var(--color-'.$palette.'-'.$from.');'."\n";
+            $css .= ' --'.$alias.'-'.$stop.': var(--color-'.$palette.'-'.$from.');'."\n";
         }
 
         return $css;

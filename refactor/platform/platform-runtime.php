@@ -59,9 +59,9 @@ return array (
       array (
         'en' => 
         array (
-          'site_title' => 'dsds',
+          'site_title' => 'ds',
           'meta_description' => '',
-          'keywords' => 'zzz d dsdsd d ds zzzz',
+          'keywords' => 'ds zzz d dsdsd d ds zzzz ds',
         ),
         'es' => 
         array (
