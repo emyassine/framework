@@ -59,7 +59,7 @@ return array (
       array (
         'en' => 
         array (
-          'site_title' => 'ds',
+          'site_title' => '',
           'meta_description' => '',
           'keywords' => 'ds zzz d dsdsd d ds zzzz ds',
         ),

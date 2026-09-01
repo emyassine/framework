@@ -7,8 +7,8 @@
 
 namespace Webkernel;
 
-use Webkernel\Console\Commands\DumpAutoloadCommand;
-use Webkernel\Console\Commands\ServerCommand;
+use Webkernel\Commands\DumpAutoloadCommand;
+use Webkernel\Commands\ServerCommand;
 
 final class CodebaseProvider extends PlatformProvider
 {

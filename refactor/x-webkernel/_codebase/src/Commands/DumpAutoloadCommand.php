@@ -5,10 +5,10 @@
 //> For the full copyright and license information, please view the LICENSE
 //> file that was distributed with this source code.
 
-namespace Webkernel\Console\Commands;
+namespace Webkernel\Commands;
 
 use Webkernel\Console\Attribute\ConsoleCommand;
-use Webkernel\Console\Commands\DumpAutoloadCommand\{
+use Webkernel\Commands\DumpAutoloadCommand\{
 	CanCompileRuntime, CanDumpAssets, CanDumpPanels,
 	CanDumpTypography, CanStampPlatform, CanWritePhp,
 	HasPackages, HasPaths, HasProviders, _DumpAutoloadCommand

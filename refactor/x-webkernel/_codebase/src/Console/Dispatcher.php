@@ -36,8 +36,6 @@ final class Dispatcher implements ComposableContract
 {
     /** @var list<class-string> */
     private const BUILTIN = [
-        DumpAutoloadCommand::class,
-        ServerCommand::class,
     ];
 
     /** @var array<string, CommandDef>|null */

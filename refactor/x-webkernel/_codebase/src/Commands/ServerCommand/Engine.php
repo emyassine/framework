@@ -5,7 +5,7 @@
 //> For the full copyright and license information, please view the LICENSE
 //> file that was distributed with this source code.
 
-namespace Webkernel\Console\Commands\ServerCommand;
+namespace Webkernel\Commands\ServerCommand;
 
 use Webkernel\Console\ExitCode;
 use Webkernel\Console\Terminal;
@@ -13,7 +13,7 @@ use Webkernel\Performance\Performance;
 use Webkernel\Performance\Status;
 
 /**
- * PHP built-in server process for {@see \Webkernel\Console\Commands\ServerCommand}.
+ * PHP built-in server process for {@see \Webkernel\Commands\ServerCommand}.
  *
  * @phpstan-type IncludeRow array{ms: float|null, run_ms: float|null, read_ms: float|null, path: string}
  * @phpstan-type RequestTimings array{

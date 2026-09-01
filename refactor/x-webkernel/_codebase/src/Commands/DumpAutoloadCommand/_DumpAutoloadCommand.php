@@ -5,7 +5,7 @@
 //> For the full copyright and license information, please view the LICENSE
 //> file that was distributed with this source code.
 
-namespace Webkernel\Console\Commands\DumpAutoloadCommand;
+namespace Webkernel\Commands\DumpAutoloadCommand;
 
 /**
  * Dump file names and panel class FQCNs. Used by every dump-autoload trait.
