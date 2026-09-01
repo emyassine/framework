@@ -7,6 +7,7 @@
 
 namespace Webkernel;
 
+use Webkernel\Request\Concerns\HasRequestState;
 use Webkernel\Request\Concerns\InteractsWithClient;
 use Webkernel\Request\Concerns\InteractsWithContentTypes;
 use Webkernel\Request\Concerns\InteractsWithHeaders;
@@ -22,6 +23,7 @@ use Webkernel\Request\TrustedProxies;
  */
 final class Request
 {
+    use HasRequestState;
     use InteractsWithClient;
     use InteractsWithContentTypes;
     use InteractsWithHeaders;

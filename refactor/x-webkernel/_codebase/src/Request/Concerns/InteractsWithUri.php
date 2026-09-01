@@ -11,9 +11,6 @@ namespace Webkernel\Request\Concerns;
  * URI and path helpers.
  *
  * @mixin HasRequestState
- *
- * @method string scheme()
- * @method string http_host()
  */
 trait InteractsWithUri
 {
@@ -76,7 +73,7 @@ trait InteractsWithUri
      */
     public function url(): string
     {
-        return \rtrim($this->scheme().'://'.$this->http_host().$this->path_info, '/');
+        return \rtrim($this->resolved_scheme().'://'.$this->resolved_http_host().$this->path_info, '/');
     }
 
     /**
@@ -109,7 +106,7 @@ trait InteractsWithUri
      */
     public function root(): string
     {
-        return \rtrim($this->scheme().'://'.$this->http_host(), '/');
+        return \rtrim($this->resolved_scheme().'://'.$this->resolved_http_host(), '/');
     }
 
     /**

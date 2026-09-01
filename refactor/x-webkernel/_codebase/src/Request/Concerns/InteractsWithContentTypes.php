@@ -11,8 +11,6 @@ namespace Webkernel\Request\Concerns;
  * Content negotiation helpers.
  *
  * @mixin HasRequestState
- *
- * @method string header(string $name, string $default = '')
  */
 trait InteractsWithContentTypes
 {
@@ -21,7 +19,7 @@ trait InteractsWithContentTypes
      */
     public function is_json(): bool
     {
-        return \str_contains($this->header('Content-Type'), 'application/json');
+        return $this->body_is_json();
     }
 
     /**
@@ -29,7 +27,7 @@ trait InteractsWithContentTypes
      */
     public function wants_json(): bool
     {
-        $accept = $this->header('Accept');
+        $accept = $this->normalized_header('Accept');
         if ($accept === '') {
             return false;
         }
@@ -42,7 +40,7 @@ trait InteractsWithContentTypes
      */
     public function ajax(): bool
     {
-        return \strcasecmp($this->header('X-Requested-With'), 'XMLHttpRequest') === 0;
+        return \strcasecmp($this->normalized_header('X-Requested-With'), 'XMLHttpRequest') === 0;
     }
 
     /**
@@ -50,6 +48,6 @@ trait InteractsWithContentTypes
      */
     public function pjax(): bool
     {
-        return $this->header('X-PJAX') !== '';
+        return $this->normalized_header('X-PJAX') !== '';
     }
 }

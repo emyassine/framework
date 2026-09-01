@@ -21,12 +21,7 @@ trait InteractsWithHeaders
      */
     public function header(string $name, string $default = ''): string
     {
-        $key = \strtolower(\str_replace('_', '-', $name));
-        if (\str_starts_with($key, 'http-')) {
-            $key = \substr($key, 5);
-        }
-
-        return $this->headers[$key] ?? $default;
+        return $this->normalized_header($name, $default);
     }
 
     /**

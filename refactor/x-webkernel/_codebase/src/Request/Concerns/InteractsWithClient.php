@@ -11,8 +11,6 @@ namespace Webkernel\Request\Concerns;
  * Client connection metadata (host, scheme, IP).
  *
  * @mixin HasRequestState
- *
- * @method string header(string $name, string $default = '')
  */
 trait InteractsWithClient
 {
@@ -21,12 +19,7 @@ trait InteractsWithClient
      */
     public function is_secure(): bool
     {
-        $https = (string) ($this->server['HTTPS'] ?? '');
-        if ($https === 'on' || $https === '1') {
-            return true;
-        }
-
-        return $this->header('X-Forwarded-Proto') === 'https';
+        return $this->resolved_is_secure();
     }
 
     /**
@@ -34,7 +27,7 @@ trait InteractsWithClient
      */
     public function scheme(): string
     {
-        return $this->is_secure() ? 'https' : 'http';
+        return $this->resolved_scheme();
     }
 
     /**
@@ -42,12 +35,7 @@ trait InteractsWithClient
      */
     public function host(): string
     {
-        $host = (string) ($this->server['HTTP_HOST'] ?? $this->server['SERVER_NAME'] ?? 'localhost');
-        if (\str_contains($host, ':')) {
-            $host = \explode(':', $host, 2)[0];
-        }
-
-        return $host;
+        return $this->resolved_host_without_port();
     }
 
     /**
@@ -55,7 +43,7 @@ trait InteractsWithClient
      */
     public function http_host(): string
     {
-        return (string) ($this->server['HTTP_HOST'] ?? $this->host());
+        return $this->resolved_http_host();
     }
 
     /**
@@ -97,9 +85,9 @@ trait InteractsWithClient
         if (! \Webkernel\Request::trusted_proxies()->is_trusted($remote)) {
             return [$remote];
         }
-        $forwarded = $this->header('X-Forwarded-For');
+        $forwarded = $this->normalized_header('X-Forwarded-For');
         if ($forwarded === '') {
-            $real = $this->header('X-Real-IP');
+            $real = $this->normalized_header('X-Real-IP');
             if ($real !== '') {
                 return [\trim($real)];
             }

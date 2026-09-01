@@ -11,9 +11,6 @@ namespace Webkernel\Request\Concerns;
  * Query string, body, cookie, and file input.
  *
  * @mixin HasRequestState
- *
- * @method bool is_json()
- * @method array<string, mixed> json(?string $key = null, mixed $default = null)
  */
 trait InteractsWithInput
 {
@@ -40,7 +37,7 @@ trait InteractsWithInput
      */
     public function input(?string $key = null, mixed $default = null): mixed
     {
-        $data = $this->is_json() ? $this->json() : $this->request;
+        $data = $this->body_is_json() ? $this->json() : $this->request;
         if ($key === null) {
             return $data;
         }
@@ -145,7 +142,7 @@ trait InteractsWithInput
      */
     public function merge(array $input): self
     {
-        if ($this->is_json()) {
+        if ($this->body_is_json()) {
             $this->json_cache = \array_merge($this->json(), $input);
         } else {
             $this->request = \array_merge($this->request, $input);
@@ -160,7 +157,7 @@ trait InteractsWithInput
      */
     public function replace(array $input): self
     {
-        if ($this->is_json()) {
+        if ($this->body_is_json()) {
             $this->json_cache = $input;
         } else {
             $this->request = $input;
