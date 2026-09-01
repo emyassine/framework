@@ -14,7 +14,11 @@ class ComposerStaticInitcc6f492cc5d64cb7f09b9024726d6929
         'W' =>
         array (
             'Webkernel\\System\\' => 17,
+            'Webkernel\\Platform\\Widgets\\' => 27,
+            'Webkernel\\Platform\\Tables\\' => 26,
             'Webkernel\\Platform\\Schemas\\' => 27,
+            'Webkernel\\Platform\\Notifications\\' => 33,
+            'Webkernel\\Platform\\Forms\\' => 25,
             'Webkernel\\Platform\\Components\\' => 30,
             'Webkernel\\Platform\\Actions\\' => 27,
             'Webkernel\\Platform\\' => 19,
@@ -58,9 +62,25 @@ class ComposerStaticInitcc6f492cc5d64cb7f09b9024726d6929
         array (
             0 => __DIR__ . '/..' . '/webkernel/system/src',
         ),
+        'Webkernel\\Platform\\Widgets\\' =>
+        array (
+            0 => __DIR__ . '/..' . '/webkernel/widgets/src',
+        ),
+        'Webkernel\\Platform\\Tables\\' =>
+        array (
+            0 => __DIR__ . '/..' . '/webkernel/tables/src',
+        ),
         'Webkernel\\Platform\\Schemas\\' =>
         array (
             0 => __DIR__ . '/..' . '/webkernel/schemas/src',
+        ),
+        'Webkernel\\Platform\\Notifications\\' =>
+        array (
+            0 => __DIR__ . '/..' . '/webkernel/notifications/src',
+        ),
+        'Webkernel\\Platform\\Forms\\' =>
+        array (
+            0 => __DIR__ . '/..' . '/webkernel/forms/src',
         ),
         'Webkernel\\Platform\\Components\\' =>
         array (
@@ -1997,6 +2017,7 @@ class ComposerStaticInitcc6f492cc5d64cb7f09b9024726d6929
         'Webkernel\\Platform\\Http\\Middleware\\Authenticate' => __DIR__ . '/..' . '/webkernel/panels/src/Http/Middleware/Authenticate.php',
         'Webkernel\\Platform\\Js' => __DIR__ . '/..' . '/webkernel/codebase/src/Platform/Js.php',
         'Webkernel\\Platform\\Notification' => __DIR__ . '/..' . '/webkernel/panels/src/Notification.php',
+        'Webkernel\\Platform\\Notifications\\Providers\\NotificationsProvider' => __DIR__ . '/..' . '/webkernel/notifications/src/Providers/NotificationsProvider.php',
         'Webkernel\\Platform\\Pages\\Dashboard' => __DIR__ . '/..' . '/webkernel/panels/src/Pages/Dashboard.php',
         'Webkernel\\Platform\\Pages\\ManagePanel' => __DIR__ . '/..' . '/webkernel/panels/src/Pages/ManagePanel.php',
         'Webkernel\\Platform\\Pages\\Page' => __DIR__ . '/..' . '/webkernel/panels/src/Pages/Page.php',

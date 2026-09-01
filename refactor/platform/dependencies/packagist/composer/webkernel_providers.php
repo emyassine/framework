@@ -17,6 +17,7 @@ return [
     \Webkernel\I18n\I18nProvider::class,
     \Webkernel\Imagery\ImageryProvider::class,
     \Webkernel\Models\ModelsProvider::class,
+    \Webkernel\Platform\Notifications\Providers\NotificationsProvider::class,
     \Webkernel\Platform\PanelsProvider::class,
     \Webkernel\System\SystemProvider::class,
 ];

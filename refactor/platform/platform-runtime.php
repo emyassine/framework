@@ -60,8 +60,8 @@ return array (
         'en' => 
         array (
           'site_title' => '',
-          'meta_description' => 'dsd',
-          'keywords' => 'dsdsd ds',
+          'meta_description' => 'dsd dsdsdsds',
+          'keywords' => 'dsdsd ds s',
         ),
         'es' => 
         array (

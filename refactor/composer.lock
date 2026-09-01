@@ -761,7 +761,7 @@
             "dist": {
                 "type": "path",
                 "url": "x-webkernel/_codebase",
-                "reference": "904834640c4f44372e65449e6c4a6b3599540806"
+                "reference": "d33717af000d2d16a15dd53bf773090fdfd485f4"
             },
             "require": {
                 "ext-dom": "*",
@@ -782,15 +782,22 @@
                 "psr/http-message": "^2.0",
                 "psr/log": "^3.0",
                 "psr/simple-cache": "^3.0",
+                "webkernel/actions": "^0.12.0",
                 "webkernel/auth": "^0.12.0",
                 "webkernel/components": "^0.12.0",
                 "webkernel/database": "^0.12.0",
+                "webkernel/devtools": "^0.12.0",
+                "webkernel/forms": "^0.12.0",
                 "webkernel/i18n": "^0.12.0",
                 "webkernel/imagery": "^0.12.0",
                 "webkernel/lifecycle": "^0.12.0",
                 "webkernel/models": "^0.12.0",
+                "webkernel/notifications": "^0.12.0",
                 "webkernel/panels": "^0.12.0",
-                "webkernel/schemas": "^0.12.0"
+                "webkernel/schemas": "^0.12.0",
+                "webkernel/system": "^0.12.0",
+                "webkernel/tables": "^0.12.0",
+                "webkernel/widgets": "^0.12.0"
             },
             "type": "library",
             "extra": {
@@ -900,6 +907,89 @@
                 "proprietary"
             ],
             "description": "Webkernel database: connections, query, schema, migrations. Drivers: sqlite, mysql, pgsql. ClickHouse later.",
+            "transport-options": {
+                "symlink": true,
+                "relative": true
+            }
+        },
+        {
+            "name": "webkernel/devtools",
+            "version": "0.12.0",
+            "dist": {
+                "type": "path",
+                "url": "x-webkernel/devtools",
+                "reference": "fcd9eb935fa6e454f4badf89f9230f7c5e44f2f2"
+            },
+            "require": {
+                "php": ">=8.5",
+                "webkernel/codebase": "^0.12.0",
+                "webkernel/lifecycle": "^0.12.0"
+            },
+            "type": "webkernel-devtool",
+            "extra": {
+                "webkernel": {
+                    "package_repo": "git@github.com:webkernelphp/devtools.git",
+                    "production": false,
+                    "provider": "Webkernel\\DevTools\\DevToolsProvider",
+                    "prefix": "devtools",
+                    "post_autoload_dump": "Webkernel\\DevTools\\IdeHelper"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Webkernel\\DevTools\\": "src/"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "Webkernel\\DevTools\\Tests\\": "tests/"
+                }
+            },
+            "license": [
+                "proprietary"
+            ],
+            "description": "Webkernel developer tools",
+            "transport-options": {
+                "symlink": true,
+                "relative": true
+            }
+        },
+        {
+            "name": "webkernel/forms",
+            "version": "0.12.0",
+            "dist": {
+                "type": "path",
+                "url": "x-webkernel/platform-forms",
+                "reference": "b44a47bfa6a2ea4171ec488f23ec5a9b031290c5"
+            },
+            "require": {
+                "php": ">=8.5",
+                "webkernel/codebase": "^0.12.0",
+                "webkernel/components": "^0.12.0",
+                "webkernel/schemas": "^0.12.0"
+            },
+            "type": "webkernel-stdlib",
+            "extra": {
+                "webkernel": {
+                    "package_repo": "git@github.com:webkernelphp/forms.git",
+                    "production": true,
+                    "prefix": "forms"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Webkernel\\Platform\\Forms\\": "src/"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "Webkernel\\Platform\\Forms\\Tests\\": "tests/"
+                }
+            },
+            "license": [
+                "proprietary"
+            ],
+            "description": "Webkernel forms: field components and form builders on schemas.",
             "transport-options": {
                 "symlink": true,
                 "relative": true
@@ -1087,6 +1177,47 @@
             }
         },
         {
+            "name": "webkernel/notifications",
+            "version": "0.12.0",
+            "dist": {
+                "type": "path",
+                "url": "x-webkernel/platform-notifications",
+                "reference": "53148c34c92ad769b8f7c7e1de1246a5a7261d69"
+            },
+            "require": {
+                "php": ">=8.5",
+                "webkernel/codebase": "^0.12.0",
+                "webkernel/components": "^0.12.0"
+            },
+            "type": "webkernel-stdlib",
+            "extra": {
+                "webkernel": {
+                    "package_repo": "git@github.com:webkernelphp/notifications.git",
+                    "provider": "Webkernel\\Platform\\Notifications\\Providers\\NotificationsProvider",
+                    "production": true,
+                    "prefix": "notifications"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Webkernel\\Platform\\Notifications\\": "src/"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "Webkernel\\Platform\\Notifications\\Tests\\": "tests/"
+                }
+            },
+            "license": [
+                "proprietary"
+            ],
+            "description": "Webkernel notifications: flash and in-app notification surfaces.",
+            "transport-options": {
+                "symlink": true,
+                "relative": true
+            }
+        },
+        {
             "name": "webkernel/panels",
             "version": "0.12.0",
             "dist": {
@@ -1208,6 +1339,87 @@
                 "proprietary"
             ],
             "description": "Webkernel System admin panel and its resources.",
+            "transport-options": {
+                "symlink": true,
+                "relative": true
+            }
+        },
+        {
+            "name": "webkernel/tables",
+            "version": "0.12.0",
+            "dist": {
+                "type": "path",
+                "url": "x-webkernel/platform-tables",
+                "reference": "bcbb1bb2956aeee6ee6b59744a631fcd0b3e392f"
+            },
+            "require": {
+                "php": ">=8.5",
+                "webkernel/actions": "^0.12.0",
+                "webkernel/codebase": "^0.12.0",
+                "webkernel/components": "^0.12.0"
+            },
+            "type": "webkernel-stdlib",
+            "extra": {
+                "webkernel": {
+                    "package_repo": "git@github.com:webkernelphp/tables.git",
+                    "production": true,
+                    "prefix": "tables"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Webkernel\\Platform\\Tables\\": "src/"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "Webkernel\\Platform\\Tables\\Tests\\": "tests/"
+                }
+            },
+            "license": [
+                "proprietary"
+            ],
+            "description": "Webkernel tables: list columns, filters, and bulk actions.",
+            "transport-options": {
+                "symlink": true,
+                "relative": true
+            }
+        },
+        {
+            "name": "webkernel/widgets",
+            "version": "0.12.0",
+            "dist": {
+                "type": "path",
+                "url": "x-webkernel/platform-widgets",
+                "reference": "bd1c475e1ce7a2ea6de844bbd84c99dd408e3dea"
+            },
+            "require": {
+                "php": ">=8.5",
+                "webkernel/codebase": "^0.12.0",
+                "webkernel/components": "^0.12.0"
+            },
+            "type": "webkernel-stdlib",
+            "extra": {
+                "webkernel": {
+                    "package_repo": "git@github.com:webkernelphp/widgets.git",
+                    "production": true,
+                    "prefix": "widgets"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Webkernel\\Platform\\Widgets\\": "src/"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "Webkernel\\Platform\\Widgets\\Tests\\": "tests/"
+                }
+            },
+            "license": [
+                "proprietary"
+            ],
+            "description": "Webkernel widgets: dashboard and page widgets.",
             "transport-options": {
                 "symlink": true,
                 "relative": true
@@ -2978,48 +3190,6 @@
                 }
             ],
             "time": "2025-11-17T20:03:58+00:00"
-        },
-        {
-            "name": "webkernel/devtools",
-            "version": "0.12.0",
-            "dist": {
-                "type": "path",
-                "url": "x-webkernel/devtools",
-                "reference": "fcd9eb935fa6e454f4badf89f9230f7c5e44f2f2"
-            },
-            "require": {
-                "php": ">=8.5",
-                "webkernel/codebase": "^0.12.0",
-                "webkernel/lifecycle": "^0.12.0"
-            },
-            "type": "webkernel-devtool",
-            "extra": {
-                "webkernel": {
-                    "package_repo": "git@github.com:webkernelphp/devtools.git",
-                    "production": false,
-                    "provider": "Webkernel\\DevTools\\DevToolsProvider",
-                    "prefix": "devtools",
-                    "post_autoload_dump": "Webkernel\\DevTools\\IdeHelper"
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "Webkernel\\DevTools\\": "src/"
-                }
-            },
-            "autoload-dev": {
-                "psr-4": {
-                    "Webkernel\\DevTools\\Tests\\": "tests/"
-                }
-            },
-            "license": [
-                "proprietary"
-            ],
-            "description": "Webkernel developer tools",
-            "transport-options": {
-                "symlink": true,
-                "relative": true
-            }
         }
     ],
     "aliases": [],

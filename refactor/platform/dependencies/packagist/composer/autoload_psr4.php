@@ -7,7 +7,11 @@ $baseDir = dirname(dirname(dirname($vendorDir)));
 
 return array(
     'Webkernel\\System\\' => array($vendorDir . '/webkernel/system/src'),
+    'Webkernel\\Platform\\Widgets\\' => array($vendorDir . '/webkernel/widgets/src'),
+    'Webkernel\\Platform\\Tables\\' => array($vendorDir . '/webkernel/tables/src'),
     'Webkernel\\Platform\\Schemas\\' => array($vendorDir . '/webkernel/schemas/src'),
+    'Webkernel\\Platform\\Notifications\\' => array($vendorDir . '/webkernel/notifications/src'),
+    'Webkernel\\Platform\\Forms\\' => array($vendorDir . '/webkernel/forms/src'),
     'Webkernel\\Platform\\Components\\' => array($vendorDir . '/webkernel/components/src'),
     'Webkernel\\Platform\\Actions\\' => array($vendorDir . '/webkernel/actions/src'),
     'Webkernel\\Platform\\' => array($vendorDir . '/webkernel/panels/src'),

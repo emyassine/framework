@@ -1845,6 +1845,7 @@ return array(
     'Webkernel\\Platform\\Http\\Middleware\\Authenticate' => $vendorDir . '/webkernel/panels/src/Http/Middleware/Authenticate.php',
     'Webkernel\\Platform\\Js' => $vendorDir . '/webkernel/codebase/src/Platform/Js.php',
     'Webkernel\\Platform\\Notification' => $vendorDir . '/webkernel/panels/src/Notification.php',
+    'Webkernel\\Platform\\Notifications\\Providers\\NotificationsProvider' => $vendorDir . '/webkernel/notifications/src/Providers/NotificationsProvider.php',
     'Webkernel\\Platform\\Pages\\Dashboard' => $vendorDir . '/webkernel/panels/src/Pages/Dashboard.php',
     'Webkernel\\Platform\\Pages\\ManagePanel' => $vendorDir . '/webkernel/panels/src/Pages/ManagePanel.php',
     'Webkernel\\Platform\\Pages\\Page' => $vendorDir . '/webkernel/panels/src/Pages/Page.php',

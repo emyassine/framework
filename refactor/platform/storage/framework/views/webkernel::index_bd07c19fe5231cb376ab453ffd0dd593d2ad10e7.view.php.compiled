@@ -1,0 +1,13 @@
+
+<?php  $__props = [
+  'alignment' => 'end',
+  'vertical_alignment' => 'start',
+]; foreach ($__props as $__n => $__d) { if (!isset($$__n)) { $$__n = $__d; } } $attributes = (isset($attributes) && $attributes instanceof \Webkernel\View\AttributeBag ? $attributes : new \Webkernel\View\AttributeBag([]))->except(\array_keys($__props)); unset($__props, $__n, $__d); ?>
+<div
+  class="w-no w-align-<?php echo \Webkernel\View\View::echo($alignment); ?> w-vertical-align-<?php echo \Webkernel\View\View::echo($vertical_alignment); ?>"
+  role="status"
+  aria-atomic="false"
+>
+  <?php echo $slot; ?>
+
+</div>

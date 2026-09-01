@@ -210,10 +210,10 @@ final class Notification
         }
         $slot = '';
         foreach ($items as $item) {
-            $slot .= View::make('webkernel::notifications.notification', $item)->render();
+            $slot .= View::make('webkernel::notification', $item)->render();
         }
 
-        return View::make('webkernel::notifications', ['slot' => $slot])->render();
+        return View::make('webkernel::notification', ['slot' => $slot])->render();
     }
 
     /**

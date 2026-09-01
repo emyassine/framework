@@ -37,15 +37,22 @@
         "psr/http-message": "^2.0",
         "psr/log": "^3.0",
         "psr/simple-cache": "^3.0",
+        "webkernel/lifecycle": "^0.12.0",
         "webkernel/auth": "^0.12.0",
-        "webkernel/components": "^0.12.0",
+        "webkernel/models": "^0.12.0",
         "webkernel/database": "^0.12.0",
+        "webkernel/devtools": "^0.12.0",
         "webkernel/i18n": "^0.12.0",
         "webkernel/imagery": "^0.12.0",
-        "webkernel/lifecycle": "^0.12.0",
-        "webkernel/models": "^0.12.0",
+        "webkernel/actions": "^0.12.0",
+        "webkernel/components": "^0.12.0",
+        "webkernel/forms": "^0.12.0",
+        "webkernel/notifications": "^0.12.0",
         "webkernel/panels": "^0.12.0",
-        "webkernel/schemas": "^0.12.0"
+        "webkernel/schemas": "^0.12.0",
+        "webkernel/tables": "^0.12.0",
+        "webkernel/widgets": "^0.12.0",
+        "webkernel/system": "^0.12.0"
     },
     "extra": {
         "webkernel": {
