@@ -2016,7 +2016,7 @@ class ComposerStaticInitcc6f492cc5d64cb7f09b9024726d6929
         'Webkernel\\Platform\\GeneratedFileHeader' => __DIR__ . '/..' . '/webkernel/codebase/src/Platform/GeneratedFileHeader.php',
         'Webkernel\\Platform\\Http\\Middleware\\Authenticate' => __DIR__ . '/..' . '/webkernel/panels/src/Http/Middleware/Authenticate.php',
         'Webkernel\\Platform\\Js' => __DIR__ . '/..' . '/webkernel/codebase/src/Platform/Js.php',
-        'Webkernel\\Platform\\Notification' => __DIR__ . '/..' . '/webkernel/panels/src/Notification.php',
+        'Webkernel\\Platform\\Notifications\\Notification' => __DIR__ . '/..' . '/webkernel/notifications/src/Notification.php',
         'Webkernel\\Platform\\Notifications\\Providers\\NotificationsProvider' => __DIR__ . '/..' . '/webkernel/notifications/src/Providers/NotificationsProvider.php',
         'Webkernel\\Platform\\Pages\\Dashboard' => __DIR__ . '/..' . '/webkernel/panels/src/Pages/Dashboard.php',
         'Webkernel\\Platform\\Pages\\ManagePanel' => __DIR__ . '/..' . '/webkernel/panels/src/Pages/ManagePanel.php',

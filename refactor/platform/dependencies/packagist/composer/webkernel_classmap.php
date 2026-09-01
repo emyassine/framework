@@ -190,7 +190,7 @@ return array(
     'Webkernel\\Platform\\GeneratedFileHeader' => $b . '/x-webkernel/_codebase/src/Platform/GeneratedFileHeader.php',
     'Webkernel\\Platform\\Http\\Middleware\\Authenticate' => $b . '/x-webkernel/platform-panels/src/Http/Middleware/Authenticate.php',
     'Webkernel\\Platform\\Js' => $b . '/x-webkernel/_codebase/src/Platform/Js.php',
-    'Webkernel\\Platform\\Notification' => $b . '/x-webkernel/platform-panels/src/Notification.php',
+    'Webkernel\\Platform\\Notifications\\Notification' => $b . '/x-webkernel/platform-notifications/src/Notification.php',
     'Webkernel\\Platform\\Notifications\\Providers\\NotificationsProvider' => $b . '/x-webkernel/platform-notifications/src/Providers/NotificationsProvider.php',
     'Webkernel\\Platform\\Pages\\Dashboard' => $b . '/x-webkernel/platform-panels/src/Pages/Dashboard.php',
     'Webkernel\\Platform\\Pages\\ManagePanel' => $b . '/x-webkernel/platform-panels/src/Pages/ManagePanel.php',

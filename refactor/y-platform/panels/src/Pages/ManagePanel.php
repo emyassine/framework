@@ -20,7 +20,7 @@ use Webkernel\Platform\Components\Tabs;
 use Webkernel\Liveview\Liveview;
 use Webkernel\Platform\Components\Textarea;
 use Webkernel\Platform\Components\TextInput;
-use Webkernel\Platform\Notification;
+use Webkernel\Platform\Notifications\Notification;
 use Webkernel\Platform\Schemas\Schema;
 
 /**

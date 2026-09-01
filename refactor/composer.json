@@ -35,6 +35,13 @@
     },
     {
       "type": "path",
+      "url": "y-platform/*",
+      "options": {
+        "symlink": true
+      }
+    },
+    {
+      "type": "path",
       "url": "x-modules/*/*",
       "options": {
         "symlink": true

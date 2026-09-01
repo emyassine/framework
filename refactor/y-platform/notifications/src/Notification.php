@@ -5,7 +5,7 @@
 //> For the full copyright and license information, please view the LICENSE
 //> file that was distributed with this source code.
 
-namespace Webkernel\Platform;
+namespace Webkernel\Platform\Notifications;
 
 use Webkernel\View\View;
 
@@ -210,10 +210,10 @@ final class Notification
         }
         $slot = '';
         foreach ($items as $item) {
-            $slot .= View::make('webkernel::notification', $item)->render();
+            $slot .= View::make('webkernel::notifications.notification', $item)->render();
         }
 
-        return View::make('webkernel::notification', ['slot' => $slot])->render();
+        return View::make('webkernel::notifications', ['slot' => $slot])->render();
     }
 
     /**

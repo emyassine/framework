@@ -11,6 +11,7 @@
         "webkernel/auth": "^0.12.0",
         "webkernel/codebase": "^0.12.0",
         "webkernel/components": "^0.12.0",
+        "webkernel/notifications": "^0.12.0",
         "webkernel/schemas": "^0.12.0"
     },
     "autoload": {
