@@ -112,7 +112,7 @@ final class ManagePanel extends Page
     /**
      * @return list<Action>
      */
-    public function get_footer_actions(): array
+    public function get_base_actions(): array
     {
         return [
             Action::make('save')
@@ -197,7 +197,7 @@ final class ManagePanel extends Page
                 ->state($values)
                 ->errors($this->errors)
                 ->hidden(['edit_locale' => $edit_locale])
-                ->header_actions($this->get_footer_actions()),
+                ->header_actions($this->get_base_actions()),
         ];
     }
 
