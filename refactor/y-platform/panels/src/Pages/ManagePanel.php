@@ -317,7 +317,8 @@ final class ManagePanel extends Page
     {
         return Schema::make()->components([
             Section::make($this->lang('panel.section.identity', 'Identity'))
-                ->columns(2)
+                ->columns(3)
+                ->extra_attributes(['style'=>'margin-bottom:1.6rem;'])
                 ->schema([
                     TextInput::make('name')->label($this->lang('panel.field.name', 'Name')),
                     TextInput::make('site_title')->label($this->lang('panel.field.site_title', 'Site title')),
@@ -330,6 +331,7 @@ final class ManagePanel extends Page
                 ]),
             Section::make($this->lang('panel.section.logo', 'Logo'))
                 ->columns(2)
+                ->extra_attributes(['style'=>'margin-bottom:1.6rem;'])
                 ->schema([
                     TextInput::make('logo_light')->label($this->lang('panel.field.logo_light', 'Logo (light)'))->type('url'),
                     TextInput::make('logo_dark')->label($this->lang('panel.field.logo_dark', 'Logo (dark)'))->type('url'),
