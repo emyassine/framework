@@ -268,6 +268,21 @@ Not: `/** Use this to send HTMX-specific headers from your components. */`
 - **English only** in code, comments, identifiers, commits, docblocks. No franglais.
 - **No emojis.**
 - **`declare(strict_types=1);`** on every PHP source.
+- **Import types; no inline FQCNs in signatures.** A `use` import at the top of the file, then the short class or interface name in parameters, return types, `extends`, `implements`, `instanceof`, and property types.
+
+```php
+// Wrong
+public static function from_psr7(\Psr\Http\Message\ServerRequestInterface $psr): self
+
+// Right
+use Psr\Http\Message\ServerRequestInterface;
+
+public static function from_psr7(ServerRequestInterface $psr): self
+```
+
+PHPDoc `@param`, `@return`, and `@throws` use the same short name when the type is imported. Leading `\` on PHP builtins (`\strlen`, `\array_merge`) stays as today.
+
+**Exceptions:** generated dumps, `namespacer.php` `class_alias` targets, and string class names passed to reflection or `::class` — not signature type hints.
 
 ---
 
@@ -1009,6 +1024,7 @@ Each step leaves the previous door working. Spec items not in A–G stay spec.
 ## 30. Quick checklist
 
 - [ ] File header + `strict_types`
+- [ ] Types imported with `use`; no `\Fully\Qualified\Name` in signatures
 - [ ] snake_case on Webkernel methods/params/config (foreign interfaces excepted)
 - [ ] PHPDoc `@param $name type`; summaries describe the thing (not “Use this to…”)
 - [ ] English only; no emojis; no AI-tutor comment voice
