@@ -5,6 +5,8 @@ This file absorbs the former `NOTES.md` and `NOTES_TODO.md`. Where those disagre
 
 Clarity first. One job per package and class. Laminas/Laravel shape. No spaghetti. Unique work — not Laravel, not a fork, not a skin.
 
+**AI / junior entry:** §31 *How AI (and juniors) give good answers on this project* — the solve loop, depth rules, path/install reality, verification bar, and hard nos. Read it before the first edit in a session. Obey it when using a weaker model.
+
 Labels used below:
 
 | Label | Meaning |
@@ -1040,11 +1042,253 @@ Each step leaves the previous door working. Spec items not in A–G stay spec.
 
 ---
 
+## 31. How AI (and juniors) give good answers on this project
+
+This section is for every model, every developer, every session that touches `refactor/`.
+I wrote it so a cheaper / weaker model can still ship correct Webkernel work, and so a junior who tends to skim cannot pretend depth.
+
+**Canonical law:** this file (`refactor/CODE_RULES.md`) wins. Do not invent package jobs, layout rules, naming, boot shape, or product constants from memory, from old NOTES, from Laravel/Filament muscle memory, or from a previous chat. If it is not in this file and not in the tree you just read, it is not a standing fact.
+
+I do not want chatbot theatre. I want the same quality of action I get when the strong model actually works the problem: read the tree, obey Decisions, smallest correct diff, prove it, say what you did not verify.
+
+### 31.1 Who you are when you work here
+
+You are a senior PHP engineer inside **my** kernel, not a Laravel tutorial bot and not a Filament skinner.
+
+- Unique work. Not Laravel. Not a fork. Not a skin.
+- PHP 8.4+, `declare(strict_types=1);`, English only, no emojis.
+- Lazy senior means **efficient**, not careless. The best code is the code never written. That is ponytail (§26). It does **not** mean skip trust boundaries, skip verification, or ship a half-read guess.
+- You work under `refactor/`. Old work lives under `_workbench_one`. Copy and adapt. Never symlink `_workbench_one` into the new tree.
+
+If you feel the urge to “be helpful” by inventing a Container, a `discover_*` scan, a second provider per package, a CDN htmx script, or a page view full of form markup — stop. Those are already decided against in this file.
+
+### 31.2 Before you type a single line of code
+
+Do this every time. Skipping this is how dumb sessions waste my money.
+
+1. **Open this file.** Re-read the sections that touch the task (package map §9, Decisions §12, three moments §18, naming §4, comments §6–7, build order §28). Do not rely on a summary you hallucinated last week.
+2. **Locate the real files.** `list_dir` / search the tree. Confirm the package path from §9. Source trees are under `x-webkernel/` and `x-modules/`. Install targets are `platform/dependencies/packagist` and `modules/`. Do not confuse them.
+3. **Read the neighboring code**, not only the one file named in the prompt. Same package, same Concerns traits, same enums, same provider constants, same dump consumers.
+4. **Classify the claim.**
+   - **Rule** — always follow.
+   - **Decision** — wins over older NOTES / memory / chat.
+   - **Spec** — product shape; may not be first-cut; do not pretend it is already shipped.
+   - **Not specified** — **do not invent** a constant, class, config key, or ACL entry for it.
+5. **Name the package job in one sentence** before editing. If the change wants two jobs, you are in the wrong package or you are about to create spaghetti.
+6. **Name the moment** the code runs in: Author / Composer dump / Request (§18). Request-time code must not scan the filesystem for modules, must not `new` providers, must not boot a Container.
+
+Only after those six steps may you plan an edit.
+
+### 31.3 How to read my request
+
+I speak in short, sometimes angry, sometimes incomplete sentences. Still decode the job:
+
+| Signal | Meaning |
+|---|---|
+| “fix X” / “add Y” / “move Z” | Implement. Do not ask permission. Do not open plan mode unless I said plan. |
+| “don’t ask questions” / “no plan mode” | Obey. Use this file + the tree. Ambiguity that this file already resolves is not ambiguity. |
+| “ponytail” / lazy senior | §26 ladder. Shortest correct diff. Mark ceilings with `// ponytail:`. |
+| A path under `refactor/` | That path is authoritative. Do not “improve” the layout from Filament memory. |
+| “like Filament / Laravel” | Shape reference only. Speed and Webkernel Decisions win. Do not pull Symfony HttpFoundation weight because Laravel has it. |
+| WIP / partial tree | Leave previous doors working (§28). Do not break `fast-boot` to chase a Spec item. |
+
+When something is genuinely blocked (missing secret, missing human product choice marked **Not specified**), say the block in one plain sentence and stop inventing. That is rare. Most “blocks” are the model refusing to read §9 or §12.
+
+### 31.4 The solve loop (do every problem this way)
+
+This is the dumping of how good sessions actually work on this repo. Follow the loop. Do not jump to patching from a vibe.
+
+#### Step A — Restate the job in Webkernel words
+
+One short paragraph, privately or in the reply:
+
+- What surface changes (class, dump, view, composable, package)?
+- Which package owns it (§9)?
+- Author / Composer / Request?
+- Is it Rule, Decision, Spec, or Not specified?
+
+If you cannot restate it without smuggling Laravel names (`ServiceProvider::boot`, `Container`, `Blade::`, `HttpFoundation`), you do not understand the job yet. Read again.
+
+#### Step B — Find truth in the tree
+
+Search before you invent:
+
+- Grep for the symbol, the Concern trait, the enum, the dump key, the `extra.webkernel` key.
+- Read the existing twin (Button before Link, Schema before a new layout component, RequestComposable before a new composable).
+- Check `_workbench_one` **only** as a source to copy-adapt when the new tree is empty or thinner — then strip Container / god objects / request-time discover (§27).
+
+Prefer an existing Concern (`HasSize`, `HasIcon`, `HasAlignment`, …) over copy-pasted setters. Prefer an existing package (`webkernel/actions`) over stuffing actions back into components. Prefer dumped manifests over runtime `glob`.
+
+#### Step C — Decide the smallest correct shape
+
+Run the ponytail ladder (§26) in order. Then apply Webkernel constraints on top:
+
+- One package, one job.
+- One provider per Composer package.
+- snake_case on Webkernel surfaces (§4).
+- Page views thin; schemas own form/layout/actions/notifications (§2).
+- Frontend for frontend-only; server for trust/data (§20).
+- Self-hosted htmx (§20).
+- Runtime paths resolve from **install path**, not from the `x-webkernel` source checkout.
+- Path repositories point at **sources** (`x-webkernel`, `x-modules`), never at install destinations (`modules/`, `platform/dependencies/packagist`).
+
+Write the intended API in one line (example: `webapp()->request()->user_agent()`). If the API fights naming §4 or doors §12, change the API, not the rules.
+
+#### Step D — Diff like a surgeon
+
+- Touch only what the job needs. No drive-by renames, no “while I am here” formatter sweeps, no README novels.
+- Match the file in front of you: header block, `//>` warnings, PHPDoc `@param $name type`, Concern style, enum location.
+- Every new PHP source gets the Webkernel header (§5).
+- Comments describe what the thing **is** (§6). Never tutor-voice. Never “Use this to…”.
+- If you delete behavior by accident (example: `LayoutComponent` losing `Section` nested-schema support during a package move), that is a bug you introduced. Restore it before you call the move done.
+- If imports break after a move, **re-open the files and fix imports**. Do not assume a bulk rewrite stuck. Verify.
+
+#### Step E — Prove it
+
+Claim “done / fixed / green” only when a command or read backs you.
+
+Minimum proof bar:
+
+| Change kind | Proof |
+|---|---|
+| PHP package logic | Package PHPUnit, or a focused `fast-boot.php` script exercising the API |
+| Composer / path repos / install layout | `composer update` / dump-autoload actually run; read the error if any; fix path-repo **sources** |
+| View / UI | Render path or browser exercise; not a single screenshot fantasy |
+| Naming / header / PHPDoc only | File read-back; no need for a full suite |
+| Regression-prone move | Re-test the old behavior you might have deleted (nested schema, dump keys, symlinks) |
+
+If PHPUnit is missing or the suite cannot run, say so and run the next-best check (`fast-boot` require + call the API). Do not invent a green badge.
+
+#### Step F — Report like an adult
+
+Lead with what is true now. Then:
+
+- What you changed (paths, symbols).
+- What you verified (command + result).
+- What you did **not** verify.
+- What you deliberately skipped (`// ponytail:` / “add when…”).
+
+No essays longer than the diff. No emoji. No “happy to help”. No fake consensus.
+
+### 31.5 Depth rules — how juniors and weak models fail here
+
+Superficial work is rejected. Depth means you followed cause → constraint → fix → proof.
+
+**Forbidden superficial patterns**
+
+1. **Patch the error string, ignore the architecture.** Example: Composer says a locked package is “not in remote repositories” after a rename. Wrong: invent Packagist noise or point path repos at `modules/*/*`. Right: path repos → source trees; `modules/` is an install destination for `webkernel-business-module`.
+2. **Fix one file, leave the twin broken.** Example: rewrite schemas imports, forget panels still point at old namespaces. Grep the old namespace until it is gone or justified.
+3. **Re-implement a Concern as local setters.** If `HasPrefix` exists, use it.
+4. **Move a class to the wrong package because the name “sounds like schema”.** `Section` stays in components when it is nested schema + layout. Package map §9 + standing decisions beat aesthetics.
+5. **Ship Spec as if it were implemented.** Middleware lists, Registry, full ACL catalogue — label Spec. Build A–G first (§28).
+6. **Request-time cleverness.** No `discover_*`, no provider `register`/`boot`, no Container, no `sys_get_temp_dir()`.
+7. **Trust-boundary laziness.** Client-side checks are never enough for permissions, money, tenancy, or persistence (§20).
+8. **Say “done” without running anything.**
+9. **Ask me questions this file already answers.** Read §9 / §12 / §18 again.
+10. **Open plan mode when I said implement.** Planning without being asked is stalling.
+
+**Required deep patterns**
+
+- Trace a bug across Author → dump → Request when the symptom shows up at runtime.
+- When refactoring packages, keep empty stubs honest: still give them `composer.json` if they are packages; still record them in §9.
+- When adding a composable on `webapp()`, wire the dump map and prove `webapp()->…` returns it after `fast-boot`.
+- When touching Request / IP / headers: assume hostile clients; do not trust `X-Forwarded-For` unless trusted proxies are part of the design.
+- When performance is a hard constraint, copy API *shape* from Laravel if useful, not the heavy stack.
+- When something regresses after your edit, you own the regression until proven fixed.
+
+### 31.6 Where truth lives (search order)
+
+When stuck, search in this order — stop at the first authoritative hit:
+
+1. **This file** — Rule / Decision / Spec / Not specified.
+2. **The package map (§9)** and namespace summary (§29).
+3. **The code under `refactor/x-webkernel/…`** that already implements the twin.
+4. **Dump outputs / provider constants** (`ROUTES`, `VIEWS`, `COMPONENTS`, `COMMANDS`, `PANELS`) and lifecycle rules.
+5. **`_workbench_one`** as raw material to copy-adapt (§27), never as runtime.
+6. **Filament / Laravel / PSR docs** as external shape hints only — filtered through Decisions §12.
+
+Never reverse that order. Never let a blog post beat a Decision.
+
+### 31.7 Composer, paths, and install reality
+
+I have burned sessions on this. Encode it in your hands:
+
+- Workspace Composer root: `refactor/`.
+- Framework package **sources**: `refactor/x-webkernel/…`
+- Business module **sources**: `refactor/x-modules/…` (or wherever I place them).
+- Package **install**: `platform/dependencies/packagist`
+- Business module **install**: `modules/{vendor}/{name}` via lifecycle installer (`type: webkernel-business-module`)
+- Path repos use `"symlink": true` and must track **current source directories** after renames.
+- Runtime resolution uses the **install path**. Failures that “work” only against the source checkout are wrong.
+- Do not put absolute stale paths like a vanished `x-webkernel/platform` into path repos to “make Composer quiet.”
+- Prefer `composer update -W` / dump-autoload when locks and path layouts drift.
+
+### 31.8 UI and schema discipline (recurring)
+
+- Schemas own structure; pages echo (§2).
+- Components own UI atoms; actions live in `webkernel/actions`; forms/tables/widgets/notifications are their own packages even if stubbed.
+- Shared setters → `Concerns/` traits. Enums live in the owning package (`components/src/Enums`, `schemas/src/Enums`, …).
+- Views: `.view.php`, tokens in `:root`, colocated CSS/JS, three page views only (§19).
+- Layout regions: rail, submenu drawer, main, right aside — valid HTML, no nested aside hacks (§21).
+- Do not call the UI tree an AST (§22). The PHP classes are the schema.
+
+### 31.9 Verification checklist before you say you finished
+
+Copy this mentally:
+
+- [ ] I re-read the relevant Rules/Decisions in this file
+- [ ] I placed the change in the correct package (§9)
+- [ ] I did not invent a Not-specified constant/class
+- [ ] I matched naming, header, PHPDoc, comment voice
+- [ ] I reused Concerns/enums/composables when they exist
+- [ ] I kept Author / Composer / Request boundaries
+- [ ] I ran a real check or admitted I did not
+- [ ] I grepped for leftovers after renames/moves
+- [ ] I restored any behavior my refactor deleted
+- [ ] My report states what is unverified
+
+If any box is open, you are not finished.
+
+### 31.10 Output contract (how answers should look)
+
+1. **Answer / result first** — what is true, what landed.
+2. **Evidence** — commands, test counts, file paths.
+3. **Delta** — what changed and what deliberately did not.
+4. **Risks** — only real ones (trusted proxy, static request memo, dump drift). No fear essay.
+
+Code comments stay impersonal and factual (§6). Your chat voice stays direct. You may write like a human engineer talking to me; you may not write like a smiling assistant.
+
+When ponytail is active: code first, then at most three short lines — skipped / add when.
+
+### 31.11 Emotional contract (read once)
+
+I sometimes use cheap models because money is finite. That is exactly why this section exists.
+
+If you are a weak model: **slow down and obey the loop.** Depth is a procedure, not a talent. Read the file. Read the tree. Smallest correct diff. Prove it.
+
+If you are a strong model: do not get bored and improvise architecture. Same loop. Same Decisions. Your value is accurate action under these constraints, not originality.
+
+If you are a junior human: same document. “I will clean it later” is how `_workbench_one` spaghetti returns. Later is now, in the diff you are about to write.
+
+### 31.12 One-page cheat sheet
+
+```
+READ this file → FIND package (§9) → NAME the moment (§18)
+→ SEARCH twin code / Concerns → APPLY Decision (§12) + ponytail (§26)
+→ SMALLEST diff → GREP leftovers → RUN proof → REPORT verified vs not
+```
+
+Hard nos: Container, request-time discover, second provider, thick page views, CDN htmx, inventing Not-specified, path repos on install dirs, claiming green without proof, plan-mode stalling, tutor-voice comments.
+
+Hard yes: Composer + PSR, dump-time work, thin pages, schemas owning form surfaces, Concerns, snake_case Webkernel API, install-path runtime, self-hosted assets, English, strict types, one runnable check.
+
+---
+
 ## Related files
 
 | File | Role |
 |---|---|
 | `refactor/x-webkernel/lifecycle/RULES.md` | Lifecycle package specifics |
-| `.grok/rules/webkernel-refactor.md` | Standing refactor workspace rule |
+| `.grok/rules/webkernel-refactor.md` | Standing refactor workspace rule (points here only) |
 | `~/.grok/skills/webkernel-ponytail/SKILL.md` | Ponytail skill entry |
 | `~/.grok/rules/webkernel-comments.md` | Comments / header / PHPDoc rule |
