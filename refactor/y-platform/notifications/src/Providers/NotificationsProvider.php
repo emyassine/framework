@@ -18,13 +18,13 @@ final class NotificationsProvider extends PlatformProvider
 {
     public const VIEWS = [
         'webkernel' => [
-            __DIR__.'/../../resources/views/notifications',
+            __DIR__.'/../../resources/views',
         ],
     ];
 
     public const COMPONENTS = [
         'webkernel' => [
-            __DIR__.'/../../resources/views/notifications',
+            __DIR__.'/../../resources/views',
         ],
     ];
 }

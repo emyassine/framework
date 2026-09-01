@@ -1,29 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<phpunit bootstrap="x-webkernel/codebase/tests/bootstrap.php"
+<phpunit bootstrap="platform/fast-boot.php"
          colors="true"
          cacheDirectory="platform/storage/framework/phpunit"
 >
     <testsuites>
         <testsuite name="codebase">
-            <directory>x-webkernel/codebase/tests</directory>
+            <directory>x-webkernel/_codebase/tests</directory>
         </testsuite>
         <testsuite name="imagery">
-            <directory>x-webkernel/platform/imagery/tests</directory>
+            <directory>x-webkernel/imagery/tests</directory>
         </testsuite>
         <testsuite name="i18n">
-            <directory>x-webkernel/platform/i18n/tests</directory>
+            <directory>x-webkernel/i18n/tests</directory>
         </testsuite>
         <testsuite name="lifecycle">
-            <directory>x-webkernel/lifecycle/tests</directory>
+            <directory>x-webkernel/_lifecycle/tests</directory>
         </testsuite>
         <testsuite name="components">
-            <directory>x-webkernel/platform/components/tests</directory>
+            <directory>y-platform/components/tests</directory>
+        </testsuite>
+        <testsuite name="notifications">
+            <directory>y-platform/notifications/tests</directory>
         </testsuite>
         <testsuite name="schemas">
-            <directory>x-webkernel/platform/schemas/tests</directory>
+            <directory>y-platform/schemas/tests</directory>
         </testsuite>
         <testsuite name="panels">
-            <directory>x-webkernel/platform/panels/tests</directory>
+            <directory>y-platform/panels/tests</directory>
         </testsuite>
         <testsuite name="system">
             <directory>x-webkernel/system/tests</directory>
@@ -32,26 +35,27 @@
             <directory>x-webkernel/database/tests</directory>
         </testsuite>
         <testsuite name="models">
-            <directory>x-webkernel/models/tests</directory>
+            <directory>x-webkernel/database-models/tests</directory>
         </testsuite>
         <testsuite name="auth">
-            <directory>x-webkernel/auth/tests</directory>
+            <directory>x-webkernel/authorization/tests</directory>
         </testsuite>
     </testsuites>
     <source>
         <include>
-            <directory>x-webkernel/codebase/src</directory>
-            <directory>x-webkernel/lifecycle/Lifecycle</directory>
-            <directory>x-webkernel/platform/imagery/src</directory>
-            <directory>x-webkernel/platform/i18n/src</directory>
-            <directory>x-webkernel/platform/components/src</directory>
-            <directory>x-webkernel/platform/schemas/src</directory>
-            <directory>x-webkernel/platform/panels/src</directory>
+            <directory>x-webkernel/_codebase/src</directory>
+            <directory>x-webkernel/_lifecycle/src</directory>
+            <directory>x-webkernel/imagery/src</directory>
+            <directory>x-webkernel/i18n/src</directory>
+            <directory>y-platform/components/src</directory>
+            <directory>y-platform/notifications/src</directory>
+            <directory>y-platform/schemas/src</directory>
+            <directory>y-platform/panels/src</directory>
             <directory>x-webkernel/system/src</directory>
             <directory>x-webkernel/devtools/src</directory>
             <directory>x-webkernel/database/src</directory>
-            <directory>x-webkernel/models/src</directory>
-            <directory>x-webkernel/auth/src</directory>
+            <directory>x-webkernel/database-models/src</directory>
+            <directory>x-webkernel/authorization/src</directory>
             <directory>modules</directory>
         </include>
     </source>

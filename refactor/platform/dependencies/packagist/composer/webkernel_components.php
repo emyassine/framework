@@ -18,7 +18,7 @@ return [
         $b . '/y-platform/components/resources/views/navigation',
         $b . '/y-platform/components/resources/views/components',
         $b . '/x-webkernel/i18n/resources/views',
-        $b . '/y-platform/notifications/resources/views/notifications',
+        $b . '/y-platform/notifications/resources/views',
     ],
     'namespaces' => [
         'billing' => [
@@ -30,7 +30,7 @@ return [
             $b . '/y-platform/components/resources/views/navigation',
             $b . '/y-platform/components/resources/views/components',
             $b . '/x-webkernel/i18n/resources/views',
-            $b . '/y-platform/notifications/resources/views/notifications',
+            $b . '/y-platform/notifications/resources/views',
         ],
     ],
 ];

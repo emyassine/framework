@@ -19,7 +19,7 @@ return [
         $b . '/y-platform/components/resources/views/navigation',
         $b . '/y-platform/components/resources/views/components',
         $b . '/x-webkernel/i18n/resources/views',
-        $b . '/y-platform/notifications/resources/views/notifications',
+        $b . '/y-platform/notifications/resources/views',
         $b . '/y-platform/panels/resources/views',
         $b . '/x-webkernel/system/resources/views',
     ],
@@ -34,7 +34,7 @@ return [
             $b . '/y-platform/components/resources/views/navigation',
             $b . '/y-platform/components/resources/views/components',
             $b . '/x-webkernel/i18n/resources/views',
-            $b . '/y-platform/notifications/resources/views/notifications',
+            $b . '/y-platform/notifications/resources/views',
             $b . '/y-platform/panels/resources/views',
         ],
         'webkernel-system' => [
