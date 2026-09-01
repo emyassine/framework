@@ -13,6 +13,7 @@ class ComposerStaticInitcc6f492cc5d64cb7f09b9024726d6929
     public static $prefixLengthsPsr4 = array (
         'W' =>
         array (
+            'Webkernel\\System\\' => 17,
             'Webkernel\\Platform\\Schemas\\' => 27,
             'Webkernel\\Platform\\Components\\' => 30,
             'Webkernel\\Platform\\Actions\\' => 27,
@@ -53,6 +54,10 @@ class ComposerStaticInitcc6f492cc5d64cb7f09b9024726d6929
     );
 
     public static $prefixDirsPsr4 = array (
+        'Webkernel\\System\\' =>
+        array (
+            0 => __DIR__ . '/..' . '/webkernel/system/src',
+        ),
         'Webkernel\\Platform\\Schemas\\' =>
         array (
             0 => __DIR__ . '/..' . '/webkernel/schemas/src',
@@ -2010,6 +2015,9 @@ class ComposerStaticInitcc6f492cc5d64cb7f09b9024726d6929
         'Webkernel\\Platform\\Schemas\\LayoutComponent' => __DIR__ . '/..' . '/webkernel/schemas/src/LayoutComponent.php',
         'Webkernel\\Platform\\Schemas\\Schema' => __DIR__ . '/..' . '/webkernel/schemas/src/Schema.php',
         'Webkernel\\Platform\\Tables\\Table' => __DIR__ . '/..' . '/webkernel/panels/src/Tables/Table.php',
+        'Webkernel\\Request' => __DIR__ . '/..' . '/webkernel/codebase/src/Request.php',
+        'Webkernel\\Request\\Captured' => __DIR__ . '/..' . '/webkernel/codebase/src/Request/Captured.php',
+        'Webkernel\\Request\\TrustedProxies' => __DIR__ . '/..' . '/webkernel/codebase/src/Request/TrustedProxies.php',
         'Webkernel\\Route\\Action\\RedirectAction' => __DIR__ . '/..' . '/webkernel/codebase/src/Route/Action/RedirectAction.php',
         'Webkernel\\Route\\Action\\ViewAction' => __DIR__ . '/..' . '/webkernel/codebase/src/Route/Action/ViewAction.php',
         'Webkernel\\Route\\Binding' => __DIR__ . '/..' . '/webkernel/codebase/src/Route/Binding.php',
@@ -2026,6 +2034,9 @@ class ComposerStaticInitcc6f492cc5d64cb7f09b9024726d6929
         'Webkernel\\Route\\Route' => __DIR__ . '/..' . '/webkernel/codebase/src/Route/Route.php',
         'Webkernel\\Route\\Uri\\Uri' => __DIR__ . '/..' . '/webkernel/codebase/src/Route/Uri/Uri.php',
         'Webkernel\\Route\\Uri\\UriException' => __DIR__ . '/..' . '/webkernel/codebase/src/Route/Uri/UriException.php',
+        'Webkernel\\System\\Pages\\Dashboard' => __DIR__ . '/..' . '/webkernel/system/src/Pages/Dashboard.php',
+        'Webkernel\\System\\SystemPanelProvider' => __DIR__ . '/..' . '/webkernel/system/src/SystemPanelProvider.php',
+        'Webkernel\\System\\SystemProvider' => __DIR__ . '/..' . '/webkernel/system/src/SystemProvider.php',
         'Webkernel\\Typography\\TypographySystem' => __DIR__ . '/..' . '/webkernel/codebase/src/Typography/TypographySystem.php',
         'Webkernel\\View\\AttributeBag' => __DIR__ . '/..' . '/webkernel/codebase/src/View/AttributeBag.php',
         'Webkernel\\View\\Compile\\Comments' => __DIR__ . '/..' . '/webkernel/codebase/src/View/Compile/Comments.php',

@@ -275,6 +275,9 @@ final class Route implements ComposableContract
             $uri = substr($uri, 0, $q);
         }
         $uri = rawurldecode($uri);
+        if ($uri !== '/' && str_ends_with($uri, '/')) {
+            $uri = rtrim($uri, '/') ?: '/';
+        }
         $host = self::normalize_host($host ?? (string) ($_SERVER['HTTP_HOST'] ?? ''));
 
         $data = self::dispatch_data($host);

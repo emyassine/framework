@@ -6,6 +6,7 @@ $vendorDir = dirname(__DIR__);
 $baseDir = dirname(dirname(dirname($vendorDir)));
 
 return array(
+    'Webkernel\\System\\' => array($vendorDir . '/webkernel/system/src'),
     'Webkernel\\Platform\\Schemas\\' => array($vendorDir . '/webkernel/schemas/src'),
     'Webkernel\\Platform\\Components\\' => array($vendorDir . '/webkernel/components/src'),
     'Webkernel\\Platform\\Actions\\' => array($vendorDir . '/webkernel/actions/src'),

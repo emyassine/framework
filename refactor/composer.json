@@ -44,7 +44,8 @@
   "require": {
     "php": ">=8.5",
     "acme/billing": "*",
-    "webkernel/codebase": "^0.12.0"
+    "webkernel/codebase": "^0.12.0",
+    "webkernel/system": "^0.12.0"
   },
   "require-dev": {
     "phpunit/phpunit": "^11.5",

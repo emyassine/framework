@@ -93,4 +93,90 @@ return array (
       ),
     ),
   ),
+  1 => 
+  array (
+    'id' => 'system',
+    'path' => 'system',
+    'href' => '/system',
+    'home_url' => '/system',
+    'label' => 'System',
+    'icon' => 'settings',
+    'scope' => 'platform',
+    'default' => true,
+    'pages' => 
+    array (
+      0 => 'Webkernel\\System\\Pages\\Dashboard',
+      1 => 'Webkernel\\Platform\\Pages\\ManagePanel',
+    ),
+    'widgets' => 
+    array (
+    ),
+    'resources' => 
+    array (
+    ),
+    'middleware' => 
+    array (
+    ),
+    'auth_middleware' => 
+    array (
+      0 => 'Webkernel\\Auth\\Http\\Middleware\\Authenticate',
+    ),
+    'branding' => 
+    array (
+      'favicon' => '/favicon.ico',
+      'logo_light' => NULL,
+      'logo_dark' => NULL,
+      'logo_height' => '2rem',
+      'colors' => 
+      array (
+        'primary' => 'blue',
+      ),
+      'dark_mode' => true,
+    ),
+    'layout' => 
+    array (
+      'sidebar' => true,
+      'sidebar_width' => '20rem',
+      'collapsed_sidebar_width' => '0px',
+      'sidebar_collapsible_on_desktop' => true,
+      'collapsible_navigation_groups' => true,
+      'topbar' => true,
+      'panel_sidebar' => true,
+      'panel_sidebar_width' => '4rem',
+    ),
+    'provider' => 'Webkernel\\System\\SystemPanelProvider',
+    'package_provider' => 'Webkernel\\System\\SystemProvider',
+    'prefix' => 'webkernel',
+    'package' => 'webkernel/system',
+    'navigation' => 
+    array (
+      0 => 
+      array (
+        'label' => '',
+        'items' => 
+        array (
+          0 => 
+          array (
+            'label' => 'Overview',
+            'href' => '/system',
+            'icon' => 'layout-dashboard',
+          ),
+        ),
+      ),
+      1 => 
+      array (
+        'label' => 'panel.settings',
+        'icon' => 'folder',
+        'items' => 
+        array (
+          0 => 
+          array (
+            'label' => 'panel.manage',
+            'href' => '/system/manage',
+            'icon' => 'sliders',
+          ),
+        ),
+      ),
+    ),
+  ),
 );

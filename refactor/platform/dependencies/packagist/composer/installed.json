@@ -3120,6 +3120,51 @@
                 "relative": true
             },
             "install-path": "../webkernel/schemas"
+        },
+        {
+            "name": "webkernel/system",
+            "version": "0.12.0",
+            "version_normalized": "0.12.0.0",
+            "dist": {
+                "type": "path",
+                "url": "x-webkernel/system",
+                "reference": "2e32a483cf997442a95ab11c795da4043697c96c"
+            },
+            "require": {
+                "php": ">=8.5",
+                "webkernel/auth": "^0.12.0",
+                "webkernel/codebase": "^0.12.0",
+                "webkernel/panels": "^0.12.0"
+            },
+            "type": "webkernel-stdlib",
+            "extra": {
+                "webkernel": {
+                    "package_repo": "git@github.com:webkernelphp/system.git",
+                    "production": true,
+                    "provider": "Webkernel\\System\\SystemProvider",
+                    "prefix": "webkernel"
+                }
+            },
+            "installation-source": "dist",
+            "autoload": {
+                "psr-4": {
+                    "Webkernel\\System\\": "src/"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "Webkernel\\System\\Tests\\": "tests/"
+                }
+            },
+            "license": [
+                "proprietary"
+            ],
+            "description": "Webkernel System admin panel and its resources.",
+            "transport-options": {
+                "symlink": true,
+                "relative": true
+            },
+            "install-path": "../webkernel/system"
         }
     ],
     "dev": true,
