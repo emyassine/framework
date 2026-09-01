@@ -14,5 +14,5 @@ return [
     $b . '/x-webkernel/authorization/routes.php',
     $b . '/x-webkernel/i18n/routes.php',
     $b . '/x-webkernel/imagery/routes.php',
-    $b . '/x-webkernel/platform-panels/routes.php',
+    $b . '/y-platform/panels/routes.php',
 ];

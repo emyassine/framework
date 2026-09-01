@@ -14,11 +14,11 @@ return [
     'dirs' => [
         $b . '/x-modules/acme/billing/resources/views/components',
         $b . '/x-webkernel/authorization/resources/views',
-        $b . '/x-webkernel/platform-components/resources/views/layout',
-        $b . '/x-webkernel/platform-components/resources/views/navigation',
-        $b . '/x-webkernel/platform-components/resources/views/components',
+        $b . '/y-platform/components/resources/views/layout',
+        $b . '/y-platform/components/resources/views/navigation',
+        $b . '/y-platform/components/resources/views/components',
         $b . '/x-webkernel/i18n/resources/views',
-        $b . '/x-webkernel/platform-notifications/resources/views/notifications',
+        $b . '/y-platform/notifications/resources/views/notifications',
     ],
     'namespaces' => [
         'billing' => [
@@ -26,11 +26,11 @@ return [
         ],
         'webkernel' => [
             $b . '/x-webkernel/authorization/resources/views',
-            $b . '/x-webkernel/platform-components/resources/views/layout',
-            $b . '/x-webkernel/platform-components/resources/views/navigation',
-            $b . '/x-webkernel/platform-components/resources/views/components',
+            $b . '/y-platform/components/resources/views/layout',
+            $b . '/y-platform/components/resources/views/navigation',
+            $b . '/y-platform/components/resources/views/components',
             $b . '/x-webkernel/i18n/resources/views',
-            $b . '/x-webkernel/platform-notifications/resources/views/notifications',
+            $b . '/y-platform/notifications/resources/views/notifications',
         ],
     ],
 ];

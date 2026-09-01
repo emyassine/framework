@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "dc85dfea390e3eb955652fee635f8aef",
+    "content-hash": "297557146b599af011c3a3eb2ed8a8d4",
     "packages": [
         {
             "name": "acme/billing",
@@ -678,7 +678,7 @@
             "version": "0.12.0",
             "dist": {
                 "type": "path",
-                "url": "x-webkernel/platform-actions",
+                "url": "y-platform/actions",
                 "reference": "212e890369c9e4759ccfd57ded7a6b63edbe211a"
             },
             "require": {
@@ -836,7 +836,7 @@
             "version": "0.12.0",
             "dist": {
                 "type": "path",
-                "url": "x-webkernel/platform-components",
+                "url": "y-platform/components",
                 "reference": "8c22ba944e4e6c26011225e9860e1e30c45b0c18"
             },
             "require": {
@@ -959,7 +959,7 @@
             "version": "0.12.0",
             "dist": {
                 "type": "path",
-                "url": "x-webkernel/platform-forms",
+                "url": "y-platform/forms",
                 "reference": "b44a47bfa6a2ea4171ec488f23ec5a9b031290c5"
             },
             "require": {
@@ -1181,7 +1181,7 @@
             "version": "0.12.0",
             "dist": {
                 "type": "path",
-                "url": "x-webkernel/platform-notifications",
+                "url": "y-platform/notifications",
                 "reference": "53148c34c92ad769b8f7c7e1de1246a5a7261d69"
             },
             "require": {
@@ -1222,8 +1222,8 @@
             "version": "0.12.0",
             "dist": {
                 "type": "path",
-                "url": "x-webkernel/platform-panels",
-                "reference": "df3ad19f9c8ce9e6980e51c1778712de19346b86"
+                "url": "y-platform/panels",
+                "reference": "5d3ad2400a42af80e202f03482de97457ceef161"
             },
             "require": {
                 "php": ">=8.5",
@@ -1231,6 +1231,7 @@
                 "webkernel/auth": "^0.12.0",
                 "webkernel/codebase": "^0.12.0",
                 "webkernel/components": "^0.12.0",
+                "webkernel/notifications": "^0.12.0",
                 "webkernel/schemas": "^0.12.0"
             },
             "type": "webkernel-stdlib",
@@ -1266,7 +1267,7 @@
             "version": "0.12.0",
             "dist": {
                 "type": "path",
-                "url": "x-webkernel/platform-schemas",
+                "url": "y-platform/schemas",
                 "reference": "de77e49846a607b84fb704f226f97e58e86fec5d"
             },
             "require": {
@@ -1349,7 +1350,7 @@
             "version": "0.12.0",
             "dist": {
                 "type": "path",
-                "url": "x-webkernel/platform-tables",
+                "url": "y-platform/tables",
                 "reference": "bcbb1bb2956aeee6ee6b59744a631fcd0b3e392f"
             },
             "require": {
@@ -1390,7 +1391,7 @@
             "version": "0.12.0",
             "dist": {
                 "type": "path",
-                "url": "x-webkernel/platform-widgets",
+                "url": "y-platform/widgets",
                 "reference": "bd1c475e1ce7a2ea6de844bbd84c99dd408e3dea"
             },
             "require": {

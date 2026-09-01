@@ -60,7 +60,7 @@ return array (
         'en' => 
         array (
           'site_title' => '',
-          'meta_description' => 'dsd dsdsdsds',
+          'meta_description' => '',
           'keywords' => 'dsdsd ds s',
         ),
         'es' => 
