@@ -299,17 +299,16 @@ PHPDoc `@param`, `@return`, and `@throws` use the same short name when the type 
 | `refactor/x-webkernel/lifecycle` | `webkernel/lifecycle` | Composer plugin and install paths |
 | `refactor/x-webkernel/devtools` | `webkernel/devtools` | Developer tools. Not production runtime. |
 | `refactor/x-webkernel/system` | `webkernel/system` | System admin panel and its resources |
-| `refactor/x-webkernel/platform` | `webkernel/platform` | Metapackage only |
-| `refactor/x-webkernel/platform/components` | `webkernel/components` | UI atoms |
-| `refactor/x-webkernel/platform/actions` | `webkernel/actions` | Action, ActionGroup, modals, CRUD actions |
-| `refactor/x-webkernel/platform/forms` | `webkernel/forms` | Form fields on schemas |
-| `refactor/x-webkernel/platform/tables` | `webkernel/tables` | List columns, filters, bulk actions |
-| `refactor/x-webkernel/platform/widgets` | `webkernel/widgets` | Dashboard and page widgets |
-| `refactor/x-webkernel/platform/notifications` | `webkernel/notifications` | Flash and in-app notifications |
-| `refactor/x-webkernel/platform/i18n` | `webkernel/i18n` | Locale, catalog, translations |
-| `refactor/x-webkernel/platform/imagery` | `webkernel/imagery` | Icons, brands, pixmaps |
-| `refactor/x-webkernel/platform/panels` | `webkernel/panels` | Panel, Resource, Page, Table, Wds. Not System. |
-| `refactor/x-webkernel/platform/schemas` | `webkernel/schemas` | Schema tree for forms and readonly views |
+| `refactor/y-platform/components` | `webkernel/components` | UI atoms (platform frontend logic) |
+| `refactor/y-platform/actions` | `webkernel/actions` | Action, ActionGroup, modals, CRUD actions |
+| `refactor/y-platform/forms` | `webkernel/forms` | Form fields on schemas |
+| `refactor/y-platform/tables` | `webkernel/tables` | List columns, filters, bulk actions |
+| `refactor/y-platform/widgets` | `webkernel/widgets` | Dashboard and page widgets |
+| `refactor/y-platform/notifications` | `webkernel/notifications` | Flash and in-app notifications |
+| `refactor/y-platform/i18n` | `webkernel/i18n` | Locale, catalog, translations |
+| `refactor/y-platform/imagery` | `webkernel/imagery` | Icons, brands, pixmaps |
+| `refactor/y-platform/panels` | `webkernel/panels` | Panel, Resource, Page, Table, Wds. Not System. |
+| `refactor/y-platform/schemas` | `webkernel/schemas` | Schema tree for forms and readonly views |
 | `refactor/modules/*/*` | business modules | Domain modules. Module-scoped panels live here. |
 
 **Pending moves (do when implementing):**
@@ -322,7 +321,7 @@ PHPDoc `@param`, `@return`, and `@throws` use the same short name when the type 
 ## 10. Foreword — old work and modularity
 
 - Old work lives under `_workbench_one`. **Copy and adapt.** Do not symlink that tree into refactor.
-- Composer path-repo `"symlink": true` for `x-webkernel/*` (editing the package Composer links) is allowed. `ln -s _workbench_one` is not.
+- Composer path-repo `"symlink": true` for `x-webkernel/*` and `y-platform/*` (editing the package Composer links) is allowed. `ln -s _workbench_one` is not.
 - Views and their compilation stay, but are **not** a platform-wide hardcoded bag. Views live in each package/module `resources/views`, declared on that package's provider.
 - Same for routes. A host `routes.php` is allowed for tests. Production routes live in packages and modules.
 - Do not repeat old-work spaghetti (Container, `WebApp` god object, request-time provider glob, hardcoded host views).
@@ -827,6 +826,15 @@ refactor/
 │       ├── src/
 │       └── features/
 │           └── {vendor}-{name}/
+├── y-platform/                      # Platform packages / frontend logic
+│   ├── actions/
+│   ├── components/
+│   ├── forms/
+│   ├── notifications/
+│   ├── panels/
+│   ├── schemas/
+│   ├── tables/
+│   └── widgets/
 └── platform/
     ├── fast-boot.php                # autoload only
     ├── platform-runtime.php         # Config::set target
@@ -1067,7 +1075,7 @@ If you feel the urge to “be helpful” by inventing a Container, a `discover_*
 Do this every time. Skipping this is how dumb sessions waste my money.
 
 1. **Open this file.** Re-read the sections that touch the task (package map §9, Decisions §12, three moments §18, naming §4, comments §6–7, build order §28). Do not rely on a summary you hallucinated last week.
-2. **Locate the real files.** `list_dir` / search the tree. Confirm the package path from §9. Source trees are under `x-webkernel/` and `x-modules/`. Install targets are `platform/dependencies/packagist` and `modules/`. Do not confuse them.
+2. **Locate the real files.** `list_dir` / search the tree. Confirm the package path from §9. Core framework sources are under `x-webkernel/`, platform frontend packages under `y-platform/`, and business modules under `x-modules/`. Install targets are `platform/dependencies/packagist` and `modules/`. Do not confuse them.
 3. **Read the neighboring code**, not only the one file named in the prompt. Same package, same Concerns traits, same enums, same provider constants, same dump consumers.
 4. **Classify the claim.**
    - **Rule** — always follow.
@@ -1130,7 +1138,7 @@ Run the ponytail ladder (§26) in order. Then apply Webkernel constraints on top
 - Frontend for frontend-only; server for trust/data (§20).
 - Self-hosted htmx (§20).
 - Runtime paths resolve from **install path**, not from the `x-webkernel` source checkout.
-- Path repositories point at **sources** (`x-webkernel`, `x-modules`), never at install destinations (`modules/`, `platform/dependencies/packagist`).
+- Path repositories point at **sources** (`x-webkernel`, `y-platform`, `x-modules`), never at install destinations (`modules/`, `platform/dependencies/packagist`).
 
 Write the intended API in one line (example: `webapp()->request()->user_agent()`). If the API fights naming §4 or doors §12, change the API, not the rules.
 
@@ -1202,7 +1210,7 @@ When stuck, search in this order — stop at the first authoritative hit:
 
 1. **This file** — Rule / Decision / Spec / Not specified.
 2. **The package map (§9)** and namespace summary (§29).
-3. **The code under `refactor/x-webkernel/…`** that already implements the twin.
+3. **The code under `refactor/x-webkernel/…` and `refactor/y-platform/…`** that already implements the twin.
 4. **Dump outputs / provider constants** (`ROUTES`, `VIEWS`, `COMPONENTS`, `COMMANDS`, `PANELS`) and lifecycle rules.
 5. **`_workbench_one`** as raw material to copy-adapt (§27), never as runtime.
 6. **Filament / Laravel / PSR docs** as external shape hints only — filtered through Decisions §12.
@@ -1215,6 +1223,7 @@ I have burned sessions on this. Encode it in your hands:
 
 - Workspace Composer root: `refactor/`.
 - Framework package **sources**: `refactor/x-webkernel/…`
+- Platform frontend package **sources**: `refactor/y-platform/…`
 - Business module **sources**: `refactor/x-modules/…` (or wherever I place them).
 - Package **install**: `platform/dependencies/packagist`
 - Business module **install**: `modules/{vendor}/{name}` via lifecycle installer (`type: webkernel-business-module`)

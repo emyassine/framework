@@ -61,7 +61,7 @@ return array (
         array (
           'site_title' => '',
           'meta_description' => '',
-          'keywords' => 'dsdsd ds s',
+          'keywords' => 'd dsdsd d',
         ),
         'es' => 
         array (

@@ -72,6 +72,9 @@ final class Engine
     /** @var array<int, list<string>> */
     private array $slot_stack = [];
 
+    /** @var list<array{view: string, template: string}> */
+    private array $render_stack = [];
+
     private string $echo_format = '\\'.View::class.'::echo(%s)';
 
     private ?Compiler $compiler = null;
@@ -452,20 +455,29 @@ final class Engine
             $compiled = $this->compiled_file($view);
         }
         if ($compiled === '' || ! is_file($compiled)) {
-            throw new \RuntimeException('Compiled view missing: '.$view);
+            $caller = $this->caller_location();
+            $ref = $caller !== '' ? ' (referenced in '.$caller.')' : '';
+            throw new \RuntimeException('Compiled view missing: '.$view.$ref);
         }
         extract($this->variables);
-        if (\function_exists('webkernel_profile_enter')) {
-            \webkernel_profile_enter($compiled);
-            try {
-                include $compiled;
-            } finally {
-                \webkernel_profile_leave();
-            }
 
-            return;
+        $template = $this->template_files[$view] ?? '';
+        $this->render_stack[] = ['view' => $view, 'template' => $template];
+        try {
+            if (\function_exists('webkernel_profile_enter')) {
+                \webkernel_profile_enter($compiled);
+                try {
+                    include $compiled;
+                } finally {
+                    \webkernel_profile_leave();
+                }
+
+                return;
+            }
+            include $compiled;
+        } finally {
+            array_pop($this->render_stack);
         }
-        include $compiled;
     }
 
     private function ensure_compiled(string $view): void
@@ -492,7 +504,9 @@ final class Engine
         $template = $this->template_file($view);
         $compiled = $this->compiled_file($view);
         if ($template === '' || $compiled === '') {
-            throw new \RuntimeException('Template not found: '.$view);
+            $caller = $this->caller_location();
+            $ref = $caller !== '' ? ' (referenced in '.$caller.')' : '';
+            throw new \RuntimeException('Template not found: '.$view.$ref);
         }
         $compiler = $this->compiler();
         $module = null;
@@ -505,6 +519,50 @@ final class Engine
         $compiler->set_acl_module($module);
         $compiler->compile_file($template, $compiled);
         unset($this->compiled_files[$view], $this->template_files[$view]);
+    }
+
+    /**
+     * Finds caller file and line for error messages.
+     *
+     * @return string
+     */
+    private function caller_location(): string
+    {
+        $parent = end($this->render_stack);
+        $trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
+
+        $caller_file = '';
+        $caller_line = 0;
+
+        foreach ($trace as $frame) {
+            $file = $frame['file'] ?? '';
+            if (
+                $file === '' ||
+                str_ends_with($file, '/Engine.php') ||
+                str_ends_with($file, '/View.php') ||
+                str_ends_with($file, '/Compiler.php') ||
+                str_ends_with($file, '/Directives.php')
+            ) {
+                continue;
+            }
+            $caller_file = $file;
+            $caller_line = (int) ($frame['line'] ?? 0);
+            break;
+        }
+
+        if ($parent !== false && $parent['view'] !== '') {
+            $view_name = $parent['view'];
+            $template = $parent['template'] !== '' ? $parent['template'] : $caller_file;
+            $loc = $template !== '' ? ($caller_line > 0 ? $template.':'.$caller_line : $template) : '';
+
+            return $loc !== '' ? "view '{$view_name}' at {$loc}" : "view '{$view_name}'";
+        }
+
+        if ($caller_file !== '') {
+            return $caller_line > 0 ? $caller_file.':'.$caller_line : $caller_file;
+        }
+
+        return '';
     }
 
     private function expired(string $view): bool
@@ -631,6 +689,6 @@ final class Engine
             $html,
         );
 
-        return is_string($replaced) ? $replaced : $html;
+        return \is_string($replaced) ? $replaced : $html;
     }
 }
