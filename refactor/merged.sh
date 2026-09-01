@@ -2,7 +2,7 @@
 
 set -euo pipefail
 
-# Terminal colors
+# Terminal styling
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[0;33m'
@@ -11,12 +11,10 @@ CYAN='\033[0;36m'
 BOLD='\033[1m'
 NC='\033[0m'
 
-# Dynamic terminal width detection
 get_term_width() {
     tput cols 2>/dev/null || echo 80
 }
 
-# Print header and dynamic separator
 print_banner() {
     local width
     width=$(get_term_width)
@@ -29,27 +27,55 @@ print_banner() {
 
 output_path=""
 raw_inputs=()
+raw_excludes=()
 
-# Parse CLI flags
+# Clean strings (strip trailing/leading whitespace and stray commas)
+clean_token() {
+    local val="$1"
+    val=$(echo "$val" | sed -e 's/^,*//' -e 's/,*$//' | xargs)
+    echo "$val"
+}
+
+# Parse CLI arguments intelligently
 while [[ $# -gt 0 ]]; do
     case "$1" in
-        --dir=*)
-            raw_inputs+=("${1#*=}")
-            shift
-            ;;
-        --dir)
-            raw_inputs+=("$2")
-            shift 2
-            ;;
-        --dirs=*)
+        --dir=*|--dirs=*)
             IFS=',' read -r -a split_dirs <<< "${1#*=}"
-            raw_inputs+=("${split_dirs[@]}")
+            for item in "${split_dirs[@]}"; do
+                c_item=$(clean_token "$item")
+                [[ -n "$c_item" ]] && raw_inputs+=("$c_item")
+            done
             shift
             ;;
-        --dirs)
-            IFS=',' read -r -a split_dirs <<< "$2"
-            raw_inputs+=("${split_dirs[@]}")
-            shift 2
+        --dir|--dirs)
+            shift
+            while [[ $# -gt 0 ]] && [[ "$1" != --* ]]; do
+                IFS=',' read -r -a split_dirs <<< "$1"
+                for item in "${split_dirs[@]}"; do
+                    c_item=$(clean_token "$item")
+                    [[ -n "$c_item" ]] && raw_inputs+=("$c_item")
+                done
+                shift
+            done
+            ;;
+        --exclude=*|--excludes=*)
+            IFS=',' read -r -a split_excl <<< "${1#*=}"
+            for item in "${split_excl[@]}"; do
+                c_item=$(clean_token "$item")
+                [[ -n "$c_item" ]] && raw_excludes+=("$c_item")
+            done
+            shift
+            ;;
+        --exclude|--excludes)
+            shift
+            while [[ $# -gt 0 ]] && [[ "$1" != --* ]]; do
+                IFS=',' read -r -a split_excl <<< "$1"
+                for item in "${split_excl[@]}"; do
+                    c_item=$(clean_token "$item")
+                    [[ -n "$c_item" ]] && raw_excludes+=("$c_item")
+                done
+                shift
+            done
             ;;
         --output=*|--out=*)
             output_path="${1#*=}"
@@ -60,34 +86,41 @@ while [[ $# -gt 0 ]]; do
             shift 2
             ;;
         *)
-            echo -e "${RED}Error: Unknown option '$1'${NC}" >&2
-            exit 1
+            # Capture trailing or unflagged positional paths directly
+            if [[ "$1" != -* ]]; then
+                IFS=',' read -r -a split_dirs <<< "$1"
+                for item in "${split_dirs[@]}"; do
+                    c_item=$(clean_token "$item")
+                    [[ -n "$c_item" ]] && raw_inputs+=("$c_item")
+                done
+                shift
+            else
+                echo -e "${RED}Error: Unknown option '$1'${NC}" >&2
+                exit 1
+            fi
             ;;
     esac
 done
 
-# Print banner at top of terminal execution
 print_banner
 
-# Interactive prompt if no inputs provided via CLI flags
+# Interactive mode if no paths were provided
 if [ ${#raw_inputs[@]} -eq 0 ]; then
     echo -e "${BOLD}${YELLOW}Interactive Mode Enabled${NC}"
-    echo -e "Enter file or directory paths below (use ${BOLD}Tab${NC} for autocompletion, left/right arrows to edit)."
-    echo -e "Leave prompt empty and press ${BOLD}Enter${NC} when done.\n"
+    echo -e "Enter file or directory paths (use ${BOLD}Tab${NC} for completion). Press ${BOLD}Enter${NC} on empty input when finished.\n"
 
-    # Configure readline options for bash read
     bind 'set completion-ignore-case on' 2>/dev/null || true
 
-    path_index=1
+    path_idx=1
     while true; do
-        read -e -p "$(echo -e "${BOLD}${GREEN}Path #${path_index}:${NC} ")" input_entry
-        input_entry=$(echo "$input_entry" | xargs)
+        read -e -p "$(echo -e "${BOLD}${GREEN}Path #${path_idx}:${NC} ")" input_entry
+        input_entry=$(clean_token "$input_entry")
 
         if [ -z "$input_entry" ]; then
             if [ ${#raw_inputs[@]} -gt 0 ]; then
                 break
             else
-                echo -e "${RED}Error: You must provide at least one valid path.${NC}"
+                echo -e "${RED}Error: Provide at least one path.${NC}"
                 continue
             fi
         fi
@@ -96,25 +129,35 @@ if [ ${#raw_inputs[@]} -eq 0 ]; then
 
         if [ -e "$expanded_entry" ]; then
             raw_inputs+=("$expanded_entry")
-            ((path_index++))
+            ((path_idx++))
         else
             echo -e "${YELLOW}Warning: Path '$input_entry' does not exist. Try again.${NC}"
         fi
     done
 
+    # Optional interactive excludes
+    read -e -p "$(echo -e "${BOLD}${YELLOW}Exclusions (comma-separated files/dirs/extensions, optional):${NC} ")" user_excludes
+    if [ -n "$user_excludes" ]; then
+        IFS=',' read -r -a split_excl <<< "$user_excludes"
+        for item in "${split_excl[@]}"; do
+            c_item=$(clean_token "$item")
+            [[ -n "$c_item" ]] && raw_excludes+=("$c_item")
+        done
+    fi
+
     if [ -z "$output_path" ]; then
         echo ""
-        read -e -i "merged.txt" -p "$(echo -e "${BOLD}${GREEN}Output target path:${NC} ")" user_output
-        output_path=$(echo "$user_output" | xargs)
+        read -e -i "merged.txt" -p "$(echo -e "${BOLD}${GREEN}Output file path:${NC} ")" user_output
+        output_path=$(clean_token "$user_output")
     fi
 fi
 
-# Default fallback output name
+# Set default output
 if [ -z "$output_path" ]; then
     output_path="merged.txt"
 fi
 
-# Calculate incremental output file name if file exists
+# Determine incremental output path
 target_output="$output_path"
 if [ -e "$target_output" ]; then
     parent_dir=$(dirname "$output_path")
@@ -134,11 +177,11 @@ if [ -e "$target_output" ]; then
     target_output="${parent_dir}/${file_prefix}.${counter}${extension}"
 fi
 
-# Ensure output parent directory exists
+# Ensure target directory exists
 parent_dir=$(dirname "$target_output")
 mkdir -p "$parent_dir"
 
-# Binary file detector
+# Binary file check
 is_binary_file() {
     local target_file="$1"
     if [ ! -f "$target_file" ]; then
@@ -152,24 +195,70 @@ is_binary_file() {
     return 1
 }
 
-# Clean and validate input paths
+# Resolve and validate exclusion rules
+resolved_excludes=()
+for excl in "${raw_excludes[@]}"; do
+    eval expanded_excl="$excl"
+    resolved_excludes+=("$expanded_excl")
+done
+
+is_excluded() {
+    local target="$1"
+    local real_target
+    real_target=$(realpath "$target" 2>/dev/null || echo "$target")
+
+    # Always skip output target file
+    local real_output
+    real_output=$(realpath "$target_output" 2>/dev/null || echo "$target_output")
+    if [ "$real_target" = "$real_output" ]; then
+        return 0
+    fi
+
+    # Binary check
+    if is_binary_file "$target"; then
+        return 0
+    fi
+
+    # Explicit exclude matching
+    for excl in "${resolved_excludes[@]}"; do
+        local real_excl
+        real_excl=$(realpath "$excl" 2>/dev/null || echo "$excl")
+
+        if [ "$real_target" = "$real_excl" ]; then
+            return 0
+        fi
+
+        if [ -d "$excl" ] && [[ "$real_target" == "$real_excl"* ]]; then
+            return 0
+        fi
+
+        local base_name
+        base_name=$(basename "$target")
+        if [[ "$base_name" == $excl ]] || [[ "$target" == $excl ]]; then
+            return 0
+        fi
+    done
+
+    return 1
+}
+
+# Evaluate input paths (Directories, Files, Globs)
 valid_paths=()
 for raw_path in "${raw_inputs[@]}"; do
-    clean_path=$(echo "$raw_path" | xargs)
-    eval clean_path="$clean_path"
-    if [ -e "$clean_path" ]; then
-        valid_paths+=("$clean_path")
+    eval expanded_path="$raw_path"
+    if [ -e "$expanded_path" ]; then
+        valid_paths+=("$expanded_path")
     else
-        echo -e "${YELLOW}Warning: Path '$clean_path' does not exist. Skipping.${NC}" >&2
+        echo -e "${YELLOW}Warning: Path '$expanded_path' does not exist. Skipping.${NC}" >&2
     fi
 done
 
 if [ ${#valid_paths[@]} -eq 0 ]; then
-    echo -e "${RED}Error: None of the provided target paths exist.${NC}" >&2
+    echo -e "${RED}Error: No valid paths to process.${NC}" >&2
     exit 1
 fi
 
-echo -e "${BLUE}Merging contents into target file...${NC}"
+echo -e "${BLUE}Merging contents into: ${BOLD}${target_output}${NC}"
 
 # Execute aggregation
 {
@@ -196,13 +285,7 @@ echo -e "${BLUE}Merging contents into target file...${NC}"
     for path in "${valid_paths[@]}"; do
         if [ -d "$path" ]; then
             while IFS= read -r -d '' item; do
-                real_item=$(realpath "$item" 2>/dev/null || echo "$item")
-                real_target=$(realpath "$target_output" 2>/dev/null || echo "$target_output")
-                if [ "$real_item" = "$real_target" ]; then
-                    continue
-                fi
-
-                if is_binary_file "$item"; then
+                if is_excluded "$item"; then
                     continue
                 fi
 
@@ -213,7 +296,7 @@ echo -e "${BLUE}Merging contents into target file...${NC}"
                 echo -e "\n"
             done < <(find "$path" -type f ! -path '*/.*' -print0)
         elif [ -f "$path" ]; then
-            if ! is_binary_file "$path"; then
+            if ! is_excluded "$path"; then
                 echo "--------------------------------------------------"
                 echo ">>> FILE: $path"
                 echo -e "--------------------------------------------------\n"
@@ -225,5 +308,5 @@ echo -e "${BLUE}Merging contents into target file...${NC}"
 } > "$target_output"
 
 term_width=$(get_term_width)
-echo -e "${GREEN}Output successfully written to: ${BOLD}${target_output}${NC}"
+echo -e "${GREEN}Process completed: ${BOLD}${target_output}${NC}"
 echo -e "${BLUE}$(printf '%.0s=' $(seq 1 "$term_width"))${NC}"
