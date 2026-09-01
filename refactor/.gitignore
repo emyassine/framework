@@ -3,3 +3,5 @@ platform/dependencies/node_modules
 platform/dependencies/package-lock.json
 composer.lock
 platform/storage/database.sqlite
+merged.txt
+merged.*.txt
