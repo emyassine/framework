@@ -2640,7 +2640,7 @@
             "dist": {
                 "type": "path",
                 "url": "x-webkernel/_codebase",
-                "reference": "d33717af000d2d16a15dd53bf773090fdfd485f4"
+                "reference": "604bfafe5c3dd06a8b6f2bab3ad1586294ba6ea0"
             },
             "require": {
                 "ext-dom": "*",
@@ -2685,7 +2685,7 @@
                     "production": true,
                     "provider": "Webkernel\\CodebaseProvider",
                     "prefix": "webkernel",
-                    "post_autoload_dump": "Webkernel\\Console\\Commands\\DumpAutoloadCommand"
+                    "post_autoload_dump": "Webkernel\\Commands\\DumpAutoloadCommand"
                 }
             },
             "installation-source": "dist",

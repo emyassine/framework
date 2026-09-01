@@ -7,7 +7,7 @@
 
 namespace Webkernel\DevTools;
 
-use Webkernel\Console\Commands\DumpAutoloadCommand;
+use Webkernel\Commands\DumpAutoloadCommand;
 use Webkernel\Console\DumpHook;
 
 /**

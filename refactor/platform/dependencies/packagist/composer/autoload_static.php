@@ -8,8 +8,6 @@ class ComposerStaticInitcc6f492cc5d64cb7f09b9024726d6929
 {
     public static $files = array (
         'b3937b7fa35431fe0895577483870c74' => __DIR__ . '/..' . '/webkernel/codebase/namespacer.php',
-        '6124b4c8570aa390c21fafd04a26c69f' => __DIR__ . '/..' . '/myclabs/deep-copy/src/DeepCopy/deep_copy.php',
-        'ec07570ca5a812141189b1fa81503674' => __DIR__ . '/..' . '/phpunit/phpunit/src/Framework/Assert/Functions.php',
     );
 
     public static $prefixLengthsPsr4 = array (
@@ -1858,6 +1856,7 @@ class ComposerStaticInitcc6f492cc5d64cb7f09b9024726d6929
         'Webkernel\\Auth\\Session' => __DIR__ . '/..' . '/webkernel/auth/src/Session.php',
         'Webkernel\\Auth\\User' => __DIR__ . '/..' . '/webkernel/auth/src/User.php',
         'Webkernel\\CodebaseProvider' => __DIR__ . '/..' . '/webkernel/codebase/src/CodebaseProvider.php',
+        'Webkernel\\Commands\\CompletionCommand' => __DIR__ . '/..' . '/webkernel/codebase/src/Commands/CompletionCommand.php',
         'Webkernel\\Commands\\DumpAutoloadCommand' => __DIR__ . '/..' . '/webkernel/codebase/src/Commands/DumpAutoloadCommand.php',
         'Webkernel\\Commands\\DumpAutoloadCommand\\CanCompileRuntime' => __DIR__ . '/..' . '/webkernel/codebase/src/Commands/DumpAutoloadCommand/CanCompileRuntime.php',
         'Webkernel\\Commands\\DumpAutoloadCommand\\CanDumpAssets' => __DIR__ . '/..' . '/webkernel/codebase/src/Commands/DumpAutoloadCommand/CanDumpAssets.php',
@@ -1887,6 +1886,7 @@ class ComposerStaticInitcc6f492cc5d64cb7f09b9024726d6929
         'Webkernel\\Console' => __DIR__ . '/..' . '/webkernel/codebase/src/Console.php',
         'Webkernel\\Console\\Attribute\\ConsoleCommand' => __DIR__ . '/..' . '/webkernel/codebase/src/Console/Attribute/ConsoleCommand.php',
         'Webkernel\\Console\\Cancelled' => __DIR__ . '/..' . '/webkernel/codebase/src/Console/Cancelled.php',
+        'Webkernel\\Console\\CommandsDiscovery' => __DIR__ . '/..' . '/webkernel/codebase/src/Console/CommandsDiscovery.php',
         'Webkernel\\Console\\Dispatcher' => __DIR__ . '/..' . '/webkernel/codebase/src/Console/Dispatcher.php',
         'Webkernel\\Console\\DumpHook' => __DIR__ . '/..' . '/webkernel/codebase/src/Console/DumpHook.php',
         'Webkernel\\Console\\ExitCode' => __DIR__ . '/..' . '/webkernel/codebase/src/Console/ExitCode.php',

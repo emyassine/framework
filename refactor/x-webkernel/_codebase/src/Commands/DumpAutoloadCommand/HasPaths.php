@@ -59,7 +59,8 @@ trait HasPaths
      */
     private function codebase_root(): string
     {
-        return \dirname(__DIR__, 4);
+        //> HasPaths lives in src/Commands/DumpAutoloadCommand/ — three levels up is the package root.
+        return \dirname(__DIR__, 3);
     }
 
     /**

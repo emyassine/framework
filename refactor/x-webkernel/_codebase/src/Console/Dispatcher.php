@@ -8,15 +8,17 @@
 namespace Webkernel\Console;
 
 use Webkernel\Composables\ComposableContract;
-use Webkernel\Console\Attribute\ConsoleCommand;
 use Webkernel\Console\Input\ArgvInput;
 use Webkernel\Console\Middleware\ConsoleMiddleware;
 
 /**
- * Discovers `#[ConsoleCommand]` methods and maps PHP parameters to argv.
+ * Runs dumped `#[ConsoleCommand]` methods and maps PHP parameters to argv.
  *
  * `webapp()->console()` is this object. `Webkernel\Console::run()` is the
  * process door: construct, handle(), exit.
+ *
+ * //> Command classes come from CommandsDiscovery + webkernel_commands.php.
+ * //> No hardcoded command list in this class.
  *
  * @phpstan-type CommandDef array{
  *   class: class-string,
@@ -32,12 +34,18 @@ use Webkernel\Console\Middleware\ConsoleMiddleware;
  */
 final class Dispatcher implements ComposableContract
 {
-    /** @var list<class-string> */
-    private const BUILTIN = [
-    ];
-
     /** @var array<string, CommandDef>|null */
     private ?array $definitions = null;
+
+    private readonly CommandsDiscovery $discovery;
+
+    /**
+     * @param CommandsDiscovery|null $discovery
+     */
+    public function __construct(?CommandsDiscovery $discovery = null)
+    {
+        $this->discovery = $discovery ?? new CommandsDiscovery();
+    }
 
     /**
      * @return string
@@ -109,44 +117,11 @@ final class Dispatcher implements ComposableContract
             return $this->definitions;
         }
 
-        $out = [];
-        foreach ($this->command_classes() as $class) {
-            if (! \class_exists($class)) {
-                continue;
-            }
-            $ref = new \ReflectionClass($class);
-            foreach ($ref->getMethods(\ReflectionMethod::IS_PUBLIC) as $method) {
-                $attrs = $method->getAttributes(ConsoleCommand::class);
-                if ($attrs === []) {
-                    continue;
-                }
-                /** @var ConsoleCommand $attribute */
-                $attribute = $attrs[0]->newInstance();
-                $command_name = self::command_name($ref, $method, $attribute);
-                $definition = [
-                    'class' => $class,
-                    'method' => $method->getName(),
-                    'description' => $attribute->description,
-                    'middleware' => $attribute->middleware,
-                    'aliases' => $attribute->aliases,
-                    'hidden' => $attribute->hidden,
-                    'reflection' => $method,
-                ];
-                foreach ([$command_name, ...$attribute->aliases] as $name) {
-                    if ($name === '') {
-                        continue;
-                    }
-                    if (isset($out[$name])) {
-                        throw new \RuntimeException('Duplicate console command ['.$name.'].');
-                    }
-                    $out[$name] = $definition;
-                }
-            }
-        }
-        \ksort($out);
-        $this->definitions = $out;
+        $this->definitions = $this->discovery->definitions(
+            $this->discovery->classes_from_dump(),
+        );
 
-        return $out;
+        return $this->definitions;
     }
 
     /**
@@ -181,9 +156,9 @@ final class Dispatcher implements ComposableContract
             $type = self::scalar_type($param);
             $kebab = \str_replace('_', '-', $param->getName());
             $is_bool = $type === 'bool';
-            $is_argument = ! $is_bool && ! $param->isDefaultValueAvailable();
+            $required = ! $is_bool && ! $param->isDefaultValueAvailable();
 
-            if ($is_argument) {
+            if ($required) {
                 if (! \array_key_exists($position, $positional)) {
                     throw new \InvalidArgumentException('Missing argument <'.$param->getName().'>.');
                 }
@@ -193,22 +168,30 @@ final class Dispatcher implements ComposableContract
             }
 
             $value = $this->option_value($param, $input, $kebab, $used_options);
-            if ($value === null) {
-                if ($param->isDefaultValueAvailable()) {
-                    $args[] = $param->getDefaultValue();
+            if ($value !== null) {
+                if ($is_bool) {
+                    $args[] = $value === true || $value === '1' || $value === 'true';
                     continue;
                 }
-                if ($param->allowsNull()) {
-                    $args[] = null;
-                    continue;
-                }
-                throw new \InvalidArgumentException('Missing option --'.$kebab.'.');
-            }
-            if ($is_bool) {
-                $args[] = $value === true || $value === '1' || $value === 'true';
+                $args[] = self::cast($type, $value, $param->allowsNull());
                 continue;
             }
-            $args[] = self::cast($type, $value, $param->allowsNull());
+
+            if (! $is_bool && \array_key_exists($position, $positional)) {
+                $args[] = self::cast($type, $positional[$position], $param->allowsNull());
+                $position++;
+                continue;
+            }
+
+            if ($param->isDefaultValueAvailable()) {
+                $args[] = $param->getDefaultValue();
+                continue;
+            }
+            if ($param->allowsNull()) {
+                $args[] = null;
+                continue;
+            }
+            throw new \InvalidArgumentException('Missing option --'.$kebab.'.');
         }
 
         if (isset($positional[$position])) {
@@ -289,42 +272,6 @@ final class Dispatcher implements ComposableContract
     }
 
     /**
-     * @return list<class-string>
-     */
-    private function command_classes(): array
-    {
-        $classes = $this->dumped_commands();
-        if ($classes !== []) {
-            return $classes;
-        }
-
-        return self::BUILTIN;
-    }
-
-    /**
-     * @return list<class-string>
-     */
-    private function dumped_commands(): array
-    {
-        $file = vendor_dir('composer/webkernel_commands.php');
-        if (! \is_file($file)) {
-            return [];
-        }
-        $loaded = require $file;
-        if (! \is_array($loaded)) {
-            return [];
-        }
-        $out = [];
-        foreach ($loaded as $class) {
-            if (\is_string($class) && $class !== '') {
-                $out[] = $class;
-            }
-        }
-
-        return $out;
-    }
-
-    /**
      * @param string|null $name
      *
      * @return void
@@ -351,19 +298,40 @@ final class Dispatcher implements ComposableContract
      */
     private function print_list(): void
     {
-        echo "\n  ".Terminal::BOLD.'webkernel'.Terminal::RESET.' '.Terminal::muted('<command>')."\n\n";
         $definitions = $this->definitions();
+        $version = $this->framework_version();
+
+        echo "\n";
+        echo '  '.Terminal::BOLD.'Webkernel'.Terminal::RESET;
+        if ($version !== '') {
+            echo ' '.Terminal::muted($version);
+        }
+        echo "\n\n";
+        echo '  '.Terminal::BOLD.'Usage:'.Terminal::RESET."\n";
+        echo '    webkernel '.Terminal::muted('<command> [options] [arguments]')."\n\n";
+        echo '  '.Terminal::BOLD.'Available commands:'.Terminal::RESET."\n";
+
         $width = 4;
         foreach (\array_keys($definitions) as $name) {
             $width = \max($width, \strlen($name));
         }
-        foreach ($definitions as $name => $definition) {
-            if ($definition['hidden'] || \in_array($name, $definition['aliases'], true)) {
-                continue;
+
+        $groups = $this->discovery->groups($definitions);
+        foreach ($groups as $group => $names) {
+            if ($group !== '') {
+                echo "\n  ".Terminal::YELLOW.$group.Terminal::RESET."\n";
+            } else {
+                echo "\n";
             }
-            $pad = \str_repeat(' ', $width - \strlen($name) + 3);
-            $desc = $definition['description'] !== '' ? $definition['description'] : $this->signature_hint($definition['reflection']);
-            echo '  '.Terminal::CYAN.$name.Terminal::RESET.$pad.Terminal::muted($desc)."\n";
+            foreach ($names as $name) {
+                $definition = $definitions[$name];
+                $pad = \str_repeat(' ', $width - \strlen($name) + 3);
+                $desc = $definition['description'] !== ''
+                    ? $definition['description']
+                    : $this->signature_hint($definition['reflection']);
+                $indent = $group !== '' ? '    ' : '  ';
+                echo $indent.Terminal::CYAN.$name.Terminal::RESET.$pad.Terminal::muted($desc)."\n";
+            }
         }
         echo "\n";
     }
@@ -376,14 +344,30 @@ final class Dispatcher implements ComposableContract
      */
     private function print_command(string $name, array $definition): void
     {
+        $primary = $name;
+        foreach ($this->definitions() as $candidate => $candidate_definition) {
+            if (
+                $candidate_definition['class'] === $definition['class']
+                && $candidate_definition['method'] === $definition['method']
+                && ! \in_array($candidate, $definition['aliases'], true)
+            ) {
+                $primary = $candidate;
+                break;
+            }
+        }
         $hint = $this->signature_hint($definition['reflection']);
-        echo "\n  ".Terminal::BOLD.'webkernel'.Terminal::RESET.' '.Terminal::CYAN.$name.Terminal::RESET;
+        echo "\n  ".Terminal::BOLD.'Usage:'.Terminal::RESET."\n";
+        echo '    webkernel '.Terminal::CYAN.$primary.Terminal::RESET;
         if ($hint !== '') {
             echo ' '.Terminal::muted($hint);
         }
         echo "\n";
         if ($definition['description'] !== '') {
-            echo "\n  ".Terminal::muted($definition['description'])."\n";
+            echo "\n  ".$definition['description']."\n";
+        }
+        if ($definition['aliases'] !== []) {
+            echo "\n  ".Terminal::BOLD.'Aliases:'.Terminal::RESET.' '
+                .\implode(', ', $definition['aliases'])."\n";
         }
         echo "\n";
     }
@@ -409,7 +393,7 @@ final class Dispatcher implements ComposableContract
             if ($param->isDefaultValueAvailable()) {
                 $default = $param->getDefaultValue();
                 $shown = \is_scalar($default) ? (string) $default : '';
-                $parts[] = '[--'.$kebab.($shown !== '' ? '='.$shown : '').']';
+                $parts[] = '['.$param->getName().($shown !== '' ? '='.$shown : '').']';
                 continue;
             }
             $parts[] = '<'.$param->getName().'>';
@@ -419,40 +403,22 @@ final class Dispatcher implements ComposableContract
     }
 
     /**
-     * @param \ReflectionClass<covariant object> $class
-     * @param \ReflectionMethod                  $method
-     * @param ConsoleCommand                     $attribute
-     *
      * @return string
      */
-    private static function command_name(\ReflectionClass $class, \ReflectionMethod $method, ConsoleCommand $attribute): string
+    private function framework_version(): string
     {
-        if ($attribute->name !== null && $attribute->name !== '') {
-            return $attribute->name;
+        if (! \function_exists('vendor_dir')) {
+            return '';
         }
-        $short = $class->getShortName();
-        if (\str_ends_with($short, 'Command')) {
-            $short = \substr($short, 0, -7);
+        $installed = vendor_dir('composer/installed.php');
+        if (! \is_file($installed)) {
+            return '';
         }
-        $class_part = self::kebab($short);
-        if ($method->getName() === '__invoke') {
-            return $class_part;
-        }
+        /** @var array{versions?: array<string, array{pretty_version?: string}>} $data */
+        $data = require $installed;
+        $version = $data['versions']['webkernel/codebase']['pretty_version'] ?? null;
 
-        return $class_part.':'.self::kebab($method->getName());
-    }
-
-    /**
-     * @param string $name
-     *
-     * @return string
-     */
-    private static function kebab(string $name): string
-    {
-        $kebab = \preg_replace('/([a-z0-9])([A-Z])/', '$1-$2', $name);
-        $kebab = \str_replace('_', '-', \is_string($kebab) ? $kebab : $name);
-
-        return \strtolower($kebab);
+        return \is_string($version) ? $version : '';
     }
 
     /**

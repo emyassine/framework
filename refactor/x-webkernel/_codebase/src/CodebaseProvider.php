@@ -7,6 +7,7 @@
 
 namespace Webkernel;
 
+use Webkernel\Commands\CompletionCommand;
 use Webkernel\Commands\DumpAutoloadCommand;
 use Webkernel\Commands\ServerCommand;
 
@@ -18,5 +19,9 @@ final class CodebaseProvider extends PlatformProvider
 
     public const CONFIG = [__DIR__.'/../config/mail.php'];
 
-    public const COMMANDS = [DumpAutoloadCommand::class, ServerCommand::class];
+    public const COMMANDS = [
+        CompletionCommand::class,
+        DumpAutoloadCommand::class,
+        ServerCommand::class,
+    ];
 }

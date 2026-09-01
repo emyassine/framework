@@ -60,7 +60,7 @@
             "production": true,
             "provider": "Webkernel\\CodebaseProvider",
             "prefix": "webkernel",
-            "post_autoload_dump": "Webkernel\\Console\\Commands\\DumpAutoloadCommand"
+            "post_autoload_dump": "Webkernel\\Commands\\DumpAutoloadCommand"
         }
     },
     "config": {

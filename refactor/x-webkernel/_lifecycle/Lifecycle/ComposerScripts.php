@@ -8,7 +8,7 @@
 namespace Webkernel\Lifecycle;
 
 use Composer\Script\Event;
-use Webkernel\Console\Commands\DumpAutoloadCommand;
+use Webkernel\Commands\DumpAutoloadCommand;
 
 /**
  * Optional host composer.json hook. The plugin already runs on post-autoload-dump.

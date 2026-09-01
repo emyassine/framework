@@ -13,6 +13,7 @@ use Webkernel\Commands\DumpAutoloadCommand\{
 	CanDumpTypography, CanStampPlatform, CanWritePhp,
 	HasPackages, HasPaths, HasProviders, _DumpAutoloadCommand
 };
+use Webkernel\Console\CommandsDiscovery;
 use Webkernel\Console\DumpHook;
 use Webkernel\Console\ExitCode;
 use Webkernel\Instance\InstanceId;
@@ -120,7 +121,12 @@ final readonly class DumpAutoloadCommand
         );
         $this->write_class_list(
             $composer_dir.DIRECTORY_SEPARATOR.self::COMMANDS_BASENAME,
-            $this->collect_provider_classes($providers, 'COMMANDS'),
+            (new CommandsDiscovery())->classes_from_providers(
+                $providers,
+                function (string $class) use ($classmap): void {
+                    $this->ensure_class($class, $classmap);
+                },
+            ),
         );
         $panels = $this->panels_dump($providers, $classmap, $root);
         $this->write_php(

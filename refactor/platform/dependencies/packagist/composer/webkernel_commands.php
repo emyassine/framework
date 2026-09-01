@@ -9,7 +9,8 @@
 
 return [
     \Webkernel\Auth\Console\UserCreateCommand::class,
-    \Webkernel\Console\Commands\DumpAutoloadCommand::class,
-    \Webkernel\Console\Commands\ServerCommand::class,
+    \Webkernel\Commands\CompletionCommand::class,
+    \Webkernel\Commands\DumpAutoloadCommand::class,
+    \Webkernel\Commands\ServerCommand::class,
     \Webkernel\Database\Console\MigrateCommand::class,
 ];
