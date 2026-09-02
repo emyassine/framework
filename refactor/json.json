@@ -1,0 +1,46 @@
+{
+  "extra": {
+    "webkernel": {
+      "lifecycle": {
+	      "checks": [
+	        {
+	          "check": "PHP_VERSION_ID < 80500",
+	          "on-fail": { "type": "warning", "message": "PHP version must be >= 8.5" },
+	          "fix": "sudo apt install php8.5"
+	        },
+	        {
+	          "check": "!extension_loaded('pdo')",
+	          "on-fail": { "type": "danger", "message": "PDO extension must be enabled" },
+	          "fix": "sudo apt install php8.5-mysql"
+	        },
+	        {
+	          "check": "!file_exists('storage')",
+	          "on-fail": { "type": "info", "message": "Storage directory missing" },
+	          "fix": "mkdir -p storage"
+	        },
+	        {
+	          "check": "!extension_loaded('openssl')",
+	          "on-fail": { "type": "danger", "message": "OpenSSL extension required" },
+	          "fix": "sudo apt install php8.5-openssl"
+	        }
+	      ],
+        "events": {
+          "post-autoload-dump": "Webkernel\\Commands\\DumpAutoloadCommand",
+          "post-create-project-cmd": "",
+          "post-install-cmd": "",
+          "post-root-package-install": "",
+          "post-update-cmd": "",
+          "pre-autoload-dump": "",
+          "pre-install-cmd": "",
+          "pre-update-cmd": ""
+        }
+      },
+      "provider": "",
+      "x-monorepo": {
+        "package-repos": [
+          "git@github.com:webkernelphp/config.git"
+        ]
+      }
+    }
+  }
+}

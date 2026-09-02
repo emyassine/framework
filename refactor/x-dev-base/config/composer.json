@@ -1,0 +1,63 @@
+{
+    "$schema": "https://getcomposer.org/schema.json",
+    "name": "webkernel/config",
+    "description": "Webkernel platform configuration package — booted, guarded, injectable.",
+    "version": "0.12.0",
+    "homepage": "https://www.webkernelphp.com",
+    "type": "library",
+    "license": "proprietary",
+    "authors": [
+        {
+            "name": "El Moumen Yassine",
+            "email": "yassine@numerimondes.com",
+            "homepage": "https://webkernelphp.com/about"
+        }
+    ],
+    "require": {
+        "php": "^8.5",
+        "webkernel/lifecycle": "self.version"
+    },
+    "autoload": {
+        "psr-4": {
+            "Webkernel\\Config\\": "src/"
+        },
+        "classmap": [
+            "src/Config.php"
+        ],
+        "files": [
+            "load.config.function.php"
+        ]
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Webkernel\\Config\\Tests\\": "tests/"
+        }
+    },
+    "extra": {
+        "webkernel": {
+            "package": {
+                "provider": "",
+                "post-autoload-dump": ""
+            },
+            "x-monorepo": {
+                "package-repos": [
+                    "git@github.com:webkernelphp/config.git"
+                ]
+            },
+            "notices" : {
+	            "depends-on": [
+	                "platform_path()",
+	                "vendor_path()",
+	                "Webkernel\\PlatformProvider"
+	            ],
+	            "note": "platform_path() and vendor_path() are injected by the Webkernel Composer plugin at runtime."
+            }
+        }
+    },
+    "config": {
+        "allow-plugins": {},
+        "sort-packages": true
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}

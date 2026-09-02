@@ -1,6 +1,19 @@
 # Webkernel Platform
-A high-performance PHP web kernel and enterprise application builder. Minimum overhead on the request path. Composer for install and dependencies. PSR for interoperability.
-Webkernel replaces generic framework overhead with explicit PHP primitives designed for complex business environments. It does not reject Composer. It does not skip PSR. It rejects request-path bloat.
+
+## Introduction
+
+### What is Webkernel?
+
+Webkernel is a high-performance, cross-platform application kernel and enterprise application builder.
+
+It enables you to construct mission-critical software running seamlessly across web, mobile,
+and desktop platforms using explicit PHP primitives.
+
+Webkernel replaces generic framework overhead with a lightweight execution model engineered for complex business environments.
+It eliminates execution overhead on the request path, uses Composer for dependency management,
+and enforces PSR standards for ecosystem interoperability.
+
+Webkernel does not reject standard tooling or conventions — it eliminates request-path bloat across all target platforms.
 
 ## Vision & Product Philosophy
 Webkernel is an **application builder**. The kernel stays lean. Composer is how the platform is installed and how dependencies are managed — in the majority of cases:

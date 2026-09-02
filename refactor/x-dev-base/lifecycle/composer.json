@@ -1,0 +1,54 @@
+{
+  "name": "webkernel/lifecycle",
+  "description": "Webkernel Composer plugin — custom installer, lifecycle hooks, and concern-based code generation.",
+  "type": "composer-plugin",
+  "version": "0.12.0",
+  "license": "proprietary",
+  "authors": [
+    {
+      "name": "El Moumen Yassine",
+      "email": "yassine@numerimondes.com",
+      "role": "Author"
+    }
+  ],
+  "require": {
+    "php": ">=8.5",
+    "composer-plugin-api": "^2.0",
+    "composer/composer": "^2.0"
+  },
+  "require-dev": {
+    "composer/composer": "^2.0"
+  },
+  "autoload": {
+    "psr-4": {
+      "Webkernel\\Lifecycle\\": "src/"
+    }
+  },
+  "extra": {
+    "class": "Webkernel\\Lifecycle\\LCInstaller",
+    "webkernel": {
+      "$schema": "./_schemas/schema.v1.json",
+      "lifecycle": {
+        "checks": [
+          {
+            "check": "PHP_VERSION_ID < 80500",
+            "on-fail": { "type": "danger", "message": "PHP >= 8.5 is required." },
+            "fix": "sudo apt install php8.5"
+          }
+        ],
+        "events": {
+          "post-autoload-dump": "Webkernel\\Lifecycle\\ComposerScripts::post_autoload_dump"
+        },
+        "concerns": [
+          "Webkernel\\Lifecycle\\Concerns\\Builtin\\GenPathHelpers",
+          "Webkernel\\Lifecycle\\Concerns\\Builtin\\GenVendorHelpers"
+        ]
+      }
+    }
+  },
+  "config": {
+    "allow-plugins": {
+      "webkernel/lifecycle": true
+    }
+  }
+}

@@ -1,0 +1,524 @@
+==================================================
+STRUCTURE
+==================================================
+
+--- Directory: /home/yassine/Projects/framework/refactor/x-dev-base/config/src ---
+/home/yassine/Projects/framework/refactor/x-dev-base/config/src
+├── BaseConfig.php
+├── Config.php
+├── ConfigWriter.php
+├── Enums
+│   └── ConfigPath.php
+└── PlatformConfig.php
+
+2 directories, 5 files
+
+==================================================
+FILE CONTENTS
+==================================================
+--------------------------------------------------
+>>> FILE: /home/yassine/Projects/framework/refactor/x-dev-base/config/src/Config.php
+--------------------------------------------------
+
+<?php declare(strict_types=1);
+//> This file is part of Webkernel.
+//> (c) 2025 - 2027 Numerimondes, El Moumen Yassine
+//> Yassine El Moumen <yassine@numerimondes.com> | <platform@webkernelphp.com>
+//> For the full copyright and license information, please view the LICENSE
+//> file that was distributed with this source code.
+
+namespace Webkernel\Config;
+use Webkernel\Config\Enums\ConfigPath;
+/**
+ * Static accessor for PlatformConfig instance.
+ * Compatible with Swoole and FrankenPHP request lifecycle flushes.
+ */
+final class Config
+{
+    private static ?PlatformConfig $instance = null;
+
+    private static string $platform_path = '';
+
+    private static string $vendor_path = '';
+
+    public static function set_paths(string $platform_path, string $vendor_path = ''): void
+    {
+        self::$platform_path = $platform_path;
+        self::$vendor_path = $vendor_path;
+        self::$instance = null;
+    }
+
+    public static function instance(): PlatformConfig
+    {
+        if (self::$instance === null) {
+            $root = self::$platform_path !== ''
+                ? self::$platform_path
+                : (\function_exists('platform_path') ? \platform_path() : \getcwd());
+
+            $vendor = self::$vendor_path !== ''
+                ? self::$vendor_path
+                : (\function_exists('vendor_path') ? \vendor_path() : $root . '/vendor');
+
+            self::$instance = new PlatformConfig($root, $vendor);
+            self::$instance->boot();
+        }
+
+        return self::$instance;
+    }
+
+    public static function boot(?string $platform_path = null, ?string $vendor_path = null): PlatformConfig
+    {
+        if ($platform_path !== null) {
+            self::$platform_path = $platform_path;
+        }
+
+        if ($vendor_path !== null) {
+            self::$vendor_path = $vendor_path;
+        }
+
+        self::$instance = null;
+
+        return self::instance();
+    }
+
+    public static function get(string $key, mixed $default = null): mixed
+    {
+        return self::instance()->get($key, $default);
+    }
+
+    public static function set(string $key, mixed $value): PlatformConfig
+    {
+        return self::instance()->set($key, $value);
+    }
+
+    public static function has(string $key): bool
+    {
+        return self::instance()->has($key);
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public static function all(): array
+    {
+        return self::instance()->all();
+    }
+
+    public static function path(string|ConfigPath $key, string $sub_path = ''): string
+    {
+        return self::instance()->path($key, $sub_path);
+    }
+
+    public static function flush(): void
+    {
+        if (self::$instance !== null) {
+            self::$instance->flush();
+            self::$instance = null;
+        }
+    }
+}
+
+
+--------------------------------------------------
+>>> FILE: /home/yassine/Projects/framework/refactor/x-dev-base/config/src/PlatformConfig.php
+--------------------------------------------------
+
+<?php declare(strict_types=1);
+//> This file is part of Webkernel.
+//> (c) 2025 - 2027 Numerimondes, El Moumen Yassine
+//> Yassine El Moumen <yassine@numerimondes.com> | <platform@webkernelphp.com>
+//> For the full copyright and license information, please view the LICENSE
+//> file that was distributed with this source code.
+
+namespace Webkernel\Config;
+
+use Webkernel\PlatformProvider;
+use Webkernel\Config\Enums\ConfigPath;
+
+/**
+ * Platform configuration manager handling boot sequence, paths, provider packages, and runtime updates.
+ */
+class PlatformConfig extends BaseConfig
+{
+    public function __construct(
+        string $platform_path,
+        protected string $vendor_path = ''
+    ) {
+        parent::__construct($platform_path);
+
+        if ($this->vendor_path === '') {
+            $this->vendor_path = $this->root_path . '/vendor';
+        } else {
+            $this->vendor_path = \rtrim($this->vendor_path, '/\\');
+        }
+    }
+
+    public function get_vendor_path(): string
+    {
+        return $this->vendor_path;
+    }
+
+    public function boot(): static
+    {
+        if ($this->booted) {
+            return $this;
+        }
+
+        $tree = [];
+
+        // 1. Resolve foundation paths first to avoid chicken-and-egg bootstrap deadlock
+        $paths_file = $this->resolve_file(ConfigPath::PLATFORM_PATHS->value);
+        $paths_config = self::require_array($paths_file);
+        if (! empty($paths_config)) {
+            $tree = \array_replace_recursive($tree, $paths_config);
+        }
+
+        // 2. Discover package provider configurations
+        $package_tree = $this->load_package_configs();
+        $tree = \array_replace_recursive($tree, $package_tree);
+
+        // 3. Apply platform and application base configurations
+        foreach ([ConfigPath::PLATFORM_CONFIG->value, ConfigPath::APP_CONFIG->value] as $rel) {
+            $tree = \array_replace_recursive($tree, self::require_array($this->resolve_file($rel)));
+        }
+
+        // 4. Layer runtime overrides
+        $runtime_file = $this->resolve_file(ConfigPath::RUNTIME_CONFIG->value);
+        $tree = \array_replace_recursive($tree, self::require_array($runtime_file));
+
+        $this->tree = $tree;
+        $this->booted = true;
+
+        return $this;
+    }
+
+    public function set(string $key, mixed $value): static
+    {
+        if (! $this->booted) {
+            $this->boot();
+        }
+
+        $runtime_file = $this->resolve_file(ConfigPath::RUNTIME_CONFIG->value);
+        $current = self::require_array($runtime_file);
+        $next = \array_replace_recursive($current, self::dot_to_tree($key, $value));
+
+        ConfigWriter::write($runtime_file, $next);
+        $this->set_dot($this->tree, $key, $value);
+
+        return $this;
+    }
+
+    public function resolve_file(string $relative_path): string
+    {
+        return $this->root_path . '/' . \ltrim($relative_path, '/\\');
+    }
+
+    /**
+     * Resolves absolute path from platform path configurations.
+     */
+    public function path(string|ConfigPath $key, string $sub_path = ''): string
+    {
+        $path_key = $key instanceof ConfigPath ? $key->value : $key;
+        $resolved = $this->get($path_key);
+
+        if (! \is_string($resolved) || $resolved === '') {
+            $resolved = $path_key;
+        }
+
+        $full = $this->resolve_file($resolved);
+
+        if ($sub_path !== '') {
+            $full .= '/' . \ltrim($sub_path, '/\\');
+        }
+
+        return $full;
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    protected function load_package_configs(): array
+    {
+        $file = $this->vendor_path . '/composer/webkernel_providers.php';
+        if (! \is_file($file)) {
+            $file = $this->resolve_file(ConfigPath::PROVIDERS_MANIFEST->value);
+            if (! \is_file($file)) {
+                return [];
+            }
+        }
+
+        $providers = require $file;
+        if (! \is_array($providers)) {
+            return [];
+        }
+
+        $tree = [];
+        foreach ($providers as $class) {
+            if (! \is_string($class) || ! \class_exists($class) || ! \is_a($class, PlatformProvider::class, true))
+             { continue; }
+            foreach ($class::declaration('CONFIG') as $path) {
+                if (\is_string($path) && $path !== '') {
+                    $tree = \array_replace_recursive($tree, self::require_array($path));
+                }
+            }
+        }
+
+        return $tree;
+    }
+}
+
+
+--------------------------------------------------
+>>> FILE: /home/yassine/Projects/framework/refactor/x-dev-base/config/src/BaseConfig.php
+--------------------------------------------------
+
+<?php declare(strict_types=1);
+//> This file is part of Webkernel.
+//> (c) 2025 - 2027 Numerimondes, El Moumen Yassine
+//> Yassine El Moumen <yassine@numerimondes.com> | <platform@webkernelphp.com>
+//> For the full copyright and license information, please view the LICENSE
+//> file that was distributed with this source code.
+
+namespace Webkernel\Config;
+
+/**
+ * Base key-value configuration tree container supporting dot-notation retrieval and mutation.
+ */
+class BaseConfig
+{
+    /** @var array<string, mixed> */
+    protected array $tree = [];
+
+    protected bool $booted = false;
+
+    public function __construct(
+        protected string $root_path = ''
+    ) {
+        if ($this->root_path !== '') {
+            $this->root_path = \rtrim($this->root_path, '/\\');
+        }
+    }
+
+    public function get_root_path(): string
+    {
+        return $this->root_path;
+    }
+
+    public function is_booted(): bool
+    {
+        return $this->booted;
+    }
+
+    public function get(string $key, mixed $default = null): mixed
+    {
+        $cursor = $this->tree;
+        foreach (\explode('.', $key) as $part) {
+            if (! \is_array($cursor) || ! \array_key_exists($part, $cursor)) {
+                return $default;
+            }
+            $cursor = $cursor[$part];
+        }
+
+        return $cursor;
+    }
+
+    public function has(string $key): bool
+    {
+        $cursor = $this->tree;
+        foreach (\explode('.', $key) as $part) {
+            if (! \is_array($cursor) || ! \array_key_exists($part, $cursor)) {
+                return false;
+            }
+            $cursor = $cursor[$part];
+        }
+
+        return true;
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function all(): array
+    {
+        return $this->tree;
+    }
+
+    /**
+     * @param array<string, mixed> $tree
+     */
+    public function merge(array $tree): static
+    {
+        $this->tree = \array_replace_recursive($this->tree, $tree);
+
+        return $this;
+    }
+
+    public function flush(): static
+    {
+        $this->tree = [];
+        $this->booted = false;
+
+        return $this;
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    protected static function require_array(string $file_path): array
+    {
+        if (! \is_file($file_path)) {
+            return [];
+        }
+
+        $loaded = require $file_path;
+
+        return \is_array($loaded) ? $loaded : [];
+    }
+
+    /**
+     * @param array<string, mixed> $tree
+     */
+    protected function set_dot(array &$tree, string $key, mixed $value): void
+    {
+        $parts = \explode('.', $key);
+        $cursor = &$tree;
+        $last = \array_key_last($parts);
+
+        foreach ($parts as $i => $part) {
+            if ($i === $last) {
+                $cursor[$part] = $value;
+                return;
+            }
+
+            if (! isset($cursor[$part]) || ! \is_array($cursor[$part])) {
+                $cursor[$part] = [];
+            }
+
+            $cursor = &$cursor[$part];
+        }
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    protected static function dot_to_tree(string $key, mixed $value): array
+    {
+        $tree = $value;
+        foreach (\array_reverse(\explode('.', $key)) as $part) {
+            $tree = [$part => $tree];
+        }
+
+        /** @var array<string, mixed> $tree */
+        return $tree;
+    }
+}
+
+
+--------------------------------------------------
+>>> FILE: /home/yassine/Projects/framework/refactor/x-dev-base/config/src/ConfigWriter.php
+--------------------------------------------------
+
+<?php declare(strict_types=1);
+//> This file is part of Webkernel.
+//> (c) 2025 - 2027 Numerimondes, El Moumen Yassine
+//> Yassine El Moumen <yassine@numerimondes.com> | <platform@webkernelphp.com>
+//> For the full copyright and license information, please view the LICENSE
+//> file that was distributed with this source code.
+
+namespace Webkernel\Config;
+
+use RuntimeException;
+
+/**
+ * Standalone atomic config rewriter for persistent runtime configuration updates.
+ */
+final class ConfigWriter
+{
+    /**
+     * @param array<string, mixed> $keys
+     */
+    public static function atomic_rewrite(string $path, array $keys): void
+    {
+        $current = [];
+        if (\is_file($path)) {
+            $loaded = require $path;
+            if (\is_array($loaded)) {
+                $current = $loaded;
+            }
+        }
+
+        self::write($path, \array_replace_recursive($current, $keys));
+    }
+
+    /**
+     * @param array<string, mixed> $tree
+     */
+    public static function write(string $path, array $tree): void
+    {
+        $dir = \dirname($path);
+        if (! \is_dir($dir) && ! \mkdir($dir, 0775, true) && ! \is_dir($dir)) {
+            throw new RuntimeException('Unable to create directory ' . $dir);
+        }
+
+        $exported = \var_export($tree, true);
+        $end = ((int) \date('Y')) + 1;
+        $body = <<<PHP
+<?php declare(strict_types=1);
+//> This file is part of Webkernel.
+//> (c) 2025 - {$end} Numerimondes, El Moumen Yassine
+//> Yassine El Moumen <yassine@numerimondes.com> | <platform@webkernelphp.com>
+//> For the full copyright and license information, please view the LICENSE
+//> file that was distributed with this source code.
+//
+// WARNING: Some keys in this file are written by the platform itself (see
+// "platform-managed" comments). Do not edit those keys by hand — your changes
+// will be overwritten on next boot if the platform detects a drift.
+
+return {$exported};
+
+PHP;
+
+        $tmp = $path . '.' . \bin2hex(\random_bytes(4)) . '.tmp';
+        if (\file_put_contents($tmp, $body, LOCK_EX) === false) {
+            throw new RuntimeException('Unable to write file ' . $tmp);
+        }
+
+        if (! \rename($tmp, $path)) {
+            @\unlink($tmp);
+            throw new RuntimeException('Unable to rename atomic file over ' . $path);
+        }
+
+        if (\function_exists('opcache_invalidate')) {
+            \opcache_invalidate($path, true);
+        }
+    }
+}
+
+
+--------------------------------------------------
+>>> FILE: /home/yassine/Projects/framework/refactor/x-dev-base/config/src/Enums/ConfigPath.php
+--------------------------------------------------
+
+<?php declare(strict_types=1);
+//> This file is part of Webkernel.
+//> (c) 2025 - 2027 Numerimondes, El Moumen Yassine
+//> Yassine El Moumen <yassine@numerimondes.com> | <platform@webkernelphp.com>
+//> For the full copyright and license information, please view the LICENSE
+//> file that was distributed with this source code.
+
+namespace Webkernel\Config;
+
+/**
+ * Standard configuration file and section path identifiers.
+ */
+enum ConfigPath: string
+{
+    case PLATFORM_PATHS = 'config/platform-paths.php';
+    case PLATFORM_CONFIG = 'config/platform.php';
+    case APP_CONFIG = 'config/app.php';
+    case RUNTIME_CONFIG = 'internal/platform-runtime.php';
+    case PROVIDERS_MANIFEST = 'internal/dependencies/packagist/webkernel_providers.php';
+    case MODULES_MANIFEST = 'internal/temporary/modules_manifest.php';
+}
+
+
