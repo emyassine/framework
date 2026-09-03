@@ -1,0 +1,237 @@
+==================================================
+STRUCTURE
+==================================================
+
+--- Directory: config ---
+config
+├── app.php
+├── paths.php
+├── platform.php
+└── telemetry.php
+
+1 directory, 4 files
+
+==================================================
+FILE CONTENTS
+==================================================
+--------------------------------------------------
+>>> FILE: config/platform.php
+--------------------------------------------------
+
+<?php declare(strict_types=1);
+//> This file is part of Webkernel.
+//> (c) 2025 - 2027 Numerimondes, El Moumen Yassine
+//> Yassine El Moumen <yassine@numerimondes.com> | <platform@webkernelphp.com>
+//> For the full copyright and license information, please view the LICENSE
+//> file that was distributed with this source code.
+//
+// WARNING: Some keys in this file are written by the platform itself (see
+// "platform-managed" comments). Do not edit those keys by hand — your changes
+// will be overwritten on next boot if the platform detects a drift.
+
+return array (
+  'id' => 'bf0b7a6fe1dc0f33e62c091b9c7fe6e9',
+  'hostname' => 'xdv',
+  'ip' => '127.0.1.1',
+  'uuid' => '18171914e030401586f89cae55151312',
+  'macs' => '88:a4:c2:f3:ac:22,00:00:00:00:00:00,10:66:6a:00:00:00,d8:80:83:06:45:d5',
+  'instance_file_path' => 'internal/storage/instance',
+  'created' => '2026-08-21T00:00:00+00:00',
+  'autoload' => 'internal/dependencies/packagist/autoload.php',
+  'internal' =>
+  array (
+    'path' => 'internal',
+    'config_path' => 'config',
+    'bootstrap_path' => 'internal/bootstrap',
+    'cache_path' => 'internal/cache',
+    'settings_path' => 'internal/settings',
+    'storage_path' => 'internal/storage',
+    'telemetry_path' => 'internal/telemetry',
+    'temporary_path' => 'internal/temporary',
+  ),
+  'dependencies' =>
+  array (
+    'path' => 'internal/dependencies',
+    'packagist_path' => 'internal/dependencies/packagist',
+    'node_modules_path' => 'internal/dependencies/node_modules',
+    'package_json' => 'internal/dependencies/package.json',
+  ),
+  'modules' =>
+  array (
+    'path' => 'modules',
+    'manifest_path' => 'internal/temporary/modules_manifest.php',
+  ),
+  'public' =>
+  array (
+    'path' => 'public',
+    'index' => 'public/index.php',
+  ),
+  'js' =>
+  array (
+    'manager' => 'npm',
+    'package_json' => 'internal/dependencies/package.json',
+    'node_modules_path' => 'internal/dependencies/node_modules',
+  ),
+  'telemetry' =>
+  array (
+    'enabled' => true,
+    'logs_path' => 'internal/telemetry/logs',
+  ),
+);
+
+
+--------------------------------------------------
+>>> FILE: config/app.php
+--------------------------------------------------
+
+<?php declare(strict_types=1);
+//> This file is part of Webkernel.
+//> (c) 2025 - 2027 Numerimondes, El Moumen Yassine
+//> Yassine El Moumen <yassine@numerimondes.com> | <platform@webkernelphp.com>
+//> For the full copyright and license information, please view the LICENSE
+//> file that was distributed with this source code.
+
+return [
+    'app' => [
+        'name' => 'Webkernel',
+        'locale' => 'en',
+        'debug' => false,
+        'timezone' => 'Africa/Casablanca',
+        'env' => 'prod',
+    ],
+    'branding' => [
+        'favicon' => '/favicon.ico',
+        'logo_light' => null,
+        'logo_dark' => null,
+        'logo_height' => '2rem',
+        'colors' => [
+            'primary' => 'blue',
+        ],
+    ],
+    'ui' => [
+        'dark_mode' => true,
+        'sidebar_customizable' => true,
+    ],
+    'database' => [
+        'default' => 'sqlite',
+        'connections' => [
+            'sqlite' => [
+                'driver' => 'sqlite',
+                'database' => 'platform/storage/database.sqlite',
+            ],
+            'mysql' => [
+                'driver' => 'mysql',
+                'host' => '127.0.0.1',
+                'port' => 3306,
+                'database' => 'webkernel',
+                'username' => 'root',
+                'password' => '',
+                'charset' => 'utf8mb4',
+            ],
+            'pgsql' => [
+                'driver' => 'pgsql',
+                'host' => '127.0.0.1',
+                'port' => 5432,
+                'database' => 'webkernel',
+                'username' => 'webkernel',
+                'password' => '',
+            ],
+        ],
+    ],
+    'cache' => [
+        'driver' => 'apcu',
+        'fallback' => 'redis',
+    ],
+    'logging' => [
+        'level' => 'info',
+        'channel' => 'single',
+    ],
+];
+
+
+--------------------------------------------------
+>>> FILE: config/telemetry.php
+--------------------------------------------------
+
+<?php declare(strict_types=1);
+//> This file is part of Webkernel.
+//> (c) 2025 - 2027 Numerimondes, El Moumen Yassine
+//> Yassine El Moumen <yassine@numerimondes.com> | <platform@webkernelphp.com>
+//> For the full copyright and license information, please view the LICENSE
+//> file that was distributed with this source code.
+
+return [
+	'schema_version' => '1.0.1',
+
+	'telemetry' => [
+		'enabled'   => true,
+		'logs_path' => 'platform/telemetry/logs',
+
+		'structure' => [
+			'logs' => [
+				'access' => [
+					'path'        => 'platform/telemetry/logs/access',
+					'description' => 'High-throughput HTTP request/response logs',
+				],
+				'app' => [
+					'path'        => 'platform/telemetry/logs/app',
+					'description' => 'Application domain events and exceptions',
+				],
+				'system' => [
+					'path'        => 'platform/telemetry/logs/system',
+					'description' => 'Webkernel core lifecycle and low-level error logs',
+				],
+			],
+
+			'metrics' => [
+				'counters' => [
+					'path'        => 'platform/telemetry/metrics/counters',
+					'description' => 'Monotonically increasing values (total requests, error counts)',
+				],
+				'gauges' => [
+					'path'        => 'platform/telemetry/metrics/gauges',
+					'description' => 'Point-in-time metrics (memory usage, active workers)',
+				],
+				'histograms' => [
+					'path'        => 'platform/telemetry/metrics/histograms',
+					'description' => 'Statistical distributions (request latency, payload size)',
+				],
+			],
+
+			'traces' => [
+				'active' => [
+					'path'        => 'platform/telemetry/traces/active',
+					'description' => 'In-flight trace contexts and propagation headers',
+				],
+				'spans' => [
+					'path'        => 'platform/telemetry/traces/spans',
+					'description' => 'Completed span trees ready for collector export',
+				],
+			],
+
+			'profiles' => [
+				'cpu' => [
+					'path'        => 'platform/telemetry/profiles/cpu',
+					'description' => 'Execution clock sampling and call graphs',
+				],
+				'memory' => [
+					'path'        => 'platform/telemetry/profiles/memory',
+					'description' => 'Heap allocation snapshots and pointer tracking',
+				],
+			],
+
+			'buffer' => [
+				'shm' => [
+					'path'        => 'platform/telemetry/buffer/shm',
+					'description' => 'Shared memory segments (shmop, APCu, memory-mapped rings)',
+				],
+				'queue' => [
+					'path'        => 'platform/telemetry/buffer/queue',
+					'description' => 'Write-ahead log or disk-backed failover queues',
+				],
+			],
+		],
+	],
+];
+
+

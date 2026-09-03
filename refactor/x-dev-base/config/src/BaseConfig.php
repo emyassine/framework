@@ -16,7 +16,6 @@ class BaseConfig
 {
     /** @var array<string, mixed> */
     protected array $tree = [];
-
     protected bool $booted = false;
 
     public function __construct(
@@ -76,7 +75,7 @@ class BaseConfig
 
     public function flush(): static
     {
-        $this->tree  = [];
+        $this->tree   = [];
         $this->booted = false;
         return $this;
     }
@@ -85,7 +84,11 @@ class BaseConfig
     // Helpers
     // -------------------------------------------------------------------------
 
-    /** @return array<string, mixed> */
+    /**
+     * Require a PHP file and return its array value, or [] if missing/invalid.
+     *
+     * @return array<string, mixed>
+     */
     protected static function require_array(string $file_path): array
     {
         if (! \is_file($file_path)) {
@@ -95,13 +98,46 @@ class BaseConfig
         return \is_array($loaded) ? $loaded : [];
     }
 
+    /**
+     * Require a PHP config file and wrap its contents under the file's stem key.
+     *
+     * e.g. "config/platform.php" → ['platform' => [...contents...]]
+     *      "config/platform-paths.php" → ['platform-paths' => [...contents...]]
+     *
+     * This ensures dot-notation access always starts with the filename:
+     *   config('platform.id'), config('app.name'), config('database.connections.mysql.host')
+     *
+     * Pass $stem explicitly to override the auto-derived key (useful for
+     * runtime-override files that must be merged flat, like platform-runtime.php).
+     *
+     * @param  string      $file_path  Absolute path to the PHP config file.
+     * @param  string|null $stem       Override key; null = derived from basename.
+     * @return array<string, mixed>    Always a single-key array: [$stem => $contents].
+     */
+    protected static function require_file_under_key(string $file_path, ?string $stem = null): array
+    {
+        $contents = self::require_array($file_path);
+        if (empty($contents)) {
+            return [];
+        }
+
+        if ($stem === null) {
+            // Derive stem: strip directory + all extensions
+            // "config/platform.php"       → "platform"
+            // "config/platform-paths.php" → "platform-paths"
+            $basename = \basename($file_path);
+            $stem     = \strstr($basename, '.', before_needle: true) ?: $basename;
+        }
+
+        return [$stem => $contents];
+    }
+
     /** @param array<string, mixed> $tree */
     protected function set_dot(array &$tree, string $key, mixed $value): void
     {
         $parts  = \explode('.', $key);
         $cursor = &$tree;
         $last   = \array_key_last($parts);
-
         foreach ($parts as $i => $part) {
             if ($i === $last) {
                 $cursor[$part] = $value;

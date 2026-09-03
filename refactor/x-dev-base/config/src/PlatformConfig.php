@@ -26,6 +26,19 @@ use Webkernel\Config\Exceptions\ConfigGuardException;
  *  1. The $vendor_path constructor argument (explicit injection), OR
  *  2. The vendor_path() global function (Composer plugin), OR
  *  3. $root_path . '/vendor'  (last-resort fallback only)
+ *
+ * --- KEY FORMAT ---
+ * Every config file is stored in the tree under its filename stem so that
+ * dot-notation always starts with the filename:
+ *
+ *   config/platform.php       → $tree['platform'][...]
+ *   config/app.php            → $tree['app'][...]
+ *   config/platform-paths.php → $tree['platform-paths'][...]
+ *
+ * Access examples:
+ *   Config::get('platform.id')
+ *   Config::get('app.name')
+ *   Config::get('database.connections.mysql.host')
  */
 class PlatformConfig extends BaseConfig
 {
@@ -83,22 +96,27 @@ class PlatformConfig extends BaseConfig
 
         $tree = [];
 
-        // 1. Foundation paths first — avoids bootstrap chicken-and-egg deadlock
-        $paths_file   = $this->resolve_file(ConfigPath::PlatformPaths->value);
-        $paths_config = self::require_array($paths_file);
-        if (! empty($paths_config)) {
-            $tree = \array_replace_recursive($tree, $paths_config);
-        }
+        // 1. Foundation paths first — avoids bootstrap chicken-and-egg deadlock.
+        //    Wrapped under 'platform-paths' key:
+        //      config('platform-paths.some_key')
+        $paths_file = $this->resolve_file(ConfigPath::PlatformPaths->value);
+        $tree       = \array_replace_recursive($tree, self::require_file_under_key($paths_file));
 
-        // 2. Discover and merge package provider configurations
+        // 2. Discover and merge package provider configurations.
+        //    Each provider file is wrapped under its own stem key.
         $tree = \array_replace_recursive($tree, $this->load_package_configs());
 
-        // 3. Platform and application base configurations
+        // 3. Platform and application base configurations, each under their stem:
+        //      config/platform.php → $tree['platform']
+        //      config/app.php      → $tree['app']
         foreach ([ConfigPath::PlatformConfig->value, ConfigPath::AppConfig->value] as $rel) {
-            $tree = \array_replace_recursive($tree, self::require_array($this->resolve_file($rel)));
+            $abs  = $this->resolve_file($rel);
+            $tree = \array_replace_recursive($tree, self::require_file_under_key($abs));
         }
 
-        // 4. Layer runtime overrides (written by set())
+        // 4. Layer runtime overrides (written by set()).
+        //    The runtime file already stores dot-expanded keys (written by set_dot()),
+        //    so it is merged FLAT — no extra stem wrapping — directly into the tree.
         $runtime_file = $this->resolve_file(ConfigPath::RuntimeConfig->value);
         $tree         = \array_replace_recursive($tree, self::require_array($runtime_file));
 
@@ -110,6 +128,9 @@ class PlatformConfig extends BaseConfig
 
     /**
      * Set a config key at runtime, persisting it to the runtime config file.
+     *
+     * The key must use the canonical dot-notation format: <filename>.<key>.<nested_key>
+     * e.g. Config::set('platform.debug', true)
      *
      * @throws ConfigGuardException when the key (or its prefix) is protected.
      */
@@ -124,7 +145,6 @@ class PlatformConfig extends BaseConfig
         $runtime_file = $this->resolve_file(ConfigPath::RuntimeConfig->value);
         $current      = self::require_array($runtime_file);
         $next         = \array_replace_recursive($current, self::dot_to_tree($key, $value));
-
         ConfigWriter::write($runtime_file, $next);
         $this->set_dot($this->tree, $key, $value);
 
@@ -169,6 +189,9 @@ class PlatformConfig extends BaseConfig
     /**
      * Load config arrays declared by all registered PlatformProvider packages.
      *
+     * Each provider config file is wrapped under its filename stem, exactly
+     * like the platform and app config files in boot().
+     *
      * Provider manifest is looked up relative to vendor_path() and never hardcoded.
      *
      * @return array<string, mixed>
@@ -201,7 +224,8 @@ class PlatformConfig extends BaseConfig
 
             foreach ($class::declaration('CONFIG') as $path) {
                 if (\is_string($path) && $path !== '') {
-                    $tree = \array_replace_recursive($tree, self::require_array($path));
+                    // Wrap under the file's stem key, consistent with boot()
+                    $tree = \array_replace_recursive($tree, self::require_file_under_key($path));
                 }
             }
         }
