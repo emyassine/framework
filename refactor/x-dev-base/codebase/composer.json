@@ -38,6 +38,8 @@
         "psr/log": "^3.0",
         "psr/simple-cache": "^3.0",
         "webkernel/config": "self.version",
+        "webkernel/commands": "self.version",
+        "webkernel/console": "self.version",
         "webkernel/lifecycle": "self.version"
     },
     "extra": {

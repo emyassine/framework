@@ -8,7 +8,9 @@ $baseDir = dirname(dirname(dirname($vendorDir)));
 return array(
     'Webkernel\\Lifecycle\\' => array($vendorDir . '/webkernel/lifecycle/src'),
     'Webkernel\\DevTools\\' => array($vendorDir . '/webkernel/devtools/src'),
+    'Webkernel\\Console\\' => array($vendorDir . '/webkernel/console/src'),
     'Webkernel\\Config\\' => array($vendorDir . '/webkernel/config/src'),
+    'Webkernel\\Commands\\' => array($vendorDir . '/webkernel/commands/src'),
     'Webkernel\\' => array($vendorDir . '/webkernel/codebase/src'),
     'Psr\\SimpleCache\\' => array($vendorDir . '/psr/simple-cache/src'),
     'Psr\\Log\\' => array($vendorDir . '/psr/log/src'),

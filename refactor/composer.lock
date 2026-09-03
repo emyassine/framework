@@ -650,7 +650,7 @@
             "dist": {
                 "type": "path",
                 "url": "x-dev-base/codebase",
-                "reference": "43c90cbcac61e708c065352cf24b5d2aab87090a"
+                "reference": "f50f663feccc8282475019833c8a63d75d155d82"
             },
             "require": {
                 "ext-dom": "*",
@@ -671,7 +671,9 @@
                 "psr/http-message": "^2.0",
                 "psr/log": "^3.0",
                 "psr/simple-cache": "^3.0",
+                "webkernel/commands": "self.version",
                 "webkernel/config": "self.version",
+                "webkernel/console": "self.version",
                 "webkernel/lifecycle": "self.version"
             },
             "type": "library",
@@ -709,12 +711,71 @@
             }
         },
         {
+            "name": "webkernel/commands",
+            "version": "0.12.0",
+            "dist": {
+                "type": "path",
+                "url": "x-dev-base/commands",
+                "reference": "c062d044b2b17077ef476fbc50cc7f1c366b6fd6"
+            },
+            "require": {
+                "php": ">=8.5",
+                "webkernel/config": "self.version"
+            },
+            "type": "library",
+            "extra": {
+                "webkernel": {
+                    "$schema": "https://webkernelphp.org/packages/v1/schema.json",
+                    "lifecycle": {
+                        "checks": [],
+                        "events": {
+                            "post-autoload-dump": "",
+                            "post-create-project-cmd": "",
+                            "post-install-cmd": "",
+                            "post-root-package-install": "",
+                            "post-update-cmd": "",
+                            "pre-autoload-dump": "",
+                            "pre-install-cmd": "",
+                            "pre-update-cmd": ""
+                        }
+                    },
+                    "provider": "Webkernel\\Commands\\CommandsProvider",
+                    "x-monorepo": {
+                        "package-repos": [
+                            "git@github.com:webkernelphp/commands.git"
+                        ]
+                    }
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Webkernel\\Commands\\": "src/"
+                }
+            },
+            "license": [
+                "proprietary"
+            ],
+            "authors": [
+                {
+                    "name": "El Moumen Yassine",
+                    "email": "yassine@numerimondes.com",
+                    "homepage": "https://webkernelphp.com/about"
+                }
+            ],
+            "description": "Webkernel commands.",
+            "homepage": "https://www.webkernelphp.com",
+            "transport-options": {
+                "symlink": true,
+                "relative": true
+            }
+        },
+        {
             "name": "webkernel/config",
             "version": "0.12.0",
             "dist": {
                 "type": "path",
                 "url": "x-dev-base/config",
-                "reference": "79de17084e15b88f344663a428f8b9e6e4ff25c0"
+                "reference": "8da19ca99edb61ed9d2118b2f59aae6b2f802445"
             },
             "require": {
                 "php": ">=8.5",
@@ -738,9 +799,6 @@
                 "psr-4": {
                     "Webkernel\\Config\\": "src/"
                 },
-                "classmap": [
-                    "src/Config.php"
-                ],
                 "files": [
                     "load.config.function.php"
                 ]
@@ -761,6 +819,71 @@
                 }
             ],
             "description": "Webkernel platform configuration package — booted, guarded, injectable.",
+            "homepage": "https://www.webkernelphp.com",
+            "transport-options": {
+                "symlink": true,
+                "relative": true
+            }
+        },
+        {
+            "name": "webkernel/console",
+            "version": "0.12.0",
+            "dist": {
+                "type": "path",
+                "url": "x-dev-base/console",
+                "reference": "c239e8bcc1b548cc020c44ec68249a044a9cac79"
+            },
+            "require": {
+                "php": ">=8.5",
+                "webkernel/config": "self.version"
+            },
+            "type": "library",
+            "extra": {
+                "webkernel": {
+                    "$schema": "https://webkernelphp.org/packages/v1/schema.json",
+                    "lifecycle": {
+                        "checks": [],
+                        "events": {
+                            "post-autoload-dump": "",
+                            "post-create-project-cmd": "",
+                            "post-install-cmd": "",
+                            "post-root-package-install": "",
+                            "post-update-cmd": "",
+                            "pre-autoload-dump": "",
+                            "pre-install-cmd": "",
+                            "pre-update-cmd": ""
+                        }
+                    },
+                    "provider": "Webkernel\\Console\\ConsoleProvider",
+                    "x-monorepo": {
+                        "package-repos": [
+                            "git@github.com:webkernelphp/console.git"
+                        ]
+                    }
+                }
+            },
+            "autoload": {
+                "files": [
+                    "load.console.function.php"
+                ],
+                "psr-4": {
+                    "Webkernel\\Console\\": "src/"
+                },
+                "classmap": [
+                    "classmap/Console.php"
+                ]
+            },
+            "license": [
+                "proprietary"
+            ],
+            "authors": [
+                {
+                    "name": "El Moumen Yassine",
+                    "email": "yassine@numerimondes.com",
+                    "homepage": "https://webkernelphp.com/about"
+                }
+            ],
+            "description": "Command line interface engine and console execution components for Webkernel.",
             "homepage": "https://www.webkernelphp.com",
             "transport-options": {
                 "symlink": true,

@@ -1,0 +1,55 @@
+{
+    "$schema": "https://getcomposer.org/schema.json",
+    "name": "webkernel/commands",
+    "description": "Webkernel commands.",
+    "version": "0.12.0",
+    "homepage": "https://www.webkernelphp.com",
+    "type": "library",
+    "license": "proprietary",
+    "authors": [
+        {
+            "name": "El Moumen Yassine",
+            "email": "yassine@numerimondes.com",
+            "homepage": "https://webkernelphp.com/about"
+        }
+    ],
+    "require": {
+        "php": ">=8.5",
+        "webkernel/config": "self.version"
+    },
+    "require-dev": {},
+    "autoload": {
+        "psr-4": {
+            "Webkernel\\Commands\\": "src/"
+        }
+    },
+    "extra": {
+        "webkernel": {
+            "$schema": "https://webkernelphp.org/packages/v1/schema.json",
+            "lifecycle": {
+                "checks": [],
+                "events": {
+                    "post-autoload-dump": "",
+                    "post-create-project-cmd": "",
+                    "post-install-cmd": "",
+                    "post-root-package-install": "",
+                    "post-update-cmd": "",
+                    "pre-autoload-dump": "",
+                    "pre-install-cmd": "",
+                    "pre-update-cmd": ""
+                }
+            },
+            "provider": "Webkernel\\Commands\\CommandsProvider",
+            "x-monorepo": {
+                "package-repos": [
+                    "git@github.com:webkernelphp/commands.git"
+                ]
+            }
+        }
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}

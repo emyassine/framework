@@ -8,7 +8,7 @@
 define('START_REQUEST', hrtime(true));
 $base_path = dirname(__DIR__);
 
-if (is_file($maint = $base_path.'/platform/maintenance.php')) { require $maint; return; }
+if (is_file($maint = $base_path.'/internal/maintenance.php')) { require $maint; return; }
 
 $uri  = $_SERVER['REQUEST_URI'] ?? '/';
 $route = parse_url($uri, PHP_URL_PATH);

@@ -21,9 +21,6 @@
         "psr-4": {
             "Webkernel\\Config\\": "src/"
         },
-        "classmap": [
-            "src/Config.php"
-        ],
         "files": [
             "load.config.function.php"
         ]

@@ -10,7 +10,6 @@ namespace Webkernel\Config\Discovery;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 use SplFileInfo;
-use Webkernel\PlatformProvider;
 
 /**
  * Discovers configuration files dynamically from directories and package providers.

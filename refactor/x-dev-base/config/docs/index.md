@@ -4,23 +4,23 @@ Welcome to the **Webkernel Config** package documentation. Webkernel Config is a
 
 ## Documentation Index
 
-- [Architecture & Fingerprint Engine](./architecture.md)
+- [Architecture & Fingerprint Engine](./00-architecture.en.md)
   - Pre-compiled O(1) flat dictionary
   - Automatic change detection & fingerprinting
   - Atomic OPcache invalidation
-- [Configuration & Options](./configuration.md)
+- [Configuration & Options](./10-configuration.en.md)
   - Value retrieval & default handling
   - Nested branch extraction
   - Runtime mutation and persistence
-- [Package Provider & Asset Publishing](./providers.md)
+- [Package Provider & Asset Publishing](./20-providers.en.md)
   - `PlatformProvider::CONFIG` structure
   - Publishing manifest & `Config::publishables()`
   - Package configuration overrides
-- [Immutability & Guard System](./guards.md)
+- [Immutability & Guard System](./30-guards.en.md)
   - Key protection rules
   - Prefix tree matching
   - Exception handling
-- [Benchmark & Profiling Guide](./benchmarks.md)
+- [Benchmark & Profiling Guide](./40-benchmarks.en.md)
   - 10,000,000 iteration benchmark analysis
   - Sub-microsecond latency profiling
   - Zero request-path bloat rules

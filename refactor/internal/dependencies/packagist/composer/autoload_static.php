@@ -9,6 +9,7 @@ class ComposerStaticInit14abc4c1689dfc6da53295fe1247c246
     public static $files = array (
         '23018b0a9c1a1e28e4fd8e8d1787d9a8' => __DIR__ . '/..' . '/webkernel/lifecycle/load.lifecycle.functions.php',
         'a7e1958e8ac4599b4fc92e46f8f9c705' => __DIR__ . '/..' . '/webkernel/config/load.config.function.php',
+        '4a1f966df5d8bc1ce3f217c61584896f' => __DIR__ . '/..' . '/webkernel/console/load.console.function.php',
         '6124b4c8570aa390c21fafd04a26c69f' => __DIR__ . '/..' . '/myclabs/deep-copy/src/DeepCopy/deep_copy.php',
         'b3937b7fa35431fe0895577483870c74' => __DIR__ . '/..' . '/webkernel/codebase/namespacer.php',
         'ec07570ca5a812141189b1fa81503674' => __DIR__ . '/..' . '/phpunit/phpunit/src/Framework/Assert/Functions.php',
@@ -19,7 +20,9 @@ class ComposerStaticInit14abc4c1689dfc6da53295fe1247c246
         array (
             'Webkernel\\Lifecycle\\' => 20,
             'Webkernel\\DevTools\\' => 19,
+            'Webkernel\\Console\\' => 18,
             'Webkernel\\Config\\' => 17,
+            'Webkernel\\Commands\\' => 19,
             'Webkernel\\' => 10,
         ),
         'P' =>
@@ -53,9 +56,17 @@ class ComposerStaticInit14abc4c1689dfc6da53295fe1247c246
         array (
             0 => __DIR__ . '/..' . '/webkernel/devtools/src',
         ),
+        'Webkernel\\Console\\' =>
+        array (
+            0 => __DIR__ . '/..' . '/webkernel/console/src',
+        ),
         'Webkernel\\Config\\' =>
         array (
             0 => __DIR__ . '/..' . '/webkernel/config/src',
+        ),
+        'Webkernel\\Commands\\' =>
+        array (
+            0 => __DIR__ . '/..' . '/webkernel/commands/src',
         ),
         'Webkernel\\' =>
         array (
@@ -1767,8 +1778,23 @@ class ComposerStaticInit14abc4c1689dfc6da53295fe1247c246
         'TheSeer\\Tokenizer\\TokenCollectionException' => __DIR__ . '/..' . '/theseer/tokenizer/src/TokenCollectionException.php',
         'TheSeer\\Tokenizer\\Tokenizer' => __DIR__ . '/..' . '/theseer/tokenizer/src/Tokenizer.php',
         'TheSeer\\Tokenizer\\XMLSerializer' => __DIR__ . '/..' . '/theseer/tokenizer/src/XMLSerializer.php',
+        'Webkernel\\Commands\\CompletionCommand' => __DIR__ . '/..' . '/webkernel/commands/src/CompletionCommand.php',
+        'Webkernel\\Commands\\DumpAutoloadCommand' => __DIR__ . '/..' . '/webkernel/commands/src/DumpAutoloadCommand.php',
+        'Webkernel\\Commands\\DumpAutoloadCommand\\CanCompileRuntime' => __DIR__ . '/..' . '/webkernel/commands/src/DumpAutoloadCommand/CanCompileRuntime.php',
+        'Webkernel\\Commands\\DumpAutoloadCommand\\CanDumpAssets' => __DIR__ . '/..' . '/webkernel/commands/src/DumpAutoloadCommand/CanDumpAssets.php',
+        'Webkernel\\Commands\\DumpAutoloadCommand\\CanDumpPanels' => __DIR__ . '/..' . '/webkernel/commands/src/DumpAutoloadCommand/CanDumpPanels.php',
+        'Webkernel\\Commands\\DumpAutoloadCommand\\CanDumpTypography' => __DIR__ . '/..' . '/webkernel/commands/src/DumpAutoloadCommand/CanDumpTypography.php',
+        'Webkernel\\Commands\\DumpAutoloadCommand\\CanStampPlatform' => __DIR__ . '/..' . '/webkernel/commands/src/DumpAutoloadCommand/CanStampPlatform.php',
+        'Webkernel\\Commands\\DumpAutoloadCommand\\CanWritePhp' => __DIR__ . '/..' . '/webkernel/commands/src/DumpAutoloadCommand/CanWritePhp.php',
+        'Webkernel\\Commands\\DumpAutoloadCommand\\HasPackages' => __DIR__ . '/..' . '/webkernel/commands/src/DumpAutoloadCommand/HasPackages.php',
+        'Webkernel\\Commands\\DumpAutoloadCommand\\HasPaths' => __DIR__ . '/..' . '/webkernel/commands/src/DumpAutoloadCommand/HasPaths.php',
+        'Webkernel\\Commands\\DumpAutoloadCommand\\HasProviders' => __DIR__ . '/..' . '/webkernel/commands/src/DumpAutoloadCommand/HasProviders.php',
+        'Webkernel\\Commands\\DumpAutoloadCommand\\_DumpAutoloadCommand' => __DIR__ . '/..' . '/webkernel/commands/src/DumpAutoloadCommand/_DumpAutoloadCommand.php',
+        'Webkernel\\Commands\\ServerCommand' => __DIR__ . '/..' . '/webkernel/commands/src/ServerCommand.php',
+        'Webkernel\\Commands\\ServerCommand\\Engine' => __DIR__ . '/..' . '/webkernel/commands/src/ServerCommand/Engine.php',
         'Webkernel\\Config\\Compiler\\ConfigCompiler' => __DIR__ . '/..' . '/webkernel/config/src/Compiler/ConfigCompiler.php',
         'Webkernel\\Config\\Compiler\\ConfigFingerprint' => __DIR__ . '/..' . '/webkernel/config/src/Compiler/ConfigFingerprint.php',
+        'Webkernel\\Config\\Config' => __DIR__ . '/..' . '/webkernel/config/src/Config.php',
         'Webkernel\\Config\\Contracts\\CompilerContract' => __DIR__ . '/..' . '/webkernel/config/src/Contracts/CompilerContract.php',
         'Webkernel\\Config\\Contracts\\RepositoryContract' => __DIR__ . '/..' . '/webkernel/config/src/Contracts/RepositoryContract.php',
         'Webkernel\\Config\\Discovery\\ConfigDiscovery' => __DIR__ . '/..' . '/webkernel/config/src/Discovery/ConfigDiscovery.php',
@@ -1780,6 +1806,18 @@ class ComposerStaticInit14abc4c1689dfc6da53295fe1247c246
         'Webkernel\\Config\\Guards\\ConfigGuard' => __DIR__ . '/..' . '/webkernel/config/src/Guards/ConfigGuard.php',
         'Webkernel\\Config\\Repository\\ConfigRepository' => __DIR__ . '/..' . '/webkernel/config/src/Repository/ConfigRepository.php',
         'Webkernel\\Config\\Writer\\ConfigWriter' => __DIR__ . '/..' . '/webkernel/config/src/Writer/ConfigWriter.php',
+        'Webkernel\\Console' => __DIR__ . '/..' . '/webkernel/console/classmap/Console.php',
+        'Webkernel\\Console\\Attribute\\ConsoleCommand' => __DIR__ . '/..' . '/webkernel/console/src/Attribute/ConsoleCommand.php',
+        'Webkernel\\Console\\Cancelled' => __DIR__ . '/..' . '/webkernel/console/src/Cancelled.php',
+        'Webkernel\\Console\\CommandsDiscovery' => __DIR__ . '/..' . '/webkernel/console/src/CommandsDiscovery.php',
+        'Webkernel\\Console\\Dispatcher' => __DIR__ . '/..' . '/webkernel/console/src/Dispatcher.php',
+        'Webkernel\\Console\\DumpHook' => __DIR__ . '/..' . '/webkernel/console/src/DumpHook.php',
+        'Webkernel\\Console\\ExitCode' => __DIR__ . '/..' . '/webkernel/console/src/ExitCode.php',
+        'Webkernel\\Console\\IncludeClock' => __DIR__ . '/..' . '/webkernel/console/src/IncludeClock.php',
+        'Webkernel\\Console\\Input\\ArgvInput' => __DIR__ . '/..' . '/webkernel/console/src/Input/ArgvInput.php',
+        'Webkernel\\Console\\Middleware\\ConsoleMiddleware' => __DIR__ . '/..' . '/webkernel/console/src/Middleware/ConsoleMiddleware.php',
+        'Webkernel\\Console\\Prompt' => __DIR__ . '/..' . '/webkernel/console/src/Prompt.php',
+        'Webkernel\\Console\\Terminal' => __DIR__ . '/..' . '/webkernel/console/src/Terminal.php',
         'Webkernel\\DevTools\\DevToolsProvider' => __DIR__ . '/..' . '/webkernel/devtools/src/DevToolsProvider.php',
         'Webkernel\\DevTools\\IdeHelper' => __DIR__ . '/..' . '/webkernel/devtools/src/IdeHelper.php',
         'Webkernel\\Lifecycle\\Actions\\Contracts\\LifecycleActionContract' => __DIR__ . '/..' . '/webkernel/lifecycle/src/Actions/Contracts/LifecycleActionContract.php',
@@ -1793,6 +1831,8 @@ class ComposerStaticInit14abc4c1689dfc6da53295fe1247c246
         'Webkernel\\Lifecycle\\Installer\\LCPackageType' => __DIR__ . '/..' . '/webkernel/lifecycle/src/Installer/LCPackageType.php',
         'Webkernel\\Lifecycle\\LCInstaller' => __DIR__ . '/..' . '/webkernel/lifecycle/src/LCInstaller.php',
         'Webkernel\\Lifecycle\\Providers\\LifecycleProvider' => __DIR__ . '/..' . '/webkernel/lifecycle/src/Providers/LifecycleProvider.php',
+        'Webkernel\\Performance\\Performance' => __DIR__ . '/..' . '/webkernel/codebase/src/Performance/Performance.php',
+        'Webkernel\\Performance\\Status' => __DIR__ . '/..' . '/webkernel/codebase/src/Performance/Status.php',
         'Webkernel\\PlatformProvider' => __DIR__ . '/..' . '/webkernel/codebase/src/PlatformProvider.php',
         'staabm\\SideEffectsDetector\\SideEffect' => __DIR__ . '/..' . '/staabm/side-effects-detector/lib/SideEffect.php',
         'staabm\\SideEffectsDetector\\SideEffectsDetector' => __DIR__ . '/..' . '/staabm/side-effects-detector/lib/SideEffectsDetector.php',
