@@ -15,6 +15,11 @@ final class ConfigFingerprint
     /**
      * Determines whether the compiled configuration cache is stale relative to its sources.
      *
+     * Monitors:
+     *  - Root application configuration directory (base_path('config')) and subdirectories.
+     *  - Package provider configuration files declared via PlatformProvider::CONFIG.
+     *  - Runtime override configuration files (internal/platform-runtime.php).
+     *
      * @param $cache_file string Path to compiled cache file.
      * @param $source_files list<string> Absolute paths to tracked configuration files.
      * @param $directories list<string> Monitored directory paths for addition/deletion detection.
@@ -33,7 +38,7 @@ final class ConfigFingerprint
             return true;
         }
 
-        // Check directory modification times (detects file additions, removals, renames)
+        // 1. Check directory modification times (detects file additions, removals, renames)
         foreach ($directories as $dir) {
             if (\is_dir($dir)) {
                 $dir_mtime = @\filemtime($dir);
@@ -43,7 +48,7 @@ final class ConfigFingerprint
             }
         }
 
-        // Check individual file modification times
+        // 2. Check individual file modification times and existence across app & package sources
         foreach ($source_files as $file) {
             if (! \is_file($file)) {
                 return true;
@@ -59,7 +64,7 @@ final class ConfigFingerprint
     }
 
     /**
-     * Computes a cryptographic checksum of file sizes and modification times.
+     * Computes a cryptographic checksum of file paths, modification times, and file sizes.
      *
      * @param $source_files list<string>
      *

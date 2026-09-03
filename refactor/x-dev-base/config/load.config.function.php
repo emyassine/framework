@@ -41,8 +41,6 @@ if (! \function_exists('config_path')) {
      */
     function config_path(string $path = ''): string
     {
-        $base = \function_exists('base_path') ? \base_path('config') : \getcwd() . '/config';
-
-        return $path === '' ? $base : $base . '/' . \ltrim($path, '/\\');
+        return \base_path($path === '' ? 'config' : 'config/' . \ltrim($path, '/\\'));
     }
 }

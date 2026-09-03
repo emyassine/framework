@@ -2587,7 +2587,7 @@
             "dist": {
                 "type": "path",
                 "url": "x-dev-base/config",
-                "reference": "a7842717f56e34701763700b03e50092a8dd0a82"
+                "reference": "79de17084e15b88f344663a428f8b9e6e4ff25c0"
             },
             "require": {
                 "php": ">=8.5",
@@ -2613,8 +2613,7 @@
                     "Webkernel\\Config\\": "src/"
                 },
                 "classmap": [
-                    "src/Config.php",
-                    "src/ConfigWriter.php"
+                    "src/Config.php"
                 ],
                 "files": [
                     "load.config.function.php"

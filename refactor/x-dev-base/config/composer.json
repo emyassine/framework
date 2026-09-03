@@ -22,8 +22,7 @@
             "Webkernel\\Config\\": "src/"
         },
         "classmap": [
-            "src/Config.php",
-            "src/ConfigWriter.php"
+            "src/Config.php"
         ],
         "files": [
             "load.config.function.php"
