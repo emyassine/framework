@@ -445,15 +445,11 @@ final class Config
     protected static function init_paths(): void
     {
         if (self::$root_path === '') {
-            self::$root_path = \function_exists('base_path')
-                ? \base_path()
-                : \getcwd();
+            self::$root_path = \base_path();
         }
 
         if (self::$vendor_path === '') {
-            self::$vendor_path = \function_exists('vendor_path')
-                ? \vendor_path()
-                : self::$root_path . '/vendor';
+            self::$vendor_path = \vendor_path();
         }
 
         if (self::$cache_dir === '') {
