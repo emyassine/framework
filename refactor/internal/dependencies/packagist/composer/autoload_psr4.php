@@ -10,6 +10,7 @@ return array(
     'Webkernel\\DevTools\\' => array($vendorDir . '/webkernel/devtools/src'),
     'Webkernel\\Console\\' => array($vendorDir . '/webkernel/console/src'),
     'Webkernel\\Config\\' => array($vendorDir . '/webkernel/config/src'),
+    'Webkernel\\Composables\\' => array($vendorDir . '/webkernel/composables/src'),
     'Webkernel\\Commands\\' => array($vendorDir . '/webkernel/commands/src'),
     'Webkernel\\' => array($vendorDir . '/webkernel/codebase/src'),
     'Psr\\SimpleCache\\' => array($vendorDir . '/psr/simple-cache/src'),

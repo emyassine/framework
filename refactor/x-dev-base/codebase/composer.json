@@ -39,6 +39,7 @@
         "psr/simple-cache": "^3.0",
         "webkernel/config": "self.version",
         "webkernel/commands": "self.version",
+        "webkernel/composables": "self.version",
         "webkernel/console": "self.version",
         "webkernel/lifecycle": "self.version"
     },

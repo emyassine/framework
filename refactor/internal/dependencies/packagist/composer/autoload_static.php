@@ -22,6 +22,7 @@ class ComposerStaticInit14abc4c1689dfc6da53295fe1247c246
             'Webkernel\\DevTools\\' => 19,
             'Webkernel\\Console\\' => 18,
             'Webkernel\\Config\\' => 17,
+            'Webkernel\\Composables\\' => 22,
             'Webkernel\\Commands\\' => 19,
             'Webkernel\\' => 10,
         ),
@@ -63,6 +64,10 @@ class ComposerStaticInit14abc4c1689dfc6da53295fe1247c246
         'Webkernel\\Config\\' =>
         array (
             0 => __DIR__ . '/..' . '/webkernel/config/src',
+        ),
+        'Webkernel\\Composables\\' =>
+        array (
+            0 => __DIR__ . '/..' . '/webkernel/composables/src',
         ),
         'Webkernel\\Commands\\' =>
         array (
@@ -1792,6 +1797,10 @@ class ComposerStaticInit14abc4c1689dfc6da53295fe1247c246
         'Webkernel\\Commands\\DumpAutoloadCommand\\_DumpAutoloadCommand' => __DIR__ . '/..' . '/webkernel/commands/src/DumpAutoloadCommand/_DumpAutoloadCommand.php',
         'Webkernel\\Commands\\ServerCommand' => __DIR__ . '/..' . '/webkernel/commands/src/ServerCommand.php',
         'Webkernel\\Commands\\ServerCommand\\Engine' => __DIR__ . '/..' . '/webkernel/commands/src/ServerCommand/Engine.php',
+        'Webkernel\\Composables\\ComposableContract' => __DIR__ . '/..' . '/webkernel/composables/src/ComposableContract.php',
+        'Webkernel\\Composables\\ConfigComposable' => __DIR__ . '/..' . '/webkernel/composables/src/ConfigComposable.php',
+        'Webkernel\\Composables\\PanelComposable' => __DIR__ . '/..' . '/webkernel/composables/src/PanelComposable.php',
+        'Webkernel\\Composables\\RequestComposable' => __DIR__ . '/..' . '/webkernel/composables/src/RequestComposable.php',
         'Webkernel\\Config\\Compiler\\ConfigCompiler' => __DIR__ . '/..' . '/webkernel/config/src/Compiler/ConfigCompiler.php',
         'Webkernel\\Config\\Compiler\\ConfigFingerprint' => __DIR__ . '/..' . '/webkernel/config/src/Compiler/ConfigFingerprint.php',
         'Webkernel\\Config\\Config' => __DIR__ . '/..' . '/webkernel/config/src/Config.php',

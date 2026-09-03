@@ -7,6 +7,7 @@
 
 namespace Webkernel\Console;
 
+use Composer\InstalledVersions;
 use Webkernel\Composables\ComposableContract;
 use Webkernel\Console\Input\ArgvInput;
 use Webkernel\Console\Middleware\ConsoleMiddleware;
@@ -77,7 +78,7 @@ final class Dispatcher implements ComposableContract
         $definitions = $this->definitions();
         $definition = $definitions[$name] ?? null;
         if ($definition === null) {
-            webterminal()->error('Unknown command: '.$name);
+            console()->error('Unknown command: '.$name);
 
             return ExitCode::INVALID;
         }
@@ -98,11 +99,11 @@ final class Dispatcher implements ComposableContract
 
             return $next();
         } catch (Cancelled $e) {
-            webterminal()->error($e->getMessage());
+            console()->error($e->getMessage());
 
             return ExitCode::ERROR;
         } catch (\InvalidArgumentException $e) {
-            webterminal()->error($e->getMessage());
+            console()->error($e->getMessage());
 
             return ExitCode::INVALID;
         }
@@ -285,7 +286,7 @@ final class Dispatcher implements ComposableContract
         }
         $definition = $this->definitions()[$name] ?? null;
         if ($definition === null) {
-            webterminal()->error('Unknown command: '.$name);
+            console()->error('Unknown command: '.$name);
             $this->print_list();
 
             return;
@@ -402,24 +403,13 @@ final class Dispatcher implements ComposableContract
         return \implode(' ', $parts);
     }
 
-    /**
-     * @return string
-     */
-    private function framework_version(): string
-    {
-        if (! \function_exists('vendor_dir')) {
-            return '';
-        }
-        $installed = vendor_dir('composer/installed.php');
-        if (! \is_file($installed)) {
-            return '';
-        }
-        /** @var array{versions?: array<string, array{pretty_version?: string}>} $data */
-        $data = require $installed;
-        $version = $data['versions']['webkernel/codebase']['pretty_version'] ?? null;
-
-        return \is_string($version) ? $version : '';
-    }
+     /**
+      * @return string
+      */
+     private function framework_version(): string
+     {
+     	return InstalledVersions::getPrettyVersion('webkernel/codebase') ?? '';
+     }
 
     /**
      * @param \ReflectionParameter $param

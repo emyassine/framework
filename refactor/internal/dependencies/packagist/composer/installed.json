@@ -2520,7 +2520,7 @@
             "dist": {
                 "type": "path",
                 "url": "x-dev-base/codebase",
-                "reference": "f50f663feccc8282475019833c8a63d75d155d82"
+                "reference": "37b40c6ac17bd523ffd93f2b657fb66e38481807"
             },
             "require": {
                 "ext-dom": "*",
@@ -2542,6 +2542,7 @@
                 "psr/log": "^3.0",
                 "psr/simple-cache": "^3.0",
                 "webkernel/commands": "self.version",
+                "webkernel/composables": "self.version",
                 "webkernel/config": "self.version",
                 "webkernel/console": "self.version",
                 "webkernel/lifecycle": "self.version"
@@ -2643,6 +2644,68 @@
                 "relative": true
             },
             "install-path": "../webkernel/commands"
+        },
+        {
+            "name": "webkernel/composables",
+            "version": "0.12.0",
+            "version_normalized": "0.12.0.0",
+            "dist": {
+                "type": "path",
+                "url": "x-dev-base/composables",
+                "reference": "58f2898b18d272225032b6e3e3d750a98677067a"
+            },
+            "require": {
+                "php": ">=8.5",
+                "webkernel/config": "self.version"
+            },
+            "type": "library",
+            "extra": {
+                "webkernel": {
+                    "$schema": "https://webkernelphp.org/packages/v1/schema.json",
+                    "lifecycle": {
+                        "checks": [],
+                        "events": {
+                            "post-autoload-dump": "",
+                            "post-create-project-cmd": "",
+                            "post-install-cmd": "",
+                            "post-root-package-install": "",
+                            "post-update-cmd": "",
+                            "pre-autoload-dump": "",
+                            "pre-install-cmd": "",
+                            "pre-update-cmd": ""
+                        }
+                    },
+                    "provider": "Webkernel\\Composables\\ComposablesProvider",
+                    "x-monorepo": {
+                        "package-repos": [
+                            "git@github.com:webkernelphp/composables.git"
+                        ]
+                    }
+                }
+            },
+            "installation-source": "dist",
+            "autoload": {
+                "psr-4": {
+                    "Webkernel\\Composables\\": "src/"
+                }
+            },
+            "license": [
+                "proprietary"
+            ],
+            "authors": [
+                {
+                    "name": "El Moumen Yassine",
+                    "email": "yassine@numerimondes.com",
+                    "homepage": "https://webkernelphp.com/about"
+                }
+            ],
+            "description": "Webkernel composables.",
+            "homepage": "https://www.webkernelphp.com",
+            "transport-options": {
+                "symlink": true,
+                "relative": true
+            },
+            "install-path": "../webkernel/composables"
         },
         {
             "name": "webkernel/config",
