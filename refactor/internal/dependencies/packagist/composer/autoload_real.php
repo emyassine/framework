@@ -32,7 +32,7 @@ class ComposerAutoloaderInit14abc4c1689dfc6da53295fe1247c246
         call_user_func(\Composer\Autoload\ComposerStaticInit14abc4c1689dfc6da53295fe1247c246::getInitializer($loader));
 
         $loader->setClassMapAuthoritative(true);
-        $loader->setApcuPrefix('85aca9745114b15be2fa');
+        $loader->setApcuPrefix('a8c468c8b1637893fb5e');
         $loader->register(true);
 
         $filesToLoad = \Composer\Autoload\ComposerStaticInit14abc4c1689dfc6da53295fe1247c246::$files;

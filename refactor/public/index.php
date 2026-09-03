@@ -6,9 +6,9 @@
 //> file that was distributed with this source code.
 
 define('START_REQUEST', hrtime(true));
-$webapp_path = dirname(__DIR__);
+$base_path = dirname(__DIR__);
 
-if (is_file($maint = $webapp_path.'/platform/maintenance.php')) { require $maint; return; }
+if (is_file($maint = $base_path.'/platform/maintenance.php')) { require $maint; return; }
 
 $uri  = $_SERVER['REQUEST_URI'] ?? '/';
 $route = parse_url($uri, PHP_URL_PATH);
@@ -20,4 +20,4 @@ if ($route === '/healthz' || $route === '/ready') {
     echo 'Platform is Ready'; return;
 }
 
-require $webapp_path.'/platform/fast-boot.php'; \Webkernel\Http::run();
+require $base_path.'/platform/fast-boot.php'; \Webkernel\Http::run();

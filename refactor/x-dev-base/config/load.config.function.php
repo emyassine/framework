@@ -5,7 +5,7 @@
 //> For the full copyright and license information, please view the LICENSE
 //> file that was distributed with this source code.
 
-use Webkernel\Config\Config;
+use Webkernel\Config\ConfigQuickAccess;
 
 if (! \function_exists('config')) {
     /**
@@ -19,9 +19,6 @@ if (! \function_exists('config')) {
      */
     function config(?string $key = null, mixed $default = null): mixed
     {
-        if ($key === null) {
-            return Config::instance();
-        }
-        return Config::get($key, $default);
+    	return ConfigQuickAccess::get($key, $default);
     }
 }
