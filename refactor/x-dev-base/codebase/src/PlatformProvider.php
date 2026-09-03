@@ -47,7 +47,12 @@ abstract class PlatformProvider
     /**
      * Package config files merged at boot, before app.php.
      *
-     * @var list<string>
+     * Each entry is keyed by the config name, with:
+     *   - `path`: absolute path to the package config file
+     *   - `publish`: target path for vendor:publish
+     *   - `tag`: optional publish tag
+     *
+     * @var array<string, array{path:string, publish:string, tag?:string}>|list<string>
      */
     public const CONFIG = [];
 
@@ -62,7 +67,9 @@ abstract class PlatformProvider
     public const MIGRATIONS = [];
 
     /**
-     * @return list<mixed>
+     * @param $constant string
+     *
+     * @return list<mixed>|array<string, mixed>
      */
     public static function declaration(string $constant): array
     {

@@ -14,7 +14,7 @@
         }
     ],
     "require": {
-        "php": "^8.5",
+        "php": ">=8.5",
         "webkernel/lifecycle": "self.version"
     },
     "autoload": {
@@ -22,7 +22,8 @@
             "Webkernel\\Config\\": "src/"
         },
         "classmap": [
-            "src/Config.php"
+            "src/Config.php",
+            "src/ConfigWriter.php"
         ],
         "files": [
             "load.config.function.php"
@@ -43,14 +44,6 @@
                 "package-repos": [
                     "git@github.com:webkernelphp/config.git"
                 ]
-            },
-            "notices" : {
-	            "depends-on": [
-	                "platform_path()",
-	                "vendor_path()",
-	                "Webkernel\\PlatformProvider"
-	            ],
-	            "note": "platform_path() and vendor_path() are injected by the Webkernel Composer plugin at runtime."
             }
         }
     },

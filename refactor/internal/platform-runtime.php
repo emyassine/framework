@@ -1,13 +1,12 @@
 <?php declare(strict_types=1);
 //> This file is part of Webkernel.
-//> (c) 2025 - 2027 Numerimondes, El Moumen Yassine
+//> (c) 2025 - 2028 Numerimondes, El Moumen Yassine
 //> Yassine El Moumen <yassine@numerimondes.com> | <platform@webkernelphp.com>
 //> For the full copyright and license information, please view the LICENSE
 //> file that was distributed with this source code.
 //
-// WARNING: Some keys in this file are written by the platform itself (see
-// "platform-managed" comments). Do not edit those keys by hand — your changes
-// will be overwritten on next boot if the platform detects a drift.
+// WARNING: Configuration persisted at runtime.
+// Hand edits will be preserved unless explicitly overwritten by platform updates.
 
 return array (
   'tests' => 
@@ -119,6 +118,13 @@ return array (
         ),
       ),
       'logo' => '',
+    ),
+  ),
+  'custom' => 
+  array (
+    'runtime' => 
+    array (
+      'feature' => true,
     ),
   ),
 );

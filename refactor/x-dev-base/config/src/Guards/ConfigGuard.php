@@ -4,22 +4,16 @@
 //> Yassine El Moumen <yassine@numerimondes.com> | <platform@webkernelphp.com>
 //> For the full copyright and license information, please view the LICENSE
 //> file that was distributed with this source code.
+
 namespace Webkernel\Config\Guards;
 
 use Webkernel\Config\Exceptions\ConfigGuardException;
 
 /**
- * Maintains a set of key patterns that must never be mutated at runtime.
+ * Enforces immutability on protected configuration keys and prefixes.
  *
- * Guards are matched with dot-notation exact keys OR dot-notation prefixes
- * (a guarded prefix "app" blocks "app.name", "app.env", etc.).
- *
- * Usage:
- *   $guard = new ConfigGuard(['app.key', 'platform.version']);
- *   $guard->assert('app.debug');   // fine
- *   $guard->assert('app.key');     // throws ConfigGuardException
- *
- * Designed to be injected into PlatformConfig — never instantiated globally.
+ * Exact keys and prefix hierarchies are guarded against runtime mutations.
+ * A guarded prefix "platform" blocks "platform", "platform.id", "platform.debug", etc.
  */
 final class ConfigGuard
 {
@@ -27,29 +21,36 @@ final class ConfigGuard
     private array $protected_keys;
 
     /**
-     * @param list<string> $protected_keys Exact keys or prefix segments to protect.
+     * @param $protected_keys list<string> Exact keys or prefix segments to protect.
      */
     public function __construct(array $protected_keys = [])
     {
-        $this->protected_keys = $protected_keys;
+        $this->protected_keys = \array_values(\array_unique($protected_keys));
     }
 
     /**
-     * Returns a new guard with additional keys appended (immutable composition).
+     * Returns a new guard instance with additional keys merged immutably.
      *
-     * @param list<string> $keys
+     * @param $keys list<string>
+     *
+     * @return static
      */
     public function with_keys(array $keys): static
     {
         $clone = clone $this;
         $clone->protected_keys = \array_values(\array_unique([...$this->protected_keys, ...$keys]));
+
         return $clone;
     }
 
     /**
-     * Asserts the given key is NOT protected, throws if it is.
+     * Asserts that the given key is permitted to be mutated.
      *
-     * @throws ConfigGuardException
+     * @param $key string Dot-notation configuration key.
+     *
+     * @return void
+     *
+     * @throws ConfigGuardException When the key or its prefix is protected.
      */
     public function assert(string $key): void
     {
@@ -61,7 +62,11 @@ final class ConfigGuard
     }
 
     /**
-     * Returns true when the key is protected (non-throwing variant).
+     * Determines whether a key matches any protected pattern.
+     *
+     * @param $key string Dot-notation configuration key.
+     *
+     * @return bool
      */
     public function is_protected(string $key): bool
     {
@@ -70,10 +75,15 @@ final class ConfigGuard
                 return true;
             }
         }
+
         return false;
     }
 
-    /** @return list<string> */
+    /**
+     * Returns the list of registered protection rules.
+     *
+     * @return list<string>
+     */
     public function get_protected_keys(): array
     {
         return $this->protected_keys;

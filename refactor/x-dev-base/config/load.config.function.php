@@ -5,20 +5,44 @@
 //> For the full copyright and license information, please view the LICENSE
 //> file that was distributed with this source code.
 
-use Webkernel\Config\ConfigQuickAccess;
+use Webkernel\Config\Config;
+use Webkernel\Config\Repository\ConfigRepository;
 
 if (! \function_exists('config')) {
     /**
-     * Access the platform config singleton.
+     * Accesses configuration values or the repository at hardware speed.
      *
-     * config()               → PlatformConfig instance (for chaining / injection)
-     * config('app.name')     → mixed  (shorthand for Config::get())
-     * config('key', $default)→ mixed
+     * config()               → ConfigRepository instance
+     * config('app.name')     → mixed
+     * config('key', default) → mixed
      *
-     * @return ($key is null ? PlatformConfig : mixed)
+     * @param $key string|null Dot-notation configuration key.
+     * @param $default mixed Fallback value when key is absent.
+     *
+     * @return ($key is null ? ConfigRepository : mixed)
      */
     function config(?string $key = null, mixed $default = null): mixed
     {
-    	return ConfigQuickAccess::get($key, $default);
+        if ($key === null) {
+            return Config::repository();
+        }
+
+        return Config::$items[$key] ?? Config::get($key, $default);
+    }
+}
+
+if (! \function_exists('config_path')) {
+    /**
+     * Resolves an absolute path inside the application configuration directory.
+     *
+     * @param $path string Relative sub-path.
+     *
+     * @return string
+     */
+    function config_path(string $path = ''): string
+    {
+        $base = \function_exists('base_path') ? \base_path('config') : \getcwd() . '/config';
+
+        return $path === '' ? $base : $base . '/' . \ltrim($path, '/\\');
     }
 }

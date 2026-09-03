@@ -4,9 +4,10 @@
 //> Yassine El Moumen <yassine@numerimondes.com> | <platform@webkernelphp.com>
 //> For the full copyright and license information, please view the LICENSE
 //> file that was distributed with this source code.
+
 namespace Webkernel\Config\Exceptions;
 
 /**
- * Thrown when the config writer fails to persist a file (disk, permissions, rename…).
+ * Thrown when atomic persistence of runtime configuration fails.
  */
 class ConfigWriteException extends ConfigException {}

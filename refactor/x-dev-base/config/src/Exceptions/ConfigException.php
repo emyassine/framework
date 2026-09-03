@@ -4,11 +4,12 @@
 //> Yassine El Moumen <yassine@numerimondes.com> | <platform@webkernelphp.com>
 //> For the full copyright and license information, please view the LICENSE
 //> file that was distributed with this source code.
+
 namespace Webkernel\Config\Exceptions;
 
 use RuntimeException;
 
 /**
- * Base exception for the Webkernel config package.
+ * Base runtime exception for the configuration system.
  */
 class ConfigException extends RuntimeException {}
