@@ -6,11 +6,6 @@
 //> file that was distributed with this source code.
 namespace Webkernel\Lifecycle\Installer;
 
-/**
- * All package types managed by the Webkernel custom installer.
- *
- * The string value is the exact "type" field in composer.json of the managed package.
- */
 enum LCPackageType: string
 {
     case Assets                = 'webkernel-assets';

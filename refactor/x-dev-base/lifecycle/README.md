@@ -1,31 +1,46 @@
 # webkernel/lifecycle
-
-> Composer plugin for the [Webkernel](https://webkernelphp.org) framework —
-> custom installer, lifecycle hooks, environment checks, and concern-based code generation.
-
+> Webkernel Composer plugin — custom installer, lifecycle hooks, environment checks,
+> and action-based code generation.
 ---
-
-## What it does
-
-| Responsibility | Class |
+## Global helpers — `load.lifecycle.functions.php`
+Loaded automatically via `autoload.files`. No generation step needed.
+| Function | Resolution strategy |
 |---|---|
-| Custom installer for `webkernel-*` package types | `LCBaseInstaller` |
-| Dispatch `extra.webkernel.lifecycle.events.{event}` callables | `LCHookDispatcher` |
-| Run environment checks (`extra.webkernel.lifecycle.checks`) | `LCEnvChecker` |
-| Run concern-based code generation | `LCConcernRunner` |
-| Static entry-point for Composer scripts | `ComposerScripts` |
+| `base_path($path)` | `InstalledVersions::getRootPackage()['install_path']` — exact project root, set by Composer |
+| `vendor_path($path)` | `dirname(__DIR__, 2)` from lifecycle package — vendor-dir agnostic |
+| `webkernel_package($package, $sub_path)` | `InstalledVersions::getInstallPath('webkernel/{$package}')` — immune to vendor-dir layout |
+
+## Benchmark results
+```bash
+PHP Path Functions Benchmark
+============================
+Iterations : 10,000,000
+base_path              : 695.31 ms | 69.53 ns | 0.069531 µs | 14,381,985 calls/s
+  result: /home/yassine/Projects/framework/refactor/json.json
+vendor_path            : 701.89 ms | 70.19 ns | 0.070189 µs | 14,247,310 calls/s
+  result: /home/yassine/Projects/framework/refactor/json.json
+webkernel_package      : 735.95 ms | 73.59 ns | 0.073595 µs | 13,587,895 calls/s
+  result: /home/yassine/Projects/framework/refactor/x-dev-base/lifecycle/README.md
+```
+### Why `InstalledVersions` for `base_path()` and `webkernel_package()`?
+```json
+"config": { "vendor-dir": "933a2789/internal/dependencies/packagist" }
+```
+`dirname(__DIR__, N)` would need to know `N` — impossible with a non-standard vendor-dir.
+`InstalledVersions::getRootPackage()['install_path']` always contains the exact project root, set by Composer itself.
+`InstalledVersions::getInstallPath('webkernel/{$package}')` asks Composer directly for each package path; `realpath()` then resolves any traversal segments. Throws a `RuntimeException` attributed to the caller when the package is absent or its path does not exist on disk.
+
+`vendor_path()` uses `dirname(__DIR__, 2)` because this file lives at `{vendor}/webkernel/lifecycle/` — two levels up is always `{vendor}`, regardless of what that directory is named.
+
+All three helpers use `static` cache — computed once per process, zero overhead on repeat calls.
 
 ---
-
 ## extra.webkernel structure
-
 ```json
 {
   "extra": {
     "webkernel": {
       "$schema": "./_schemas/schema.v1.json",
-      "provider": "Vendor\\MyPackage\\MyProvider",
-      "module": "vendor/parent-module",
       "lifecycle": {
         "checks": [
           {
@@ -35,102 +50,44 @@
           }
         ],
         "events": {
-          "post-autoload-dump": "Webkernel\\Lifecycle\\ComposerScripts::post_autoload_dump",
-          "post-install-cmd": "",
-          "post-update-cmd": ""
+          "post-autoload-dump": "Webkernel\\Lifecycle\\ComposerScripts::post_autoload_dump"
         },
-        "concerns": [
-          "Webkernel\\Lifecycle\\Concerns\\Builtin\\GenPathHelpers",
-          "Webkernel\\Lifecycle\\Concerns\\Builtin\\GenVendorHelpers",
-          "Your\\Package\\Concerns\\GenMyCustomFile"
-        ]
-      },
-      "x-monorepo": {
-        "package-repos": [
-          "git@github.com:webkernelphp/config.git"
+        "actions": [
+          "Your\\Package\\Actions\\GenTailwindConfig",
+          "Your\\Package\\Actions\\GenEnvStub"
         ]
       }
     }
   }
 }
 ```
-
 ---
-
-## Concerns
-
-A **Concern** is a self-contained code-generation unit. One concern = one responsibility.
-
-### Built-in concerns
-
-| FQCN | Generates | Output |
-|---|---|---|
-| `GenPathHelpers` | `platform_path()`, `base_path()`, `storage_path()` | `vendor/webkernel/path-helpers.php` |
-| `GenVendorHelpers` | `vendor_path()`, `autoload_path()` | `vendor/webkernel/vendor-helpers.php` |
-
-### Writing your own concern
-
+## Writing an Action
 ```php
-namespace Your\Package\Concerns;
-
+namespace Your\Package\Actions;
 use Composer\Script\Event;
-use Webkernel\Lifecycle\Concerns\Contracts\LifecycleConcernContract;
-
-final class GenMyConfig implements LifecycleConcernContract
+use Webkernel\Lifecycle\Actions\Contracts\LifecycleActionContract;
+final class GenTailwindConfig implements LifecycleActionContract
 {
-    public function name(): string
-    {
-        return 'Generate my-config.php';
-    }
-
+    public function key(): string  { return 'tailwind-config'; }
+    public function name(): string { return 'Generate Tailwind config stub'; }
     public function handle(Event $event): void
     {
-        $vendor_dir = $event->getComposer()->getConfig()->get('vendor-dir');
-        file_put_contents($vendor_dir . '/my-config.php', '<?php return [];');
+        $output = webkernel_package('lifecycle', 'generated/tailwind.config.js');
+        file_put_contents($output, "module.exports = { content: [] };\n");
     }
 }
 ```
-
-Then declare it in `extra.webkernel.lifecycle.concerns` of your `composer.json`.
-
-**Rules:**
-- Must implement `LifecycleConcernContract`.
-- Must be **idempotent** (safe to re-run on every `composer dump-autoload`).
-- Must NOT depend on any package outside `webkernel/lifecycle`.
-
+Rules: idempotent · no external deps · output in `webkernel_package('lifecycle', 'generated/*')`.
 ---
-
 ## Environment checks
-
-Checks run at `post-autoload-dump`. Each check is a PHP expression:
-
 | `on-fail.type` | Behaviour |
 |---|---|
 | `info` | Blue notice, continues |
 | `warning` | Yellow warning, continues |
-| `danger` | Red error, **throws** and blocks Composer |
-
+| `danger` | Red error, **throws**, blocks Composer |
 ---
-
-## Schema
-
-The JSON Schema for `extra.webkernel` lives in `_schemas/schema.v1.json`.
-Point your IDE to it with:
-
-```json
-"$schema": "./_schemas/schema.v1.json"
-```
-
-or reference the versioned path in the monorepo:
-
-```
-lifecycle/_schemas/schema.v1.json
-```
-
----
-
 ## Package types
-
 | Type | Install path |
 |---|---|
 | `webkernel-business-module` | `modules/{vendor}/{name}/` |
@@ -138,12 +95,8 @@ lifecycle/_schemas/schema.v1.json
 | `webkernel-platform-module` | `modules/{vendor}/{name}/` |
 | `webkernel-platform-module-feature` | `modules/{parentVendor}/{parentName}/features/{vendor}-{name}/` |
 | `webkernel-ffi` | `ffi/{vendor}/{name}/` |
-| everything else | `vendor/{vendor}/{name}/` (standard) |
-
+| everything else | standard vendor path |
 Feature packages must declare `extra.webkernel.module: "vendor/parent-name"`.
-
 ---
-
 ## License
-
 Proprietary — (c) 2025–2027 Numerimondes, El Moumen Yassine

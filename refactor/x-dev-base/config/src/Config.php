@@ -92,7 +92,7 @@ final class Config
              // Resolve platform root path
              $root = self::$platform_path !== ''
                  ? self::$platform_path
-                 : (\function_exists('platform_path') ? \platform_path() : null);
+                 : (\function_exists('base_path') ? \base_path() : null);
 
              if ($root === null || !is_dir($root)) {
                  throw new \RuntimeException(

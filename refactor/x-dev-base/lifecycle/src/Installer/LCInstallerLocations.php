@@ -10,13 +10,9 @@ use Composer\Composer;
 use Composer\Package\PackageInterface;
 
 /**
- * Maps each LCPackageType to its install path template.
+ * Maps LCPackageType → install path template.
  *
- * Template variables:
- *   {$vendor}       — package vendor (left of '/')
- *   {$name}         — package name (right of '/')
- *   {$parentVendor} — parent module vendor (feature packages only)
- *   {$parentName}   — parent module name (feature packages only)
+ * Variables: {$vendor}, {$name}, {$parentVendor}, {$parentName}
  */
 final readonly class LCInstallerLocations
 {
@@ -25,7 +21,7 @@ final readonly class LCInstallerLocations
 
     public function __construct(Composer $composer)
     {
-        $vendor_dir = \rtrim((string) $composer->getConfig()->get('vendor-dir'), '/');
+        $vendor_dir = rtrim((string) $composer->getConfig()->get('vendor-dir'), '/');
 
         $this->templates = [
             'modules/{$vendor}/{$name}' => [
@@ -53,7 +49,7 @@ final readonly class LCInstallerLocations
     /** @return list<string> */
     public function types(): array
     {
-        return \array_map(static fn (LCPackageType $t): string => $t->value, LCPackageType::cases());
+        return array_map(static fn (LCPackageType $t): string => $t->value, LCPackageType::cases());
     }
 
     public function destination(PackageInterface $package): ?string
@@ -65,7 +61,7 @@ final readonly class LCInstallerLocations
         }
 
         foreach ($this->templates as $template => $types) {
-            if (\in_array($type, $types, strict: true)) {
+            if (in_array($type, $types, strict: true)) {
                 return $template;
             }
         }
@@ -73,20 +69,16 @@ final readonly class LCInstallerLocations
         return null;
     }
 
-    /**
-     * Extracts the parent module from extra.webkernel.module.
-     *
-     * @return array{vendor: string, name: string}|null
-     */
+    /** @return array{vendor: string, name: string}|null */
     public function parent_module(PackageInterface $package): ?array
     {
         $module = $package->getExtra()['webkernel']['module'] ?? null;
 
-        if (! \is_string($module) || ! \str_contains($module, '/')) {
+        if (! is_string($module) || ! str_contains($module, '/')) {
             return null;
         }
 
-        [$vendor, $name] = \explode('/', $module, 2);
+        [$vendor, $name] = explode('/', $module, 2);
 
         return ['vendor' => $vendor, 'name' => $name];
     }

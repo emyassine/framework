@@ -6,10 +6,5 @@
 //> file that was distributed with this source code.
 namespace Webkernel\Lifecycle\Providers;
 
-/**
- * Placeholder for a future Webkernel/Laravel ServiceProvider.
- * Declared here so the namespace is established for downstream packages.
- */
-class LifecycleProvider
-{
-}
+/** Placeholder for future Webkernel ServiceProvider. */
+class LifecycleProvider {}

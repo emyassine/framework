@@ -7,53 +7,47 @@
 namespace Webkernel\Lifecycle;
 
 use Composer\Script\Event;
-use Webkernel\Lifecycle\Concerns\LCConcernRunner;
-use Webkernel\Lifecycle\Concerns\LCEnvChecker;
+use Webkernel\Lifecycle\Actions\LCActionRunner;
+use Webkernel\Lifecycle\Actions\LCEnvChecker;
 
 /**
- * Static entry-point for Composer script hooks.
+ * Static entry-point for Composer lifecycle script hooks.
  *
- * Declare in extra.webkernel.lifecycle.events of any package:
- *
+ * Declared in extra.webkernel.lifecycle.events of any package:
  *   "post-autoload-dump": "Webkernel\\Lifecycle\\ComposerScripts::post_autoload_dump"
  *
- * This class is intentionally thin: it only wires the Event into
- * the internal runners. All logic lives in LCEnvChecker and LCConcernRunner.
- *
- * Zero dependency on any package outside webkernel/lifecycle.
+ * Thin orchestrator only — all logic lives in LCEnvChecker and LCActionRunner.
+ * Zero dependency outside webkernel/lifecycle.
  */
 final class ComposerScripts
 {
     /**
-     * Triggered after `composer dump-autoload`.
-     *
-     * 1. Run environment checks (blocking on "danger" level).
-     * 2. Run concern-based code generation (one concern = one responsibility).
+     * After `composer dump-autoload`:
+     *   1. Environment checks (blocking on "danger").
+     *   2. Action-based code generation.
      */
     public static function post_autoload_dump(Event $event): void
     {
-        $event->getIO()->write('<info>[webkernel/lifecycle] Running lifecycle checks…</info>');
+        $io = $event->getIO();
+
+        $io->write("\n<comment>[webkernel/lifecycle]</comment><info>  Checking environment…</info>\n");
         (new LCEnvChecker())->run($event);
 
-        $event->getIO()->write('<info>[webkernel/lifecycle] Running concerns…</info>');
-        (new LCConcernRunner())->run($event);
+        $io->write("<comment>[webkernel/lifecycle]</comment><info>  Running actions…</info>\n");
+        (new LCActionRunner())->run($event);
     }
 
-    /**
-     * Triggered before `composer install`.
-     * Reserved for pre-install environment validation.
-     */
+    /** Before `composer install` — checks only, no generation. */
     public static function pre_install_cmd(Event $event): void
     {
+        $event->getIO()->write("\n<comment>[webkernel/lifecycle]</comment><info>  Pre-install checks…</info>\n");
         (new LCEnvChecker())->run($event);
     }
 
-    /**
-     * Triggered before `composer update`.
-     * Reserved for pre-update environment validation.
-     */
+    /** Before `composer update` — checks only, no generation. */
     public static function pre_update_cmd(Event $event): void
     {
+        $event->getIO()->write("\n<comment>[webkernel/lifecycle]</comment><info>  Pre-update checks…</info>\n");
         (new LCEnvChecker())->run($event);
     }
 }

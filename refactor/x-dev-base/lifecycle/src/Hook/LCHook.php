@@ -7,25 +7,20 @@
 namespace Webkernel\Lifecycle\Hook;
 
 /**
- * Enumeration of all Composer script events supported by the Webkernel lifecycle plugin.
- *
- * Each case maps to the exact Composer event name (its string value).
- * Packages declare their callables under extra.webkernel.lifecycle.events.{value}.
+ * Composer script events supported by the Webkernel lifecycle plugin.
+ * String value = exact Composer event name.
  */
 enum LCHook: string
 {
-    case PreInstallCmd           = 'pre-install-cmd';
-    case PostInstallCmd          = 'post-install-cmd';
-    case PreUpdateCmd            = 'pre-update-cmd';
-    case PostUpdateCmd           = 'post-update-cmd';
-    case PreAutoloadDump         = 'pre-autoload-dump';
-    case PostAutoloadDump        = 'post-autoload-dump';
-    case PostRootPackageInstall  = 'post-root-package-install';
-    case PostCreateProjectCmd    = 'post-create-project-cmd';
+    case PreInstallCmd          = 'pre-install-cmd';
+    case PostInstallCmd         = 'post-install-cmd';
+    case PreUpdateCmd           = 'pre-update-cmd';
+    case PostUpdateCmd          = 'post-update-cmd';
+    case PreAutoloadDump        = 'pre-autoload-dump';
+    case PostAutoloadDump       = 'post-autoload-dump';
+    case PostRootPackageInstall = 'post-root-package-install';
+    case PostCreateProjectCmd   = 'post-create-project-cmd';
 
-    /**
-     * The key used in extra.webkernel.lifecycle.events.{key}.
-     */
     public function extra_key(): string
     {
         return $this->value;

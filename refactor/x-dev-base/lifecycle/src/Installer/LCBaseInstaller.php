@@ -15,9 +15,6 @@ use RuntimeException;
 /**
  * Custom installer for webkernel-* package types.
  *
- * Resolves the install path for each package based on its type,
- * delegating to LCInstallerLocations for the template mapping.
- *
  * @see https://getcomposer.org/doc/articles/custom-installers.md
  */
 final class LCBaseInstaller extends LibraryInstaller
@@ -33,13 +30,9 @@ final class LCBaseInstaller extends LibraryInstaller
     #[\Override]
     public function supports($packageType): bool
     {
-        return \in_array($packageType, $this->locations->types(), strict: true);
+        return in_array($packageType, $this->locations->types(), strict: true);
     }
 
-    /**
-     * Returns the absolute install path for the given package.
-     * Path never ends with a slash.
-     */
     #[\Override]
     public function getInstallPath(PackageInterface $package): string
     {
@@ -49,7 +42,7 @@ final class LCBaseInstaller extends LibraryInstaller
             return parent::getInstallPath($package);
         }
 
-        [$vendor, $name] = \explode('/', $package->getName(), 2);
+        [$vendor, $name] = explode('/', $package->getName(), 2);
 
         $replacements = [
             '{$vendor}' => $vendor,
@@ -62,8 +55,8 @@ final class LCBaseInstaller extends LibraryInstaller
             $parent = $this->locations->parent_module($package);
 
             if ($parent === null) {
-                throw new RuntimeException(\sprintf(
-                    'Package "%s" has type "%s" and must declare its parent module via extra.webkernel.module in composer.json.',
+                throw new RuntimeException(sprintf(
+                    'Package "%s" (type: "%s") must declare extra.webkernel.module: "vendor/name".',
                     $package->getName(),
                     $type->value,
                 ));
@@ -73,6 +66,6 @@ final class LCBaseInstaller extends LibraryInstaller
             $replacements['{$parentName}']   = $parent['name'];
         }
 
-        return \rtrim(\strtr($template, $replacements), '/\\');
+        return rtrim(strtr($template, $replacements), '/\\');
     }
 }

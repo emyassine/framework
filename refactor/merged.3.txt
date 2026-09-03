@@ -1,0 +1,828 @@
+==================================================
+STRUCTURE
+==================================================
+
+--- Directory: /home/yassine/Projects/framework/refactor/x-dev-base/lifecycle/src ---
+/home/yassine/Projects/framework/refactor/x-dev-base/lifecycle/src
+├── Actions
+│   ├── Builtin
+│   ├── Contracts
+│   │   └── LifecycleActionContract.php
+│   ├── LCActionRunner.php
+│   └── LCEnvChecker.php
+├── ComposerScripts.php
+├── Hook
+│   ├── LCHookDispatcher.php
+│   └── LCHook.php
+├── Installer
+│   ├── LCBaseInstaller.php
+│   ├── LCInstallerLocations.php
+│   └── LCPackageType.php
+├── LCInstaller.php
+└── Providers
+    └── LifecycleProvider.php
+
+7 directories, 11 files
+
+==================================================
+FILE CONTENTS
+==================================================
+--------------------------------------------------
+>>> FILE: /home/yassine/Projects/framework/refactor/x-dev-base/lifecycle/src/ComposerScripts.php
+--------------------------------------------------
+
+<?php declare(strict_types=1);
+//> This file is part of Webkernel.
+//> (c) 2025 - 2027 Numerimondes, El Moumen Yassine
+//> Yassine El Moumen <yassine@numerimondes.com> | <platform@webkernelphp.com>
+//> For the full copyright and license information, please view the LICENSE
+//> file that was distributed with this source code.
+namespace Webkernel\Lifecycle;
+
+use Composer\Script\Event;
+use Webkernel\Lifecycle\Actions\LCActionRunner;
+use Webkernel\Lifecycle\Actions\LCEnvChecker;
+
+/**
+ * Static entry-point for Composer lifecycle script hooks.
+ *
+ * Declared in extra.webkernel.lifecycle.events of any package:
+ *   "post-autoload-dump": "Webkernel\\Lifecycle\\ComposerScripts::post_autoload_dump"
+ *
+ * Thin orchestrator only — all logic lives in LCEnvChecker and LCActionRunner.
+ * Zero dependency outside webkernel/lifecycle.
+ */
+final class ComposerScripts
+{
+    /**
+     * After `composer dump-autoload`:
+     *   1. Environment checks (blocking on "danger").
+     *   2. Action-based code generation.
+     */
+    public static function post_autoload_dump(Event $event): void
+    {
+        $io = $event->getIO();
+
+        $io->write("\n<comment>[webkernel/lifecycle]</comment><info>  Checking environment…</info>\n");
+        (new LCEnvChecker())->run($event);
+
+        $io->write("<comment>[webkernel/lifecycle]</comment><info>  Running actions…</info>\n");
+        (new LCActionRunner())->run($event);
+    }
+
+    /** Before `composer install` — checks only, no generation. */
+    public static function pre_install_cmd(Event $event): void
+    {
+        $event->getIO()->write("\n<comment>[webkernel/lifecycle]</comment><info>  Pre-install checks…</info>\n");
+        (new LCEnvChecker())->run($event);
+    }
+
+    /** Before `composer update` — checks only, no generation. */
+    public static function pre_update_cmd(Event $event): void
+    {
+        $event->getIO()->write("\n<comment>[webkernel/lifecycle]</comment><info>  Pre-update checks…</info>\n");
+        (new LCEnvChecker())->run($event);
+    }
+}
+
+
+--------------------------------------------------
+>>> FILE: /home/yassine/Projects/framework/refactor/x-dev-base/lifecycle/src/Providers/LifecycleProvider.php
+--------------------------------------------------
+
+<?php declare(strict_types=1);
+//> This file is part of Webkernel.
+//> (c) 2025 - 2027 Numerimondes, El Moumen Yassine
+//> Yassine El Moumen <yassine@numerimondes.com> | <platform@webkernelphp.com>
+//> For the full copyright and license information, please view the LICENSE
+//> file that was distributed with this source code.
+namespace Webkernel\Lifecycle\Providers;
+
+/** Placeholder for future Webkernel ServiceProvider. */
+class LifecycleProvider {}
+
+
+--------------------------------------------------
+>>> FILE: /home/yassine/Projects/framework/refactor/x-dev-base/lifecycle/src/Actions/LCEnvChecker.php
+--------------------------------------------------
+
+<?php declare(strict_types=1);
+//> This file is part of Webkernel.
+//> (c) 2025 - 2027 Numerimondes, El Moumen Yassine
+//> Yassine El Moumen <yassine@numerimondes.com> | <platform@webkernelphp.com>
+//> For the full copyright and license information, please view the LICENSE
+//> file that was distributed with this source code.
+namespace Webkernel\Lifecycle\Actions;
+
+use Composer\IO\IOInterface;
+use Composer\Script\Event;
+
+/**
+ * Evaluates environment checks declared in extra.webkernel.lifecycle.checks[].
+ *
+ * Each check is a PHP boolean expression (string). Truthy = failed.
+ *
+ * Severity:
+ *   info    → blue notice, continues.
+ *   warning → yellow warning, continues.
+ *   danger  → red error, throws RuntimeException, blocks Composer.
+ */
+final class LCEnvChecker
+{
+    public function run(Event $event): void
+    {
+        $io       = $event->getIO();
+        $packages = $this->collect_packages($event);
+
+        foreach ($packages as ['name' => $pkg_name, 'checks' => $checks]) {
+            foreach ($checks as $spec) {
+                $this->evaluate($spec, $pkg_name, $io);
+            }
+        }
+    }
+
+    /** @throws \RuntimeException on danger-level failure */
+    private function evaluate(mixed $spec, string $pkg_name, IOInterface $io): void
+    {
+        if (! is_array($spec)) {
+            return;
+        }
+
+        $expression = $spec['check']   ?? null;
+        $on_fail    = $spec['on-fail'] ?? [];
+        $fix        = $spec['fix']     ?? null;
+
+        if (! is_string($expression) || $expression === '') {
+            return;
+        }
+
+        try {
+            // phpcs:ignore Squiz.PHP.Eval.Discouraged
+            $failed = (bool) eval("return ({$expression});");
+        } catch (\ParseError) {
+            $io->writeError(sprintf(
+                '  <warning>[webkernel/lifecycle] Invalid check expression in "%s": %s</warning>',
+                $pkg_name,
+                $expression,
+            ));
+            return;
+        }
+
+        if (! $failed) {
+            return;
+        }
+
+        $type    = $on_fail['type']    ?? 'warning';
+        $message = $on_fail['message'] ?? 'An environment check failed.';
+
+        [$open, $close] = match ($type) {
+            'danger'  => ['<error>',   '</error>'],
+            'warning' => ['<warning>', '</warning>'],
+            default   => ['<info>',    '</info>'],
+        };
+
+        $io->writeError("  {$open}[webkernel/{$pkg_name}] {$message}{$close}");
+
+        if (is_string($fix) && $fix !== '') {
+            $io->writeError("    Fix: <comment>{$fix}</comment>");
+        }
+
+        if ($type === 'danger') {
+            throw new \RuntimeException(
+                "[webkernel/lifecycle] Blocking check failed in \"{$pkg_name}\": {$message}",
+            );
+        }
+    }
+
+    /**
+     * @return list<array{name: string, checks: list<mixed>}>
+     */
+    private function collect_packages(Event $event): array
+    {
+        $composer  = $event->getComposer();
+        $installed = $composer->getRepositoryManager()->getLocalRepository()->getPackages();
+        $out       = [];
+        $seen      = [];
+
+        foreach (array_merge([$composer->getPackage()], $installed) as $package) {
+            $name   = $package->getName();
+            $checks = $package->getExtra()['webkernel']['lifecycle']['checks'] ?? [];
+
+            if (! is_array($checks) || $checks === []) {
+                continue;
+            }
+            if (isset($seen[$name])) {
+                continue;
+            }
+
+            $seen[$name] = true;
+            $out[] = ['name' => $name, 'checks' => array_values($checks)];
+        }
+
+        return $out;
+    }
+}
+
+
+--------------------------------------------------
+>>> FILE: /home/yassine/Projects/framework/refactor/x-dev-base/lifecycle/src/Actions/LCActionRunner.php
+--------------------------------------------------
+
+<?php declare(strict_types=1);
+//> This file is part of Webkernel.
+//> (c) 2025 - 2027 Numerimondes, El Moumen Yassine
+//> Yassine El Moumen <yassine@numerimondes.com> | <platform@webkernelphp.com>
+//> For the full copyright and license information, please view the LICENSE
+//> file that was distributed with this source code.
+namespace Webkernel\Lifecycle\Actions;
+
+use Composer\Script\Event;
+use Webkernel\Lifecycle\Actions\Contracts\LifecycleActionContract;
+
+/**
+ * Resolves and runs every action declared in extra.webkernel.lifecycle.actions[]
+ * across all installed packages (root + installed).
+ *
+ * Execution order:
+ *   1. Root package actions first.
+ *   2. webkernel/codebase actions second (platform core).
+ *   3. All other packages in alphabetical order.
+ */
+final class LCActionRunner
+{
+    public function run(Event $event): void
+    {
+        $io       = $event->getIO();
+        $packages = $this->collect_packages($event);
+
+        foreach ($packages as ['name' => $pkg_name, 'actions' => $action_fqcns]) {
+            foreach ($action_fqcns as $fqcn) {
+                if (! is_string($fqcn) || $fqcn === '') {
+                    continue;
+                }
+
+                if (! class_exists($fqcn)) {
+                    $io->writeError(sprintf(
+                        '  <warning>[webkernel/lifecycle] Action not found: %s (package: %s)</warning>',
+                        $fqcn,
+                        $pkg_name,
+                    ));
+                    continue;
+                }
+
+                $action = new $fqcn();
+
+                if (! $action instanceof LifecycleActionContract) {
+                    $io->writeError(sprintf(
+                        '  <warning>[webkernel/lifecycle] %s does not implement LifecycleActionContract — skipped.</warning>',
+                        $fqcn,
+                    ));
+                    continue;
+                }
+
+                $io->write(sprintf('  <info>→ [%s] %s</info>', $pkg_name, $action->name()));
+
+                try {
+                    $action->handle($event);
+                } catch (\Throwable $e) {
+                    $io->writeError(sprintf(
+                        '  <error>[webkernel/lifecycle] Action "%s" failed: %s</error>',
+                        $action->name(),
+                        $e->getMessage(),
+                    ));
+                }
+            }
+        }
+    }
+
+    /**
+     * @return list<array{name: string, actions: list<string>}>
+     */
+    private function collect_packages(Event $event): array
+    {
+        $composer  = $event->getComposer();
+        $installed = $composer->getRepositoryManager()->getLocalRepository()->getPackages();
+        $out       = [];
+        $seen      = [];
+
+        foreach (array_merge([$composer->getPackage()], $installed) as $package) {
+            $name    = $package->getName();
+            $actions = $package->getExtra()['webkernel']['lifecycle']['actions'] ?? [];
+
+            if (! is_array($actions) || $actions === []) {
+                continue;
+            }
+            if (isset($seen[$name])) {
+                continue;
+            }
+
+            $seen[$name] = true;
+            $out[] = ['name' => $name, 'actions' => array_values($actions)];
+        }
+
+        usort($out, static function (array $a, array $b): int {
+            $priority = static fn (string $n): int => match ($n) {
+                ''                   => -1,
+                'webkernel/codebase' => 0,
+                default              => 1,
+            };
+            return [$priority($a['name']), $a['name']] <=> [$priority($b['name']), $b['name']];
+        });
+
+        return $out;
+    }
+}
+
+
+--------------------------------------------------
+>>> FILE: /home/yassine/Projects/framework/refactor/x-dev-base/lifecycle/src/Actions/Contracts/LifecycleActionContract.php
+--------------------------------------------------
+
+<?php declare(strict_types=1);
+//> This file is part of Webkernel.
+//> (c) 2025 - 2027 Numerimondes, El Moumen Yassine
+//> Yassine El Moumen <yassine@numerimondes.com> | <platform@webkernelphp.com>
+//> For the full copyright and license information, please view the LICENSE
+//> file that was distributed with this source code.
+namespace Webkernel\Lifecycle\Actions\Contracts;
+
+use Composer\Script\Event;
+
+/**
+ * One action = one code-generation responsibility.
+ *
+ * Rules:
+ *   - Idempotent: safe to re-run on every `composer dump-autoload`.
+ *   - No dependency outside webkernel/lifecycle.
+ *   - Use webkernel_package('lifecycle', 'generated/{file}') for output paths.
+ */
+interface LifecycleActionContract
+{
+    /**
+     * Unique key identifying what this action generates.
+     * Used for logging and future diffing.
+     * Example: "tailwind-config", "env-stub"
+     */
+    public function key(): string;
+
+    /**
+     * Human-readable label shown in Composer output.
+     * Example: "Generate Tailwind config stub"
+     */
+    public function name(): string;
+
+    /**
+     * Execute the action.
+     */
+    public function handle(Event $event): void;
+}
+
+
+--------------------------------------------------
+>>> FILE: /home/yassine/Projects/framework/refactor/x-dev-base/lifecycle/src/Hook/LCHook.php
+--------------------------------------------------
+
+<?php declare(strict_types=1);
+//> This file is part of Webkernel.
+//> (c) 2025 - 2027 Numerimondes, El Moumen Yassine
+//> Yassine El Moumen <yassine@numerimondes.com> | <platform@webkernelphp.com>
+//> For the full copyright and license information, please view the LICENSE
+//> file that was distributed with this source code.
+namespace Webkernel\Lifecycle\Hook;
+
+/**
+ * Composer script events supported by the Webkernel lifecycle plugin.
+ * String value = exact Composer event name.
+ */
+enum LCHook: string
+{
+    case PreInstallCmd          = 'pre-install-cmd';
+    case PostInstallCmd         = 'post-install-cmd';
+    case PreUpdateCmd           = 'pre-update-cmd';
+    case PostUpdateCmd          = 'post-update-cmd';
+    case PreAutoloadDump        = 'pre-autoload-dump';
+    case PostAutoloadDump       = 'post-autoload-dump';
+    case PostRootPackageInstall = 'post-root-package-install';
+    case PostCreateProjectCmd   = 'post-create-project-cmd';
+
+    public function extra_key(): string
+    {
+        return $this->value;
+    }
+}
+
+
+--------------------------------------------------
+>>> FILE: /home/yassine/Projects/framework/refactor/x-dev-base/lifecycle/src/Hook/LCHookDispatcher.php
+--------------------------------------------------
+
+<?php declare(strict_types=1);
+//> This file is part of Webkernel.
+//> (c) 2025 - 2027 Numerimondes, El Moumen Yassine
+//> Yassine El Moumen <yassine@numerimondes.com> | <platform@webkernelphp.com>
+//> For the full copyright and license information, please view the LICENSE
+//> file that was distributed with this source code.
+namespace Webkernel\Lifecycle\Hook;
+
+/**
+ * Dispatches extra.webkernel.lifecycle.events.{event} callables
+ * declared across installed packages.
+ *
+ * Callable formats:
+ *   "Vendor\\ClassName"          → new ClassName(); __invoke($event)
+ *   "Vendor\\ClassName::method"  → static or instance call
+ *
+ * Order: webkernel/codebase first, then alphabetical.
+ */
+final class LCHookDispatcher
+{
+    /**
+     * @param list<array{name: string, extra: array<string, mixed>}> $packages
+     * @throws \RuntimeException
+     */
+    public function dispatch(string $event_name, object $event, array $packages): void
+    {
+        $hook = LCHook::tryFrom($event_name);
+
+        if ($hook === null) {
+            return;
+        }
+
+        $key  = $hook->extra_key();
+        $jobs = [];
+
+        foreach ($packages as $package) {
+            $target = $package['extra']['lifecycle']['events'][$key] ?? null;
+
+            if (! is_string($target) || $target === '') {
+                continue;
+            }
+
+            $jobs[] = ['name' => (string) $package['name'], 'target' => $target];
+        }
+
+        usort($jobs, static function (array $a, array $b): int {
+            $p = static fn (string $n): int => $n === 'webkernel/codebase' ? 0 : 1;
+            return [$p($a['name']), $a['name']] <=> [$p($b['name']), $b['name']];
+        });
+
+        foreach ($jobs as $job) {
+            $this->invoke($job['target'], $event);
+        }
+    }
+
+    /** @throws \RuntimeException */
+    private function invoke(string $target, object $event): void
+    {
+        $class  = $target;
+        $method = '__invoke';
+
+        if (str_contains($target, '::')) {
+            [$class, $method] = explode('::', $target, 2);
+        }
+
+        if (! class_exists($class)) {
+            return;
+        }
+
+        if (! method_exists($class, $method)) {
+            throw new \RuntimeException('[webkernel/lifecycle] Hook method not found: ' . $target);
+        }
+
+        $ref  = new \ReflectionMethod($class, $method);
+        $args = $ref->getNumberOfParameters() > 0 ? [$event] : [];
+
+        $ref->isStatic()
+            ? $ref->invokeArgs(null, $args)
+            : $ref->invokeArgs(new $class(), $args);
+    }
+}
+
+
+--------------------------------------------------
+>>> FILE: /home/yassine/Projects/framework/refactor/x-dev-base/lifecycle/src/Installer/LCBaseInstaller.php
+--------------------------------------------------
+
+<?php declare(strict_types=1);
+//> This file is part of Webkernel.
+//> (c) 2025 - 2027 Numerimondes, El Moumen Yassine
+//> Yassine El Moumen <yassine@numerimondes.com> | <platform@webkernelphp.com>
+//> For the full copyright and license information, please view the LICENSE
+//> file that was distributed with this source code.
+namespace Webkernel\Lifecycle\Installer;
+
+use Composer\Composer;
+use Composer\Installer\LibraryInstaller;
+use Composer\IO\IOInterface;
+use Composer\Package\PackageInterface;
+use RuntimeException;
+
+/**
+ * Custom installer for webkernel-* package types.
+ *
+ * @see https://getcomposer.org/doc/articles/custom-installers.md
+ */
+final class LCBaseInstaller extends LibraryInstaller
+{
+    private readonly LCInstallerLocations $locations;
+
+    public function __construct(IOInterface $io, Composer $composer)
+    {
+        parent::__construct($io, $composer, 'library');
+        $this->locations = new LCInstallerLocations($composer);
+    }
+
+    #[\Override]
+    public function supports($packageType): bool
+    {
+        return in_array($packageType, $this->locations->types(), strict: true);
+    }
+
+    #[\Override]
+    public function getInstallPath(PackageInterface $package): string
+    {
+        $template = $this->locations->destination($package);
+
+        if ($template === null) {
+            return parent::getInstallPath($package);
+        }
+
+        [$vendor, $name] = explode('/', $package->getName(), 2);
+
+        $replacements = [
+            '{$vendor}' => $vendor,
+            '{$name}'   => $name,
+        ];
+
+        $type = LCPackageType::from($package->getType());
+
+        if ($type->requires_parent_module()) {
+            $parent = $this->locations->parent_module($package);
+
+            if ($parent === null) {
+                throw new RuntimeException(sprintf(
+                    'Package "%s" (type: "%s") must declare extra.webkernel.module: "vendor/name".',
+                    $package->getName(),
+                    $type->value,
+                ));
+            }
+
+            $replacements['{$parentVendor}'] = $parent['vendor'];
+            $replacements['{$parentName}']   = $parent['name'];
+        }
+
+        return rtrim(strtr($template, $replacements), '/\\');
+    }
+}
+
+
+--------------------------------------------------
+>>> FILE: /home/yassine/Projects/framework/refactor/x-dev-base/lifecycle/src/Installer/LCInstallerLocations.php
+--------------------------------------------------
+
+<?php declare(strict_types=1);
+//> This file is part of Webkernel.
+//> (c) 2025 - 2027 Numerimondes, El Moumen Yassine
+//> Yassine El Moumen <yassine@numerimondes.com> | <platform@webkernelphp.com>
+//> For the full copyright and license information, please view the LICENSE
+//> file that was distributed with this source code.
+namespace Webkernel\Lifecycle\Installer;
+
+use Composer\Composer;
+use Composer\Package\PackageInterface;
+
+/**
+ * Maps LCPackageType → install path template.
+ *
+ * Variables: {$vendor}, {$name}, {$parentVendor}, {$parentName}
+ */
+final readonly class LCInstallerLocations
+{
+    /** @var array<string, list<LCPackageType>> */
+    private array $templates;
+
+    public function __construct(Composer $composer)
+    {
+        $vendor_dir = rtrim((string) $composer->getConfig()->get('vendor-dir'), '/');
+
+        $this->templates = [
+            'modules/{$vendor}/{$name}' => [
+                LCPackageType::BusinessModule,
+                LCPackageType::PlatformModule,
+            ],
+            'modules/{$parentVendor}/{$parentName}/features/{$vendor}-{$name}' => [
+                LCPackageType::BusinessModuleFeature,
+                LCPackageType::PlatformModuleFeature,
+            ],
+            'ffi/{$vendor}/{$name}' => [
+                LCPackageType::Ffi,
+            ],
+            $vendor_dir . '/{$vendor}/{$name}' => [
+                LCPackageType::Assets,
+                LCPackageType::Component,
+                LCPackageType::DevTool,
+                LCPackageType::Stdlib,
+                LCPackageType::Element,
+                LCPackageType::Agent,
+            ],
+        ];
+    }
+
+    /** @return list<string> */
+    public function types(): array
+    {
+        return array_map(static fn (LCPackageType $t): string => $t->value, LCPackageType::cases());
+    }
+
+    public function destination(PackageInterface $package): ?string
+    {
+        $type = LCPackageType::tryFrom($package->getType());
+
+        if ($type === null) {
+            return null;
+        }
+
+        foreach ($this->templates as $template => $types) {
+            if (in_array($type, $types, strict: true)) {
+                return $template;
+            }
+        }
+
+        return null;
+    }
+
+    /** @return array{vendor: string, name: string}|null */
+    public function parent_module(PackageInterface $package): ?array
+    {
+        $module = $package->getExtra()['webkernel']['module'] ?? null;
+
+        if (! is_string($module) || ! str_contains($module, '/')) {
+            return null;
+        }
+
+        [$vendor, $name] = explode('/', $module, 2);
+
+        return ['vendor' => $vendor, 'name' => $name];
+    }
+}
+
+
+--------------------------------------------------
+>>> FILE: /home/yassine/Projects/framework/refactor/x-dev-base/lifecycle/src/Installer/LCPackageType.php
+--------------------------------------------------
+
+<?php declare(strict_types=1);
+//> This file is part of Webkernel.
+//> (c) 2025 - 2027 Numerimondes, El Moumen Yassine
+//> Yassine El Moumen <yassine@numerimondes.com> | <platform@webkernelphp.com>
+//> For the full copyright and license information, please view the LICENSE
+//> file that was distributed with this source code.
+namespace Webkernel\Lifecycle\Installer;
+
+enum LCPackageType: string
+{
+    case Assets                = 'webkernel-assets';
+    case Component             = 'webkernel-component';
+    case DevTool               = 'webkernel-devtool';
+    case Stdlib                = 'webkernel-stdlib';
+    case Element               = 'webkernel-element';
+    case Agent                 = 'webkernel-agent';
+    case Ffi                   = 'webkernel-ffi';
+    case BusinessModule        = 'webkernel-business-module';
+    case BusinessModuleFeature = 'webkernel-business-module-feature';
+    case PlatformModule        = 'webkernel-platform-module';
+    case PlatformModuleFeature = 'webkernel-platform-module-feature';
+
+    public function description(): string
+    {
+        return match ($this) {
+            self::Assets                => 'Asset bundle.',
+            self::DevTool               => 'Development tool package.',
+            self::Stdlib                => 'Standard library package.',
+            self::Component             => 'Foundational component.',
+            self::Element               => 'Reusable UI element.',
+            self::Agent                 => 'Agent worker package.',
+            self::Ffi                   => 'Native binary bridged through the Webkernel ABI.',
+            self::BusinessModule        => 'Autonomous business domain module.',
+            self::BusinessModuleFeature => 'Feature attached to a parent business module. Requires extra.webkernel.module.',
+            self::PlatformModule        => 'Core platform module.',
+            self::PlatformModuleFeature => 'Feature attached to a parent platform module. Requires extra.webkernel.module.',
+        };
+    }
+
+    public function requires_parent_module(): bool
+    {
+        return match ($this) {
+            self::BusinessModuleFeature,
+            self::PlatformModuleFeature => true,
+            default                     => false,
+        };
+    }
+}
+
+
+--------------------------------------------------
+>>> FILE: /home/yassine/Projects/framework/refactor/x-dev-base/lifecycle/src/LCInstaller.php
+--------------------------------------------------
+
+<?php declare(strict_types=1);
+//> This file is part of Webkernel.
+//> (c) 2025 - 2027 Numerimondes, El Moumen Yassine
+//> Yassine El Moumen <yassine@numerimondes.com> | <platform@webkernelphp.com>
+//> For the full copyright and license information, please view the LICENSE
+//> file that was distributed with this source code.
+namespace Webkernel\Lifecycle;
+
+use Composer\Composer;
+use Composer\EventDispatcher\EventSubscriberInterface;
+use Composer\IO\IOInterface;
+use Composer\Package\PackageInterface;
+use Composer\Plugin\PluginInterface;
+use Composer\Script\Event;
+use Webkernel\Lifecycle\Hook\LCHook;
+use Webkernel\Lifecycle\Hook\LCHookDispatcher;
+use Webkernel\Lifecycle\Installer\LCBaseInstaller;
+
+/**
+ * Webkernel Composer plugin entry-point.
+ *
+ * 1. Registers the custom installer for webkernel-* package types.
+ * 2. Subscribes to all Composer script events.
+ * 3. Dispatches extra.webkernel.lifecycle.events.{event} callables across packages.
+ */
+final class LCInstaller implements PluginInterface, EventSubscriberInterface
+{
+    /** @return array<string, string> */
+    public static function getSubscribedEvents(): array
+    {
+        $events = [];
+        foreach (LCHook::cases() as $hook) {
+            $events[$hook->value] = 'on_script_event';
+        }
+        return $events;
+    }
+
+    public function activate(Composer $composer, IOInterface $io): void
+    {
+        $composer->getInstallationManager()->addInstaller(new LCBaseInstaller($io, $composer));
+    }
+
+    public function deactivate(Composer $composer, IOInterface $io): void {}
+
+    public function uninstall(Composer $composer, IOInterface $io): void {}
+
+    public function on_script_event(Event $event): void
+    {
+        $vendor   = rtrim((string) $event->getComposer()->getConfig()->get('vendor-dir'), '/');
+        $autoload = $vendor . '/autoload.php';
+
+        if (is_file($autoload)) {
+            require_once $autoload;
+        }
+
+        (new LCHookDispatcher())->dispatch(
+            $event->getName(),
+            $event,
+            $this->hook_packages($event),
+        );
+    }
+
+    /**
+     * @return list<array{name: string, extra: array<string, mixed>}>
+     */
+    private function hook_packages(Event $event): array
+    {
+        $out  = [];
+        $seen = [];
+
+        $packages = array_merge(
+            [$event->getComposer()->getPackage()],
+            $event->getComposer()->getRepositoryManager()->getLocalRepository()->getPackages(),
+        );
+
+        foreach ($packages as $package) {
+            if (! $package instanceof PackageInterface) {
+                continue;
+            }
+
+            $extra = $package->getExtra()['webkernel'] ?? null;
+
+            if (! is_array($extra)) {
+                continue;
+            }
+
+            $name = $package->getName();
+
+            if (isset($seen[$name])) {
+                continue;
+            }
+
+            $seen[$name] = true;
+            $out[] = ['name' => $name, 'extra' => $extra];
+        }
+
+        return $out;
+    }
+}
+
+

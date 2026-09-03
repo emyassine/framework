@@ -17,24 +17,15 @@ use Webkernel\Lifecycle\Hook\LCHookDispatcher;
 use Webkernel\Lifecycle\Installer\LCBaseInstaller;
 
 /**
- * Webkernel Composer plugin.
+ * Webkernel Composer plugin entry-point.
  *
- * Responsibilities:
- *   1. Register the custom installer for webkernel-* package types.
- *   2. Subscribe to all Composer script events.
- *   3. On each event, dispatch extra.webkernel.lifecycle.events.{event}
- *      callables declared across all installed packages.
- *
- * The plugin itself is stateless. LCHookDispatcher handles dispatch order.
- * LCConcernRunner and LCEnvChecker are invoked via ComposerScripts, not here.
+ * 1. Registers the custom installer for webkernel-* package types.
+ * 2. Subscribes to all Composer script events.
+ * 3. Dispatches extra.webkernel.lifecycle.events.{event} callables across packages.
  */
 final class LCInstaller implements PluginInterface, EventSubscriberInterface
 {
-    /**
-     * Subscribe to every Composer event supported by LCHook.
-     *
-     * @return array<string, string>
-     */
+    /** @return array<string, string> */
     public static function getSubscribedEvents(): array
     {
         $events = [];
@@ -53,16 +44,12 @@ final class LCInstaller implements PluginInterface, EventSubscriberInterface
 
     public function uninstall(Composer $composer, IOInterface $io): void {}
 
-    /**
-     * Called for every subscribed Composer event.
-     * Loads the autoloader (if available), then dispatches package hooks.
-     */
     public function on_script_event(Event $event): void
     {
-        $vendor   = \rtrim((string) $event->getComposer()->getConfig()->get('vendor-dir'), '/');
+        $vendor   = rtrim((string) $event->getComposer()->getConfig()->get('vendor-dir'), '/');
         $autoload = $vendor . '/autoload.php';
 
-        if (\is_file($autoload)) {
+        if (is_file($autoload)) {
             require_once $autoload;
         }
 
@@ -74,8 +61,6 @@ final class LCInstaller implements PluginInterface, EventSubscriberInterface
     }
 
     /**
-     * Collect all packages (root + installed) that have extra.webkernel declared.
-     *
      * @return list<array{name: string, extra: array<string, mixed>}>
      */
     private function hook_packages(Event $event): array
@@ -83,7 +68,7 @@ final class LCInstaller implements PluginInterface, EventSubscriberInterface
         $out  = [];
         $seen = [];
 
-        $packages = \array_merge(
+        $packages = array_merge(
             [$event->getComposer()->getPackage()],
             $event->getComposer()->getRepositoryManager()->getLocalRepository()->getPackages(),
         );
@@ -95,7 +80,7 @@ final class LCInstaller implements PluginInterface, EventSubscriberInterface
 
             $extra = $package->getExtra()['webkernel'] ?? null;
 
-            if (! \is_array($extra)) {
+            if (! is_array($extra)) {
                 continue;
             }
 

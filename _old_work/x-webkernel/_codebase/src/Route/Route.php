@@ -258,7 +258,9 @@ final class Route implements ComposableContract
     }
 
     public static function dispatch(
-    	ServerRequestInterface|Request|string|null $method = null, ?string $uri = null, ?string $host = null
+    	ServerRequestInterface|Request|string|null $method = null,
+    	?string $uri = null,
+    	?string $host = null
     ): mixed
     {
         if ($method instanceof \Webkernel\Request) {

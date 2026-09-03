@@ -1,9 +1,9 @@
 {
   "name": "webkernel/lifecycle",
-  "description": "Webkernel Composer plugin — custom installer, lifecycle hooks, and concern-based code generation.",
+  "description": "Webkernel Composer plugin — custom installer, lifecycle hooks, and action-based code generation.",
   "type": "composer-plugin",
-  "version": "0.12.0",
   "license": "proprietary",
+  "version": "0.12.0",
   "authors": [
     {
       "name": "El Moumen Yassine",
@@ -14,15 +14,15 @@
   "require": {
     "php": ">=8.5",
     "composer-plugin-api": "^2.0",
-    "composer/composer": "^2.0"
-  },
-  "require-dev": {
-    "composer/composer": "^2.0"
+    "composer/installers": "^2.0"
   },
   "autoload": {
     "psr-4": {
       "Webkernel\\Lifecycle\\": "src/"
-    }
+    },
+    "files": [
+      "load.lifecycle.functions.php"
+    ]
   },
   "extra": {
     "class": "Webkernel\\Lifecycle\\LCInstaller",
@@ -37,12 +37,11 @@
           }
         ],
         "events": {
-          "post-autoload-dump": "Webkernel\\Lifecycle\\ComposerScripts::post_autoload_dump"
+          "post-autoload-dump": "Webkernel\\Lifecycle\\ComposerScripts::post_autoload_dump",
+          "pre-install-cmd":    "Webkernel\\Lifecycle\\ComposerScripts::pre_install_cmd",
+          "pre-update-cmd":     "Webkernel\\Lifecycle\\ComposerScripts::pre_update_cmd"
         },
-        "concerns": [
-          "Webkernel\\Lifecycle\\Concerns\\Builtin\\GenPathHelpers",
-          "Webkernel\\Lifecycle\\Concerns\\Builtin\\GenVendorHelpers"
-        ]
+        "actions": []
       }
     }
   },

@@ -4,62 +4,45 @@
   "title": "Webkernel Package Schema v1",
   "description": "Schema for extra.webkernel in composer.json — Webkernel lifecycle plugin.",
   "type": "object",
+  "additionalProperties": false,
   "properties": {
-    "$schema": {
-      "type": "string",
-      "description": "Reference to the schema file. Can be a local path or a remote URL."
-    },
+    "$schema": { "type": "string" },
     "provider": {
       "type": "string",
       "description": "FQCN of the Webkernel ServiceProvider for this package."
     },
     "module": {
       "type": "string",
-      "description": "Parent module reference (vendor/name) for feature packages.",
+      "description": "Parent module reference (vendor/name) — required for feature package types.",
       "pattern": "^[a-z0-9_-]+/[a-z0-9_-]+$"
     },
     "lifecycle": {
       "type": "object",
-      "description": "Lifecycle hooks, environment checks, and concern-based code generation for this package.",
+      "additionalProperties": false,
       "properties": {
         "checks": {
           "type": "array",
-          "description": "Environment checks run at post-autoload-dump time. Each check is a PHP expression; truthy = problem.",
           "items": {
             "type": "object",
             "required": ["check", "on-fail"],
             "additionalProperties": false,
             "properties": {
-              "check": {
-                "type": "string",
-                "description": "PHP expression. Evaluated with eval(). Truthy return = check failed."
-              },
+              "check": { "type": "string", "description": "PHP boolean expression. Truthy = failed." },
               "on-fail": {
                 "type": "object",
                 "required": ["type", "message"],
                 "additionalProperties": false,
                 "properties": {
-                  "type": {
-                    "type": "string",
-                    "enum": ["info", "warning", "danger"],
-                    "description": "Severity: info (blue), warning (yellow), danger (red, blocks)."
-                  },
-                  "message": {
-                    "type": "string",
-                    "description": "Human-readable failure message shown in Composer output."
-                  }
+                  "type": { "type": "string", "enum": ["info", "warning", "danger"] },
+                  "message": { "type": "string" }
                 }
               },
-              "fix": {
-                "type": "string",
-                "description": "Optional shell command hint displayed to the developer to fix the issue."
-              }
+              "fix": { "type": "string" }
             }
           }
         },
         "events": {
           "type": "object",
-          "description": "Map of Composer script event names to FQCN or Class::method callables.",
           "additionalProperties": false,
           "properties": {
             "pre-install-cmd":           { "type": "string" },
@@ -72,29 +55,22 @@
             "post-create-project-cmd":   { "type": "string" }
           }
         },
-        "concerns": {
+        "actions": {
           "type": "array",
-          "description": "Ordered list of concern FQCNs to run during post-autoload-dump. Each concern owns exactly one code-generation responsibility.",
-          "items": {
-            "type": "string",
-            "description": "FQCN of a class implementing LifecycleConcernContract."
-          }
+          "description": "Ordered FQCNs implementing LifecycleActionContract. One action = one responsibility.",
+          "items": { "type": "string" }
         }
-      },
-      "additionalProperties": false
+      }
     },
     "x-monorepo": {
       "type": "object",
-      "description": "Monorepo configuration (development only, ignored in production).",
+      "additionalProperties": false,
       "properties": {
         "package-repos": {
           "type": "array",
-          "items": { "type": "string" },
-          "description": "List of git remote URLs for managed sub-packages."
+          "items": { "type": "string" }
         }
-      },
-      "additionalProperties": false
+      }
     }
-  },
-  "additionalProperties": false
+  }
 }
