@@ -6,13 +6,11 @@
 //> file that was distributed with this source code.
 
 return [
-    'app' => [
-        'name' => 'Webkernel',
-        'locale' => 'en',
-        'debug' => false,
-        'timezone' => 'Africa/Casablanca',
-        'env' => 'prod',
-    ],
+    'name' => 'Webkernel',
+    'locale' => 'en',
+    'debug' => false,
+    'timezone' => 'Africa/Casablanca',
+    'env' => 'prod',
     'branding' => [
         'favicon' => '/favicon.ico',
         'logo_light' => null,
