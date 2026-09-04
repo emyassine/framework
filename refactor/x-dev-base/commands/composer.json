@@ -39,7 +39,7 @@
                     "pre-update-cmd": ""
                 }
             },
-            "provider": "Webkernel\\Commands\\CommandsProvider",
+            "provider": "Webkernel\\Commands\\Providers\\CommandsProvider",
             "x-monorepo": {
                 "package-repos": [
                     "git@github.com:webkernelphp/commands.git"

@@ -2590,7 +2590,7 @@
             "dist": {
                 "type": "path",
                 "url": "x-dev-base/commands",
-                "reference": "c062d044b2b17077ef476fbc50cc7f1c366b6fd6"
+                "reference": "44358bcfa16a816129f15d41829415a8d216e9d4"
             },
             "require": {
                 "php": ">=8.5",
@@ -2613,7 +2613,7 @@
                             "pre-update-cmd": ""
                         }
                     },
-                    "provider": "Webkernel\\Commands\\CommandsProvider",
+                    "provider": "Webkernel\\Commands\\Providers\\CommandsProvider",
                     "x-monorepo": {
                         "package-repos": [
                             "git@github.com:webkernelphp/commands.git"

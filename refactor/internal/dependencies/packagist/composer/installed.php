@@ -3,7 +3,7 @@
         'name' => 'webkernel/webkernel',
         'pretty_version' => 'dev-main',
         'version' => 'dev-main',
-        'reference' => 'b3bcac2c140faa7cb6e53992a2f67a78a0cf836c',
+        'reference' => '6ce48cf9deb361b1407165a78a3bb9a4cedd33da',
         'type' => 'project',
         'install_path' => __DIR__ . '/../../../../',
         'aliases' => array(),
@@ -355,7 +355,7 @@
         'webkernel/commands' => array(
             'pretty_version' => '0.12.0',
             'version' => '0.12.0.0',
-            'reference' => 'c062d044b2b17077ef476fbc50cc7f1c366b6fd6',
+            'reference' => '44358bcfa16a816129f15d41829415a8d216e9d4',
             'type' => 'library',
             'install_path' => __DIR__ . '/../webkernel/commands',
             'aliases' => array(),
@@ -409,7 +409,7 @@
         'webkernel/webkernel' => array(
             'pretty_version' => 'dev-main',
             'version' => 'dev-main',
-            'reference' => 'b3bcac2c140faa7cb6e53992a2f67a78a0cf836c',
+            'reference' => '6ce48cf9deb361b1407165a78a3bb9a4cedd33da',
             'type' => 'project',
             'install_path' => __DIR__ . '/../../../../',
             'aliases' => array(),
