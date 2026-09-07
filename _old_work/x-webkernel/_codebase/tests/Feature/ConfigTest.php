@@ -30,13 +30,13 @@ final class ConfigTest extends TestCase
     {
         $this->assertSame(\Webkernel\Auth\User::class, Config::get('auth.user'));
         $this->assertSame('/login', Config::get('auth.login_path'));
-        $app = require \webapp_path('config/app.php');
+        $app = require \base_path('config/app.php');
         $this->assertArrayNotHasKey('auth', $app);
     }
 
     public function test_set_writes_runtime_and_reads_back(): void
     {
         $this->assertSame(1, Config::set('tests.probe', 1)->get('tests.probe'));
-        $this->assertFileExists(\webapp_path('platform/platform-runtime.php'));
+        $this->assertFileExists(\base_path('platform/platform-runtime.php'));
     }
 }

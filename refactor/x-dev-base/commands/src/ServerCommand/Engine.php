@@ -62,8 +62,8 @@ final class Engine
         $this->port = $port;
         $this->profile_lifecycle = $profile_lifecycle;
         $this->jit = $jit;
-        $this->public_dir = webapp_path('public');
-        $this->root = webapp_path();
+        $this->public_dir = base_path('public');
+        $this->root = base_path();
         $this->router = __DIR__.'/router.php';
         $this->register_signals();
         for ($try = 0; $try < self::MAX_PORT_TRIES; $try++) {
@@ -324,17 +324,17 @@ final class Engine
         $opcache_status = $opcache_active ? Terminal::GREEN.'enabled'.Terminal::RESET : Terminal::GRAY.'disabled'.Terminal::RESET;
         $jit_status = $jit_active ? Terminal::GREEN.'enabled'.Terminal::RESET : Terminal::GRAY.'disabled'.Terminal::RESET;
         echo "\n";
-        webterminal()->info('Server running on '.Terminal::BOLD.'['.$url.']'.Terminal::RESET);
+        console()->info('Server running on '.Terminal::BOLD.'['.$url.']'.Terminal::RESET);
         echo "\n";
         echo '  '.Terminal::muted('PHP Version: '.PHP_VERSION.' | OPcache: '.$opcache_status.' | JIT: '.$jit_status)."\n\n";
         if ($this->jit === true && ! \extension_loaded('Zend OPcache')) {
-            webterminal()->warning('Zend OPcache is not loaded; --with-jit has no effect.');
+            console()->warning('Zend OPcache is not loaded; --with-jit has no effect.');
             echo "\n";
         }
-        webterminal()->warning('This server is for local development only. Behavior differs from production (Nginx/Apache/FPM).');
+        console()->warning('This server is for local development only. Behavior differs from production (Nginx/Apache/FPM).');
         echo "\n";
         if ($this->profile_lifecycle) {
-            webterminal()->info(Terminal::muted('--profile-lifecycle').' real include execute cost (hrtime). JSON: webkernel-profile-json');
+            console()->info(Terminal::muted('--profile-lifecycle').' real include execute cost (hrtime). JSON: webkernel-profile-json');
             echo "\n";
         }
         echo '  '.Terminal::muted('Press Ctrl+C to stop the server')."\n\n";

@@ -125,7 +125,7 @@ final class Package
             return $resolved;
         }
 
-        $root = webapp_path();
+        $root = base_path();
         $prefix = \rtrim($root, DIRECTORY_SEPARATOR).DIRECTORY_SEPARATOR;
 
         return \str_starts_with($resolved, $prefix)
@@ -138,8 +138,8 @@ final class Package
         $base = 'bootstrap/cache/webkernel';
 
         return $subpath !== null && $subpath !== ''
-            ? webapp_path($base.'/'.\ltrim($subpath, '/'))
-            : webapp_path($base);
+            ? base_path($base.'/'.\ltrim($subpath, '/'))
+            : base_path($base);
     }
 
     /**
@@ -150,7 +150,7 @@ final class Package
         bool $make_on_miss = true,
         ?callable $on_error = null,
     ): string {
-        $cache_base = \rtrim(webapp_path('storage/framework/cache'), DIRECTORY_SEPARATOR);
+        $cache_base = \rtrim(base_path('storage/framework/cache'), DIRECTORY_SEPARATOR);
         $subpath = \ltrim(\str_replace(['/', '\\'], DIRECTORY_SEPARATOR, $subpath), DIRECTORY_SEPARATOR);
         $target = $subpath === ''
             ? $cache_base

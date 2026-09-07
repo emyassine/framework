@@ -38,7 +38,7 @@ use Webkernel\Config\ConfigWriter;
 
     // State -----------------------------------------------------------------
 
-    private string $webapp_path;
+    private string $base_path;
     private string $config_path;
 
     // versionning
@@ -47,10 +47,10 @@ use Webkernel\Config\ConfigWriter;
 
     // Entry point (fluent so callers can chain if needed) -------------------
 
-    public function fast_boot(string $webapp_path): static
+    public function fast_boot(string $base_path): static
     {
-        $this->webapp_path = $webapp_path;
-        $this->config_path = $webapp_path . '/' . self::CONFIG_REL;
+        $this->base_path = $base_path;
+        $this->config_path = $base_path . '/' . self::CONFIG_REL;
 
         // Tier-2: stamped path from config (OPcache-warm on subsequent requests).
         $platform_config = is_file($this->config_path) ? require $this->config_path : [];
@@ -80,7 +80,7 @@ use Webkernel\Config\ConfigWriter;
             return false;
         }
 
-        $abs = $this->webapp_path . '/' . $rel;
+        $abs = $this->base_path . '/' . $rel;
 
         if (!is_file($abs)) {
             return false;
@@ -101,7 +101,7 @@ use Webkernel\Config\ConfigWriter;
 
         if ($rel !== null) {
             $this->stamp_autoload_path($rel);
-            require $this->webapp_path . '/' . $rel;
+            require $this->base_path . '/' . $rel;
             return;
         }
 
@@ -120,7 +120,7 @@ use Webkernel\Config\ConfigWriter;
         fwrite(STDERR, 'fast-boot: PHP dependencies installed.' . PHP_EOL);
 
         $this->stamp_autoload_path($rel);
-        require $this->webapp_path . '/' . $rel;
+        require $this->base_path . '/' . $rel;
     }
 
     // -----------------------------------------------------------------------
@@ -145,7 +145,7 @@ use Webkernel\Config\ConfigWriter;
 
     private function read_vendor_dir_from_composer(): ?string
     {
-        $composer_json = $this->webapp_path . '/composer.json';
+        $composer_json = $this->base_path . '/composer.json';
 
         if (!is_file($composer_json)) {
             return null;
@@ -195,7 +195,7 @@ use Webkernel\Config\ConfigWriter;
     private function find_first_existing(array $candidates): ?string
     {
         foreach ($candidates as $rel) {
-            if (is_file($this->webapp_path . '/' . $rel)) {
+            if (is_file($this->base_path . '/' . $rel)) {
                 return $rel;
             }
         }
@@ -221,7 +221,7 @@ use Webkernel\Config\ConfigWriter;
             return;
         }
 
-        $file = $this->webapp_path . '/' . self::WRITER_REL;
+        $file = $this->base_path . '/' . self::WRITER_REL;
         if (is_file($file)) {
             require_once $file;
         }
@@ -245,14 +245,14 @@ use Webkernel\Config\ConfigWriter;
                 [
                     ...$composer_argv,
                     'install',
-                    '--working-dir=' . $this->webapp_path,
+                    '--working-dir=' . $this->base_path,
                     '--no-interaction',
                     '--no-ansi',
                     '--no-scripts',
                 ],
                 [0 => STDIN, 1 => STDOUT, 2 => STDERR],
                 $pipes,
-                $this->webapp_path,
+                $this->base_path,
                 $this->clean_env(),
                 ['bypass_shell' => true]
             );
@@ -343,7 +343,7 @@ use Webkernel\Config\ConfigWriter;
 
     private function write_tmp_phar(string $phar_bytes): string
     {
-        $tmp_dir = $this->webapp_path . '/' . self::TMP_DIR_REL;
+        $tmp_dir = $this->base_path . '/' . self::TMP_DIR_REL;
 
         if (!is_dir($tmp_dir) && !mkdir($tmp_dir, 0775, true) && !is_dir($tmp_dir)) {
             $this->fail_with_message('unable to create ' . self::TMP_DIR_REL . '.');
@@ -381,4 +381,4 @@ use Webkernel\Config\ConfigWriter;
         fwrite(STDERR, 'fast-boot: ' . $message . PHP_EOL); exit(1);
     }
 
-})->fast_boot(webapp_path: dirname(__DIR__, 1));
+})->fast_boot(base_path: dirname(__DIR__, 1));

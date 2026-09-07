@@ -102,7 +102,7 @@ final class Branding
         }
         $source = $asset['source'];
         if ($source !== '' && $source[0] !== '/') {
-            $source = \webapp_path($source);
+            $source = \base_path($source);
         }
         if (! \is_file($source)) {
             return '';
@@ -139,7 +139,7 @@ final class Branding
 
     private function cache_file(string $hash, string $format): string
     {
-        return \webapp_path('platform/storage/framework/cache/branding/'.$hash.'.'.$format);
+        return \base_path('platform/storage/framework/cache/branding/'.$hash.'.'.$format);
     }
 
     private function mime(string $format): string

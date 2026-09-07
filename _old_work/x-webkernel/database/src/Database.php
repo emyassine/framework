@@ -171,7 +171,7 @@ final class Database implements ComposableContract
     {
         $database = (string) ($config['database'] ?? ':memory:');
         if ($database !== ':memory:' && ! \str_starts_with($database, '/')) {
-            $database = webapp_path($database);
+            $database = base_path($database);
         }
         if ($database !== ':memory:') {
             $dir = \dirname($database);

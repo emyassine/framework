@@ -8,7 +8,7 @@
 namespace Webkernel\Typography;
 
 /**
- * Webkernel Typography System. Files live at webapp_path("public/$typo_path").
+ * Webkernel Typography System. Files live at base_path("public/$typo_path").
  */
 final class TypographySystem
 {
@@ -129,7 +129,7 @@ final class TypographySystem
      */
     public static function path(string $typo_path): string
     {
-        return webapp_path('public/'.$typo_path);
+        return base_path('public/'.$typo_path);
     }
 
     /**

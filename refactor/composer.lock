@@ -650,7 +650,7 @@
             "dist": {
                 "type": "path",
                 "url": "x-dev-base/codebase",
-                "reference": "37b40c6ac17bd523ffd93f2b657fb66e38481807"
+                "reference": "4a8c386a53b320dc7deba92b87dd6f01e43c9e61"
             },
             "require": {
                 "ext-dom": "*",
@@ -675,17 +675,18 @@
                 "webkernel/composables": "self.version",
                 "webkernel/config": "self.version",
                 "webkernel/console": "self.version",
-                "webkernel/lifecycle": "self.version"
+                "webkernel/lifecycle": "self.version",
+                "webkernel/platform-provider": "self.version"
             },
             "type": "library",
             "extra": {
                 "webkernel": {
-                    "package": {
-                        "provider": "Webkernel\\CodebaseProvider",
-                        "post-autoload-dump": "Webkernel\\Commands\\DumpAutoloadCommand"
-                    },
+                    "$schema": "https://webkernelphp.org/packages/v1/schema.json",
+                    "provider": "Webkernel\\CodebaseProvider",
                     "x-monorepo": {
-                        "package-repo": "git@github.com:webkernelphp/codebase.git"
+                        "package-repos": [
+                            "git@github.com:webkernelphp/codebase.git"
+                        ]
                     }
                 }
             },
@@ -1007,6 +1008,57 @@
                 }
             ],
             "description": "Webkernel Composer plugin — custom installer, lifecycle hooks, and action-based code generation.",
+            "transport-options": {
+                "symlink": true,
+                "relative": true
+            }
+        },
+        {
+            "name": "webkernel/platform-provider",
+            "version": "0.12.0",
+            "dist": {
+                "type": "path",
+                "url": "x-dev-base/platform-provider",
+                "reference": "06902b583272d6186e913832f7e22776e0dd7071"
+            },
+            "require": {
+                "composer-plugin-api": "^2.0",
+                "php": ">=8.5",
+                "webkernel/lifecycle": "self.version"
+            },
+            "type": "library",
+            "extra": {
+                "webkernel": {
+                    "$schema": "https://webkernelphp.org/packages/v1/schema.json",
+                    "lifecycle": {
+                        "events": {
+                            "post-autoload-dump": "Webkernel\\PlatformProvider\\ProviderDumper"
+                        }
+                    },
+                    "x-monorepo": {
+                        "package-repos": [
+                            "git@github.com:webkernelphp/platform-provider.git"
+                        ]
+                    }
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Webkernel\\": "src/"
+                }
+            },
+            "license": [
+                "proprietary"
+            ],
+            "authors": [
+                {
+                    "name": "El Moumen Yassine",
+                    "email": "yassine@numerimondes.com",
+                    "homepage": "https://webkernelphp.com/about"
+                }
+            ],
+            "description": "Webkernel provider manifest compiler.",
+            "homepage": "https://www.webkernelphp.com",
             "transport-options": {
                 "symlink": true,
                 "relative": true

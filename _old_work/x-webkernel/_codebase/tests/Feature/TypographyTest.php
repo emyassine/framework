@@ -27,7 +27,7 @@ final class TypographyTest extends TestCase
     public function test_path_is_webapp_public(): void
     {
         $this->assertSame(
-            webapp_path('public/fetch-fonts'),
+            base_path('public/fetch-fonts'),
             TypographySystem::path(TypographySystem::DIR),
         );
         $this->assertSame('latin', TypographySystem::pack('en'));

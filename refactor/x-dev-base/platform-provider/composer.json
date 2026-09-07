@@ -1,0 +1,46 @@
+{
+    "$schema": "https://getcomposer.org/schema.json",
+    "name": "webkernel/platform-provider",
+    "description": "Webkernel provider manifest compiler.",
+    "version": "0.12.0",
+    "homepage": "https://www.webkernelphp.com",
+    "type": "library",
+    "license": "proprietary",
+    "authors": [
+        {
+            "name": "El Moumen Yassine",
+            "email": "yassine@numerimondes.com",
+            "homepage": "https://webkernelphp.com/about"
+        }
+    ],
+    "require": {
+        "php": ">=8.5",
+        "composer-plugin-api": "^2.0",
+        "webkernel/lifecycle": "self.version"
+    },
+    "autoload": {
+        "psr-4": {
+            "Webkernel\\": "src/"
+        }
+    },
+    "extra": {
+        "webkernel": {
+            "$schema": "https://webkernelphp.org/packages/v1/schema.json",
+            "lifecycle": {
+                "events": {
+                    "post-autoload-dump": "Webkernel\\PlatformProvider\\ProviderDumper"
+                }
+            },
+            "x-monorepo": {
+                "package-repos": [
+                    "git@github.com:webkernelphp/platform-provider.git"
+                ]
+            }
+        }
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}

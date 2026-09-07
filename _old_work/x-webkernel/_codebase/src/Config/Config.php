@@ -79,7 +79,7 @@ final class Config
 
     private function do_boot(?string $root = null): self
     {
-        $root ??= webapp_path();
+        $root ??= base_path();
         $tree = self::package_configs($root);
         foreach (['config/platform.php', 'config/app.php'] as $rel) {
             $tree = array_replace_recursive($tree, self::require_array($root.'/'.$rel));
@@ -140,7 +140,7 @@ final class Config
     private function do_set(string $key, mixed $value): self
     {
         $this->ensure_booted();
-        $runtime = webapp_path('platform/platform-runtime.php');
+        $runtime = base_path('platform/platform-runtime.php');
         $current = self::require_array($runtime);
         $next = array_replace_recursive($current, self::dot_to_tree($key, $value));
         ConfigWriter::write($runtime, $next);

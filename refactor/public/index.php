@@ -20,4 +20,4 @@ if ($route === '/healthz' || $route === '/ready') {
     echo 'Platform is Ready'; return;
 }
 
-require $base_path.'/platform/fast-boot.php'; \Webkernel\Http::run();
+require $base_path.'/internal/fast-boot.php'; \Webkernel\Http::run();

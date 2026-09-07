@@ -48,7 +48,7 @@ final class RouteCacheTest extends TestCase
 
     public function test_warm_process_does_not_load_generator(): void
     {
-        $root = \webapp_path();
+        $root = \base_path();
         $script = $root.'/platform/temporary/route-cache-probe.php';
         if (! \is_dir(\dirname($script)) && ! \mkdir(\dirname($script), 0775, true) && ! \is_dir(\dirname($script))) {
             $this->fail('unable to create temporary dir');

@@ -116,6 +116,6 @@ final class InvoiceStore
 
     private static function path(): string
     {
-        return webapp_path('platform/storage/app/invoices.json');
+        return base_path('platform/storage/app/invoices.json');
     }
 }

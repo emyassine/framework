@@ -110,7 +110,7 @@ final class Performance implements ComposableContract
 
     public static function preference_path(): string
     {
-        return webapp_path('platform/storage/framework/performance.php');
+        return base_path('platform/storage/framework/performance.php');
     }
 
     public static function wants_jit(?string $file = null): bool

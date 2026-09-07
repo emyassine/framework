@@ -12,7 +12,7 @@ use Webkernel\Commands\DumpAutoloadCommand;
 use Webkernel\Commands\ServerCommand;
 use Webkernel\PlatformProvider;
 
-final class CodebaseProvider extends PlatformProvider
+final class CommandsProvider extends PlatformProvider
 {
     public const COMMANDS = [
         CompletionCommand::class,

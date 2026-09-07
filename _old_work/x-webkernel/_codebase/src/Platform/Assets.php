@@ -35,7 +35,7 @@ final class Assets
      */
     public static function css_path(): string
     {
-        return \webapp_path('public/'.self::CSS);
+        return \base_path('public/'.self::CSS);
     }
 
     /**
@@ -43,7 +43,7 @@ final class Assets
      */
     public static function js_path(): string
     {
-        return \webapp_path('public/'.self::JS);
+        return \base_path('public/'.self::JS);
     }
 
     /**

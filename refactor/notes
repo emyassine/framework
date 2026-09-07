@@ -1,0 +1,1 @@
+composer validate --no-check-publish x-dev-base/codebase/composer.json

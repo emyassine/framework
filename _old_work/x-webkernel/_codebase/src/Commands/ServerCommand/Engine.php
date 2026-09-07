@@ -62,8 +62,8 @@ final class Engine
         $this->port = $port;
         $this->profile_lifecycle = $profile_lifecycle;
         $this->jit = $jit;
-        $this->public_dir = webapp_path('public');
-        $this->root = webapp_path();
+        $this->public_dir = base_path('public');
+        $this->root = base_path();
         $this->router = __DIR__.'/router.php';
         $this->register_signals();
         for ($try = 0; $try < self::MAX_PORT_TRIES; $try++) {

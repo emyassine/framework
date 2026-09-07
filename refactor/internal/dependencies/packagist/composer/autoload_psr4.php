@@ -7,11 +7,12 @@ $baseDir = dirname(dirname(dirname($vendorDir)));
 
 return array(
     'Webkernel\\Lifecycle\\' => array($vendorDir . '/webkernel/lifecycle/src'),
+    'Webkernel\\DevTools\\' => array($vendorDir . '/webkernel/devtools/src'),
     'Webkernel\\Console\\' => array($vendorDir . '/webkernel/console/src'),
     'Webkernel\\Config\\' => array($vendorDir . '/webkernel/config/src'),
     'Webkernel\\Composables\\' => array($vendorDir . '/webkernel/composables/src'),
     'Webkernel\\Commands\\' => array($vendorDir . '/webkernel/commands/src'),
-    'Webkernel\\' => array($vendorDir . '/webkernel/codebase/src'),
+    'Webkernel\\' => array($vendorDir . '/webkernel/codebase/src', $vendorDir . '/webkernel/platform-provider/src'),
     'Psr\\SimpleCache\\' => array($vendorDir . '/psr/simple-cache/src'),
     'Psr\\Log\\' => array($vendorDir . '/psr/log/src'),
     'Psr\\Http\\Message\\' => array($vendorDir . '/psr/http-factory/src', $vendorDir . '/psr/http-message/src'),
@@ -19,6 +20,8 @@ return array(
     'Psr\\Container\\' => array($vendorDir . '/psr/container/src'),
     'Psr\\Clock\\' => array($vendorDir . '/psr/clock/src'),
     'Psr\\Cache\\' => array($vendorDir . '/psr/cache/src'),
+    'PhpParser\\' => array($vendorDir . '/nikic/php-parser/lib/PhpParser'),
     'PHPMailer\\PHPMailer\\' => array($vendorDir . '/phpmailer/phpmailer/src'),
+    'DeepCopy\\' => array($vendorDir . '/myclabs/deep-copy/src/DeepCopy'),
     'Composer\\Installers\\' => array($vendorDir . '/composer/installers/src/Composer/Installers'),
 );

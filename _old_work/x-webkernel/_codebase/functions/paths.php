@@ -187,11 +187,11 @@ if (! function_exists('webkernel_find_composer_root')) {
     }
 }
 
-if (! function_exists('webapp_path')) {
+if (! function_exists('base_path')) {
     /**
      * Host application root (directory that owns composer.json), optional subpath.
      */
-    function webapp_path(?string $path = null): string
+    function base_path(?string $path = null): string
     {
         $root = webkernel_boot()['webapp_root'];
 

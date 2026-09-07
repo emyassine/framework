@@ -5,7 +5,7 @@
 //> For the full copyright and license information, please view the LICENSE
 //> file that was distributed with this source code.
 
-//> Autoload + class_alias only. Functions (webapp, view, webapp_path)
+//> Autoload + class_alias only. Functions (webapp, view, base_path)
 //> live in dumped webkernel_files.php, loaded after this file.
 
 const WEBKERNEL_NS = 'Webkernel\\';

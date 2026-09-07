@@ -24,7 +24,7 @@ trait CanDumpTypography
     private const FONT_WOFF_ATTEMPTS = 3;
 
     /**
-     * Write WTS rules + self-hosted fonts under webapp_path("public/$typo_path").
+     * Write WTS rules + self-hosted fonts under base_path("public/$typo_path").
      *
      * @return void
      */

@@ -81,9 +81,7 @@ final class CommandsDiscovery
      */
     public function classes_from_dump(?string $file = null): array
     {
-        $file ??= \function_exists('vendor_dir')
-            ? vendor_dir('composer/webkernel_commands.php')
-            : '';
+        $file ??= \vendor_path('composer/webkernel_commands.php');
         if ($file === '' || ! \is_file($file)) {
             return [];
         }

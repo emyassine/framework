@@ -41,16 +41,17 @@
         "webkernel/commands": "self.version",
         "webkernel/composables": "self.version",
         "webkernel/console": "self.version",
-        "webkernel/lifecycle": "self.version"
+        "webkernel/lifecycle": "self.version",
+        "webkernel/platform-provider": "self.version"
     },
     "extra": {
         "webkernel": {
-            "package": {
-                "provider": "Webkernel\\CodebaseProvider",
-                "post-autoload-dump": "Webkernel\\Commands\\DumpAutoloadCommand"
-            },
+            "$schema": "https://webkernelphp.org/packages/v1/schema.json",
+            "provider": "Webkernel\\CodebaseProvider",
             "x-monorepo": {
-                "package-repo": "git@github.com:webkernelphp/codebase.git"
+                "package-repos": [
+                    "git@github.com:webkernelphp/codebase.git"
+                ]
             }
         }
     },

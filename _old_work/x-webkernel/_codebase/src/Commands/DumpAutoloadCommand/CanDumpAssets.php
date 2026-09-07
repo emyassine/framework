@@ -176,7 +176,7 @@ trait CanDumpAssets
             return;
         }
         $src = \dirname((new \ReflectionClass(\Webkernel\I18n\I18nProvider::class))->getFileName(), 2).'/res/flags';
-        $dest = \webapp_path('public/flags');
+        $dest = \base_path('public/flags');
         if (! \is_dir($src)) {
             return;
         }

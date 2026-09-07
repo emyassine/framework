@@ -168,7 +168,7 @@ final class View implements ComposableContract, \Stringable
         $mode ??= $map !== [] ? Mode::Fast : Mode::Auto;
         $engine = new Engine(
             $dirs,
-            webapp_path('platform/storage/framework/views'),
+            base_path('platform/storage/framework/views'),
             $mode,
         );
         $engine->set_echo_format('\\'.self::class.'::echo(%s)');

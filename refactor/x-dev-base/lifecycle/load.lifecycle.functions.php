@@ -31,7 +31,8 @@ if (! function_exists('vendor_path')) {
     {
         static $vendor = null;
         if ($vendor === null) {
-            $vendor = dirname(__DIR__, 2);
+            $file = (new \ReflectionClass(InstalledVersions::class))->getFileName();
+            $vendor = dirname(is_string($file) ? $file : __DIR__, 2);
         }
         return $path === '' ? $vendor : $vendor . '/' . $path;
     }

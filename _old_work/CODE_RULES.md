@@ -357,13 +357,13 @@ Do not copy `Webkernel\Container`. Do not `register($container)` on providers.
 Config / View / Route are static class aliases (`Config::get`, `View::make`, `Route::get`).
 `Registry` (string key → instance) remains **spec** for a future fourth service if a static class is the wrong shape. It is not a Container. It is not first-cut.
 
-### Decision: keep `webapp()`, `view()`, `webapp_path()`
+### Decision: keep `webapp()`, `view()`, `base_path()`
 
 ```php
 webapp()->config()->get('branding.logo');
 webapp()->acl()->can('do_something_new');
 view('billing::invoices.index', $data);
-webapp_path('modules');
+base_path('modules');
 ```
 
 - `webapp()` is a small fluent host. Segments are composables from the dump map. Not the old `WebApp` god object.
@@ -927,7 +927,7 @@ Code first. At most three short lines: skipped / add when. Pattern: `[code] → 
 
 ## 27. Copy from old work / do not copy
 
-**Copy and adapt** (strip Container; keep `webapp()` / `view()` / `webapp_path()` as dumped functions):
+**Copy and adapt** (strip Container; keep `webapp()` / `view()` / `base_path()` as dumped functions):
 
 - View / Compiler / Engine / Js, kernel views
 - Route
@@ -961,7 +961,7 @@ Each step leaves the previous door working. Spec items not in A–G stay spec.
 ### B — Config
 
 - [ ] `namespacer.php`: autoload + aliases only
-- [ ] dumped functions: `webapp()`, `view()`, `webapp_path()`
+- [ ] dumped functions: `webapp()`, `view()`, `base_path()`
 - [ ] `Config::boot` / `get` / `set` / `flush`
 - [ ] `Config::set` writes `platform/platform-runtime.php`
 

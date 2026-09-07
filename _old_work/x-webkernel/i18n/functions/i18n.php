@@ -204,8 +204,8 @@ if (! \function_exists('flag_markup')) {
         $used = $code;
         foreach (\array_unique($candidates) as $name) {
             foreach (['language', 'countries'] as $set) {
-                $path = \function_exists('webapp_path')
-                    ? \webapp_path('public/flags/'.$set.'/'.$name.'.svg')
+                $path = \function_exists('base_path')
+                    ? \base_path('public/flags/'.$set.'/'.$name.'.svg')
                     : '';
                 if ($path === '' || ! \is_file($path)) {
                     continue;
