@@ -131,14 +131,11 @@ return array (
     'platform.telemetry.logs_path' => 'internal/telemetry/logs',
     'app' => 
     array (
-      'app' => 
-      array (
-        'name' => 'Webkernel',
-        'locale' => 'en',
-        'debug' => false,
-        'timezone' => 'Africa/Casablanca',
-        'env' => 'prod',
-      ),
+      'name' => 'Webkernel',
+      'locale' => 'en',
+      'debug' => false,
+      'timezone' => 'Africa/Casablanca',
+      'env' => 'prod',
       'branding' => 
       array (
         'favicon' => '/favicon.ico',
@@ -197,19 +194,11 @@ return array (
         'channel' => 'single',
       ),
     ),
-    'app.app' => 
-    array (
-      'name' => 'Webkernel',
-      'locale' => 'en',
-      'debug' => false,
-      'timezone' => 'Africa/Casablanca',
-      'env' => 'prod',
-    ),
-    'app.app.name' => 'Webkernel',
-    'app.app.locale' => 'en',
-    'app.app.debug' => false,
-    'app.app.timezone' => 'Africa/Casablanca',
-    'app.app.env' => 'prod',
+    'app.name' => 'Webkernel',
+    'app.locale' => 'en',
+    'app.debug' => false,
+    'app.timezone' => 'Africa/Casablanca',
+    'app.env' => 'prod',
     'app.branding' => 
     array (
       'favicon' => '/favicon.ico',
@@ -1167,14 +1156,11 @@ return array (
     ),
     'app' => 
     array (
-      'app' => 
-      array (
-        'name' => 'Webkernel',
-        'locale' => 'en',
-        'debug' => false,
-        'timezone' => 'Africa/Casablanca',
-        'env' => 'prod',
-      ),
+      'name' => 'Webkernel',
+      'locale' => 'en',
+      'debug' => false,
+      'timezone' => 'Africa/Casablanca',
+      'env' => 'prod',
       'branding' => 
       array (
         'favicon' => '/favicon.ico',
