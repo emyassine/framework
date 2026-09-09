@@ -1,0 +1,9 @@
+.w-aside {
+  flex: 0 0 var(--w-aside-width, 20rem);
+  min-width: 0;
+  background: var(--w-surface);
+  color: var(--w-text);
+  border-inline-start: 1px solid var(--w-border);
+  padding: 1.25rem;
+}
+.w-aside[data-collapsed="1"] { display: none; }

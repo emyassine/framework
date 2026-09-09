@@ -1,0 +1,44 @@
+
+<?php  $__props = [
+  'action' => '',
+  'autosave' => false,
+  'header' => '',
+  'footer' => '',
+  'hidden' => [],
+  'grid_class' => '',
+  'grid_style' => '',
+]; foreach ($__props as $__n => $__d) { if (!isset($$__n)) { $$__n = $__d; } } $attributes = (isset($attributes) && $attributes instanceof \Webkernel\View\AttributeBag ? $attributes : new \Webkernel\View\AttributeBag([]))->except(\array_keys($__props)); unset($__props, $__n, $__d); ?>
+<?php 
+  $attributes = $attributes ?? new \Webkernel\View\AttributeBag([]);
+  $action = \is_string($action) ? $action : '';
+  $hidden = \is_array($hidden) ? $hidden : [];
+ ?>
+<form
+  <?php echo \Webkernel\View\View::echo($attributes->class(['w-schema'])->merge([
+    'id' => 'w-schema',
+    'method' => 'post',
+    'action' => $action,
+    'hx-post' => $action,
+    'hx-target' => '#w-schema',
+    'hx-swap' => 'outerHTML',
+  ] + ($autosave ? [
+    'hx-trigger' => 'submit, change delay:400ms from:input, change delay:400ms from:textarea, change delay:400ms from:select',
+  ] : []))); ?>
+
+>
+  <?php echo \Webkernel\Csrf::field(); ?>
+
+  <?php foreach($hidden as $name => $value): ?>
+    <input type="hidden" name="<?php echo \Webkernel\View\View::echo($name); ?>" value="<?php echo \Webkernel\View\View::echo($value); ?>" />
+  <?php endforeach; ?>
+  <?php if($header !== ''): ?>
+    <div class="w-schema-header"><?php echo $header; ?></div>
+  <?php endif; ?>
+  <div class="<?php echo \Webkernel\View\View::echo($grid_class !== '' ? $grid_class : ''); ?>"<?php if($grid_style !== ''): ?> style="<?php echo \Webkernel\View\View::echo($grid_style); ?>"<?php endif; ?>>
+    <?php echo $slot; ?>
+
+  </div>
+  <?php if($footer !== ''): ?>
+    <div class="w-form-actions"><?php echo $footer; ?></div>
+  <?php endif; ?>
+</form>

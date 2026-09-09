@@ -2514,13 +2514,104 @@
             "install-path": "../theseer/tokenizer"
         },
         {
+            "name": "webkernel/actions",
+            "version": "0.12.0",
+            "version_normalized": "0.12.0.0",
+            "dist": {
+                "type": "path",
+                "url": "y-dev-platform/actions",
+                "reference": "212e890369c9e4759ccfd57ded7a6b63edbe211a"
+            },
+            "require": {
+                "php": ">=8.5",
+                "webkernel/codebase": "^0.12.0",
+                "webkernel/components": "^0.12.0"
+            },
+            "type": "webkernel-stdlib",
+            "extra": {
+                "webkernel": {
+                    "package_repo": "git@github.com:webkernelphp/actions.git",
+                    "production": true,
+                    "prefix": "actions"
+                }
+            },
+            "installation-source": "dist",
+            "autoload": {
+                "psr-4": {
+                    "Webkernel\\Platform\\Actions\\": "src/"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "Webkernel\\Platform\\Actions\\Tests\\": "tests/"
+                }
+            },
+            "license": [
+                "proprietary"
+            ],
+            "description": "Webkernel actions: Action, ActionGroup, modals, and prefabricated CRUD actions.",
+            "transport-options": {
+                "symlink": true,
+                "relative": true
+            },
+            "install-path": "../webkernel/actions"
+        },
+        {
+            "name": "webkernel/auth",
+            "version": "0.12.0",
+            "version_normalized": "0.12.0.0",
+            "dist": {
+                "type": "path",
+                "url": "x-dev-base/auth",
+                "reference": "65a152fd33b78e079428eaaaa1c53bb7bba86bc0"
+            },
+            "require": {
+                "php": ">=8.5",
+                "webkernel/codebase": "^0.12.0",
+                "webkernel/components": "^0.12.0",
+                "webkernel/models": "^0.12.0"
+            },
+            "type": "webkernel-stdlib",
+            "extra": {
+                "webkernel": {
+                    "package_repo": "git@github.com:webkernelphp/auth.git",
+                    "production": true,
+                    "provider": "Webkernel\\Auth\\AuthProvider",
+                    "prefix": "auth"
+                }
+            },
+            "installation-source": "dist",
+            "autoload": {
+                "psr-4": {
+                    "Webkernel\\Auth\\": "src/"
+                },
+                "files": [
+                    "functions/auth.php"
+                ]
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "Webkernel\\Auth\\Tests\\": "tests/"
+                }
+            },
+            "license": [
+                "proprietary"
+            ],
+            "description": "Webkernel authentication: session guard, User model, login.",
+            "transport-options": {
+                "symlink": true,
+                "relative": true
+            },
+            "install-path": "../webkernel/auth"
+        },
+        {
             "name": "webkernel/codebase",
             "version": "0.12.0",
             "version_normalized": "0.12.0.0",
             "dist": {
                 "type": "path",
                 "url": "x-dev-base/codebase",
-                "reference": "cd44d40e9c5bc71b0c11a254bfa554e7c0822016"
+                "reference": "51cf9aebd3db7a3580a7879b5706d658e6f5edb7"
             },
             "require": {
                 "ext-dom": "*",
@@ -2541,24 +2632,38 @@
                 "psr/http-message": "^2.0",
                 "psr/log": "^3.0",
                 "psr/simple-cache": "^3.0",
+                "webkernel/actions": "self.version",
+                "webkernel/auth": "self.version",
                 "webkernel/commands": "self.version",
                 "webkernel/communication": "self.version",
                 "webkernel/component": "self.version",
+                "webkernel/components": "self.version",
                 "webkernel/composables": "self.version",
                 "webkernel/config": "self.version",
                 "webkernel/console": "self.version",
+                "webkernel/database": "self.version",
+                "webkernel/forms": "self.version",
                 "webkernel/http": "self.version",
+                "webkernel/i18n": "self.version",
+                "webkernel/imagery": "self.version",
                 "webkernel/instance": "self.version",
                 "webkernel/lifecycle": "self.version",
                 "webkernel/liveview": "self.version",
+                "webkernel/models": "self.version",
+                "webkernel/notifications": "self.version",
+                "webkernel/panels": "self.version",
                 "webkernel/paths": "self.version",
                 "webkernel/performance": "self.version",
                 "webkernel/platform": "self.version",
                 "webkernel/platform-provider": "self.version",
                 "webkernel/request": "self.version",
                 "webkernel/route": "self.version",
+                "webkernel/schemas": "self.version",
+                "webkernel/system": "self.version",
+                "webkernel/tables": "self.version",
                 "webkernel/typography": "self.version",
-                "webkernel/view": "self.version"
+                "webkernel/view": "self.version",
+                "webkernel/widgets": "self.version"
             },
             "type": "library",
             "extra": {
@@ -2738,6 +2843,49 @@
                 "relative": true
             },
             "install-path": "../webkernel/component"
+        },
+        {
+            "name": "webkernel/components",
+            "version": "0.12.0",
+            "version_normalized": "0.12.0.0",
+            "dist": {
+                "type": "path",
+                "url": "y-dev-platform/components",
+                "reference": "8c22ba944e4e6c26011225e9860e1e30c45b0c18"
+            },
+            "require": {
+                "php": ">=8.5",
+                "webkernel/codebase": "^0.12.0"
+            },
+            "type": "webkernel-component",
+            "extra": {
+                "webkernel": {
+                    "package_repo": "git@github.com:webkernelphp/components.git",
+                    "production": true,
+                    "provider": "Webkernel\\Platform\\Components\\Providers\\ComponentsProvider",
+                    "prefix": "webkernel"
+                }
+            },
+            "installation-source": "dist",
+            "autoload": {
+                "psr-4": {
+                    "Webkernel\\Platform\\Components\\": "src/"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "Webkernel\\Platform\\Components\\Tests\\": "tests/"
+                }
+            },
+            "license": [
+                "proprietary"
+            ],
+            "description": "Webkernel UI atoms: views plus dumpable PHP declarations.",
+            "transport-options": {
+                "symlink": true,
+                "relative": true
+            },
+            "install-path": "../webkernel/components"
         },
         {
             "name": "webkernel/composables",
@@ -2932,6 +3080,53 @@
             "install-path": "../webkernel/console"
         },
         {
+            "name": "webkernel/database",
+            "version": "0.12.0",
+            "version_normalized": "0.12.0.0",
+            "dist": {
+                "type": "path",
+                "url": "x-dev-base/database",
+                "reference": "7f7e30f4a880820445392ba9be739f7b0673a321"
+            },
+            "require": {
+                "ext-pdo": "*",
+                "php": ">=8.5",
+                "webkernel/codebase": "^0.12.0"
+            },
+            "type": "webkernel-stdlib",
+            "extra": {
+                "webkernel": {
+                    "package_repo": "git@github.com:webkernelphp/database.git",
+                    "production": true,
+                    "provider": "Webkernel\\Database\\DatabaseProvider",
+                    "prefix": "database"
+                }
+            },
+            "installation-source": "dist",
+            "autoload": {
+                "psr-4": {
+                    "Webkernel\\Database\\": "src/"
+                },
+                "files": [
+                    "functions/database.php"
+                ]
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "Webkernel\\Database\\Tests\\": "tests/"
+                }
+            },
+            "license": [
+                "proprietary"
+            ],
+            "description": "Webkernel database: connections, query, schema, migrations. Drivers: sqlite, mysql, pgsql. ClickHouse later.",
+            "transport-options": {
+                "symlink": true,
+                "relative": true
+            },
+            "install-path": "../webkernel/database"
+        },
+        {
             "name": "webkernel/devtools",
             "version": "0.12.0",
             "version_normalized": "0.12.0.0",
@@ -2981,6 +3176,50 @@
             "install-path": "../webkernel/devtools"
         },
         {
+            "name": "webkernel/forms",
+            "version": "0.12.0",
+            "version_normalized": "0.12.0.0",
+            "dist": {
+                "type": "path",
+                "url": "y-dev-platform/forms",
+                "reference": "b44a47bfa6a2ea4171ec488f23ec5a9b031290c5"
+            },
+            "require": {
+                "php": ">=8.5",
+                "webkernel/codebase": "^0.12.0",
+                "webkernel/components": "^0.12.0",
+                "webkernel/schemas": "^0.12.0"
+            },
+            "type": "webkernel-stdlib",
+            "extra": {
+                "webkernel": {
+                    "package_repo": "git@github.com:webkernelphp/forms.git",
+                    "production": true,
+                    "prefix": "forms"
+                }
+            },
+            "installation-source": "dist",
+            "autoload": {
+                "psr-4": {
+                    "Webkernel\\Platform\\Forms\\": "src/"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "Webkernel\\Platform\\Forms\\Tests\\": "tests/"
+                }
+            },
+            "license": [
+                "proprietary"
+            ],
+            "description": "Webkernel forms: field components and form builders on schemas.",
+            "transport-options": {
+                "symlink": true,
+                "relative": true
+            },
+            "install-path": "../webkernel/forms"
+        },
+        {
             "name": "webkernel/http",
             "version": "0.12.0",
             "version_normalized": "0.12.0.0",
@@ -3012,6 +3251,111 @@
                 "relative": true
             },
             "install-path": "../webkernel/http"
+        },
+        {
+            "name": "webkernel/i18n",
+            "version": "0.12.0",
+            "version_normalized": "0.12.0.0",
+            "dist": {
+                "type": "path",
+                "url": "x-dev-base/i18n",
+                "reference": "f773fc035cf4920bd58d7962a15e6ee31c44cca9"
+            },
+            "require": {
+                "ext-intl": "*",
+                "php": ">=8.5",
+                "webkernel/codebase": "^0.12.0"
+            },
+            "type": "webkernel-stdlib",
+            "extra": {
+                "webkernel": {
+                    "package_repo": "git@github.com:webkernelphp/i18n.git",
+                    "production": true,
+                    "provider": "Webkernel\\I18n\\I18nProvider",
+                    "prefix": "i18n"
+                }
+            },
+            "installation-source": "dist",
+            "autoload": {
+                "psr-4": {
+                    "Webkernel\\I18n\\": "src/"
+                },
+                "files": [
+                    "functions/i18n.php"
+                ]
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "Webkernel\\I18n\\Tests\\": "tests/"
+                }
+            },
+            "license": [
+                "EPL-2.0"
+            ],
+            "authors": [
+                {
+                    "name": "El Moumen Yassine",
+                    "email": "yassine@numerimondes.com"
+                }
+            ],
+            "description": "Webkernel i18n: fast_i18n, locale context, translation catalog from LANG_PATH.",
+            "transport-options": {
+                "symlink": true,
+                "relative": true
+            },
+            "install-path": "../webkernel/i18n"
+        },
+        {
+            "name": "webkernel/imagery",
+            "version": "0.12.0",
+            "version_normalized": "0.12.0.0",
+            "dist": {
+                "type": "path",
+                "url": "x-dev-base/imagery",
+                "reference": "ac501b9f3518b8abdee1c084ced2b5a3b506ef7a"
+            },
+            "require": {
+                "php": ">=8.5"
+            },
+            "type": "webkernel-stdlib",
+            "extra": {
+                "webkernel": {
+                    "package_repo": "git@github.com:webkernelphp/imagery.git",
+                    "production": true,
+                    "provider": "Webkernel\\Imagery\\ImageryProvider",
+                    "prefix": "imagery"
+                }
+            },
+            "installation-source": "dist",
+            "autoload": {
+                "psr-4": {
+                    "Webkernel\\Imagery\\": "src/"
+                },
+                "files": [
+                    "functions/branding.php",
+                    "functions/icon.php"
+                ]
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "Webkernel\\Imagery\\Tests\\": "tests/"
+                }
+            },
+            "license": [
+                "EPL-2.0"
+            ],
+            "authors": [
+                {
+                    "name": "El Moumen Yassine",
+                    "email": "yassine@numerimondes.com"
+                }
+            ],
+            "description": "Webkernel imagery: icons, brands, pixmaps.",
+            "transport-options": {
+                "symlink": true,
+                "relative": true
+            },
+            "install-path": "../webkernel/imagery"
         },
         {
             "name": "webkernel/instance",
@@ -3137,6 +3481,141 @@
                 "relative": true
             },
             "install-path": "../webkernel/liveview"
+        },
+        {
+            "name": "webkernel/models",
+            "version": "0.12.0",
+            "version_normalized": "0.12.0.0",
+            "dist": {
+                "type": "path",
+                "url": "x-dev-base/models",
+                "reference": "f5672f1c5ed5764d897d4ec3a9559582e50225e8"
+            },
+            "require": {
+                "php": ">=8.5",
+                "webkernel/database": "^0.12.0"
+            },
+            "type": "webkernel-stdlib",
+            "extra": {
+                "webkernel": {
+                    "package_repo": "git@github.com:webkernelphp/models.git",
+                    "production": true,
+                    "provider": "Webkernel\\Models\\ModelsProvider",
+                    "prefix": "models"
+                }
+            },
+            "installation-source": "dist",
+            "autoload": {
+                "psr-4": {
+                    "Webkernel\\Models\\": "src/"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "Webkernel\\Models\\Tests\\": "tests/"
+                }
+            },
+            "license": [
+                "proprietary"
+            ],
+            "description": "Webkernel models: Active Record on webkernel/database.",
+            "transport-options": {
+                "symlink": true,
+                "relative": true
+            },
+            "install-path": "../webkernel/models"
+        },
+        {
+            "name": "webkernel/notifications",
+            "version": "0.12.0",
+            "version_normalized": "0.12.0.0",
+            "dist": {
+                "type": "path",
+                "url": "y-dev-platform/notifications",
+                "reference": "53148c34c92ad769b8f7c7e1de1246a5a7261d69"
+            },
+            "require": {
+                "php": ">=8.5",
+                "webkernel/codebase": "^0.12.0",
+                "webkernel/components": "^0.12.0"
+            },
+            "type": "webkernel-stdlib",
+            "extra": {
+                "webkernel": {
+                    "package_repo": "git@github.com:webkernelphp/notifications.git",
+                    "provider": "Webkernel\\Platform\\Notifications\\Providers\\NotificationsProvider",
+                    "production": true,
+                    "prefix": "notifications"
+                }
+            },
+            "installation-source": "dist",
+            "autoload": {
+                "psr-4": {
+                    "Webkernel\\Platform\\Notifications\\": "src/"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "Webkernel\\Platform\\Notifications\\Tests\\": "tests/"
+                }
+            },
+            "license": [
+                "proprietary"
+            ],
+            "description": "Webkernel notifications: flash and in-app notification surfaces.",
+            "transport-options": {
+                "symlink": true,
+                "relative": true
+            },
+            "install-path": "../webkernel/notifications"
+        },
+        {
+            "name": "webkernel/panels",
+            "version": "0.12.0",
+            "version_normalized": "0.12.0.0",
+            "dist": {
+                "type": "path",
+                "url": "y-dev-platform/panels",
+                "reference": "5d3ad2400a42af80e202f03482de97457ceef161"
+            },
+            "require": {
+                "php": ">=8.5",
+                "webkernel/actions": "^0.12.0",
+                "webkernel/auth": "^0.12.0",
+                "webkernel/codebase": "^0.12.0",
+                "webkernel/components": "^0.12.0",
+                "webkernel/notifications": "^0.12.0",
+                "webkernel/schemas": "^0.12.0"
+            },
+            "type": "webkernel-stdlib",
+            "extra": {
+                "webkernel": {
+                    "package_repo": "git@github.com:webkernelphp/panels.git",
+                    "production": true,
+                    "provider": "Webkernel\\Platform\\PanelsProvider",
+                    "prefix": "webkernel"
+                }
+            },
+            "installation-source": "dist",
+            "autoload": {
+                "psr-4": {
+                    "Webkernel\\Platform\\": "src/"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "Webkernel\\Platform\\Tests\\": "tests/"
+                }
+            },
+            "license": [
+                "proprietary"
+            ],
+            "description": "Webkernel admin: Panel, Resource, Page, Table.",
+            "transport-options": {
+                "symlink": true,
+                "relative": true
+            },
+            "install-path": "../webkernel/panels"
         },
         {
             "name": "webkernel/paths",
@@ -3360,6 +3839,139 @@
             "install-path": "../webkernel/route"
         },
         {
+            "name": "webkernel/schemas",
+            "version": "0.12.0",
+            "version_normalized": "0.12.0.0",
+            "dist": {
+                "type": "path",
+                "url": "y-dev-platform/schemas",
+                "reference": "de77e49846a607b84fb704f226f97e58e86fec5d"
+            },
+            "require": {
+                "php": ">=8.5",
+                "webkernel/actions": "^0.12.0",
+                "webkernel/codebase": "^0.12.0",
+                "webkernel/components": "^0.12.0"
+            },
+            "type": "webkernel-stdlib",
+            "extra": {
+                "webkernel": {
+                    "package_repo": "git@github.com:webkernelphp/schemas.git",
+                    "production": true,
+                    "prefix": "schemas"
+                }
+            },
+            "installation-source": "dist",
+            "autoload": {
+                "psr-4": {
+                    "Webkernel\\Platform\\Schemas\\": "src/"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "Webkernel\\Platform\\Schemas\\Tests\\": "tests/"
+                }
+            },
+            "license": [
+                "proprietary"
+            ],
+            "description": "Webkernel schema tree: layout of components for forms and readonly views.",
+            "transport-options": {
+                "symlink": true,
+                "relative": true
+            },
+            "install-path": "../webkernel/schemas"
+        },
+        {
+            "name": "webkernel/system",
+            "version": "0.12.0",
+            "version_normalized": "0.12.0.0",
+            "dist": {
+                "type": "path",
+                "url": "x-dev-base/system",
+                "reference": "2e32a483cf997442a95ab11c795da4043697c96c"
+            },
+            "require": {
+                "php": ">=8.5",
+                "webkernel/auth": "^0.12.0",
+                "webkernel/codebase": "^0.12.0",
+                "webkernel/panels": "^0.12.0"
+            },
+            "type": "webkernel-stdlib",
+            "extra": {
+                "webkernel": {
+                    "package_repo": "git@github.com:webkernelphp/system.git",
+                    "production": true,
+                    "provider": "Webkernel\\System\\SystemProvider",
+                    "prefix": "webkernel"
+                }
+            },
+            "installation-source": "dist",
+            "autoload": {
+                "psr-4": {
+                    "Webkernel\\System\\": "src/"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "Webkernel\\System\\Tests\\": "tests/"
+                }
+            },
+            "license": [
+                "proprietary"
+            ],
+            "description": "Webkernel System admin panel and its resources.",
+            "transport-options": {
+                "symlink": true,
+                "relative": true
+            },
+            "install-path": "../webkernel/system"
+        },
+        {
+            "name": "webkernel/tables",
+            "version": "0.12.0",
+            "version_normalized": "0.12.0.0",
+            "dist": {
+                "type": "path",
+                "url": "y-dev-platform/tables",
+                "reference": "bcbb1bb2956aeee6ee6b59744a631fcd0b3e392f"
+            },
+            "require": {
+                "php": ">=8.5",
+                "webkernel/actions": "^0.12.0",
+                "webkernel/codebase": "^0.12.0",
+                "webkernel/components": "^0.12.0"
+            },
+            "type": "webkernel-stdlib",
+            "extra": {
+                "webkernel": {
+                    "package_repo": "git@github.com:webkernelphp/tables.git",
+                    "production": true,
+                    "prefix": "tables"
+                }
+            },
+            "installation-source": "dist",
+            "autoload": {
+                "psr-4": {
+                    "Webkernel\\Platform\\Tables\\": "src/"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "Webkernel\\Platform\\Tables\\Tests\\": "tests/"
+                }
+            },
+            "license": [
+                "proprietary"
+            ],
+            "description": "Webkernel tables: list columns, filters, and bulk actions.",
+            "transport-options": {
+                "symlink": true,
+                "relative": true
+            },
+            "install-path": "../webkernel/tables"
+        },
+        {
             "name": "webkernel/typography",
             "version": "0.12.0",
             "version_normalized": "0.12.0.0",
@@ -3422,6 +4034,49 @@
                 "relative": true
             },
             "install-path": "../webkernel/view"
+        },
+        {
+            "name": "webkernel/widgets",
+            "version": "0.12.0",
+            "version_normalized": "0.12.0.0",
+            "dist": {
+                "type": "path",
+                "url": "y-dev-platform/widgets",
+                "reference": "bd1c475e1ce7a2ea6de844bbd84c99dd408e3dea"
+            },
+            "require": {
+                "php": ">=8.5",
+                "webkernel/codebase": "^0.12.0",
+                "webkernel/components": "^0.12.0"
+            },
+            "type": "webkernel-stdlib",
+            "extra": {
+                "webkernel": {
+                    "package_repo": "git@github.com:webkernelphp/widgets.git",
+                    "production": true,
+                    "prefix": "widgets"
+                }
+            },
+            "installation-source": "dist",
+            "autoload": {
+                "psr-4": {
+                    "Webkernel\\Platform\\Widgets\\": "src/"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "Webkernel\\Platform\\Widgets\\Tests\\": "tests/"
+                }
+            },
+            "license": [
+                "proprietary"
+            ],
+            "description": "Webkernel widgets: dashboard and page widgets.",
+            "transport-options": {
+                "symlink": true,
+                "relative": true
+            },
+            "install-path": "../webkernel/widgets"
         }
     ],
     "dev": true,

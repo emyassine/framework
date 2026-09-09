@@ -37,11 +37,7 @@ final class Cache
 
     public static function directory(): string
     {
-        if (\function_exists('base_path')) {
-            return base_path('platform/storage/framework/cache');
-        }
-
-        return \dirname(__DIR__, 5).'/platform/storage/framework/cache';
+        return base_path('internal/storage/framework/cache');
     }
 
     /**

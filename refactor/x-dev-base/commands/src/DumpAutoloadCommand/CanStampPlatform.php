@@ -7,7 +7,7 @@
 
 namespace Webkernel\Commands\DumpAutoloadCommand;
 
-use Webkernel\Config\ConfigWriter;
+use Webkernel\Config\Writer\ConfigWriter;
 use Webkernel\Instance\InstanceId;
 
 trait CanStampPlatform

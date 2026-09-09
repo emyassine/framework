@@ -1,0 +1,33 @@
+{
+    "$schema": "https://getcomposer.org/schema.json",
+    "name": "webkernel/actions",
+    "description": "Webkernel actions: Action, ActionGroup, modals, and prefabricated CRUD actions.",
+    "version": "0.12.0",
+    "type": "webkernel-stdlib",
+    "license": "proprietary",
+    "require": {
+        "php": ">=8.5",
+        "webkernel/codebase": "^0.12.0",
+        "webkernel/components": "^0.12.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Webkernel\\Platform\\Actions\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Webkernel\\Platform\\Actions\\Tests\\": "tests/"
+        }
+    },
+    "extra": {
+        "webkernel": {
+            "package_repo": "git@github.com:webkernelphp/actions.git",
+            "production": true,
+            "prefix": "actions"
+        }
+    },
+    "config": {
+        "sort-packages": true
+    }
+}

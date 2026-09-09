@@ -1,0 +1,29 @@
+.w-icon-btn {
+  position: relative;
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 2.25rem; height: 2.25rem;
+  border-radius: var(--w-radius-lg);
+  color: var(--w-text-muted);
+  background: transparent;
+  transition: color var(--w-transition), background var(--w-transition);
+  outline: none;
+}
+.w-icon-btn:hover { color: var(--w-text); background: var(--w-bg-subtle); }
+.w-icon-btn:focus-visible { box-shadow: 0 0 0 2px var(--primary-600); }
+.w-icon-btn svg, .w-icon-btn .w-icon { width: 1rem; height: 1rem; }
+.w-icon-btn.w-size-xs { width: 1.75rem; height: 1.75rem; }
+.w-icon-btn.w-size-sm { width: 2rem; height: 2rem; }
+.w-icon-btn.w-size-lg { width: 2.5rem; height: 2.5rem; }
+.w-icon-btn.w-size-xl { width: 2.75rem; height: 2.75rem; }
+.w-icon-btn.w-color-primary { color: var(--primary-600); }
+.w-icon-btn.w-color-danger { color: var(--danger-600); }
+.w-icon-btn.w-color-success { color: var(--success-600); }
+.w-icon-btn.w-color-warning { color: var(--warning-700); }
+.w-icon-btn.w-color-info { color: var(--info-600); }
+.w-icon-btn.w-disabled, .w-icon-btn[disabled] { opacity: 0.7; pointer-events: none; cursor: default; }
+.w-icon-btn-badge {
+  position: absolute; inset-inline-start: 100%; top: 0;
+  transform: translate(-50%, -50%); z-index: 1;
+}
+[dir="rtl"] .w-icon-btn-badge { transform: translate(50%, -50%); }
+a.w-icon-btn { text-decoration: none; color: inherit; }

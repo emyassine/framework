@@ -1,0 +1,48 @@
+
+<?php  $__props = [
+  'href' => null,
+  'color' => 'primary',
+  'size' => 'md',
+  'icon' => null,
+  'icon_position' => 'before',
+  'tag' => 'a',
+  'target' => null,
+  'disabled' => false,
+  'tooltip' => null,
+  'weight' => 'medium',
+]; foreach ($__props as $__n => $__d) { if (!isset($$__n)) { $$__n = $__d; } } $attributes = (isset($attributes) && $attributes instanceof \Webkernel\View\AttributeBag ? $attributes : new \Webkernel\View\AttributeBag([]))->except(\array_keys($__props)); unset($__props, $__n, $__d); ?>
+<?php 
+  $attributes = $attributes ?? new \Webkernel\View\AttributeBag([]);
+  $size = $size instanceof \Webkernel\Platform\Components\Enums\Size ? $size->value : (string) $size;
+  $icon_position = $icon_position instanceof \Webkernel\Platform\Components\Enums\IconPosition
+      ? $icon_position->value
+      : (string) $icon_position;
+  $tag = $tag === 'button' ? 'button' : 'a';
+ ?>
+<<?php echo \Webkernel\View\View::echo($tag); ?>
+
+  <?php if($tag === 'a' && $href && ! $disabled): ?>
+    href="<?php echo \Webkernel\View\View::echo($href); ?>"
+    <?php if($target): ?>
+      target="<?php echo \Webkernel\View\View::echo($target); ?>"
+    <?php endif; ?>
+  <?php endif; ?>
+  <?php if($tag === 'button'): ?> type="button" <?php endif; ?>
+  <?php if($disabled): ?> aria-disabled="true" <?php endif; ?>
+  <?php if($tooltip): ?> title="<?php echo \Webkernel\View\View::echo($tooltip); ?>" <?php endif; ?>
+  <?php echo \Webkernel\View\View::echo($attributes->class([
+    'w-link',
+    'w-color-'.$color,
+    'w-size-'.$size,
+    'w-disabled' => $disabled,
+  ])); ?>
+
+>
+  <?php if($icon && $icon_position !== 'after'): ?>
+    <?php  $this->start_component('webkernel::icon',['name'=>$icon]); ?><?php echo $this->render_component(); ?>
+  <?php endif; ?>
+  <span class="w-link-label"><?php echo $slot; ?></span>
+  <?php if($icon && $icon_position === 'after'): ?>
+    <?php  $this->start_component('webkernel::icon',['name'=>$icon]); ?><?php echo $this->render_component(); ?>
+  <?php endif; ?>
+</<?php echo \Webkernel\View\View::echo($tag); ?>>

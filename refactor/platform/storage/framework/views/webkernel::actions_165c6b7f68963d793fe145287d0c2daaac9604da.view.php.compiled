@@ -1,0 +1,20 @@
+
+<?php  $__props = [
+  'full_width' => false,
+  'alignment' => 'start',
+  'vertical_alignment' => '',
+]; foreach ($__props as $__n => $__d) { if (!isset($$__n)) { $$__n = $__d; } } $attributes = (isset($attributes) && $attributes instanceof \Webkernel\View\AttributeBag ? $attributes : new \Webkernel\View\AttributeBag([]))->except(\array_keys($__props)); unset($__props, $__n, $__d); ?>
+<?php 
+  $attributes = $attributes ?? new \Webkernel\View\AttributeBag([]);
+  $align = \is_string($alignment) && $alignment !== '' ? $alignment : 'start';
+  $valign = \is_string($vertical_alignment) ? $vertical_alignment : '';
+ ?>
+<div <?php echo \Webkernel\View\View::echo($attributes->class([
+  'w-actions',
+  'w-full' => $full_width,
+  'w-align-'.$align,
+  'w-valign-'.$valign => $valign !== '',
+])); ?>>
+  <?php echo $slot; ?>
+
+</div>

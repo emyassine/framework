@@ -1,0 +1,45 @@
+<?php  $__props = [
+  'id' => '',
+  'title' => '',
+  'body' => null,
+  'status' => 'info',
+  'icon' => null,
+  'duration' => 6000,
+]; foreach ($__props as $__n => $__d) { if (!isset($$__n)) { $$__n = $__d; } } $attributes = (isset($attributes) && $attributes instanceof \Webkernel\View\AttributeBag ? $attributes : new \Webkernel\View\AttributeBag([]))->except(\array_keys($__props)); unset($__props, $__n, $__d); ?>
+<?php 
+  $status = (string) $status;
+  $icon = $icon ?: match ($status) {
+    'success' => 'check-circle',
+    'danger' => 'x-circle',
+    'warning' => 'alert-circle',
+    default => 'info',
+  };
+  $role = $status === 'danger' ? 'alert' : null;
+ ?>
+<div
+  class="w-no-notification w-status-<?php echo \Webkernel\View\View::echo($status); ?>"
+  data-w-notification
+  data-duration="<?php echo \Webkernel\View\View::echo($duration); ?>"
+  <?php if($id): ?> data-notification-id="<?php echo \Webkernel\View\View::echo($id); ?>" <?php endif; ?>
+  <?php if($role): ?> role="<?php echo \Webkernel\View\View::echo($role); ?>" <?php endif; ?>
+>
+  <span class="w-no-notification-icon w-color-<?php echo \Webkernel\View\View::echo($status); ?>">
+    <?php  $this->start_component('webkernel::icon',['name'=>$icon]); ?><?php echo $this->render_component(); ?>
+  </span>
+  <div class="w-no-notification-main">
+    <div class="w-no-notification-text">
+      <?php if($title !== ''): ?>
+        <h3 class="w-no-notification-title"><?php echo \Webkernel\View\View::echo($title); ?></h3>
+      <?php endif; ?>
+      <?php if($body): ?>
+        <div class="w-no-notification-body"><?php echo \Webkernel\View\View::echo($body); ?></div>
+      <?php endif; ?>
+    </div>
+  </div>
+  <button type="button" class="w-icon-btn w-no-notification-close-btn" data-w-notification-close aria-label="Close" title="Close">
+    <span class="w-icon"><svg class="w-icon-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M18 6 6 18"/>
+  <path d="m6 6 12 12"/>
+</svg></span>
+  </button>
+</div>

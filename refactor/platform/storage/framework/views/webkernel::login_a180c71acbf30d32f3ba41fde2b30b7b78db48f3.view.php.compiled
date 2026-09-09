@@ -1,0 +1,27 @@
+
+<?php  $__props = [
+  'error' => '',
+  'email' => '',
+]; foreach ($__props as $__n => $__d) { if (!isset($$__n)) { $$__n = $__d; } } $attributes = (isset($attributes) && $attributes instanceof \Webkernel\View\AttributeBag ? $attributes : new \Webkernel\View\AttributeBag([]))->except(\array_keys($__props)); unset($__props, $__n, $__d); ?>
+<?php 
+  $logo = \function_exists('webkernel_branding_url') ? webkernel_branding_url('webkernel-favicon') : '';
+ ?>
+<?php  $this->start_component('webkernel::page.simple',['title'=>'Sign in']); ?>
+  <form class="w-login" method="post" action="/login">
+    <?php echo \Webkernel\Csrf::field(); ?>
+    <div class="w-login-brand">
+      <?php if($logo !== ''): ?>
+        <img src="<?php echo \Webkernel\View\View::echo($logo); ?>" alt="" width="40" height="40" />
+      <?php endif; ?>
+    </div>
+    <h1 class="w-login-title">Sign in</h1>
+    <?php if($error !== ''): ?>
+      <p class="w-login-error" role="alert"><?php echo \Webkernel\View\View::echo($error); ?></p>
+    <?php endif; ?>
+    <?php  $this->start_component('webkernel::text-input',['name'=>'email','label'=>'Email','type'=>'email','value'=>$email]); ?><?php echo $this->render_component(); ?>
+    <?php  $this->start_component('webkernel::text-input',['name'=>'password','label'=>'Password','type'=>'password']); ?><?php echo $this->render_component(); ?>
+    <div class="w-login-actions">
+      <?php  $this->start_component('webkernel::button',['type'=>'submit','color'=>'primary']); ?>Sign in<?php echo $this->render_component(); ?>
+    </div>
+  </form>
+<?php echo $this->render_component(); ?>

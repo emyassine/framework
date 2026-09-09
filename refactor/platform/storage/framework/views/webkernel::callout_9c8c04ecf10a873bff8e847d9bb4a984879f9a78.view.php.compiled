@@ -1,0 +1,36 @@
+
+<?php  $__props = [
+  'color' => 'gray',
+  'heading' => null,
+  'description' => null,
+  'icon' => null,
+]; foreach ($__props as $__n => $__d) { if (!isset($$__n)) { $$__n = $__d; } } $attributes = (isset($attributes) && $attributes instanceof \Webkernel\View\AttributeBag ? $attributes : new \Webkernel\View\AttributeBag([]))->except(\array_keys($__props)); unset($__props, $__n, $__d); ?>
+<?php 
+  $attributes = $attributes ?? new \Webkernel\View\AttributeBag([]);
+  $has_heading = $heading !== null && $heading !== '';
+  $has_description = $description !== null && $description !== '';
+  $has_icon = $icon !== null && $icon !== '';
+  $slot = $slot ?? '';
+ ?>
+<div <?php echo \Webkernel\View\View::echo($attributes->class(['w-callout', 'w-color-'.$color => $color !== 'gray'])); ?>>
+  <?php if($has_icon): ?>
+    <span class="w-callout-icon" aria-hidden="true"><?php  $this->start_component('webkernel::icon',['name'=>$icon]); ?><?php echo $this->render_component(); ?></span>
+  <?php endif; ?>
+  <?php if($has_heading || $has_description || $slot !== ''): ?>
+    <div class="w-callout-main">
+      <?php if($has_heading || $has_description): ?>
+        <div class="w-callout-text">
+          <?php if($has_heading): ?>
+            <h4 class="w-callout-heading"><?php echo \Webkernel\View\View::echo($heading); ?></h4>
+          <?php endif; ?>
+          <?php if($has_description): ?>
+            <p class="w-callout-description"><?php echo \Webkernel\View\View::echo($description); ?></p>
+          <?php endif; ?>
+        </div>
+      <?php endif; ?>
+      <?php if($slot !== ''): ?>
+        <div class="w-callout-footer"><?php echo $slot; ?></div>
+      <?php endif; ?>
+    </div>
+  <?php endif; ?>
+</div>

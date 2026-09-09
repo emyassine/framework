@@ -1,0 +1,63 @@
+:root {
+  --w-space-outer: 0.65rem;
+  --w-space-inner: 0.65rem;
+  --w-topbar-height: 2rem;
+  --w-rail-width: 2.5rem;
+  --w-nav-width: clamp(240px, 16vw, 280px);
+  --w-nav-width-collapsed: 0px;
+  --w-aside-width: 20rem;
+  --w-radius: 7px;
+  --w-radius-lg: 13px;
+  --w-radius-full: 9999px;
+  --w-font-sans: var(--wts-font-stack, system-ui, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol");
+  --w-font-mono: var(--wts-font-mono, ui-monospace, Consolas, monospace);
+  --w-text-xs: 0.6875rem;
+  --w-text-sm: 0.8125rem;
+  --w-text-base: 0.875rem;
+  --w-text-md: 1rem;
+  --w-text-lg: 1.125rem;
+  --w-text-xl: 1.375rem;
+  --w-text-2xl: 1.625rem;
+  --w-text-3xl: 1.75rem;
+  --w-transition: 180ms ease;
+  --w-elevate-y: -2px;
+  --w-elevate-y-sm: -1px;
+  --w-elevate-y-lg: -4px;
+  --w-shadow-sm: 0 1px 2px color-mix(in srgb, var(--color-zinc-950) 6%, transparent);
+  --w-shadow: 0 2px 4px color-mix(in srgb, var(--color-zinc-950) 6%, transparent);
+  --w-shadow-md: 0 4px 8px color-mix(in srgb, var(--color-zinc-950) 8%, transparent);
+  --w-shadow-md-lift: 0 8px 16px color-mix(in srgb, var(--color-zinc-950) 10%, transparent);
+  --w-backdrop-blur: 10px;
+  --w-bg: var(--color-zinc-50);
+  --w-surface: var(--color-white);
+  --w-surface-2: var(--color-zinc-100);
+  --w-bg-subtle: var(--w-surface-2);
+  --w-border: var(--color-zinc-200);
+  --w-border-strong: var(--color-zinc-300);
+  --w-text: var(--color-zinc-900);
+  --w-text-muted: var(--color-zinc-600);
+  --w-text-faint: var(--color-zinc-500);
+  --w-rail-bg: var(--w-surface);
+  --w-nav-bg: var(--w-surface-2);
+  --w-nav-text: var(--color-zinc-700);
+}
+
+[data-w-theme="dark"] {
+  color-scheme: dark;
+  --w-bg: var(--color-zinc-950);
+  --w-surface: var(--color-zinc-950);
+  --w-surface-2: var(--color-zinc-900);
+  --w-bg-subtle: var(--color-zinc-900);
+  --w-border: var(--color-zinc-800);
+  --w-border-strong: var(--color-zinc-700);
+  --w-text: var(--color-zinc-50);
+  --w-text-muted: var(--color-zinc-400);
+  --w-text-faint: var(--color-zinc-500);
+  --w-rail-bg: var(--w-surface);
+  --w-nav-bg: var(--color-zinc-900);
+  --w-nav-text: var(--color-zinc-300);
+  --w-shadow-sm: 0 1px 2px color-mix(in srgb, black 30%, transparent);
+  --w-shadow: 0 2px 4px color-mix(in srgb, black 30%, transparent);
+  --w-shadow-md: 0 4px 8px color-mix(in srgb, black 35%, transparent);
+  --w-shadow-md-lift: 0 8px 16px color-mix(in srgb, black 40%, transparent);
+}

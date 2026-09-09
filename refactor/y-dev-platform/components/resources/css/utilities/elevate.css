@@ -1,0 +1,17 @@
+[hover~="elevate"] {
+  transition: transform var(--w-utility-duration) var(--w-utility-ease),
+    box-shadow var(--w-utility-duration) var(--w-utility-ease);
+}
+@media (hover: hover) {
+  [hover~="elevate"]:hover,
+  [hover~="elevate"]:focus-visible {
+    transform: translateY(var(--w-elevate-y));
+    box-shadow: var(--w-shadow-md-lift);
+  }
+  [hover~="elevate-sm"]:hover {
+    transform: translateY(var(--w-elevate-y-sm));
+  }
+  [hover~="elevate-lg"]:hover {
+    transform: translateY(var(--w-elevate-y-lg));
+  }
+}

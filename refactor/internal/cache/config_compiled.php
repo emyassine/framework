@@ -11,6 +11,21 @@
 return array (
   'flat' => 
   array (
+    'auth' => 
+    array (
+      'auth' => 
+      array (
+        'user' => 'Webkernel\\Auth\\User',
+        'login_path' => '/login',
+      ),
+    ),
+    'auth.auth' => 
+    array (
+      'user' => 'Webkernel\\Auth\\User',
+      'login_path' => '/login',
+    ),
+    'auth.auth.user' => 'Webkernel\\Auth\\User',
+    'auth.auth.login_path' => '/login',
     'mail' => 
     array (
       'mail' => 
@@ -90,7 +105,7 @@ return array (
       'ip' => '127.0.1.1',
       'uuid' => '18171914e030401586f89cae55151312',
       'macs' => '88:a4:c2:f3:ac:22,00:00:00:00:00:00,10:66:6a:00:00:00,d8:80:83:06:45:d5',
-      'instance_file_path' => 'internal/storage/instance',
+      'instance_file_path' => 'platform/storage/instance',
       'created' => '2026-08-21T00:00:00+00:00',
       'autoload' => 'internal/dependencies/packagist/autoload.php',
       'internal' => 
@@ -138,7 +153,7 @@ return array (
     'platform.ip' => '127.0.1.1',
     'platform.uuid' => '18171914e030401586f89cae55151312',
     'platform.macs' => '88:a4:c2:f3:ac:22,00:00:00:00:00:00,10:66:6a:00:00:00,d8:80:83:06:45:d5',
-    'platform.instance_file_path' => 'internal/storage/instance',
+    'platform.instance_file_path' => 'platform/storage/instance',
     'platform.created' => '2026-08-21T00:00:00+00:00',
     'platform.autoload' => 'internal/dependencies/packagist/autoload.php',
     'platform.internal' => 
@@ -1176,6 +1191,14 @@ return array (
   ),
   'tree' => 
   array (
+    'auth' => 
+    array (
+      'auth' => 
+      array (
+        'user' => 'Webkernel\\Auth\\User',
+        'login_path' => '/login',
+      ),
+    ),
     'mail' => 
     array (
       'mail' => 
@@ -1208,7 +1231,7 @@ return array (
       'ip' => '127.0.1.1',
       'uuid' => '18171914e030401586f89cae55151312',
       'macs' => '88:a4:c2:f3:ac:22,00:00:00:00:00:00,10:66:6a:00:00:00,d8:80:83:06:45:d5',
-      'instance_file_path' => 'internal/storage/instance',
+      'instance_file_path' => 'platform/storage/instance',
       'created' => '2026-08-21T00:00:00+00:00',
       'autoload' => 'internal/dependencies/packagist/autoload.php',
       'internal' => 

@@ -1,0 +1,7 @@
+<?php 
+  $attributes = $attributes ?? new \Webkernel\View\AttributeBag([]);
+ ?>
+<div <?php echo \Webkernel\View\View::echo($attributes->class('w-main-ctn')); ?>>
+  <?php echo $slot; ?>
+
+</div>

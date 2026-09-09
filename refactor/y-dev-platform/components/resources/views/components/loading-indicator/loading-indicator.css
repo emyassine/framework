@@ -1,0 +1,13 @@
+.w-loading-indicator {
+  display: inline-block;
+  width: 1.25rem; height: 1.25rem;
+  color: currentColor;
+}
+.w-loading-indicator.w-size-xs { width: 0.75rem; height: 0.75rem; }
+.w-loading-indicator.w-size-sm { width: 1rem; height: 1rem; }
+.w-loading-indicator.w-size-lg { width: 1.5rem; height: 1.5rem; }
+.w-loading-indicator.w-size-xl { width: 2rem; height: 2rem; }
+@media (prefers-reduced-motion: no-preference) {
+  .w-loading-indicator { animation: w-spin 0.7s linear infinite; }
+}
+@keyframes w-spin { to { transform: rotate(360deg); } }

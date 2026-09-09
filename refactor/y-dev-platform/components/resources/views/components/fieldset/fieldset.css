@@ -1,0 +1,17 @@
+.w-fieldset:not(.w-fieldset-not-contained) {
+  border-radius: var(--w-radius-lg);
+  border: 1px solid var(--w-border);
+  padding: 1.5rem;
+  color: var(--w-text);
+}
+.w-fieldset.w-fieldset-not-contained { padding-top: 1.5rem; border: 0; }
+.w-fieldset > legend {
+  margin-inline-start: -0.5rem; padding-inline: 0.5rem;
+  font-size: var(--w-text-sm); line-height: 1.5; font-weight: 500;
+  color: var(--w-text);
+}
+.w-fieldset-label-required { color: var(--danger-600); font-weight: 500; }
+.w-fieldset.w-fieldset-label-hidden > legend {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0;
+}

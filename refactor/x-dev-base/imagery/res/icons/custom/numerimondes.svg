@@ -1,0 +1,87 @@
+<svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<defs>
+  <clipPath id="a"><rect width="356.951" height="356.951" x="3233.249" y="505.745" rx="14" ry="14"/></clipPath>
+  <clipPath id="b"><path d="M-4327.554 1201.54h-136.844l-68.422-118.51 68.422-118.51h136.844l68.422 118.51z" transform="translate(-180.406 116.881) scale(1.1013)"/></clipPath>
+</defs>
+
+<g transform="translate(-28268.914 -.411)">
+  <rect width="397.871" height="230.221" x="2742.223" y="-1044.13" ry="14" rx="14" fill="#f9f9f9" stroke="#9eadbd" stroke-width="3" stroke-dasharray="12,3"/>
+  <g transform="translate(0 -2100)">
+    <path d="M2796.453 1099.998h-3.34a2.694 2.694 0 0 0-2.6 1.966l-3.167 11.263a.337.337 0 0 1-.646 0l-7.436-26.458a.337.337 0 0 0-.647 0l-3.166 11.262a2.694 2.694 0 0 1-2.586 1.967h-3.355" fill="none" stroke="#9eadbd" stroke-width="3"/>
+    <circle cx="2782.981" cy="1099.998" r="22.921" fill="none" stroke="#9eadbd" stroke-width="3"/>
+    <text x="2770" y="1100" font-family="DM Sans" font-size="24" fill="#020118" stroke="#0c111b" stroke-width="3">Incubation</text>
+  </g>
+  <path fill="#0a0d10" d="M2570-2100h2560v1440H2570z"/>
+  <path fill="#f9f9f9" d="M2594.374-2075.832h2511.251v1391.665H2594.374z"/>
+  <image width="481.968" height="856.832" x="3127.682" y="462.094" clip-path="url(#a)" transform="translate(0 -2100)"/>
+  <path d="M5031.484-2001.527v1317.36" stroke="#0a0d10"/>
+  <g transform="translate(0 -2100)">
+    <path fill="none" stroke="#11182b" stroke-width="1" d="M2698.459 1350.634h175.1v56.756h-175.1z"/>
+    <text x="2717" y="1388" font-family="Space Grotesk" font-size="34" fill="#0a0d10" stroke="#11182b" stroke-width="2">C</text>
+    <circle cx="2728.222" cy="1376.179" r="20.09" fill="none" stroke="#11182b" stroke-width="1.6"/>
+    <path d="M2698.773 1398.372v-8.888h6.518l.297.488a27 27 0 0 0 8.855 8.9 27 27 0 0 0 26 1.2 27 27 0 0 0 11-10.1l.29-.478h121.478v17.775h-174.477z" fill="#0a0d10"/>
+    <text x="2858" y="1406" font-family="DM Sans" font-size="11" text-anchor="end" fill="#f0f5f9">Numerimondes SARL AU</text>
+    <text x="2747" y="1370" font-family="Poppins" font-size="12" text-anchor="end" fill="#0a0d10">
+      <tspan x="2747" y="1370">Copyright © </tspan>
+      <tspan x="2747" y="1386">All Rights Reserved</tspan>
+    </text>
+  </g>
+  <text x="4152" y="-717" font-family="DM Sans" font-size="23" text-anchor="end" fill="#0a0d10">Unauthorized use, disclosure, or duplication of this document is strictly prohibited.</text>
+  <path d="M2668.515-2001.527v1317.36" stroke="#0a0d10"/>
+  <g transform="translate(-830.532 -2179.456) scale(1.29)">
+    <text x="2706" y="120" font-family="DM Sans" font-size="34" fill="#0a0d10">Numerimondes</text>
+    <path d="M2683.65 115.193h-7.333l-3.667-6.351 3.667-6.351h7.333l3.667 6.35z" fill="#0a0d10"/>
+    <circle cx="-4751.63" cy="1440.131" r="345.397" clip-path="url(#b)" transform="translate(2924.342 45.115) scale(.04866)" fill="#9eadbd"/>
+    <path d="M2690.614 124.184c-.09-.043-.465-.248-1.768-.965l-1.343-.74c-.69-.38-.755-.415-.852-.475-.072-.044-.093-.06-.093-.074 0-.022.053-.164.115-.308a1218 1218 0 0 1 2.086-4.76l.605-1.378a1456 1456 0 0 0 1.228-2.803c.138-.317.208-.479.422-.961a291 291 0 0 0 1.256-2.879c.005-.01.001-.018-.115-.29-.25-.58-.728-1.674-1.141-2.61a154 154 0 0 1-.422-.959c-.188-.432-.503-1.151-1.133-2.587a3657 3657 0 0 1-1.23-2.804 1319 1319 0 0 1-1.153-2.628 51 51 0 0 1-.455-1.048 1.27 1.27 0 0 1-.063-.184c0-.013.02-.03.093-.074.096-.06.16-.095.816-.456l1.307-.719c1.586-.873 1.854-1.019 1.873-1.019.008 0 .018.023.33.758l.93 2.175a25892 25892 0 0 1 5.311 12.435c0 .007-.399.946-.975 2.293-1.092 2.551-1.245 2.91-2.765 6.466a27479 27479 0 0 1-1.588 3.714l-.913 2.136c-.312.734-.322.758-.33.758a.196.196 0 0 1-.033-.014z" fill="#0a0d10"/>
+  </g>
+  <path d="M5068.81-757.809H2628.187" fill="#171e2b" stroke="#0c111b" stroke-width="1.3"/>
+  <path d="M5030.984-758.471h74.641v74.968h-74.641z" fill="#132433" stroke-width="2"/>
+  <path d="M5068.81-795.96H2628.187" fill="#171e2b" stroke="#0c111b" stroke-width="1.3"/>
+  <g transform="translate(5.778 -2100)">
+    <path d="M2626.935 1387.227h-9.464l-4.732-8.197 4.732-8.196h9.464l4.732 8.196z" fill="#0a0d10"/>
+    <circle cx="-4751.63" cy="1440.131" r="345.397" clip-path="url(#b)" transform="translate(2937.557 1296.789) scale(.0628)" fill="#9eadbd"/>
+    <path d="M2635.912 1398.837c-.115-.055-.6-.32-2.281-1.245l-1.734-.954c-.892-.49-.975-.537-1.1-.614-.093-.057-.12-.078-.12-.095 0-.03.069-.212.148-.398.107-.25 1.21-2.767 1.85-4.221a2400 2400 0 0 0 1.623-3.701c.9-2.047 1.344-3.064 1.585-3.617.178-.41.27-.618.545-1.24a375 375 0 0 0 1.62-3.716c.007-.014.003-.024-.147-.374-.322-.749-.94-2.16-1.473-3.368a199 199 0 0 1-.544-1.239c-.243-.557-.649-1.485-1.462-3.338a4720 4720 0 0 1-1.588-3.62 1702 1702 0 0 1-1.488-3.391 66 66 0 0 1-.587-1.352 1.64 1.64 0 0 1-.081-.238c0-.017.026-.038.12-.095.124-.077.207-.123 1.053-.588l1.687-.929c2.046-1.126 2.393-1.314 2.417-1.314.01 0 .023.029.426.978.227.534.393.921 1.199 2.806a33416 33416 0 0 1 4.681 10.95c1.663 3.886 2.175 5.085 2.175 5.098 0 .01-.516 1.222-1.26 2.96l-3.568 8.345a35464 35464 0 0 1-2.049 4.793l-1.178 2.757c-.403.948-.416.978-.426.978a.253.253 0 0 1-.043-.018z" fill="#0a0d10"/>
+  </g>
+  <path d="M4994.164-795.294h36.821v36.821h-36.821zM2669.015-2002.857h36.821v36.821h-36.821z" fill="#132433" stroke-width="2"/>
+  <text x="955" y="-1503" font-family="DM Sans" font-size="24" fill="#9eadbd" transform="rotate(-90 954.748 -1503.335)">Brand Guidelines</text>
+  <path d="M2631.195-833.445h36.821v36.821h-36.821z" fill="#132433" stroke-width="2"/>
+  <path d="M2963.533 135.526V36.712" fill="#171e2b" stroke="#0c111b" stroke-width="1.7" transform="matrix(.98572 0 0 .73852 927.195 -2102.945)"/>
+  <path d="M5068.81-2002.192H2628.187" fill="#171e2b" stroke="#0c111b" stroke-width="1.3"/>
+  <text x="3812" y="-2027" font-family="CCS Glyke" font-size="44" fill="#0a0d10" text-anchor="end">Overview</text>
+  <text x="3885" y="-2027" font-family="CCS Glyke" font-size="44" fill="#0a0d10">About Us</text>
+  <text x="5067" y="-2027" font-family="CCS Glyke" font-size="44" fill="#0a0d10" text-anchor="end">Next: Our Mission</text>
+  <g transform="translate(0 -2100)">
+    <rect width="238.288" height="36.94" x="3233.249" y="897.315" ry="7.683" rx="7.683" fill="#f9f9f9"/>
+    <text x="3342" y="915" font-family="DM Sans" font-size="12" fill="#020118" stroke="#0c111b" stroke-width="4" text-anchor="middle">El Moumen Yassine</text>
+  </g>
+  <g transform="translate(-814.115 -1506.915) scale(1.69867)">
+    <text x="2706" y="120" font-family="DM Sans" font-size="34" fill="#0a0d10" text-anchor="middle">Numerimondes</text>
+    <path d="M2683.65 115.193h-7.333l-3.667-6.351 3.667-6.351h7.333l3.667 6.35z" fill="#0a0d10"/>
+    <circle cx="-4751.63" cy="1440.131" r="345.397" clip-path="url(#b)" transform="translate(2924.342 45.115) scale(.04866)" fill="#9eadbd"/>
+  </g>
+  <text x="2546" y="-1384" font-family="DM Sans" font-size="28" fill="#1c5dfb" stroke="#0c111b" stroke-width="6" transform="translate(2545.957 -1384.366) scale(1.47638)">An independent technology company.</text>
+  <a xlink:href="http://linkedin.com/in/elmoumenyassine" transform="translate(2.54 -2278.312)" fill="none" stroke="#000">
+    <g transform="translate(-4049.991 -1280.1) scale(2.0386)" stroke-width=".785">
+      <path d="M3592 1119a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6zm-14 1h4v12h-4z"/>
+      <circle cx="3580" cy="1115" r="2"/>
+    </g>
+  </a>
+  <g transform="translate(-10482.949 -5367.588)">
+    <rect width="118.809" height="36.94" x="13941.729" y="4035.476" ry="7.683" rx="7.683" fill="#f9f9f9"/>
+    <text x="13991" y="4054" font-family="DM Sans" font-size="12" fill="#020118" stroke="#0c111b" stroke-width="4" text-anchor="middle">Founder</text>
+  </g>
+  <g transform="translate(-10679.94 -5322.332)">
+    <rect width="185.8" height="36.94" x="14071.729" y="4035.476" ry="7.683" rx="7.683" fill="#f9f9f9"/>
+    <text x="14160" y="4054" font-family="DM Sans" font-size="12" fill="#020118" stroke="#0c111b" stroke-width="4" text-anchor="middle">Lead Architect</text>
+  </g>
+  <g transform="translate(25149.249 165.507) scale(1.2905)">
+    <text x="2706" y="120" font-family="DM Sans" font-size="34" fill="#0a0d10" text-anchor="middle">Numerimondes</text>
+    <path d="M2683.65 115.193h-7.333l-3.667-6.351 3.667-6.351h7.333l3.667 6.35z" fill="#0a0d10"/>
+    <circle cx="-4751.63" cy="1440.131" r="345.397" clip-path="url(#b)" transform="translate(2924.342 45.115) scale(.04866)" fill="#9eadbd"/>
+  </g>
+  <path stroke-width="52.9" stroke-linecap="round" d="M28301.953-67.508h24v24h-24z"/>
+  <path d="M28281.829 17.383h-5.727l-2.864-4.96 2.864-4.959h5.727l2.863 4.96z" fill="var(--wds-multimode-color)"/>
+  <path d="M28287.28 24.4c-.07-.033-.363-.193-1.38-.753l-1.049-.577a17.68 17.68 0 0 1-.665-.372c-.06-.034-.07-.047-.07-.057 0-.018.04-.129.09-.241.06-.15.732-1.674 1.119-2.554l.51-1.163.473-1.076.959-2.189c.107-.248.163-.374.329-.75.377-.853.789-1.797.936-2.143.02-.053.04-.1.05-.105 0-.009 0-.015-.09-.227-.194-.453-.568-1.307-.891-2.038-.139-.314-.227-.514-.329-.749-.147-.337-.392-.899-.885-2.02a2521 2521 0 0 1-.96-2.19c-.376-.853-.548-1.246-.901-2.052-.308-.705-.329-.752-.355-.818a.683.683 0 0 1-.05-.144c0-.01.02-.023.07-.058.07-.046.125-.074.637-.355l1.02-.562c1.239-.682 1.448-.796 1.463-.796 0 0 .01.018.258.592l.725 1.698 1.083 2.532 1.75 4.093a393 393 0 0 1 1.315 3.085c0 .006-.312.74-.762 1.791l-2.159 5.05-1.239 2.9-.713 1.668c-.244.573-.252.591-.258.591l-.03-.01z" fill="var(--wds-multimode-color)"/>
+  <circle cx="-4751.63" cy="1440.131" r="345.397" clip-path="url(#b)" transform="matrix(.038 0 0 .038 28469.792 -37.342)" fill="#9eadbd"/>
+</g>
+</svg>

@@ -1,0 +1,7 @@
+<?php  $__props = []; foreach ($__props as $__n => $__d) { if (!isset($$__n)) { $$__n = $__d; } } $attributes = (isset($attributes) && $attributes instanceof \Webkernel\View\AttributeBag ? $attributes : new \Webkernel\View\AttributeBag([]))->except(\array_keys($__props)); unset($__props, $__n, $__d); ?>
+<thead <?php echo \Webkernel\View\View::echo($attributes ?? ''); ?>>
+  <tr>
+    <?php echo $slot; ?>
+
+  </tr>
+</thead>

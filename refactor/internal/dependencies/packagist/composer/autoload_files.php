@@ -12,7 +12,10 @@ return array(
     '4a1f966df5d8bc1ce3f217c61584896f' => $vendorDir . '/webkernel/console/load.console.function.php',
     'd9af5326ecebb0c1b6e4aa78000169d4' => $vendorDir . '/webkernel/paths/load.paths.functions.php',
     '624cd2b1a2d9121930ddb9797a53b953' => $vendorDir . '/webkernel/route/load.route.function.php',
-    '6124b4c8570aa390c21fafd04a26c69f' => $vendorDir . '/myclabs/deep-copy/src/DeepCopy/deep_copy.php',
+    'e7313a28f40cb15fad1ebeafdfb1ff7e' => $vendorDir . '/webkernel/imagery/functions/branding.php',
+    '15799e59a371b86310a6cb06416bc86f' => $vendorDir . '/webkernel/imagery/functions/icon.php',
     'b3937b7fa35431fe0895577483870c74' => $vendorDir . '/webkernel/codebase/namespacer.php',
-    'ec07570ca5a812141189b1fa81503674' => $vendorDir . '/phpunit/phpunit/src/Framework/Assert/Functions.php',
+    'e5419c86fe665ad83fab1bf704a05d24' => $vendorDir . '/webkernel/database/functions/database.php',
+    '44fa2240b2b76f4414dce7f1bf628eb5' => $vendorDir . '/webkernel/auth/functions/auth.php',
+    'ee51f7b994a4ff42a39d910cca3d5372' => $vendorDir . '/webkernel/i18n/functions/i18n.php',
 );

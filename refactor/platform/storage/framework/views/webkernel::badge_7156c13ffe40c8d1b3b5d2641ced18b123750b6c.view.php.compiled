@@ -1,0 +1,36 @@
+
+<?php  $__props = [
+  'color' => 'primary',
+  'size' => 'md',
+  'icon' => null,
+  'icon_position' => 'before',
+  'href' => null,
+  'tag' => 'span',
+  'disabled' => false,
+]; foreach ($__props as $__n => $__d) { if (!isset($$__n)) { $$__n = $__d; } } $attributes = (isset($attributes) && $attributes instanceof \Webkernel\View\AttributeBag ? $attributes : new \Webkernel\View\AttributeBag([]))->except(\array_keys($__props)); unset($__props, $__n, $__d); ?>
+<?php 
+  $attributes = $attributes ?? new \Webkernel\View\AttributeBag([]);
+  $size = $size instanceof \Webkernel\Platform\Components\Enums\Size ? $size->value : (string) $size;
+  $tag = $tag === 'a' || ($href !== null && $href !== '') ? 'a' : (string) $tag;
+ ?>
+<<?php echo \Webkernel\View\View::echo($tag); ?>
+
+  <?php if($tag === 'a' && $href && ! $disabled): ?>
+    href="<?php echo \Webkernel\View\View::echo($href); ?>"
+  <?php endif; ?>
+  <?php echo \Webkernel\View\View::echo($attributes->class([
+    'w-badge',
+    'w-color-'.$color,
+    'w-size-'.$size,
+    'w-disabled' => $disabled,
+  ])); ?>
+
+>
+  <?php if($icon && $icon_position !== 'after'): ?>
+    <?php  $this->start_component('webkernel::icon',['name'=>$icon]); ?><?php echo $this->render_component(); ?>
+  <?php endif; ?>
+  <span class="w-badge-label"><?php echo $slot; ?></span>
+  <?php if($icon && $icon_position === 'after'): ?>
+    <?php  $this->start_component('webkernel::icon',['name'=>$icon]); ?><?php echo $this->render_component(); ?>
+  <?php endif; ?>
+</<?php echo \Webkernel\View\View::echo($tag); ?>>

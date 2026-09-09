@@ -1,0 +1,12 @@
+.w-toggle-wrap { display: inline-flex; align-items: center; gap: 0.6em; color: var(--w-text); }
+.w-toggle {
+  width: 2.6em; height: 1.45em; border-radius: 999px; background: var(--w-border-strong);
+  position: relative; flex: 0 0 auto;
+}
+.w-toggle[aria-checked="true"] { background: var(--primary-600); }
+.w-toggle i {
+  position: absolute; top: 2px; inset-inline-start: 2px;
+  width: 1.05em; height: 1.05em; border-radius: 999px; background: var(--color-white);
+  transition: inset-inline-start 0.15s ease;
+}
+.w-toggle[aria-checked="true"] i { inset-inline-start: calc(100% - 1.05em - 2px); }

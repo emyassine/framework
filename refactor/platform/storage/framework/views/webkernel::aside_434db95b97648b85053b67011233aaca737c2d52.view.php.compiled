@@ -1,0 +1,16 @@
+<?php  $__props = [
+  'position' => 'right',
+  'collapsed' => false,
+]; foreach ($__props as $__n => $__d) { if (!isset($$__n)) { $$__n = $__d; } } $attributes = (isset($attributes) && $attributes instanceof \Webkernel\View\AttributeBag ? $attributes : new \Webkernel\View\AttributeBag([]))->except(\array_keys($__props)); unset($__props, $__n, $__d); ?>
+<?php 
+  $attributes = $attributes ?? new \Webkernel\View\AttributeBag([]);
+ ?>
+<aside
+  <?php echo \Webkernel\View\View::echo($attributes->class('w-aside')); ?>
+
+  data-position="<?php echo \Webkernel\View\View::echo($position); ?>"
+  data-collapsed="<?php echo \Webkernel\View\View::echo($collapsed ? '1' : '0'); ?>"
+>
+  <?php echo $slot; ?>
+
+</aside>

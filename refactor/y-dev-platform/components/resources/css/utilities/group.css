@@ -1,0 +1,8 @@
+[group] { position: relative; }
+[group]:is(:hover, :focus-within) [group-hover~="elevate"] {
+  transform: translateY(var(--w-elevate-y));
+  box-shadow: var(--w-shadow-md-lift);
+}
+[group]:is(:hover, :focus-within) [group-hover~="show"] {
+  display: flex;
+}

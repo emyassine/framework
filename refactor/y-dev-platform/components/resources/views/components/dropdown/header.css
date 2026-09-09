@@ -1,0 +1,6 @@
+.w-dropdown-header {
+  display: flex; width: 100%; gap: 0.5rem; padding: 0.75rem;
+  font-size: var(--w-text-sm); font-weight: 500; color: var(--w-text);
+}
+.w-dropdown-header .w-icon { color: var(--w-text-faint); }
+.w-dropdown-header > span { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-align: start; }

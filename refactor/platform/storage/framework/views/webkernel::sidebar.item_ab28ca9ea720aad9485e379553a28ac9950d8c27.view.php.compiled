@@ -1,0 +1,12 @@
+<?php  $__props = [
+  'label' => '',
+  'href' => '#',
+  'icon' => null,
+  'active' => false,
+]; foreach ($__props as $__n => $__d) { if (!isset($$__n)) { $$__n = $__d; } } $attributes = (isset($attributes) && $attributes instanceof \Webkernel\View\AttributeBag ? $attributes : new \Webkernel\View\AttributeBag([]))->except(\array_keys($__props)); unset($__props, $__n, $__d); ?>
+<a href="<?php echo \Webkernel\View\View::echo($href); ?>" class="w-menu-element w-nav-link<?php echo \Webkernel\View\View::echo($active ? ' w-active' : ''); ?>"<?php echo $active ? ' aria-current="page"' : ''; ?>>
+  <?php if(!empty($icon)): ?>
+    <span class="w-nav-icon" aria-hidden="true"><?php  $this->start_component('webkernel::icon',['name'=>$icon]); ?><?php echo $this->render_component(); ?></span>
+  <?php endif; ?>
+  <span><?php echo \Webkernel\View\View::echo($label); ?></span>
+</a>

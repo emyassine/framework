@@ -1,0 +1,11 @@
+<?php  $__props = [
+  'href' => '#',
+  'icon' => null,
+  'active' => false,
+]; foreach ($__props as $__n => $__d) { if (!isset($$__n)) { $$__n = $__d; } } $attributes = (isset($attributes) && $attributes instanceof \Webkernel\View\AttributeBag ? $attributes : new \Webkernel\View\AttributeBag([]))->except(\array_keys($__props)); unset($__props, $__n, $__d); ?>
+<a href="<?php echo \Webkernel\View\View::echo($href); ?>" class="w-sidebar-item<?php echo \Webkernel\View\View::echo(!empty($active) ? ' w-active' : ''); ?>">
+  <?php if(!empty($icon)): ?>
+    <?php  $this->start_component('webkernel::icon',['name'=>$icon]); ?><?php echo $this->render_component(); ?>
+  <?php endif; ?>
+  <span class="w-sidebar-item-label"><?php echo $slot; ?></span>
+</a>
