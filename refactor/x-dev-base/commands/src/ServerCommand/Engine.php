@@ -27,6 +27,8 @@ use Webkernel\Performance\Status;
 final class Engine
 {
     private const int MAX_PORT_TRIES = 10;
+    private const int METRIC_INTEGER_COLUMNS = 3;
+    private const int METRIC_PRECISION = 2;
 
     private string $host = '127.0.0.1';
     private int $port = 8000;
@@ -363,20 +365,24 @@ final class Engine
         $type_badge = $is_api === 'API' ? Terminal::badge('API', '45', '97') : Terminal::badge('WEB', '42', '97');
         $reason = $this->status_reason($status_code);
 
-        $left = \sprintf('  %s %s %s%s %s %s%s%s', $type_badge, Terminal::muted($timestamp), Terminal::status_color($status_code), $status_code, $reason, Terminal::CYAN, $request, Terminal::RESET);
         $right_plain = $this->metrics_plain($timings['render_ms'] ?? null, $request_ms);
         $right = Terminal::muted($right_plain);
+
+        [$method, $uri] = $this->request_parts($request);
+        $prefix = \sprintf('  %s %s ', $type_badge, Terminal::muted($timestamp));
+        $status = Terminal::status_color($status_code).\str_pad($status_code.' '.$reason, 16).Terminal::RESET;
+        $method = Terminal::CYAN.\str_pad($method, 7).Terminal::RESET;
+        $left = $prefix.$status.' '.$method.Terminal::CYAN.$uri.Terminal::RESET;
 
         $left_len = $this->visible_len($left);
         $right_len = \strlen($right_plain);
         $dots = $width - $left_len - $right_len - 2;
 
-        if ($dots < 2) {
-            $overflow = 2 - $dots;
-            $max_req = \max(8, \strlen($request) - $overflow);
-            $request_short = $this->shorten($request, $max_req);
-            $left = \sprintf('  %s %s %s%s %s %s%s%s', $type_badge, Terminal::muted($timestamp), Terminal::status_color($status_code), $status_code, $reason, Terminal::CYAN, $request_short, Terminal::RESET);
-            $dots = \max(2, $width - $this->visible_len($left) - $right_len - 2);
+        if ($dots < 3) {
+            $overflow = 3 - $dots;
+            $uri = $this->shorten($uri, \max(8, \strlen($uri) - $overflow));
+            $left = $prefix.$status.' '.$method.Terminal::CYAN.$uri.Terminal::RESET;
+            $dots = \max(3, $width - $this->visible_len($left) - $right_len - 2);
         }
 
         echo $left.' '.Terminal::muted(\str_repeat('.', $dots)).' '.$right."\n";
@@ -469,9 +475,28 @@ final class Engine
      */
     private function metrics_plain(?float $render_ms, float $request_ms): string
     {
-        $request = 'request '.\number_format($request_ms, 2).'ms';
+        $request = 'request '.$this->format_milliseconds($request_ms);
 
-        return $render_ms === null ? $request : 'render '.\number_format($render_ms, 2).'ms  '.$request;
+        return $render_ms === null ? $request : 'render '.$this->format_milliseconds($render_ms).'  '.$request;
+    }
+
+    private function format_milliseconds(float $milliseconds): string
+    {
+        $width = self::METRIC_INTEGER_COLUMNS + 1 + self::METRIC_PRECISION;
+
+        return \sprintf('%'.$width.'.'.self::METRIC_PRECISION.'fms', $milliseconds);
+    }
+
+    /**
+     * @return array{0: string, 1: string}
+     */
+    private function request_parts(string $request): array
+    {
+        if (\preg_match('/^([A-Z]+)\s+(.+)$/', $request, $matches) === 1) {
+            return [$matches[1], $matches[2]];
+        }
+
+        return ['', $request];
     }
 
     /**
