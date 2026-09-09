@@ -46,7 +46,7 @@ trait CanDumpTypography
      */
     private function write_typography_rules(): void
     {
-        $source = $this->codebase_root().'/resources/css/wts.css';
+        $source = dirname((string) (new \ReflectionClass(TypographySystem::class))->getFileName(), 2).'/resources/css/wts.css';
         $dest = TypographySystem::path(TypographySystem::RULES_CSS);
         if (! \is_file($source)) {
             $this->terminal()->warning('missing '.$source);

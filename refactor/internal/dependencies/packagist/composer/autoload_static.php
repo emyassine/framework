@@ -9,7 +9,10 @@ class ComposerStaticInit14abc4c1689dfc6da53295fe1247c246
     public static $files = array (
         '23018b0a9c1a1e28e4fd8e8d1787d9a8' => __DIR__ . '/..' . '/webkernel/lifecycle/load.lifecycle.functions.php',
         'a7e1958e8ac4599b4fc92e46f8f9c705' => __DIR__ . '/..' . '/webkernel/config/load.config.function.php',
+        '313efaea1d53a40671c323488caf7521' => __DIR__ . '/..' . '/webkernel/view/load.view.function.php',
         '4a1f966df5d8bc1ce3f217c61584896f' => __DIR__ . '/..' . '/webkernel/console/load.console.function.php',
+        'd9af5326ecebb0c1b6e4aa78000169d4' => __DIR__ . '/..' . '/webkernel/paths/load.paths.functions.php',
+        '624cd2b1a2d9121930ddb9797a53b953' => __DIR__ . '/..' . '/webkernel/route/load.route.function.php',
         '6124b4c8570aa390c21fafd04a26c69f' => __DIR__ . '/..' . '/myclabs/deep-copy/src/DeepCopy/deep_copy.php',
         'b3937b7fa35431fe0895577483870c74' => __DIR__ . '/..' . '/webkernel/codebase/namespacer.php',
         'ec07570ca5a812141189b1fa81503674' => __DIR__ . '/..' . '/phpunit/phpunit/src/Framework/Assert/Functions.php',
@@ -18,11 +21,22 @@ class ComposerStaticInit14abc4c1689dfc6da53295fe1247c246
     public static $prefixLengthsPsr4 = array (
         'W' =>
         array (
+            'Webkernel\\View\\' => 15,
+            'Webkernel\\Typography\\' => 21,
+            'Webkernel\\Route\\' => 16,
+            'Webkernel\\Request\\' => 18,
+            'Webkernel\\Platform\\' => 19,
+            'Webkernel\\Performance\\' => 22,
+            'Webkernel\\Paths\\' => 16,
+            'Webkernel\\Liveview\\' => 19,
             'Webkernel\\Lifecycle\\' => 20,
+            'Webkernel\\Instance\\' => 19,
             'Webkernel\\DevTools\\' => 19,
             'Webkernel\\Console\\' => 18,
             'Webkernel\\Config\\' => 17,
             'Webkernel\\Composables\\' => 22,
+            'Webkernel\\Component\\' => 20,
+            'Webkernel\\Communication\\' => 24,
             'Webkernel\\Commands\\' => 19,
             'Webkernel\\' => 10,
         ),
@@ -49,9 +63,45 @@ class ComposerStaticInit14abc4c1689dfc6da53295fe1247c246
     );
 
     public static $prefixDirsPsr4 = array (
+        'Webkernel\\View\\' =>
+        array (
+            0 => __DIR__ . '/..' . '/webkernel/view/src',
+        ),
+        'Webkernel\\Typography\\' =>
+        array (
+            0 => __DIR__ . '/..' . '/webkernel/typography/src',
+        ),
+        'Webkernel\\Route\\' =>
+        array (
+            0 => __DIR__ . '/..' . '/webkernel/route/src',
+        ),
+        'Webkernel\\Request\\' =>
+        array (
+            0 => __DIR__ . '/..' . '/webkernel/request/src',
+        ),
+        'Webkernel\\Platform\\' =>
+        array (
+            0 => __DIR__ . '/..' . '/webkernel/platform/src',
+        ),
+        'Webkernel\\Performance\\' =>
+        array (
+            0 => __DIR__ . '/..' . '/webkernel/performance/src/Performance',
+        ),
+        'Webkernel\\Paths\\' =>
+        array (
+            0 => __DIR__ . '/..' . '/webkernel/paths/src',
+        ),
+        'Webkernel\\Liveview\\' =>
+        array (
+            0 => __DIR__ . '/..' . '/webkernel/liveview/src',
+        ),
         'Webkernel\\Lifecycle\\' =>
         array (
             0 => __DIR__ . '/..' . '/webkernel/lifecycle/src',
+        ),
+        'Webkernel\\Instance\\' =>
+        array (
+            0 => __DIR__ . '/..' . '/webkernel/instance/src',
         ),
         'Webkernel\\DevTools\\' =>
         array (
@@ -68,6 +118,14 @@ class ComposerStaticInit14abc4c1689dfc6da53295fe1247c246
         'Webkernel\\Composables\\' =>
         array (
             0 => __DIR__ . '/..' . '/webkernel/composables/src',
+        ),
+        'Webkernel\\Component\\' =>
+        array (
+            0 => __DIR__ . '/..' . '/webkernel/component/src',
+        ),
+        'Webkernel\\Communication\\' =>
+        array (
+            0 => __DIR__ . '/..' . '/webkernel/communication/src',
         ),
         'Webkernel\\Commands\\' =>
         array (
@@ -1800,6 +1858,14 @@ class ComposerStaticInit14abc4c1689dfc6da53295fe1247c246
         'Webkernel\\Commands\\Providers\\CommandsProvider' => __DIR__ . '/..' . '/webkernel/commands/src/Providers/CommandsProvider.php',
         'Webkernel\\Commands\\ServerCommand' => __DIR__ . '/..' . '/webkernel/commands/src/ServerCommand.php',
         'Webkernel\\Commands\\ServerCommand\\Engine' => __DIR__ . '/..' . '/webkernel/commands/src/ServerCommand/Engine.php',
+        'Webkernel\\Communication\\Mail' => __DIR__ . '/..' . '/webkernel/communication/src/Mail.php',
+        'Webkernel\\Communication\\Providers\\CommunicationProvider' => __DIR__ . '/..' . '/webkernel/communication/src/Providers/CommunicationProvider.php',
+        'Webkernel\\Component\\Component' => __DIR__ . '/..' . '/webkernel/component/src/Component.php',
+        'Webkernel\\Component\\Concerns\\HasActions' => __DIR__ . '/..' . '/webkernel/component/src/Concerns/HasActions.php',
+        'Webkernel\\Component\\Concerns\\HasLifecycleHooks' => __DIR__ . '/..' . '/webkernel/component/src/Concerns/HasLifecycleHooks.php',
+        'Webkernel\\Component\\Concerns\\HasProps' => __DIR__ . '/..' . '/webkernel/component/src/Concerns/HasProps.php',
+        'Webkernel\\Component\\ReactiveComponent' => __DIR__ . '/..' . '/webkernel/component/src/ReactiveComponent.php',
+        'Webkernel\\Component\\StaticComponent' => __DIR__ . '/..' . '/webkernel/component/src/StaticComponent.php',
         'Webkernel\\Composables\\ComposableContract' => __DIR__ . '/..' . '/webkernel/composables/src/ComposableContract.php',
         'Webkernel\\Composables\\ConfigComposable' => __DIR__ . '/..' . '/webkernel/composables/src/ConfigComposable.php',
         'Webkernel\\Composables\\PanelComposable' => __DIR__ . '/..' . '/webkernel/composables/src/PanelComposable.php',
@@ -1822,6 +1888,7 @@ class ComposerStaticInit14abc4c1689dfc6da53295fe1247c246
         'Webkernel\\Console\\Attribute\\ConsoleCommand' => __DIR__ . '/..' . '/webkernel/console/src/Attribute/ConsoleCommand.php',
         'Webkernel\\Console\\Cancelled' => __DIR__ . '/..' . '/webkernel/console/src/Cancelled.php',
         'Webkernel\\Console\\CommandsDiscovery' => __DIR__ . '/..' . '/webkernel/console/src/CommandsDiscovery.php',
+        'Webkernel\\Console\\ConsoleProvider' => __DIR__ . '/..' . '/webkernel/console/src/ConsoleProvider.php',
         'Webkernel\\Console\\Dispatcher' => __DIR__ . '/..' . '/webkernel/console/src/Dispatcher.php',
         'Webkernel\\Console\\DumpHook' => __DIR__ . '/..' . '/webkernel/console/src/DumpHook.php',
         'Webkernel\\Console\\ExitCode' => __DIR__ . '/..' . '/webkernel/console/src/ExitCode.php',
@@ -1830,8 +1897,11 @@ class ComposerStaticInit14abc4c1689dfc6da53295fe1247c246
         'Webkernel\\Console\\Middleware\\ConsoleMiddleware' => __DIR__ . '/..' . '/webkernel/console/src/Middleware/ConsoleMiddleware.php',
         'Webkernel\\Console\\Prompt' => __DIR__ . '/..' . '/webkernel/console/src/Prompt.php',
         'Webkernel\\Console\\Terminal' => __DIR__ . '/..' . '/webkernel/console/src/Terminal.php',
+        'Webkernel\\Csrf' => __DIR__ . '/..' . '/webkernel/request/classmap/Csrf.php',
         'Webkernel\\DevTools\\DevToolsProvider' => __DIR__ . '/..' . '/webkernel/devtools/src/DevToolsProvider.php',
         'Webkernel\\DevTools\\IdeHelper' => __DIR__ . '/..' . '/webkernel/devtools/src/IdeHelper.php',
+        'Webkernel\\Http' => __DIR__ . '/..' . '/webkernel/http/classmap/Http.php',
+        'Webkernel\\Instance\\InstanceId' => __DIR__ . '/..' . '/webkernel/instance/src/InstanceId.php',
         'Webkernel\\Lifecycle\\Actions\\Contracts\\LifecycleActionContract' => __DIR__ . '/..' . '/webkernel/lifecycle/src/Actions/Contracts/LifecycleActionContract.php',
         'Webkernel\\Lifecycle\\Actions\\LCActionRunner' => __DIR__ . '/..' . '/webkernel/lifecycle/src/Actions/LCActionRunner.php',
         'Webkernel\\Lifecycle\\Actions\\LCEnvChecker' => __DIR__ . '/..' . '/webkernel/lifecycle/src/Actions/LCEnvChecker.php',
@@ -1843,13 +1913,65 @@ class ComposerStaticInit14abc4c1689dfc6da53295fe1247c246
         'Webkernel\\Lifecycle\\Installer\\LCPackageType' => __DIR__ . '/..' . '/webkernel/lifecycle/src/Installer/LCPackageType.php',
         'Webkernel\\Lifecycle\\LCInstaller' => __DIR__ . '/..' . '/webkernel/lifecycle/src/LCInstaller.php',
         'Webkernel\\Lifecycle\\Providers\\LifecycleProvider' => __DIR__ . '/..' . '/webkernel/lifecycle/src/Providers/LifecycleProvider.php',
-        'Webkernel\\Performance\\Performance' => __DIR__ . '/..' . '/webkernel/codebase/src/Performance/Performance.php',
-        'Webkernel\\Performance\\Status' => __DIR__ . '/..' . '/webkernel/codebase/src/Performance/Status.php',
+        'Webkernel\\Liveview\\Extensions\\DefaultExtensions' => __DIR__ . '/..' . '/webkernel/liveview/src/Extensions/DefaultExtensions.php',
+        'Webkernel\\Liveview\\Extensions\\DownloadExtension' => __DIR__ . '/..' . '/webkernel/liveview/src/Extensions/DownloadExtension.php',
+        'Webkernel\\Liveview\\Extensions\\Extension' => __DIR__ . '/..' . '/webkernel/liveview/src/Extensions/Extension.php',
+        'Webkernel\\Liveview\\Extensions\\ExtensionManager' => __DIR__ . '/..' . '/webkernel/liveview/src/Extensions/ExtensionManager.php',
+        'Webkernel\\Liveview\\Extensions\\MultipartExtension' => __DIR__ . '/..' . '/webkernel/liveview/src/Extensions/MultipartExtension.php',
+        'Webkernel\\Liveview\\Extensions\\PromptExtension' => __DIR__ . '/..' . '/webkernel/liveview/src/Extensions/PromptExtension.php',
+        'Webkernel\\Liveview\\Extensions\\SseExtension' => __DIR__ . '/..' . '/webkernel/liveview/src/Extensions/SseExtension.php',
+        'Webkernel\\Liveview\\Extensions\\WebsocketExtension' => __DIR__ . '/..' . '/webkernel/liveview/src/Extensions/WebsocketExtension.php',
+        'Webkernel\\Liveview\\Liveview' => __DIR__ . '/..' . '/webkernel/liveview/src/Liveview.php',
+        'Webkernel\\Liveview\\ResponseHelper' => __DIR__ . '/..' . '/webkernel/liveview/src/ResponseHelper.php',
+        'Webkernel\\Paths\\Package' => __DIR__ . '/..' . '/webkernel/paths/src/Package.php',
+        'Webkernel\\Performance\\Performance' => __DIR__ . '/..' . '/webkernel/performance/src/Performance/Performance.php',
+        'Webkernel\\Performance\\Status' => __DIR__ . '/..' . '/webkernel/performance/src/Performance/Status.php',
+        'Webkernel\\Platform' => __DIR__ . '/..' . '/webkernel/codebase/src/Platform.php',
         'Webkernel\\PlatformProvider' => __DIR__ . '/..' . '/webkernel/platform-provider/src/PlatformProvider.php',
         'Webkernel\\PlatformProvider\\Actions\\CommandsFileAction' => __DIR__ . '/..' . '/webkernel/platform-provider/src/PlatformProvider/Actions/CommandsFileAction.php',
         'Webkernel\\PlatformProvider\\Actions\\ProvidersFileAction' => __DIR__ . '/..' . '/webkernel/platform-provider/src/PlatformProvider/Actions/ProvidersFileAction.php',
         'Webkernel\\PlatformProvider\\ProviderDumpContext' => __DIR__ . '/..' . '/webkernel/platform-provider/src/PlatformProvider/ProviderDumpContext.php',
         'Webkernel\\PlatformProvider\\ProviderDumper' => __DIR__ . '/..' . '/webkernel/platform-provider/src/PlatformProvider/ProviderDumper.php',
+        'Webkernel\\Platform\\Assets' => __DIR__ . '/..' . '/webkernel/platform/src/Assets.php',
+        'Webkernel\\Platform\\Colors\\Color' => __DIR__ . '/..' . '/webkernel/platform/src/Colors/Color.php',
+        'Webkernel\\Platform\\Css' => __DIR__ . '/..' . '/webkernel/platform/src/Css.php',
+        'Webkernel\\Platform\\GeneratedFileHeader' => __DIR__ . '/..' . '/webkernel/platform/src/GeneratedFileHeader.php',
+        'Webkernel\\Platform\\Js' => __DIR__ . '/..' . '/webkernel/platform/src/Js.php',
+        'Webkernel\\Request' => __DIR__ . '/..' . '/webkernel/request/classmap/Request.php',
+        'Webkernel\\Request\\Captured' => __DIR__ . '/..' . '/webkernel/request/src/Captured.php',
+        'Webkernel\\Request\\TrustedProxies' => __DIR__ . '/..' . '/webkernel/request/src/TrustedProxies.php',
+        'Webkernel\\Route\\Action\\RedirectAction' => __DIR__ . '/..' . '/webkernel/route/src/Action/RedirectAction.php',
+        'Webkernel\\Route\\Action\\ViewAction' => __DIR__ . '/..' . '/webkernel/route/src/Action/ViewAction.php',
+        'Webkernel\\Route\\Binding' => __DIR__ . '/..' . '/webkernel/route/src/Binding.php',
+        'Webkernel\\Route\\Compile\\Cache' => __DIR__ . '/..' . '/webkernel/route/src/Compile/Cache.php',
+        'Webkernel\\Route\\Compile\\Compiled' => __DIR__ . '/..' . '/webkernel/route/src/Compile/Compiled.php',
+        'Webkernel\\Route\\Compile\\Generator' => __DIR__ . '/..' . '/webkernel/route/src/Compile/Generator.php',
+        'Webkernel\\Route\\Compile\\Pattern' => __DIR__ . '/..' . '/webkernel/route/src/Compile/Pattern.php',
+        'Webkernel\\Route\\Dispatch\\Dispatcher' => __DIR__ . '/..' . '/webkernel/route/src/Dispatch/Dispatcher.php',
+        'Webkernel\\Route\\Dispatch\\Matched' => __DIR__ . '/..' . '/webkernel/route/src/Dispatch/Matched.php',
+        'Webkernel\\Route\\Dispatch\\MethodNotAllowed' => __DIR__ . '/..' . '/webkernel/route/src/Dispatch/MethodNotAllowed.php',
+        'Webkernel\\Route\\Dispatch\\NotMatched' => __DIR__ . '/..' . '/webkernel/route/src/Dispatch/NotMatched.php',
+        'Webkernel\\Route\\Exception\\BadRoute' => __DIR__ . '/..' . '/webkernel/route/src/Exception/BadRoute.php',
+        'Webkernel\\Route\\Group\\PendingGroup' => __DIR__ . '/..' . '/webkernel/route/src/Group/PendingGroup.php',
+        'Webkernel\\Route\\Route' => __DIR__ . '/..' . '/webkernel/route/src/Route.php',
+        'Webkernel\\Route\\Uri\\Uri' => __DIR__ . '/..' . '/webkernel/route/src/Uri/Uri.php',
+        'Webkernel\\Route\\Uri\\UriException' => __DIR__ . '/..' . '/webkernel/route/src/Uri/UriException.php',
+        'Webkernel\\Typography\\TypographySystem' => __DIR__ . '/..' . '/webkernel/typography/src/TypographySystem.php',
+        'Webkernel\\View\\AttributeBag' => __DIR__ . '/..' . '/webkernel/view/src/AttributeBag.php',
+        'Webkernel\\View\\Compile\\Comments' => __DIR__ . '/..' . '/webkernel/view/src/Compile/Comments.php',
+        'Webkernel\\View\\Compile\\Components' => __DIR__ . '/..' . '/webkernel/view/src/Compile/Components.php',
+        'Webkernel\\View\\Compile\\Directives' => __DIR__ . '/..' . '/webkernel/view/src/Compile/Directives.php',
+        'Webkernel\\View\\Compile\\Echoes' => __DIR__ . '/..' . '/webkernel/view/src/Compile/Echoes.php',
+        'Webkernel\\View\\Compile\\Mode' => __DIR__ . '/..' . '/webkernel/view/src/Compile/Mode.php',
+        'Webkernel\\View\\Compile\\Php' => __DIR__ . '/..' . '/webkernel/view/src/Compile/Php.php',
+        'Webkernel\\View\\Compile\\Pipeline' => __DIR__ . '/..' . '/webkernel/view/src/Compile/Pipeline.php',
+        'Webkernel\\View\\Compile\\State' => __DIR__ . '/..' . '/webkernel/view/src/Compile/State.php',
+        'Webkernel\\View\\Compile\\Statements' => __DIR__ . '/..' . '/webkernel/view/src/Compile/Statements.php',
+        'Webkernel\\View\\Compiler' => __DIR__ . '/..' . '/webkernel/view/src/Compiler.php',
+        'Webkernel\\View\\Engine' => __DIR__ . '/..' . '/webkernel/view/src/Engine.php',
+        'Webkernel\\View\\Htmlable' => __DIR__ . '/..' . '/webkernel/view/src/Htmlable.php',
+        'Webkernel\\View\\Js' => __DIR__ . '/..' . '/webkernel/view/src/Js.php',
+        'Webkernel\\View\\View' => __DIR__ . '/..' . '/webkernel/view/src/View.php',
         'staabm\\SideEffectsDetector\\SideEffect' => __DIR__ . '/..' . '/staabm/side-effects-detector/lib/SideEffect.php',
         'staabm\\SideEffectsDetector\\SideEffectsDetector' => __DIR__ . '/..' . '/staabm/side-effects-detector/lib/SideEffectsDetector.php',
     );

@@ -15,7 +15,8 @@
     ],
     "require": {
         "php": ">=8.5",
-        "webkernel/config": "self.version"
+        "webkernel/config": "self.version",
+        "webkernel/request": "self.version"
     },
     "require-dev": {},
     "autoload": {

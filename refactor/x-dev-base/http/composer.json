@@ -1,0 +1,25 @@
+{
+    "$schema": "https://getcomposer.org/schema.json",
+    "name": "webkernel/http",
+    "description": "Webkernel HTTP request and front controller.",
+    "version": "0.12.0",
+    "homepage": "https://www.webkernelphp.com",
+    "type": "library",
+    "license": "proprietary",
+    "require": {
+        "php": ">=8.5",
+        "webkernel/config": "self.version",
+        "webkernel/request": "self.version",
+        "webkernel/route": "self.version"
+    },
+    "autoload": {
+        "classmap": [
+            "classmap/Http.php"
+        ]
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}

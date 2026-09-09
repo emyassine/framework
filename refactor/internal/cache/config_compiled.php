@@ -11,6 +11,78 @@
 return array (
   'flat' => 
   array (
+    'mail' => 
+    array (
+      'mail' => 
+      array (
+        'driver' => 'smtp',
+        'host' => '127.0.0.1',
+        'port' => 587,
+        'encryption' => 'tls',
+        'username' => '',
+        'password' => '',
+        'timeout' => 30,
+        'from' => 
+        array (
+          'address' => '',
+          'name' => '',
+        ),
+        'dkim' => 
+        array (
+          'domain' => '',
+          'selector' => '',
+          'private' => '',
+          'passphrase' => '',
+        ),
+      ),
+    ),
+    'mail.mail' => 
+    array (
+      'driver' => 'smtp',
+      'host' => '127.0.0.1',
+      'port' => 587,
+      'encryption' => 'tls',
+      'username' => '',
+      'password' => '',
+      'timeout' => 30,
+      'from' => 
+      array (
+        'address' => '',
+        'name' => '',
+      ),
+      'dkim' => 
+      array (
+        'domain' => '',
+        'selector' => '',
+        'private' => '',
+        'passphrase' => '',
+      ),
+    ),
+    'mail.mail.driver' => 'smtp',
+    'mail.mail.host' => '127.0.0.1',
+    'mail.mail.port' => 587,
+    'mail.mail.encryption' => 'tls',
+    'mail.mail.username' => '',
+    'mail.mail.password' => '',
+    'mail.mail.timeout' => 30,
+    'mail.mail.from' => 
+    array (
+      'address' => '',
+      'name' => '',
+    ),
+    'mail.mail.from.address' => '',
+    'mail.mail.from.name' => '',
+    'mail.mail.dkim' => 
+    array (
+      'domain' => '',
+      'selector' => '',
+      'private' => '',
+      'passphrase' => '',
+    ),
+    'mail.mail.dkim.domain' => '',
+    'mail.mail.dkim.selector' => '',
+    'mail.mail.dkim.private' => '',
+    'mail.mail.dkim.passphrase' => '',
     'platform' => 
     array (
       'id' => 'bf0b7a6fe1dc0f33e62c091b9c7fe6e9',
@@ -1104,6 +1176,31 @@ return array (
   ),
   'tree' => 
   array (
+    'mail' => 
+    array (
+      'mail' => 
+      array (
+        'driver' => 'smtp',
+        'host' => '127.0.0.1',
+        'port' => 587,
+        'encryption' => 'tls',
+        'username' => '',
+        'password' => '',
+        'timeout' => 30,
+        'from' => 
+        array (
+          'address' => '',
+          'name' => '',
+        ),
+        'dkim' => 
+        array (
+          'domain' => '',
+          'selector' => '',
+          'private' => '',
+          'passphrase' => '',
+        ),
+      ),
+    ),
     'platform' => 
     array (
       'id' => 'bf0b7a6fe1dc0f33e62c091b9c7fe6e9',

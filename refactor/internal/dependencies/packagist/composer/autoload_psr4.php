@@ -6,11 +6,22 @@ $vendorDir = dirname(__DIR__);
 $baseDir = dirname(dirname(dirname($vendorDir)));
 
 return array(
+    'Webkernel\\View\\' => array($vendorDir . '/webkernel/view/src'),
+    'Webkernel\\Typography\\' => array($vendorDir . '/webkernel/typography/src'),
+    'Webkernel\\Route\\' => array($vendorDir . '/webkernel/route/src'),
+    'Webkernel\\Request\\' => array($vendorDir . '/webkernel/request/src'),
+    'Webkernel\\Platform\\' => array($vendorDir . '/webkernel/platform/src'),
+    'Webkernel\\Performance\\' => array($vendorDir . '/webkernel/performance/src/Performance'),
+    'Webkernel\\Paths\\' => array($vendorDir . '/webkernel/paths/src'),
+    'Webkernel\\Liveview\\' => array($vendorDir . '/webkernel/liveview/src'),
     'Webkernel\\Lifecycle\\' => array($vendorDir . '/webkernel/lifecycle/src'),
+    'Webkernel\\Instance\\' => array($vendorDir . '/webkernel/instance/src'),
     'Webkernel\\DevTools\\' => array($vendorDir . '/webkernel/devtools/src'),
     'Webkernel\\Console\\' => array($vendorDir . '/webkernel/console/src'),
     'Webkernel\\Config\\' => array($vendorDir . '/webkernel/config/src'),
     'Webkernel\\Composables\\' => array($vendorDir . '/webkernel/composables/src'),
+    'Webkernel\\Component\\' => array($vendorDir . '/webkernel/component/src'),
+    'Webkernel\\Communication\\' => array($vendorDir . '/webkernel/communication/src'),
     'Webkernel\\Commands\\' => array($vendorDir . '/webkernel/commands/src'),
     'Webkernel\\' => array($vendorDir . '/webkernel/codebase/src', $vendorDir . '/webkernel/platform-provider/src'),
     'Psr\\SimpleCache\\' => array($vendorDir . '/psr/simple-cache/src'),

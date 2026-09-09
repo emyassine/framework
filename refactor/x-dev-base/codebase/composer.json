@@ -39,10 +39,22 @@
         "psr/simple-cache": "^3.0",
         "webkernel/config": "self.version",
         "webkernel/commands": "self.version",
+        "webkernel/communication": "self.version",
+        "webkernel/component": "self.version",
         "webkernel/composables": "self.version",
         "webkernel/console": "self.version",
+        "webkernel/http": "self.version",
+        "webkernel/instance": "self.version",
         "webkernel/lifecycle": "self.version",
-        "webkernel/platform-provider": "self.version"
+        "webkernel/liveview": "self.version",
+        "webkernel/paths": "self.version",
+        "webkernel/performance": "self.version",
+        "webkernel/platform": "self.version",
+        "webkernel/platform-provider": "self.version",
+        "webkernel/request": "self.version",
+        "webkernel/route": "self.version",
+        "webkernel/typography": "self.version",
+        "webkernel/view": "self.version"
     },
     "extra": {
         "webkernel": {

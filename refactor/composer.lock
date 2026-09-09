@@ -650,7 +650,7 @@
             "dist": {
                 "type": "path",
                 "url": "x-dev-base/codebase",
-                "reference": "4a8c386a53b320dc7deba92b87dd6f01e43c9e61"
+                "reference": "cd44d40e9c5bc71b0c11a254bfa554e7c0822016"
             },
             "require": {
                 "ext-dom": "*",
@@ -672,11 +672,23 @@
                 "psr/log": "^3.0",
                 "psr/simple-cache": "^3.0",
                 "webkernel/commands": "self.version",
+                "webkernel/communication": "self.version",
+                "webkernel/component": "self.version",
                 "webkernel/composables": "self.version",
                 "webkernel/config": "self.version",
                 "webkernel/console": "self.version",
+                "webkernel/http": "self.version",
+                "webkernel/instance": "self.version",
                 "webkernel/lifecycle": "self.version",
-                "webkernel/platform-provider": "self.version"
+                "webkernel/liveview": "self.version",
+                "webkernel/paths": "self.version",
+                "webkernel/performance": "self.version",
+                "webkernel/platform": "self.version",
+                "webkernel/platform-provider": "self.version",
+                "webkernel/request": "self.version",
+                "webkernel/route": "self.version",
+                "webkernel/typography": "self.version",
+                "webkernel/view": "self.version"
             },
             "type": "library",
             "extra": {
@@ -718,11 +730,15 @@
             "dist": {
                 "type": "path",
                 "url": "x-dev-base/commands",
-                "reference": "44358bcfa16a816129f15d41829415a8d216e9d4"
+                "reference": "6a14084a8742ea977cb66bd14b5a622c0c1ab8eb"
             },
             "require": {
                 "php": ">=8.5",
-                "webkernel/config": "self.version"
+                "webkernel/config": "self.version",
+                "webkernel/console": "self.version",
+                "webkernel/platform": "self.version",
+                "webkernel/platform-provider": "self.version",
+                "webkernel/typography": "self.version"
             },
             "type": "library",
             "extra": {
@@ -772,16 +788,88 @@
             }
         },
         {
+            "name": "webkernel/communication",
+            "version": "0.12.0",
+            "dist": {
+                "type": "path",
+                "url": "x-dev-base/communication",
+                "reference": "65941384a983eab037b278e8d8074581d376d3a8"
+            },
+            "require": {
+                "php": ">=8.5",
+                "phpmailer/phpmailer": "^6.10",
+                "webkernel/config": "self.version",
+                "webkernel/platform-provider": "self.version",
+                "webkernel/view": "self.version"
+            },
+            "type": "library",
+            "extra": {
+                "webkernel": {
+                    "$schema": "https://webkernelphp.org/packages/v1/schema.json",
+                    "provider": "Webkernel\\Communication\\Providers\\CommunicationProvider",
+                    "x-monorepo": {
+                        "package-repos": [
+                            "git@github.com:webkernelphp/communication.git"
+                        ]
+                    }
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Webkernel\\Communication\\": "src/"
+                }
+            },
+            "license": [
+                "proprietary"
+            ],
+            "description": "Webkernel communication primitives.",
+            "homepage": "https://www.webkernelphp.com",
+            "transport-options": {
+                "symlink": true,
+                "relative": true
+            }
+        },
+        {
+            "name": "webkernel/component",
+            "version": "0.12.0",
+            "dist": {
+                "type": "path",
+                "url": "x-dev-base/component",
+                "reference": "3375abfc38b4aab8f1f0d482fa95070b1d3f863e"
+            },
+            "require": {
+                "php": ">=8.5",
+                "webkernel/liveview": "self.version",
+                "webkernel/view": "self.version"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Webkernel\\Component\\": "src/"
+                }
+            },
+            "license": [
+                "proprietary"
+            ],
+            "description": "Webkernel components.",
+            "homepage": "https://www.webkernelphp.com",
+            "transport-options": {
+                "symlink": true,
+                "relative": true
+            }
+        },
+        {
             "name": "webkernel/composables",
             "version": "0.12.0",
             "dist": {
                 "type": "path",
                 "url": "x-dev-base/composables",
-                "reference": "58f2898b18d272225032b6e3e3d750a98677067a"
+                "reference": "5d9d9f0cf6553e24798aeaeda403da975ee4c6a5"
             },
             "require": {
                 "php": ">=8.5",
-                "webkernel/config": "self.version"
+                "webkernel/config": "self.version",
+                "webkernel/request": "self.version"
             },
             "type": "library",
             "extra": {
@@ -892,11 +980,13 @@
             "dist": {
                 "type": "path",
                 "url": "x-dev-base/console",
-                "reference": "c239e8bcc1b548cc020c44ec68249a044a9cac79"
+                "reference": "1eb57211abe5be4bbfaf9b6e469687d423353421"
             },
             "require": {
                 "php": ">=8.5",
-                "webkernel/config": "self.version"
+                "webkernel/composables": "self.version",
+                "webkernel/config": "self.version",
+                "webkernel/platform-provider": "self.version"
             },
             "type": "library",
             "extra": {
@@ -945,6 +1035,63 @@
                 }
             ],
             "description": "Command line interface engine and console execution components for Webkernel.",
+            "homepage": "https://www.webkernelphp.com",
+            "transport-options": {
+                "symlink": true,
+                "relative": true
+            }
+        },
+        {
+            "name": "webkernel/http",
+            "version": "0.12.0",
+            "dist": {
+                "type": "path",
+                "url": "x-dev-base/http",
+                "reference": "b7d676f48228e3d4b3bc568431b446e2f209def2"
+            },
+            "require": {
+                "php": ">=8.5",
+                "webkernel/config": "self.version",
+                "webkernel/request": "self.version",
+                "webkernel/route": "self.version"
+            },
+            "type": "library",
+            "autoload": {
+                "classmap": [
+                    "classmap/Http.php"
+                ]
+            },
+            "license": [
+                "proprietary"
+            ],
+            "description": "Webkernel HTTP request and front controller.",
+            "homepage": "https://www.webkernelphp.com",
+            "transport-options": {
+                "symlink": true,
+                "relative": true
+            }
+        },
+        {
+            "name": "webkernel/instance",
+            "version": "0.12.0",
+            "dist": {
+                "type": "path",
+                "url": "x-dev-base/instance",
+                "reference": "6c6ae4ee5d41617509ef5f94fdbd2197c0addf55"
+            },
+            "require": {
+                "php": ">=8.5"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Webkernel\\Instance\\": "src/"
+                }
+            },
+            "license": [
+                "proprietary"
+            ],
+            "description": "Webkernel instance identifiers.",
             "homepage": "https://www.webkernelphp.com",
             "transport-options": {
                 "symlink": true,
@@ -1014,6 +1161,119 @@
             }
         },
         {
+            "name": "webkernel/liveview",
+            "version": "0.12.0",
+            "dist": {
+                "type": "path",
+                "url": "x-dev-base/liveview",
+                "reference": "9f8ac0c8589b83ef9a38c42ad264fee30c12834a"
+            },
+            "require": {
+                "php": ">=8.5"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Webkernel\\Liveview\\": "src/"
+                }
+            },
+            "license": [
+                "proprietary"
+            ],
+            "description": "Webkernel liveview runtime.",
+            "homepage": "https://www.webkernelphp.com",
+            "transport-options": {
+                "symlink": true,
+                "relative": true
+            }
+        },
+        {
+            "name": "webkernel/paths",
+            "version": "0.12.0",
+            "dist": {
+                "type": "path",
+                "url": "x-dev-base/paths",
+                "reference": "6cb6c9e2ffecae6354a93843f332a1c1067e820b"
+            },
+            "require": {
+                "php": ">=8.5"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Webkernel\\Paths\\": "src/"
+                },
+                "files": [
+                    "load.paths.functions.php"
+                ]
+            },
+            "license": [
+                "proprietary"
+            ],
+            "description": "Webkernel path helpers.",
+            "homepage": "https://www.webkernelphp.com",
+            "transport-options": {
+                "symlink": true,
+                "relative": true
+            }
+        },
+        {
+            "name": "webkernel/performance",
+            "version": "0.12.0",
+            "dist": {
+                "type": "path",
+                "url": "x-dev-base/performance",
+                "reference": "156bbaa0716bf9ade042d4f16dbd5a3729b3449f"
+            },
+            "require": {
+                "php": ">=8.5",
+                "webkernel/composables": "self.version",
+                "webkernel/paths": "self.version"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Webkernel\\Performance\\": "src/Performance/"
+                }
+            },
+            "license": [
+                "proprietary"
+            ],
+            "description": "Webkernel performance inspection and preferences.",
+            "homepage": "https://www.webkernelphp.com",
+            "transport-options": {
+                "symlink": true,
+                "relative": true
+            }
+        },
+        {
+            "name": "webkernel/platform",
+            "version": "0.12.0",
+            "dist": {
+                "type": "path",
+                "url": "x-dev-base/platform",
+                "reference": "4731c4d7f9f780dd4fd1861042a96dd717fbf162"
+            },
+            "require": {
+                "php": ">=8.5"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Webkernel\\Platform\\": "src/"
+                }
+            },
+            "license": [
+                "proprietary"
+            ],
+            "description": "Webkernel platform assets and generated file helpers.",
+            "homepage": "https://www.webkernelphp.com",
+            "transport-options": {
+                "symlink": true,
+                "relative": true
+            }
+        },
+        {
             "name": "webkernel/platform-provider",
             "version": "0.12.0",
             "dist": {
@@ -1058,6 +1318,130 @@
                 }
             ],
             "description": "Webkernel provider manifest compiler.",
+            "homepage": "https://www.webkernelphp.com",
+            "transport-options": {
+                "symlink": true,
+                "relative": true
+            }
+        },
+        {
+            "name": "webkernel/request",
+            "version": "0.12.0",
+            "dist": {
+                "type": "path",
+                "url": "x-dev-base/request",
+                "reference": "0c5b40b70e4ab89f6b77835cd69b21edd49d2c86"
+            },
+            "require": {
+                "php": ">=8.5",
+                "psr/http-message": "^2.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Webkernel\\Request\\": "src/"
+                },
+                "classmap": [
+                    "classmap/Csrf.php",
+                    "classmap/Request.php"
+                ]
+            },
+            "license": [
+                "proprietary"
+            ],
+            "description": "Webkernel request envelope and CSRF helpers.",
+            "homepage": "https://www.webkernelphp.com",
+            "transport-options": {
+                "symlink": true,
+                "relative": true
+            }
+        },
+        {
+            "name": "webkernel/route",
+            "version": "0.12.0",
+            "dist": {
+                "type": "path",
+                "url": "x-dev-base/route",
+                "reference": "801186d04ffe4745560e0fea82c985e235fdfddf"
+            },
+            "require": {
+                "php": ">=8.5",
+                "psr/http-message": "^2.0",
+                "webkernel/composables": "self.version",
+                "webkernel/request": "self.version",
+                "webkernel/view": "self.version"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Webkernel\\Route\\": "src/"
+                },
+                "files": [
+                    "load.route.function.php"
+                ]
+            },
+            "license": [
+                "proprietary"
+            ],
+            "description": "Webkernel routing.",
+            "homepage": "https://www.webkernelphp.com",
+            "transport-options": {
+                "symlink": true,
+                "relative": true
+            }
+        },
+        {
+            "name": "webkernel/typography",
+            "version": "0.12.0",
+            "dist": {
+                "type": "path",
+                "url": "x-dev-base/typography",
+                "reference": "30072fb7745c8796e24ba00afdd18c13889734aa"
+            },
+            "require": {
+                "php": ">=8.5"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Webkernel\\Typography\\": "src/"
+                }
+            },
+            "license": [
+                "proprietary"
+            ],
+            "description": "Webkernel typography system.",
+            "homepage": "https://www.webkernelphp.com",
+            "transport-options": {
+                "symlink": true,
+                "relative": true
+            }
+        },
+        {
+            "name": "webkernel/view",
+            "version": "0.12.0",
+            "dist": {
+                "type": "path",
+                "url": "x-dev-base/view",
+                "reference": "432420e3f6423a4df551a2ab0c13e0fd931da2f3"
+            },
+            "require": {
+                "php": ">=8.5",
+                "webkernel/composables": "self.version"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Webkernel\\View\\": "src/"
+                },
+                "files": [
+                    "load.view.function.php"
+                ]
+            },
+            "license": [
+                "proprietary"
+            ],
+            "description": "Webkernel view engine.",
             "homepage": "https://www.webkernelphp.com",
             "transport-options": {
                 "symlink": true,

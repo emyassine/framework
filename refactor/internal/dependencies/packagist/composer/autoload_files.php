@@ -8,7 +8,10 @@ $baseDir = dirname(dirname(dirname($vendorDir)));
 return array(
     '23018b0a9c1a1e28e4fd8e8d1787d9a8' => $vendorDir . '/webkernel/lifecycle/load.lifecycle.functions.php',
     'a7e1958e8ac4599b4fc92e46f8f9c705' => $vendorDir . '/webkernel/config/load.config.function.php',
+    '313efaea1d53a40671c323488caf7521' => $vendorDir . '/webkernel/view/load.view.function.php',
     '4a1f966df5d8bc1ce3f217c61584896f' => $vendorDir . '/webkernel/console/load.console.function.php',
+    'd9af5326ecebb0c1b6e4aa78000169d4' => $vendorDir . '/webkernel/paths/load.paths.functions.php',
+    '624cd2b1a2d9121930ddb9797a53b953' => $vendorDir . '/webkernel/route/load.route.function.php',
     '6124b4c8570aa390c21fafd04a26c69f' => $vendorDir . '/myclabs/deep-copy/src/DeepCopy/deep_copy.php',
     'b3937b7fa35431fe0895577483870c74' => $vendorDir . '/webkernel/codebase/namespacer.php',
     'ec07570ca5a812141189b1fa81503674' => $vendorDir . '/phpunit/phpunit/src/Framework/Assert/Functions.php',

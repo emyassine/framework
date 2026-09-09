@@ -1,0 +1,25 @@
+{
+    "$schema": "https://getcomposer.org/schema.json",
+    "name": "webkernel/paths",
+    "description": "Webkernel path helpers.",
+    "version": "0.12.0",
+    "homepage": "https://www.webkernelphp.com",
+    "type": "library",
+    "license": "proprietary",
+    "require": {
+        "php": ">=8.5"
+    },
+    "autoload": {
+        "psr-4": {
+            "Webkernel\\Paths\\": "src/"
+        },
+        "files": [
+            "load.paths.functions.php"
+        ]
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}

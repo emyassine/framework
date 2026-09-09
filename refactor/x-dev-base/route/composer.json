@@ -1,0 +1,29 @@
+{
+    "$schema": "https://getcomposer.org/schema.json",
+    "name": "webkernel/route",
+    "description": "Webkernel routing.",
+    "version": "0.12.0",
+    "homepage": "https://www.webkernelphp.com",
+    "type": "library",
+    "license": "proprietary",
+    "require": {
+        "php": ">=8.5",
+        "psr/http-message": "^2.0",
+        "webkernel/composables": "self.version",
+        "webkernel/request": "self.version",
+        "webkernel/view": "self.version"
+    },
+    "autoload": {
+        "psr-4": {
+            "Webkernel\\Route\\": "src/"
+        },
+        "files": [
+            "load.route.function.php"
+        ]
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}
