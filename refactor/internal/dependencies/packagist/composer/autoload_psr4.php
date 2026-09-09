@@ -27,6 +27,7 @@ return array(
     'Webkernel\\Instance\\' => array($vendorDir . '/webkernel/instance/src'),
     'Webkernel\\Imagery\\' => array($vendorDir . '/webkernel/imagery/src'),
     'Webkernel\\I18n\\' => array($vendorDir . '/webkernel/i18n/src'),
+    'Webkernel\\Errors\\' => array($vendorDir . '/webkernel/errors/src'),
     'Webkernel\\DevTools\\' => array($vendorDir . '/webkernel/devtools/src'),
     'Webkernel\\Database\\' => array($vendorDir . '/webkernel/database/src'),
     'Webkernel\\Console\\' => array($vendorDir . '/webkernel/console/src'),

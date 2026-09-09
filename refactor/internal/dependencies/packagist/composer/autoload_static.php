@@ -10,9 +10,9 @@ class ComposerStaticInit14abc4c1689dfc6da53295fe1247c246
         '23018b0a9c1a1e28e4fd8e8d1787d9a8' => __DIR__ . '/..' . '/webkernel/lifecycle/load.lifecycle.functions.php',
         'a7e1958e8ac4599b4fc92e46f8f9c705' => __DIR__ . '/..' . '/webkernel/config/load.config.function.php',
         '313efaea1d53a40671c323488caf7521' => __DIR__ . '/..' . '/webkernel/view/load.view.function.php',
-        '4a1f966df5d8bc1ce3f217c61584896f' => __DIR__ . '/..' . '/webkernel/console/load.console.function.php',
         'd9af5326ecebb0c1b6e4aa78000169d4' => __DIR__ . '/..' . '/webkernel/paths/load.paths.functions.php',
         '624cd2b1a2d9121930ddb9797a53b953' => __DIR__ . '/..' . '/webkernel/route/load.route.function.php',
+        '4a1f966df5d8bc1ce3f217c61584896f' => __DIR__ . '/..' . '/webkernel/console/load.console.function.php',
         'e7313a28f40cb15fad1ebeafdfb1ff7e' => __DIR__ . '/..' . '/webkernel/imagery/functions/branding.php',
         '15799e59a371b86310a6cb06416bc86f' => __DIR__ . '/..' . '/webkernel/imagery/functions/icon.php',
         'b3937b7fa35431fe0895577483870c74' => __DIR__ . '/..' . '/webkernel/codebase/namespacer.php',
@@ -45,6 +45,7 @@ class ComposerStaticInit14abc4c1689dfc6da53295fe1247c246
             'Webkernel\\Instance\\' => 19,
             'Webkernel\\Imagery\\' => 18,
             'Webkernel\\I18n\\' => 15,
+            'Webkernel\\Errors\\' => 17,
             'Webkernel\\DevTools\\' => 19,
             'Webkernel\\Database\\' => 19,
             'Webkernel\\Console\\' => 18,
@@ -163,6 +164,10 @@ class ComposerStaticInit14abc4c1689dfc6da53295fe1247c246
         'Webkernel\\I18n\\' =>
         array (
             0 => __DIR__ . '/..' . '/webkernel/i18n/src',
+        ),
+        'Webkernel\\Errors\\' =>
+        array (
+            0 => __DIR__ . '/..' . '/webkernel/errors/src',
         ),
         'Webkernel\\DevTools\\' =>
         array (
@@ -1988,6 +1993,9 @@ class ComposerStaticInit14abc4c1689dfc6da53295fe1247c246
         'Webkernel\\Database\\Schema' => __DIR__ . '/..' . '/webkernel/database/src/Schema.php',
         'Webkernel\\DevTools\\DevToolsProvider' => __DIR__ . '/..' . '/webkernel/devtools/src/DevToolsProvider.php',
         'Webkernel\\DevTools\\IdeHelper' => __DIR__ . '/..' . '/webkernel/devtools/src/IdeHelper.php',
+        'Webkernel\\Errors\\ErrorDefinition' => __DIR__ . '/..' . '/webkernel/errors/src/ErrorDefinition.php',
+        'Webkernel\\Errors\\ErrorsProvider' => __DIR__ . '/..' . '/webkernel/errors/src/ErrorsProvider.php',
+        'Webkernel\\Errors\\HttpError' => __DIR__ . '/..' . '/webkernel/errors/src/HttpError.php',
         'Webkernel\\Http' => __DIR__ . '/..' . '/webkernel/http/classmap/Http.php',
         'Webkernel\\I18n\\Catalog' => __DIR__ . '/..' . '/webkernel/i18n/src/Catalog.php',
         'Webkernel\\I18n\\Http\\SwitchLocale' => __DIR__ . '/..' . '/webkernel/i18n/src/Http/SwitchLocale.php',

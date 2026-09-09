@@ -3,7 +3,7 @@
         'name' => 'webkernel/webkernel',
         'pretty_version' => 'dev-main',
         'version' => 'dev-main',
-        'reference' => '20034057990a59afc7f0c5a5d9d6dc7282ac9c3e',
+        'reference' => '6d64e5d27e2969c8617b4928af57d1f794f6393b',
         'type' => 'project',
         'install_path' => __DIR__ . '/../../../../',
         'aliases' => array(),
@@ -364,7 +364,7 @@
         'webkernel/codebase' => array(
             'pretty_version' => '0.12.0',
             'version' => '0.12.0.0',
-            'reference' => '51cf9aebd3db7a3580a7879b5706d658e6f5edb7',
+            'reference' => 'a90d52e7bcef35986789b95daefa0dca415652a0',
             'type' => 'library',
             'install_path' => __DIR__ . '/../webkernel/codebase',
             'aliases' => array(),
@@ -373,7 +373,7 @@
         'webkernel/commands' => array(
             'pretty_version' => '0.12.0',
             'version' => '0.12.0.0',
-            'reference' => '6a14084a8742ea977cb66bd14b5a622c0c1ab8eb',
+            'reference' => '5998aff23f071c917d025e38e9ef4e4855a4d026',
             'type' => 'library',
             'install_path' => __DIR__ . '/../webkernel/commands',
             'aliases' => array(),
@@ -450,6 +450,15 @@
             'install_path' => __DIR__ . '/../webkernel/devtools',
             'aliases' => array(),
             'dev_requirement' => true,
+        ),
+        'webkernel/errors' => array(
+            'pretty_version' => '0.12.0',
+            'version' => '0.12.0.0',
+            'reference' => 'd618b575172dcf3f3cf6cfb804fd74671c34ab81',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../webkernel/errors',
+            'aliases' => array(),
+            'dev_requirement' => false,
         ),
         'webkernel/forms' => array(
             'pretty_version' => '0.12.0',
@@ -643,7 +652,7 @@
         'webkernel/webkernel' => array(
             'pretty_version' => 'dev-main',
             'version' => 'dev-main',
-            'reference' => '20034057990a59afc7f0c5a5d9d6dc7282ac9c3e',
+            'reference' => '6d64e5d27e2969c8617b4928af57d1f794f6393b',
             'type' => 'project',
             'install_path' => __DIR__ . '/../../../../',
             'aliases' => array(),

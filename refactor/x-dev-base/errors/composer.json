@@ -1,0 +1,36 @@
+{
+    "$schema": "https://getcomposer.org/schema.json",
+    "name": "webkernel/errors",
+    "description": "Webkernel HTTP error catalogue and error views.",
+    "version": "0.12.0",
+    "homepage": "https://www.webkernelphp.com",
+    "type": "library",
+    "license": "proprietary",
+    "require": {
+        "php": ">=8.5",
+        "webkernel/i18n": "self.version",
+        "webkernel/platform-provider": "self.version",
+        "webkernel/view": "self.version"
+    },
+    "autoload": {
+        "psr-4": {
+            "Webkernel\\Errors\\": "src/"
+        }
+    },
+    "extra": {
+        "webkernel": {
+            "$schema": "https://webkernelphp.org/packages/v1/schema.json",
+            "provider": "Webkernel\\Errors\\ErrorsProvider",
+            "x-monorepo": {
+                "package-repos": [
+                    "git@github.com:webkernelphp/errors.git"
+                ]
+            }
+        }
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}

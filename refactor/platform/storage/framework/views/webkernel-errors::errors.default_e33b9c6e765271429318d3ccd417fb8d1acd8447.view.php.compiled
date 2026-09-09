@@ -1,0 +1,18 @@
+<?php  $__props = [
+  'error' => [],
+]; foreach ($__props as $__n => $__d) { if (!isset($$__n)) { $$__n = $__d; } } $attributes = (isset($attributes) && $attributes instanceof \Webkernel\View\AttributeBag ? $attributes : new \Webkernel\View\AttributeBag([]))->except(\array_keys($__props)); unset($__props, $__n, $__d); ?>
+<?php 
+  $error = \is_array($error) ? $error : [];
+  $code = (int) ($error['code'] ?? 500);
+  $title = (string) ($error['title'] ?? \Webkernel\Errors\HttpError::reason($code));
+  $description = (string) ($error['description'] ?? '');
+ ?>
+<?php  $this->start_component('webkernel::page.simple',['title'=>$title]); ?>
+  <section class="w-error-page" data-accent="<?php echo \Webkernel\View\View::echo($error['accent'] ?? 'gray'); ?>">
+    <div class="w-error-code"><?php echo \Webkernel\View\View::echo($code); ?></div>
+    <h1><?php echo \Webkernel\View\View::echo($title); ?></h1>
+    <?php if($description !== ''): ?>
+      <p><?php echo \Webkernel\View\View::echo($description); ?></p>
+    <?php endif; ?>
+  </section>
+<?php echo $this->render_component(); ?>

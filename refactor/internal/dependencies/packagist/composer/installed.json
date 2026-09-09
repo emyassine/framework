@@ -2611,7 +2611,7 @@
             "dist": {
                 "type": "path",
                 "url": "x-dev-base/codebase",
-                "reference": "51cf9aebd3db7a3580a7879b5706d658e6f5edb7"
+                "reference": "a90d52e7bcef35986789b95daefa0dca415652a0"
             },
             "require": {
                 "ext-dom": "*",
@@ -2642,6 +2642,7 @@
                 "webkernel/config": "self.version",
                 "webkernel/console": "self.version",
                 "webkernel/database": "self.version",
+                "webkernel/errors": "self.version",
                 "webkernel/forms": "self.version",
                 "webkernel/http": "self.version",
                 "webkernel/i18n": "self.version",
@@ -2708,12 +2709,13 @@
             "dist": {
                 "type": "path",
                 "url": "x-dev-base/commands",
-                "reference": "6a14084a8742ea977cb66bd14b5a622c0c1ab8eb"
+                "reference": "5998aff23f071c917d025e38e9ef4e4855a4d026"
             },
             "require": {
                 "php": ">=8.5",
                 "webkernel/config": "self.version",
                 "webkernel/console": "self.version",
+                "webkernel/errors": "self.version",
                 "webkernel/platform": "self.version",
                 "webkernel/platform-provider": "self.version",
                 "webkernel/typography": "self.version"
@@ -3174,6 +3176,50 @@
                 "relative": true
             },
             "install-path": "../webkernel/devtools"
+        },
+        {
+            "name": "webkernel/errors",
+            "version": "0.12.0",
+            "version_normalized": "0.12.0.0",
+            "dist": {
+                "type": "path",
+                "url": "x-dev-base/errors",
+                "reference": "d618b575172dcf3f3cf6cfb804fd74671c34ab81"
+            },
+            "require": {
+                "php": ">=8.5",
+                "webkernel/i18n": "self.version",
+                "webkernel/platform-provider": "self.version",
+                "webkernel/view": "self.version"
+            },
+            "type": "library",
+            "extra": {
+                "webkernel": {
+                    "$schema": "https://webkernelphp.org/packages/v1/schema.json",
+                    "provider": "Webkernel\\Errors\\ErrorsProvider",
+                    "x-monorepo": {
+                        "package-repos": [
+                            "git@github.com:webkernelphp/errors.git"
+                        ]
+                    }
+                }
+            },
+            "installation-source": "dist",
+            "autoload": {
+                "psr-4": {
+                    "Webkernel\\Errors\\": "src/"
+                }
+            },
+            "license": [
+                "proprietary"
+            ],
+            "description": "Webkernel HTTP error catalogue and error views.",
+            "homepage": "https://www.webkernelphp.com",
+            "transport-options": {
+                "symlink": true,
+                "relative": true
+            },
+            "install-path": "../webkernel/errors"
         },
         {
             "name": "webkernel/forms",

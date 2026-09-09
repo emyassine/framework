@@ -9,6 +9,7 @@ namespace Webkernel\Commands\ServerCommand;
 
 use Webkernel\Console\ExitCode;
 use Webkernel\Console\Terminal;
+use Webkernel\Errors\HttpError;
 use Webkernel\Performance\Performance;
 use Webkernel\Performance\Status;
 
@@ -370,7 +371,7 @@ final class Engine
 
         [$method, $uri] = $this->request_parts($request);
         $prefix = \sprintf('  %s %s ', $type_badge, Terminal::muted($timestamp));
-        $status = Terminal::status_color($status_code).\str_pad($status_code.' '.$reason, 16).Terminal::RESET;
+        $status = Terminal::status_color($status_code).\str_pad($status_code.' '.$reason, HttpError::status_label_width()).Terminal::RESET;
         $method = Terminal::CYAN.\str_pad($method, 7).Terminal::RESET;
         $left_base = $prefix.$status.' '.$method;
         $left_base_len = $this->visible_len($left_base);
@@ -537,11 +538,7 @@ final class Engine
      */
     private function status_reason(int $code): string
     {
-        return match ($code) {
-            200 => 'OK', 201 => 'Created', 204 => 'No Content', 301 => 'Moved Permanently', 302 => 'Found', 304 => 'Not Modified',
-            400 => 'Bad Request', 401 => 'Unauthorized', 403 => 'Forbidden', 404 => 'Not Found', 405 => 'Method Not Allowed',
-            500 => 'Internal Server Error', 502 => 'Bad Gateway', 503 => 'Service Unavailable', default => 'Response',
-        };
+        return HttpError::reason($code);
     }
 
     /**

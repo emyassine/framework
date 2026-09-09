@@ -47,6 +47,7 @@
         "webkernel/composables": "self.version",
         "webkernel/console": "self.version",
         "webkernel/database": "self.version",
+        "webkernel/errors": "self.version",
         "webkernel/forms": "self.version",
         "webkernel/http": "self.version",
         "webkernel/i18n": "self.version",
