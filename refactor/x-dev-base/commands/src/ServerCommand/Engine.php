@@ -372,20 +372,16 @@ final class Engine
         $prefix = \sprintf('  %s %s ', $type_badge, Terminal::muted($timestamp));
         $status = Terminal::status_color($status_code).\str_pad($status_code.' '.$reason, 16).Terminal::RESET;
         $method = Terminal::CYAN.\str_pad($method, 7).Terminal::RESET;
-        $left = $prefix.$status.' '.$method.Terminal::CYAN.$uri.Terminal::RESET;
-
-        $left_len = $this->visible_len($left);
+        $left_base = $prefix.$status.' '.$method;
+        $left_base_len = $this->visible_len($left_base);
         $right_len = \strlen($right_plain);
-        $dots = $width - $left_len - $right_len - 2;
+        $uri_width = \max(8, $width - $left_base_len - $right_len - 5);
+        $uri = $this->shorten($uri, $uri_width);
+        $uri_len = \strlen($uri);
+        $dots = \max(3, $uri_width - $uri_len);
+        $left = $left_base.Terminal::CYAN.$uri.Terminal::RESET;
 
-        if ($dots < 3) {
-            $overflow = 3 - $dots;
-            $uri = $this->shorten($uri, \max(8, \strlen($uri) - $overflow));
-            $left = $prefix.$status.' '.$method.Terminal::CYAN.$uri.Terminal::RESET;
-            $dots = \max(3, $width - $this->visible_len($left) - $right_len - 2);
-        }
-
-        echo $left.' '.Terminal::muted(\str_repeat('.', $dots)).' '.$right."\n";
+        echo $left.' '.Terminal::muted(\str_repeat('.', $dots)).'  '.$right."\n";
         if (! $this->profile_lifecycle) {
             return;
         }
