@@ -371,7 +371,7 @@ final class Engine
 
         [$method, $uri] = $this->request_parts($request);
         $prefix = \sprintf('  %s %s ', $type_badge, Terminal::muted($timestamp));
-        $status = Terminal::status_color($status_code).\str_pad($status_code.' '.$reason, HttpError::status_label_width()).Terminal::RESET;
+        $status = Terminal::status_color($status_code).$this->status_label($status_code, $reason, $width).Terminal::RESET;
         $method = Terminal::CYAN.\str_pad($method, 7).Terminal::RESET;
         $left_base = $prefix.$status.' '.$method;
         $left_base_len = $this->visible_len($left_base);
@@ -494,6 +494,16 @@ final class Engine
         }
 
         return ['', $request];
+    }
+
+    private function status_label(int $code, string $reason, int $line_width): string
+    {
+        $base_width = \strlen('304 '.HttpError::reason(304));
+        $max_width = \max($base_width, \intdiv($line_width, 7));
+        $width = \min(HttpError::status_label_width(), $max_width);
+        $label = $this->shorten($code.' '.$reason, $width);
+
+        return \str_pad($label, $width);
     }
 
     /**
