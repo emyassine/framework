@@ -1,4 +1,5 @@
 {
+	"$schema": "https://getcomposer.org/schema.json",
   "name": "webkernel/webkernel",
   "description": "The Webkernel Platform",
   "type": "project",
@@ -7,12 +8,16 @@
     {
       "name": "webkernel",
       "email": "platform@webkernelphp.com"
+    },
+    {
+      "name": "El Moumen Yassine",
+      "email": "yassine@webkernel.numerimondes.com"
     }
   ],
   "minimum-stability": "stable",
   "prefer-stable": true,
   "config": {
-    "vendor-dir": "platform/dependencies/packagist",
+    "vendor-dir": "internal/dependencies/packagist",
     "apcu-autoloader": true,
     "optimize-autoloader": true,
     "preferred-install": "dist",
@@ -26,23 +31,23 @@
     }
   },
   "repositories": [
+	  {
+	    "type": "path",
+	    "url": "x-dev-base/*",
+	    "options": {
+	      "symlink": true
+	    }
+	  },
     {
       "type": "path",
-      "url": "x-webkernel/*",
+      "url": "y-dev-platform/*",
       "options": {
         "symlink": true
       }
     },
     {
       "type": "path",
-      "url": "y-platform/*",
-      "options": {
-        "symlink": true
-      }
-    },
-    {
-      "type": "path",
-      "url": "x-modules/*/*",
+      "url": "z-modules/*/*",
       "options": {
         "symlink": true
       }
@@ -50,18 +55,14 @@
   ],
   "require": {
     "php": ">=8.5",
-    "acme/billing": "*",
-    "webkernel/codebase": "^0.12.0",
-    "webkernel/system": "^0.12.0"
+    "webkernel/codebase": "^0.12.0"
   },
   "require-dev": {
     "phpunit/phpunit": "^11.5",
     "webkernel/devtools": "^0.12.0"
   },
   "scripts": {
-    "post-autoload-dump": [
-      "@php webkernel dump-autoload"
-    ],
+    "post-autoload-dump": [],
     "test": "phpunit"
   }
 }

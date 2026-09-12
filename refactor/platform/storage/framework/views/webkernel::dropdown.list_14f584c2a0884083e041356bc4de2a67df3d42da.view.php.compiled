@@ -1,7 +1,0 @@
-<?php 
-  $attributes = $attributes ?? new \Webkernel\View\AttributeBag([]);
- ?>
-<div <?php echo \Webkernel\View\View::echo($attributes->class('w-dropdown-list')); ?> role="menu">
-  <?php echo $slot; ?>
-
-</div>

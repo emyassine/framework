@@ -1,7 +1,7 @@
-platform/dependencies/packagist
-platform/dependencies/node_modules
-platform/dependencies/package-lock.json
+**/packagist/*
+**/node_modules/*
+**/package-lock.json
 composer.lock
-platform/storage/database.sqlite
+**/*.sqlite
 merged.txt
 merged.*.txt

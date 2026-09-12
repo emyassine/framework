@@ -1,2 +1,0 @@
-@props([])
-<tbody>{!! $slot !!}</tbody>

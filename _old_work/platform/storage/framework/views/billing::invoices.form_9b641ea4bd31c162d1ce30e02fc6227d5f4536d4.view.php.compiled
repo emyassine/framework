@@ -1,8 +1,0 @@
-<form method="post" action="<?php echo \Webkernel\View\View::echo($action); ?>">
-  <?php echo $schema->render($state); ?>
-
-  <p>
-    <?php  $this->start_component('webkernel::button',['type'=>'submit','color'=>'primary']); ?>Save<?php echo $this->render_component(); ?>
-    <?php  $this->start_component('webkernel::button',['href'=>'/billing/invoices','tag'=>'a','color'=>'gray']); ?>Cancel<?php echo $this->render_component(); ?>
-  </p>
-</form>
