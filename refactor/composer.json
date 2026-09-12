@@ -1,5 +1,5 @@
 {
-	"$schema": "https://getcomposer.org/schema.json",
+  "$schema": "https://getcomposer.org/schema.json",
   "name": "webkernel/webkernel",
   "description": "The Webkernel Platform",
   "type": "project",
@@ -31,13 +31,20 @@
     }
   },
   "repositories": [
-	  {
-	    "type": "path",
-	    "url": "x-dev-base/*",
-	    "options": {
-	      "symlink": true
-	    }
-	  },
+    {
+      "type": "path",
+      "url": "w-dev-essentials/*",
+      "options": {
+        "symlink": true
+      }
+    },
+    {
+      "type": "path",
+      "url": "x-dev-bootloaders/*",
+      "options": {
+        "symlink": true
+      }
+    },
     {
       "type": "path",
       "url": "y-dev-platform/*",

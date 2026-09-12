@@ -1,0 +1,7 @@
+**/packagist/*
+**/node_modules/*
+**/package-lock.json
+composer.lock
+**/*.sqlite
+merged.txt
+merged.*.txt

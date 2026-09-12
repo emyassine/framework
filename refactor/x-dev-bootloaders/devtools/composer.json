@@ -1,0 +1,41 @@
+{
+    "$schema": "https://getcomposer.org/schema.json",
+    "name": "webkernel/devtools",
+    "description": "Webkernel developer tools",
+    "type": "webkernel-devtool",
+    "license": "proprietary",
+    "version": "0.12.0",
+    "autoload": {
+        "psr-4": {
+            "Webkernel\\DevTools\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Webkernel\\DevTools\\Tests\\": "tests/"
+        }
+    },
+    "require": {
+        "php": ">=8.5",
+        "webkernel/codebase": "^0.12.0",
+        "webkernel/lifecycle": "^0.12.0"
+    },
+    "extra": {
+        "webkernel": {
+            "package": {
+                "provider": "Webkernel\\DevTools\\DevToolsProvider",
+                "post-autoload-dump": "Webkernel\\DevTools\\IdeHelper"
+            },
+            "x-monorepo": {
+                "package-repos": [
+                    "git@github.com:webkernelphp/devtools.git"
+                ]
+            }
+        }
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}

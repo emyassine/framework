@@ -1,0 +1,76 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "webkernel:lifecycle:schema.v1",
+  "title": "Webkernel Package Schema v1",
+  "description": "Schema for extra.webkernel in composer.json — Webkernel lifecycle plugin.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "$schema": { "type": "string" },
+    "provider": {
+      "type": "string",
+      "description": "FQCN of the Webkernel ServiceProvider for this package."
+    },
+    "module": {
+      "type": "string",
+      "description": "Parent module reference (vendor/name) — required for feature package types.",
+      "pattern": "^[a-z0-9_-]+/[a-z0-9_-]+$"
+    },
+    "lifecycle": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "checks": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["check", "on-fail"],
+            "additionalProperties": false,
+            "properties": {
+              "check": { "type": "string", "description": "PHP boolean expression. Truthy = failed." },
+              "on-fail": {
+                "type": "object",
+                "required": ["type", "message"],
+                "additionalProperties": false,
+                "properties": {
+                  "type": { "type": "string", "enum": ["info", "warning", "danger"] },
+                  "message": { "type": "string" }
+                }
+              },
+              "fix": { "type": "string" }
+            }
+          }
+        },
+        "events": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "pre-install-cmd":           { "type": "string" },
+            "post-install-cmd":          { "type": "string" },
+            "pre-update-cmd":            { "type": "string" },
+            "post-update-cmd":           { "type": "string" },
+            "pre-autoload-dump":         { "type": "string" },
+            "post-autoload-dump":        { "type": "string" },
+            "post-root-package-install": { "type": "string" },
+            "post-create-project-cmd":   { "type": "string" }
+          }
+        },
+        "actions": {
+          "type": "array",
+          "description": "Ordered FQCNs implementing LifecycleActionContract. One action = one responsibility.",
+          "items": { "type": "string" }
+        }
+      }
+    },
+    "x-monorepo": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "package-repos": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,7 @@
+# Generated files — recreated automatically on composer dump-autoload
+generated/*.php
+generated/*.js
+generated/*.json
+
+# Keep directory marker in git
+!generated/.gitkeep
